@@ -54,7 +54,7 @@ EXCHANGES = {
     "MC": {"flag":"🇪🇸","label":"Spain","market":"IBEX 35 — BME Madrid","exch_url":"https://www.bolsasymercados.es/esp/empresas/cotizaciones/acciones/Ficha/{ticker}"},
     "BR": {"flag":"🇧🇪","label":"Belgium","market":"BEL 20 — Euronext Brussels","exch_url":"https://live.euronext.com/en/product/equities/{isin}-XBRU"},
     "LS": {"flag":"🇵🇹","label":"Portugal","market":"PSI — Euronext Lisbon","exch_url":"https://live.euronext.com/en/product/equities/{isin}-XLIS"},
-    "VIE": {"flag":"🇦🇹","label":"Austria","market":"ATX — Wiener Börse","exch_url":"https://www.wienerborse.at/en/stock/{isin}/"},
+    "VI": {"flag":"🇦🇹","label":"Austria","market":"ATX — Wiener Börse","exch_url":"https://www.wienerborse.at/en/stock/{isin}/"},
     "HE": {"flag":"🇫🇮","label":"Finland","market":"OMX Helsinki — Nasdaq Nordic","exch_url":"https://www.nasdaqomxnordic.com/shares/microsite?Instrument={isin}"},
     "IR": {"flag":"🇮🇪","label":"Ireland","market":"ISEQ — Euronext Dublin","exch_url":"https://live.euronext.com/en/product/equities/{isin}-XDUB"},
     "AT": {"flag":"🇬🇷","label":"Greece","market":"ASE — Athens Stock Exchange","exch_url":"https://www.athexgroup.gr/en/web/guest/company-overview?securityCode={ticker}"},
@@ -70,7 +70,7 @@ INDEX_TICKERS = {
     "IBEX 35": "IBEX.MC",
     "BEL 20": "BFX.BR",
     "PSI": "PSI20.INDX",
-    "ATX": "ATX.VIE",
+    "ATX": "ATX.VI",
     "OMX Helsinki 25": "OMXH25.HE",
     "ISEQ": "ISEQ.IR",
     "ASE": "ATG.AT",
@@ -354,7 +354,7 @@ PAGE_TO_EXCHANGE = {
     "🇪🇸 BME Madrid": "MC",
     "🇧🇪 Euronext Brussels": "BR",
     "🇵🇹 Euronext Lisbon": "LS",
-    "🇦🇹 Wiener Börse": "VIE",
+    "🇦🇹 Wiener Börse": "VI",
     "🇫🇮 Nasdaq Helsinki": "HE",
     "🇮🇪 Euronext Dublin": "IR",
     "🇬🇷 Athens SE": "AT",
@@ -785,7 +785,7 @@ elif page == "ℹ️ Info & Dati":
         **Università:** Ca' Foscari, Venezia — Economia
         **Esperienza:**
         - JP Morgan London — Asst. Portfolio Manager (4 anni)
-        - Zenit SGR — Gestore azionario fondo pensione (5 anni)
+        - Zenith SGR — Gestore azionario fondo pensione (5 anni)
         **Sede:** Via Lorenzo Fava 24, 37139 Verona
         **Tel/WhatsApp:** +39 351 837 3385
         **Email:** andreameschini19@gmail.com
