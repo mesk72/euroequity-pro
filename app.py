@@ -480,8 +480,16 @@ if page == "🏠 Dashboard":
             with idx_cols[i % 6]:
                 q = get_index_quote(ticker)
                 if q:
-                    chg = q.get("change_p", 0)
-                    px_val = q.get("close") or q.get("adjusted_close", 0)
+                    chg = q.get("change_p", 0) or 0
+                    try:
+                        chg = float(chg)
+                    except (TypeError, ValueError):
+                        chg = 0.0
+                    px_val = q.get("close") or q.get("adjusted_close") or 0
+                    try:
+                        px_val = float(px_val)
+                    except (TypeError, ValueError):
+                        px_val = 0.0
                     color = "#22d48a" if chg >= 0 else "#e84560"
                     sign = "+" if chg >= 0 else ""
                     ts = q.get("timestamp", "")
@@ -777,7 +785,7 @@ elif page == "ℹ️ Info & Dati":
         **Università:** Ca' Foscari, Venezia — Economia
         **Esperienza:**
         - JP Morgan London — Asst. Portfolio Manager (4 anni)
-        - Zenit SGR — Gestore azionario fondo pensione (5 anni)
+        - Zenith SGR — Gestore azionario fondo pensione (5 anni)
         **Sede:** Via Lorenzo Fava 24, 37139 Verona
         **Tel/WhatsApp:** +39 351 837 3385
         **Email:** andreameschini19@gmail.com
