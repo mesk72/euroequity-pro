@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 # EODHD API Key — sostituire con chiave a pagamento per uso commerciale
-EODHD_KEY = "6a080c18d196d5.18357577"
+EODHD_KEY = "6a082147c38bf8.66517579"
 EODHD_BASE = "https://eodhd.com/api"
 
 # ─── CSS ──────────────────────────────────────────────────────────
@@ -785,7 +785,7 @@ elif page == "ℹ️ Info & Dati":
         **Università:** Ca' Foscari, Venezia — Economia
         **Esperienza:**
         - JP Morgan London — Asst. Portfolio Manager (4 anni)
-        - Zenith SGR — Gestore azionario fondo pensione (5 anni)
+        - Zenit SGR — Gestore azionario fondo pensione (5 anni)
         **Sede:** Via Lorenzo Fava 24, 37139 Verona
         **Tel/WhatsApp:** +39 351 837 3385
         **Email:** andreameschini19@gmail.com
