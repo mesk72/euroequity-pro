@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 # EODHD API Key — sostituire con chiave a pagamento per uso commerciale
-EODHD_KEY = "6a082147c38bf8.66517579"
+EODHD_KEY = "6a0826ce2e8a52.04646471"
 EODHD_BASE = "https://eodhd.com/api"
 
 # ─── CSS ──────────────────────────────────────────────────────────
