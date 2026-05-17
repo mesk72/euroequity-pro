@@ -16,7 +16,6 @@ export const EXCHANGES: Record<string, { flag: string; label: string; market: st
 // ── INDICES ──────────────────────────────────────────────────────
 export const INDICES = [
   { name: 'Euro Stoxx 50',      ticker: 'STOXX50E.INDX' },
-  { name: 'FTSE MIB',           ticker: 'FTSEMIB.INDX'  },
   { name: 'FTSE MIB All Share', ticker: 'ITLMS.INDX'    },
   { name: 'DAX',                ticker: 'GDAXI.INDX'    },
   { name: 'CAC 40',             ticker: 'FCHI.INDX'     },
