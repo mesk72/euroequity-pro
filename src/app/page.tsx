@@ -16,6 +16,9 @@ import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
 
+// ── DEMO MODE — set false when Leeway API is active ─────────────
+const USE_DEMO = true  // Cambia in false quando Leeway è attivo
+
 // ── HELPERS ───────────────────────────────────────────────────────
 const fp = (v: number | null | undefined, d = 1): string => {
   if (v == null || isNaN(v)) return '—'
@@ -44,16 +47,38 @@ type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal'
 
 // ── API CALLS (client-side → Next.js API routes with shared cache) ──
 async function apiExchange(code: string): Promise<Stock[]> {
-  const codes = code === 'EZ' ? Object.keys(EXCHANGES) : [code]
-  const results = await Promise.all(
-    codes.map(c =>
-      fetch(`/api/exchange?code=${c}`)
-        .then(r => r.ok ? r.json() : { stocks: [] })
-        .then(d => d.stocks || [])
-        .catch(() => [])
+  // Demo mode — mostra dati MSCI EMU hardcoded mentre Leeway non è attivo
+  if (USE_DEMO) {
+    const scored = computeScores([...DEMO_STOCKS])
+    if (code === 'EZ') return scored
+    if (code === 'MIL') return scored.filter(s => s.exchange === 'MIL')
+    return scored.filter(s => s.exchange === code)
+  }
+  try {
+    const codes = code === 'EZ' ? Object.keys(EXCHANGES) : [code]
+    const results = await Promise.all(
+      codes.map(c =>
+        fetch(`/api/exchange?code=${c}`)
+          .then(r => r.ok ? r.json() : { stocks: [] })
+          .then(d => (d.stocks || []) as Stock[])
+          .catch(() => [] as Stock[])
+      )
     )
-  )
-  return results.flat()
+    const live = results.flat()
+    // Fallback a dati demo se Leeway non è attivo
+    const hasData = live.some(s => s.price != null && s.price > 0)
+    if (!hasData) {
+      const scored = computeScores([...DEMO_STOCKS])
+      if (code === 'EZ') return scored
+      if (code === 'MIL') return scored.filter(s => s.exchange === 'MIL')
+      return scored.filter(s => s.exchange === code)
+    }
+    return live
+  } catch {
+    const scored = computeScores([...DEMO_STOCKS])
+    if (code === 'EZ') return scored
+    return scored.filter(s => s.exchange === code)
+  }
 }
 
 async function apiEnrich(stocks: Stock[]): Promise<Stock[]> {
