@@ -26,7 +26,7 @@ function computeSectors(stocks: Stock[]): SectorData[] {
   }
 
   const result: SectorData[] = []
-  for (const [sector, ss] of map) {
+  for (const [sector, ss] of Array.from(map.entries())) {
     const valid = ss.filter(s => s.mktCap && s.change1d != null)
     const totalMkt = valid.reduce((a, s) => a + (s.mktCap || 0), 0)
     const mcwReturn = totalMkt > 0
