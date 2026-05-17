@@ -341,11 +341,11 @@ def get_dashboard_universe():
     all_p["_vol"] = pd.to_numeric(all_p["Volume"],errors="coerce")
     quick=[]
     for code in EXCHANGES:
-        sub = all_p[all_p["Exchange"]==code].nlargest(20,"_vol",keep="all")
+        sub = all_p[all_p["Exchange"]==code].nlargest(5,"_vol",keep="all")
         quick.extend(sub.index.tolist())
     all_p = enrich_rows(all_p, quick, show_progress=False)
     all_p["_mc"] = pd.to_numeric(all_p["Market Cap €B"],errors="coerce")
-    top200 = all_p.nlargest(200,"_mc",keep="all")
+    top200 = all_p.nlargest(50,"_mc",keep="all")  # top 50 for dashboard speed
     need   = top200[top200["P/E Trail."].isna()].index.tolist()
     if need: all_p = enrich_rows(all_p, need, show_progress=False)
     return all_p[all_p.index.isin(top200.index)].copy()
