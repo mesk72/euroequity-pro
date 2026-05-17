@@ -709,6 +709,11 @@ if page=="🏠 Dashboard":
             st.write(f"Total: {len(all_df)} stocks")
             st.write(f"1D % not null: {all_df['1D %'].notna().sum()}")
             st.write(f"Sample 1D % values: {all_df['1D %'].dropna().head(5).tolist()}")
+            # Mostra i campi raw del bulk XETRA
+            raw_xetra = get_bulk_eod("XETRA")
+            if not raw_xetra.empty:
+                st.write(f"Bulk XETRA columns: {list(raw_xetra.columns)}")
+                st.write(f"Sample row: {raw_xetra.iloc[0].to_dict()}")
 
     u200 = all_df.copy() if not all_df.empty else pd.DataFrame()
     if not u200.empty:
