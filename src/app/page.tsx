@@ -1157,7 +1157,7 @@ function Portfolio() {
           ['Total Gain %',    fp(totalGainPct),    totalGainPct],
           ['Daily Change €',  `€${totalDaily>=0?'+':''}${totalDaily.toLocaleString('de-DE',{maximumFractionDigits:0})}`, totalDaily],
           ['Daily Change %',  fp(ewChg1d),         ewChg1d],
-        ].map(([label,value,colorVal]:[string,string,number|null]) => (
+        ] as [string,string,number|null][]).map(([label,value,colorVal]) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
             <div className="metric-value" style={{
@@ -1310,7 +1310,7 @@ function Portfolio() {
                 ['ROE %',        fp(wMetrics.roe,1),      wMetrics.roe],
                 ['Div Yield %',  fp(wMetrics.divYield,2), wMetrics.divYield],
                 ['Beta',         fv(wMetrics.beta,2),     null],
-              ].map(([label,value,colorVal]:[string,string,number|null]) => (
+              ] as [string,string,number|null][]).map(([label,value,colorVal]) => (
                 <div key={label} className="metric-card">
                   <div className="metric-label">{label}</div>
                   <div className="metric-value" style={{ fontSize:'0.95rem',
@@ -1335,7 +1335,7 @@ function Portfolio() {
                 ['Mom 1 Month',    fp(wMetrics.mom1m,1),      wMetrics.mom1m],
                 ['Mom 6 Months',   fp(wMetrics.mom6m,1),      wMetrics.mom6m],
                 ['Mom 12 Months',  fp(wMetrics.mom12m,1),     wMetrics.mom12m],
-              ].map(([label,value,colorVal]:[string,string,number|null]) => (
+              ] as [string,string,number|null][]).map(([label,value,colorVal]) => (
                 <div key={label} className="metric-card">
                   <div className="metric-label">{label}</div>
                   <div className="metric-value" style={{ fontSize:'0.95rem',
@@ -1355,7 +1355,7 @@ function Portfolio() {
               {[
                 ['Weighted Value Score',  wMetrics.valueScore],
                 ['Weighted Growth Score', wMetrics.growthScore],
-              ].map(([label,val]:[string,number|null]) => (
+              ] as [string,number|null][]).map(([label,val]) => (
                 <div key={label} className="metric-card" style={{ display:'flex', alignItems:'center', gap:16 }}>
                   <div style={{ flex:1 }}>
                     <div className="metric-label">{label}</div>
