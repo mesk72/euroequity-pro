@@ -691,15 +691,30 @@ if page=="🏠 Dashboard":
     st.markdown("---")
 
     with st.spinner("Loading all Eurozone prices…"):
-        all_df=_load_all_prices()
+        all_df = _load_all_prices()
 
-    # Dashboard usa solo prezzi bulk — istantaneo
+    # Debug: mostra quanti titoli caricati per exchange
+    if all_df.empty:
+        st.error("No data loaded from EODHD. Check API key and connection.")
+    else:
+        # Diagnostica temporanea
+        debug_info = []
+        for code in EXCHANGES:
+            n = len(all_df[all_df["Exchange"]==code])
+            chg_ok = all_df[all_df["Exchange"]==code]["1D %"].notna().sum()
+            debug_info.append(f"{EXCHANGES[code]['flag']} {code}: {n} stocks, {chg_ok} with 1D%")
+        with st.expander("🔍 Debug data (remove before launch)", expanded=False):
+            for d in debug_info:
+                st.write(d)
+            st.write(f"Total: {len(all_df)} stocks")
+            st.write(f"1D % not null: {all_df['1D %'].notna().sum()}")
+            st.write(f"Sample 1D % values: {all_df['1D %'].dropna().head(5).tolist()}")
+
     u200 = all_df.copy() if not all_df.empty else pd.DataFrame()
     if not u200.empty:
         u200["_chg"] = pd.to_numeric(u200["1D %"],   errors="coerce")
         u200["_vol"] = pd.to_numeric(u200["Volume"], errors="coerce")
         u200["_px"]  = pd.to_numeric(u200["Price"],  errors="coerce")
-        # Top 200 by volume as proxy for market cap (no API needed)
         u200 = u200.nlargest(200, "_vol", keep="all")
 
     if not all_df.empty and not u200.empty:
