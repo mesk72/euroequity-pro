@@ -673,8 +673,13 @@ function Dashboard({ onSectorClick }: { onSectorClick: (s: string) => void }) {
     }, 400)
   }, [search])
 
+  // Top 200 per market cap — gainers/losers su titoli più grandi per capitalizzazione
   const u200 = allStocks
-    .sort((a, b) => (b.volume || 0) - (a.volume || 0))
+    .sort((a, b) => {
+      const am = a.mktCap || 0, bm = b.mktCap || 0
+      if (am > 0 && bm > 0) return bm - am
+      return (b.volume || 0) - (a.volume || 0)
+    })
     .slice(0, 200)
 
   const valid    = u200.filter(s => s.change1d != null)
