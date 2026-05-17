@@ -535,7 +535,8 @@ function Screener({ initExchange = 'MIL', initSector = 'All' }: {
 
   async function runEnrich() {
     setEnriching(true); setProgress(0)
-    const BATCH = 10 let updated = [...rawStocks]
+    const BATCH = 10
+    let updated = [...rawStocks]
     const idxMap = new Map(candidates.map((s, i) => [`${s.ticker}.${s.exchange}`, i]))
 
     for (let i = 0; i < candidates.length; i += BATCH) {
@@ -805,7 +806,7 @@ function Dashboard({ onSectorClick }: { onSectorClick: (s: string) => void }) {
                       <td className={`font-mono font-600 ${clr(s.change1d)}`}>{fp(s.change1d)}</td>
                       <td className="text-sub">{fmtVol(s.volume)}</td>
                     </tr>
-                  ))}
+              ))}
                 </tbody>
               </table>
             </div>
@@ -1072,7 +1073,8 @@ function Portfolio() {
         </div>
         <div style={{ position:'relative', marginBottom: searchRes.length > 0 ? 0 : 12 }}>
           <Search size={14} style={{ position:'absolute', left:10, top:'50%',
-            transform:'translateY(-50%)', color:'var(--text4)', pointerEvents:'none' }} /> <input value={searchQ} onChange={e=>{setSearchQ(e.target.value);setSelectedStock(null)}}
+            transform:'translateY(-50%)', color:'var(--text4)', pointerEvents:'none' }} />
+          <input value={searchQ} onChange={e=>{setSearchQ(e.target.value);setSelectedStock(null)}}
             placeholder="Search by ticker or company name (e.g. ENI, ASML, Intesa...)"
             className="input-field" style={{ paddingLeft:32, fontSize:13 }} />
           {searchQ && (
