@@ -837,12 +837,30 @@ function Portfolio() {
   const [active,     setActive]     = useState('Portfolio 1')
   const [newName,    setNewName]    = useState('')
 
+  // Stock search state
+  const [searchQ,      setSearchQ]      = useState('')
+  const [searchRes,    setSearchRes]    = useState<Stock[]>([])
+  const [selectedStock,setSelectedStock]= useState<Stock | null>(null)
+  const [addQty,       setAddQty]       = useState('')
+  const [addPrice,     setAddPrice]     = useState('')
+
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
     const defaults = { 'Portfolio 1': [], 'Portfolio 2': [], 'Portfolio 3': [] }
-    const merged = { ...defaults, ...stored }
-    setPortfolios(merged)
+    setPortfolios({ ...defaults, ...stored })
   }, [])
+
+  // Search in demo stocks (and live stocks when available)
+  useEffect(() => {
+    if (searchQ.length < 2) { setSearchRes([]); return }
+    const q = searchQ.toLowerCase()
+    const scored = computeScores([...DEMO_STOCKS])
+    const results = scored.filter(s =>
+      s.ticker.toLowerCase().includes(q) ||
+      (s.company || '').toLowerCase().includes(q)
+    ).slice(0, 8)
+    setSearchRes(results)
+  }, [searchQ])
 
   const save = (pfs: typeof portfolios) => {
     setPortfolios(pfs)
@@ -864,68 +882,202 @@ function Portfolio() {
     save(updated)
   }
 
+  function selectStock(s: Stock) {
+    setSelectedStock(s)
+    setAddPrice(s.price?.toFixed(2) || '')
+    setSearchQ(s.ticker + ' — ' + s.company)
+    setSearchRes([])
+  }
+
+  function addToPortfolio() {
+    if (!selectedStock || !addQty || !addPrice) return
+    const pfs = { ...portfolios }
+    if (!pfs[active]) pfs[active] = []
+    if (pfs[active].length >= 50) { toast.error('Max 50 positions per portfolio'); return }
+    pfs[active].push({
+      ticker:    selectedStock.ticker,
+      exchange:  selectedStock.exchange,
+      company:   selectedStock.company,
+      flag:      selectedStock.flag,
+      sector:    selectedStock.sector,
+      qty:       parseFloat(addQty),
+      buy_price: parseFloat(addPrice),
+      added_at:  new Date().toISOString(),
+    })
+    save(pfs)
+    toast.success(`${selectedStock.ticker} added to ${active}`)
+    setSelectedStock(null)
+    setSearchQ('')
+    setAddQty('')
+    setAddPrice('')
+  }
+
   return (
-    <div className="space-y-4 fade-in">
+    <div style={{ display:'flex', flexDirection:'column', gap:16 }} className="fade-in">
+      {/* Header */}
       <div className="section-hdr">💼 Portfolio Management</div>
-      <div className="bg-surface border border-border rounded p-3 text-xs text-muted">
-        ⚠️ Beta: portfolios are stored in your browser (localStorage). Persistent cloud sync via Supabase coming in the full version.
+      <div style={{ background:'rgba(249,115,22,0.08)', border:'1px solid rgba(249,115,22,0.2)', borderRadius:3, padding:'8px 12px', fontSize:11, color:'var(--text3)' }}>
+        ⚠️ Beta: portfolios are stored in your browser. Cloud sync via Supabase coming in full version.
       </div>
 
-      {/* Tabs + new portfolio */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Portfolio tabs */}
+      <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:8 }}>
         {Object.keys(portfolios).map(name => (
           <button key={name} onClick={() => setActive(name)}
-            className={`px-3 py-1.5 rounded text-xs font-600 border transition-colors ${
-              active === name ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold'
-            }`}>
+            className={`tab-btn ${active === name ? 'active' : ''}`}>
             {name} ({(portfolios[name] || []).length})
           </button>
         ))}
-        <div className="flex gap-1 ml-auto">
-          <input
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
-            placeholder="New portfolio name"
-            className="input-field w-40 text-xs"
-            onKeyDown={e => e.key === 'Enter' && createPortfolio()}
-          />
-          <button onClick={createPortfolio} className="btn-ghost text-xs px-2">+ Create</button>
+        <div style={{ display:'flex', gap:6, marginLeft:'auto' }}>
+          <input value={newName} onChange={e => setNewName(e.target.value)}
+            placeholder="New portfolio name" className="input-field"
+            style={{ width:160 }}
+            onKeyDown={e => e.key === 'Enter' && createPortfolio()} />
+          <button onClick={createPortfolio} className="btn-ghost">+ Create</button>
         </div>
       </div>
 
+      {/* ── STOCK SEARCH ── */}
+      <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, padding:16 }}>
+        <div style={{ fontSize:11, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+          letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--orange)', marginBottom:12 }}>
+          + Add Stock to {active}
+        </div>
+
+        {/* Search box */}
+        <div style={{ position:'relative', marginBottom:12 }}>
+          <Search size={14} style={{ position:'absolute', left:10, top:'50%',
+            transform:'translateY(-50%)', color:'var(--text4)', pointerEvents:'none' }} />
+          <input
+            value={searchQ}
+            onChange={e => { setSearchQ(e.target.value); setSelectedStock(null) }}
+            placeholder="Search ticker or company name (e.g. ENI, ASML, SAP...)"
+            className="input-field"
+            style={{ paddingLeft:32, fontSize:13 }}
+          />
+          {searchQ && (
+            <button onClick={() => { setSearchQ(''); setSearchRes([]); setSelectedStock(null) }}
+              style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)',
+                color:'var(--text4)', background:'none', border:'none', cursor:'pointer' }}>
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Search results dropdown */}
+        {searchRes.length > 0 && (
+          <div style={{ border:'1px solid var(--border2)', borderRadius:3, overflow:'hidden', marginBottom:12 }}>
+            {searchRes.map((s, i) => (
+              <div key={i} onClick={() => selectStock(s)}
+                style={{ padding:'9px 12px', borderBottom: i < searchRes.length-1 ? '1px solid var(--border)' : 'none',
+                  display:'flex', alignItems:'center', gap:12, cursor:'pointer',
+                  background: selectedStock?.ticker === s.ticker ? 'rgba(249,115,22,0.08)' : 'var(--surface2)',
+                  transition:'background 0.1s' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(249,115,22,0.06)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background =
+                  selectedStock?.ticker === s.ticker ? 'rgba(249,115,22,0.08)' : 'var(--surface2)'}>
+                <span style={{ fontSize:16 }}>{s.flag}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', fontWeight:700,
+                  color:'var(--orange)', fontSize:13, width:70 }}>{s.ticker}</span>
+                <span style={{ color:'var(--text2)', fontSize:12, flex:1 }}>{s.company}</span>
+                <span style={{ color:'var(--text3)', fontSize:11 }}>{s.exchange}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', color:'var(--text)', fontSize:12 }}>
+                  €{s.price?.toFixed(2) || '—'}
+                </span>
+                {selectedStock?.ticker === s.ticker && (
+                  <span style={{ color:'var(--orange)', fontSize:11, fontWeight:700 }}>✓</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add form — shown when stock selected */}
+        {selectedStock && (
+          <div style={{ display:'flex', alignItems:'flex-end', gap:10, flexWrap:'wrap',
+            background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:3, padding:12 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, flex:1, minWidth:200 }}>
+              <span style={{ fontSize:18 }}>{selectedStock.flag}</span>
+              <div>
+                <div style={{ fontFamily:'IBM Plex Mono', fontWeight:700,
+                  color:'var(--orange)', fontSize:14 }}>{selectedStock.ticker}</div>
+                <div style={{ fontSize:11, color:'var(--text3)' }}>{selectedStock.company}</div>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize:10, color:'var(--text3)', marginBottom:4,
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em' }}>
+                Quantity
+              </div>
+              <input type="number" placeholder="e.g. 100" value={addQty}
+                onChange={e => setAddQty(e.target.value)}
+                className="input-field" style={{ width:100 }} />
+            </div>
+            <div>
+              <div style={{ fontSize:10, color:'var(--text3)', marginBottom:4,
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em' }}>
+                Buy Price €
+              </div>
+              <input type="number" placeholder="Price" value={addPrice}
+                onChange={e => setAddPrice(e.target.value)}
+                className="input-field" style={{ width:110 }} />
+            </div>
+            <button onClick={addToPortfolio} className="btn-primary">
+              ➕ Add to {active}
+            </button>
+            <button onClick={() => { setSelectedStock(null); setSearchQ(''); setAddQty(''); setAddPrice('') }}
+              style={{ color:'var(--text4)', background:'none', border:'none', cursor:'pointer' }}>
+              <X size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="metric-card"><div className="metric-label">Positions</div><div className="metric-value">{positions.length}</div></div>
-        <div className="metric-card"><div className="metric-label">Total Cost</div><div className="metric-value">€{totalCost.toLocaleString('de-DE', { maximumFractionDigits: 0 })}</div></div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
+        <div className="metric-card"><div className="metric-label">Positions</div>
+          <div className="metric-value">{positions.length}</div></div>
+        <div className="metric-card"><div className="metric-label">Total Cost</div>
+          <div className="metric-value">€{totalCost.toLocaleString('de-DE',{maximumFractionDigits:0})}</div></div>
       </div>
 
       {/* Positions table */}
       {positions.length === 0 ? (
-        <div className="text-center py-16 text-muted text-sm">
-          <Briefcase size={32} className="mx-auto mb-3 opacity-30" />
-          <p>No positions. Add stocks from the Screener.</p>
+        <div style={{ padding:48, textAlign:'center', color:'var(--text4)',
+          border:'1px dashed var(--border)', borderRadius:4 }}>
+          <Briefcase size={28} style={{ margin:'0 auto 10px', opacity:0.3 }} />
+          <p style={{ fontSize:13 }}>No positions yet. Search for a stock above or add from the Screener.</p>
         </div>
       ) : (
-        <div className="bg-surface border border-border rounded-lg overflow-hidden">
+        <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, overflow:'hidden' }}>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Ticker</th><th>Company</th><th>Qty</th>
-                <th>Buy Price €</th><th>Cost Value €</th><th>Added</th><th></th>
+                <th>Ticker</th><th>Company</th><th>Sector</th>
+                <th>Qty</th><th>Buy Price €</th><th>Cost Value €</th>
+                <th>Added</th><th></th>
               </tr>
             </thead>
             <tbody>
               {positions.map((p: any, i: number) => (
                 <tr key={i}>
-                  <td className="font-700 text-text">{p.flag || ''} {p.ticker}.{p.exchange}</td>
-                  <td className="text-sub">{p.company}</td>
-                  <td className="font-mono">{p.qty}</td>
-                  <td className="font-mono">€{p.buy_price?.toFixed(2)}</td>
-                  <td className="font-mono">€{(p.qty * p.buy_price).toFixed(0)}</td>
-                  <td className="text-muted text-[10px]">{p.added_at?.slice(0, 10)}</td>
+                  <td>
+                    <span style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700, color:'var(--orange)' }}>
+                      {p.flag || ''} {p.ticker}
+                    </span>
+                  </td>
+                  <td><span style={{ color:'var(--text2)', fontSize:12 }}>{p.company}</span></td>
+                  <td><span style={{ color:'var(--text3)', fontSize:11 }}>{p.sector || '—'}</span></td>
+                  <td><span style={{ fontFamily:'IBM Plex Mono' }}>{p.qty}</span></td>
+                  <td><span style={{ fontFamily:'IBM Plex Mono' }}>€{(+p.buy_price).toFixed(2)}</span></td>
+                  <td><span style={{ fontFamily:'IBM Plex Mono' }}>€{(p.qty * p.buy_price).toLocaleString('de-DE',{maximumFractionDigits:0})}</span></td>
+                  <td><span style={{ color:'var(--text4)', fontSize:11 }}>{p.added_at?.slice(0,10)}</span></td>
                   <td>
                     <button onClick={() => removePosition(i)}
-                      className="text-red hover:opacity-80 text-xs">Remove</button>
+                      style={{ color:'var(--red)', fontSize:12, cursor:'pointer',
+                        background:'none', border:'none', padding:'2px 6px' }}>
+                      Remove
+                    </button>
                   </td>
                 </tr>
               ))}
