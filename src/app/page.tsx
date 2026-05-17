@@ -538,6 +538,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All' }: {
     const BATCH = 10
     let updated = [...rawStocks]
     const idxMap = new Map(candidates.map((s, i) => [`${s.ticker}.${s.exchange}`, i]))
+
     for (let i = 0; i < candidates.length; i += BATCH) {
       const batch = candidates.slice(i, i + BATCH)
       const enriched = await apiEnrich(batch)
@@ -831,6 +832,74 @@ function Dashboard({ onSectorClick }: { onSectorClick: (s: string) => void }) {
 }
 
 // ── PORTFOLIO ─────────────────────────────────────────────────────
+
+// ── PIE CHART COMPONENT ─────────────────────────────────────────
+function PieChart({ data, title }: { data: Record<string,number>; title: string }) {
+  const entries = Object.entries(data).sort((a,b) => b[1]-a[1])
+  const total   = entries.reduce((a,[,v])=>a+v,0)
+  let cumAngle  = -90 // start from top
+
+  return (
+    <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, padding:16 }}>
+      <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+        letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text3)', marginBottom:12 }}>
+        {title}
+      </div>
+      <div style={{ display:'flex', gap:20, alignItems:'center', flexWrap:'wrap' }}>
+        {/* SVG Pie */}
+        <svg width="140" height="140" viewBox="0 0 140 140" style={{ flexShrink:0 }}>
+          {entries.map(([label, val], i) => {
+            const pct   = val / total
+            const angle = pct * 360
+            const start = cumAngle * Math.PI / 180
+            cumAngle   += angle
+            const end   = cumAngle * Math.PI / 180
+            const r     = 60, cx = 70, cy = 70
+            const x1 = cx + r * Math.cos(start)
+            const y1 = cy + r * Math.sin(start)
+            const x2 = cx + r * Math.cos(end)
+            const y2 = cy + r * Math.sin(end)
+            const large = angle > 180 ? 1 : 0
+            const color = PIE_COLORS[i % PIE_COLORS.length]
+            return (
+              <path key={label}
+                d={`M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`}
+                fill={color} stroke="var(--bg)" strokeWidth="1.5">
+                <title>{label}: {val.toFixed(1)}%</title>
+              </path>
+            )
+          })}
+          {/* Center hole */}
+          <circle cx="70" cy="70" r="32" fill="var(--surface)" />
+          <text x="70" y="73" textAnchor="middle" fill="var(--text)"
+            style={{ fontSize:11, fontFamily:'IBM Plex Mono', fontWeight:600 }}>
+            {entries.length}
+          </text>
+          <text x="70" y="84" textAnchor="middle" fill="var(--text3)"
+            style={{ fontSize:8, fontFamily:'IBM Plex Sans Condensed' }}>
+            {entries.length === 1 ? 'sector' : 'sectors'}
+          </text>
+        </svg>
+        {/* Legend */}
+        <div style={{ display:'flex', flexDirection:'column', gap:5, flex:1, minWidth:120 }}>
+          {entries.map(([label, val], i) => (
+            <div key={label} style={{ display:'flex', alignItems:'center', gap:7 }}>
+              <div style={{ width:10, height:10, borderRadius:2, flexShrink:0,
+                background: PIE_COLORS[i % PIE_COLORS.length] }} />
+              <span style={{ fontSize:11, color:'var(--text2)', flex:1, fontFamily:'IBM Plex Sans' }}>
+                {label}
+              </span>
+              <span style={{ fontSize:11, fontFamily:'IBM Plex Mono', color:'var(--orange)', fontWeight:600 }}>
+                {val.toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Portfolio() {
   const [portfolios,    setPortfolios]    = useState<Record<string, any[]>>({})
   const [active,        setActive]        = useState('Portfolio 1')
@@ -973,71 +1042,6 @@ function Portfolio() {
   const PIE_COLORS = ['#f97316','#3b82f6','#22c55e','#eab308','#8b5cf6',
     '#14b8a6','#ef4444','#0ea5e9','#84cc16','#f59e0b','#6366f1','#ec4899']
 
-  function PieChart({ data, title }: { data: Record<string,number>; title: string }) {
-    const entries = Object.entries(data).sort((a,b) => b[1]-a[1])
-    const total   = entries.reduce((a,[,v])=>a+v,0)
-    let cumAngle  = -90 // start from top
-
-    return (
-      <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, padding:16 }}>
-        <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-          letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text3)', marginBottom:12 }}>
-          {title}
-        </div>
-        <div style={{ display:'flex', gap:20, alignItems:'center', flexWrap:'wrap' }}>
-          {/* SVG Pie */}
-          <svg width="140" height="140" viewBox="0 0 140 140" style={{ flexShrink:0 }}>
-            {entries.map(([label, val], i) => {
-              const pct   = val / total
-              const angle = pct * 360
-              const start = cumAngle * Math.PI / 180
-              cumAngle   += angle
-              const end   = cumAngle * Math.PI / 180
-              const r     = 60, cx = 70, cy = 70
-              const x1 = cx + r * Math.cos(start)
-              const y1 = cy + r * Math.sin(start)
-              const x2 = cx + r * Math.cos(end)
-              const y2 = cy + r * Math.sin(end)
-              const large = angle > 180 ? 1 : 0
-              const color = PIE_COLORS[i % PIE_COLORS.length]
-              return (
-                <path key={label}
-                  d={`M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`}
-                  fill={color} stroke="var(--bg)" strokeWidth="1.5">
-                  <title>{label}: {val.toFixed(1)}%</title>
-                </path>
-              )
-            })}
-            {/* Center hole */}
-            <circle cx="70" cy="70" r="32" fill="var(--surface)" />
-            <text x="70" y="73" textAnchor="middle" fill="var(--text)"
-              style={{ fontSize:11, fontFamily:'IBM Plex Mono', fontWeight:600 }}>
-              {entries.length}
-            </text>
-            <text x="70" y="84" textAnchor="middle" fill="var(--text3)"
-              style={{ fontSize:8, fontFamily:'IBM Plex Sans Condensed' }}>
-              {entries.length === 1 ? 'sector' : 'sectors'}
-            </text>
-          </svg>
-          {/* Legend */}
-          <div style={{ display:'flex', flexDirection:'column', gap:5, flex:1, minWidth:120 }}>
-            {entries.map(([label, val], i) => (
-              <div key={label} style={{ display:'flex', alignItems:'center', gap:7 }}>
-                <div style={{ width:10, height:10, borderRadius:2, flexShrink:0,
-                  background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                <span style={{ fontSize:11, color:'var(--text2)', flex:1, fontFamily:'IBM Plex Sans' }}>
-                  {label}
-                </span>
-                <span style={{ fontSize:11, fontFamily:'IBM Plex Mono', color:'var(--orange)', fontWeight:600 }}>
-                  {val.toFixed(1)}%
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }} className="fade-in">
