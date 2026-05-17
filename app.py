@@ -330,25 +330,23 @@ def enrich_rows(df, indices, show_progress=True):
     return df
 
 # ── DASHBOARD UNIVERSE ────────────────────────────────────────────
-@st.cache_data(ttl=7200, show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_dashboard_universe():
+    """
+    Dashboard universe built from BULK EOD only — zero fundamental API calls.
+    Fast: 11 bulk calls (one per exchange), all cached.
+    Top movers, momentum proxy (1D%), and sector breakdown from prices only.
+    """
     frames=[]
     for code in EXCHANGES:
         df_ex = build_exchange_df(code)
         if not df_ex.empty: frames.append(df_ex)
     if not frames: return pd.DataFrame()
-    all_p = pd.concat(frames,ignore_index=True)
-    all_p["_vol"] = pd.to_numeric(all_p["Volume"],errors="coerce")
-    quick=[]
-    for code in EXCHANGES:
-        sub = all_p[all_p["Exchange"]==code].nlargest(5,"_vol",keep="all")
-        quick.extend(sub.index.tolist())
-    all_p = enrich_rows(all_p, quick, show_progress=False)
-    all_p["_mc"] = pd.to_numeric(all_p["Market Cap €B"],errors="coerce")
-    top200 = all_p.nlargest(50,"_mc",keep="all")  # top 50 for dashboard speed
-    need   = top200[top200["P/E Trail."].isna()].index.tolist()
-    if need: all_p = enrich_rows(all_p, need, show_progress=False)
-    return all_p[all_p.index.isin(top200.index)].copy()
+    all_p = pd.concat(frames, ignore_index=True)
+    all_p["_vol"] = pd.to_numeric(all_p["Volume"], errors="coerce")
+    all_p["_chg"] = pd.to_numeric(all_p["1D %"],   errors="coerce")
+    all_p["_px"]  = pd.to_numeric(all_p["Price"],   errors="coerce")
+    return all_p
 
 # ── FORMATTING ───────────────────────────────────────────────────
 def fp(v,d=1):
@@ -692,22 +690,24 @@ if page=="🏠 Dashboard":
 
     with st.spinner("Loading all Eurozone prices…"):
         all_df=load_all_prices()
-    with st.spinner("Building top-200 universe by market cap…"):
-        u200=get_dashboard_universe()
+
+    # Dashboard usa solo prezzi bulk — istantaneo
+    u200 = all_df.copy() if not all_df.empty else pd.DataFrame()
+    if not u200.empty:
+        u200["_chg"] = pd.to_numeric(u200["1D %"],   errors="coerce")
+        u200["_vol"] = pd.to_numeric(u200["Volume"], errors="coerce")
+        u200["_px"]  = pd.to_numeric(u200["Price"],  errors="coerce")
+        # Top 200 by volume as proxy for market cap (no API needed)
+        u200 = u200.nlargest(200, "_vol", keep="all")
 
     if not all_df.empty and not u200.empty:
-        u200["_mc"] =pd.to_numeric(u200["Market Cap €B"],errors="coerce")
-        u200["_m12"]=pd.to_numeric(u200["Mom 12M %"],   errors="coerce")
-        u200["_dv"] =pd.to_numeric(u200["Div Yield %"],  errors="coerce")
-        u200["_eg"] =pd.to_numeric(u200["EPS Gr %"],     errors="coerce")
-        u200["_chg"]=pd.to_numeric(u200["1D %"],         errors="coerce")
-        ew_12m=u200["_m12"].mean()
+        ew_chg = u200["_chg"].mean()  # equally weighted 1D return as live indicator
 
         kk=st.columns(4)
-        kk[0].metric("Total Stocks — All Markets",     f"{len(all_df):,}")
-        kk[1].metric("EW 12M Return (top 200 MktCap)", fp(ew_12m) if not np.isnan(ew_12m) else "N/A")
-        kk[2].metric("Stocks w/ EPS Data (top 200)",   f"{int(u200['_eg'].notna().sum())}")
-        kk[3].metric("Div Yield > 3% (top 200)",        f"{int((u200['_dv']>3).sum())}")
+        kk[0].metric("Total Stocks — All Markets",    f"{len(all_df):,}")
+        kk[1].metric("EW 1D Return (top 200 volume)", fp(ew_chg) if pd.notna(ew_chg) else "N/A")
+        kk[2].metric("Gainers today (top 200)",       f"{int((u200['_chg']>0).sum())}")
+        kk[3].metric("Losers today (top 200)",         f"{int((u200['_chg']<0).sum())}")
         st.markdown("---")
 
         if dash_search:
@@ -726,75 +726,62 @@ if page=="🏠 Dashboard":
                 st.warning(f"No stocks found for '{dash_search}'")
                 st.markdown("---")
 
-        valid_u=u200[u200["_chg"].notna()]
-        col1,col2=st.columns(2)
-        def show_mover(df_m,n,asc,color,label):
-            m=df_m.nsmallest(n,"_chg") if asc else df_m.nlargest(n,"_chg")
-            m=m[["Flag","Ticker","Company","Price","_chg","_mc"]].copy()
-            m.columns=["","Ticker","Company","Price €","1D %","Mkt Cap €B"]
-            m["Price €"]=m["Price €"].apply(lambda x:fv(x,2))
-            m["1D %"]=m["1D %"].apply(fp)
-            m["Mkt Cap €B"]=m["Mkt Cap €B"].apply(lambda x:fv(x,1))
-            st.markdown(f'<div style="font-size:9px;font-weight:700;letter-spacing:.1em;color:{color};margin-bottom:6px;">{label}</div>',unsafe_allow_html=True)
-            st.dataframe(m,use_container_width=True,hide_index=True)
-        with col1: show_mover(valid_u,10,False,"#22d48a","🟢 TOP 10 GAINERS — TOP 200 MKTCAP")
-        with col2: show_mover(valid_u,10,True, "#e84560","🔴 TOP 10 LOSERS — TOP 200 MKTCAP")
+        valid_u = u200[u200["_chg"].notna()]
+        col1, col2 = st.columns(2)
+
+        def show_mover(df_m, n, asc, color, label):
+            m = df_m.nsmallest(n,"_chg") if asc else df_m.nlargest(n,"_chg")
+            m = m[["Flag","Ticker","Company","Price","_chg","_vol"]].copy()
+            m.columns = ["","Ticker","Company","Price €","1D %","Volume"]
+            m["Price €"] = m["Price €"].apply(lambda x: fv(x,2))
+            m["1D %"]    = m["1D %"].apply(fp)
+            m["Volume"]  = m["Volume"].apply(lambda x: f"{int(x):,}" if pd.notna(x) else "—")
+            st.markdown(f'<div style="font-size:9px;font-weight:700;letter-spacing:.1em;color:{color};margin-bottom:6px;">{label}</div>', unsafe_allow_html=True)
+            st.dataframe(m, use_container_width=True, hide_index=True)
+
+        with col1: show_mover(valid_u, 10, False, "#22d48a", "🟢 TOP 10 GAINERS — ALL MARKETS")
+        with col2: show_mover(valid_u, 10, True,  "#e84560", "🔴 TOP 10 LOSERS — ALL MARKETS")
 
         st.markdown("---")
-        st.markdown('<div class="section-hdr">🚀 Top 10 — 12-Month Momentum (top 200 by MktCap)</div>',unsafe_allow_html=True)
-        mom_v=u200[u200["_m12"].notna()].nlargest(10,"_m12")
-        if not mom_v.empty:
-            mdf=mom_v[["Flag","Ticker","Company","Price","_chg","Mom 1W %","Mom 1M %","Mom 6M %","_m12","_mc"]].copy()
-            mdf.columns=["","Ticker","Company","Price €","1D %","1W","1M","6M","12M","MktCap €B"]
-            mdf["Price €"]=mdf["Price €"].apply(lambda x:fv(x,2))
-            mdf["MktCap €B"]=mdf["MktCap €B"].apply(lambda x:fv(x,1))
-            for col in ["1D %","1W","1M","6M","12M"]: mdf[col]=mdf[col].apply(fp)
-            st.dataframe(mdf,use_container_width=True,hide_index=True)
+        st.markdown('<div class="section-hdr">🚀 Top 10 — Best 1D Performance by Volume (top 200)</div>', unsafe_allow_html=True)
+        st.caption("12-month momentum available in each national screen after clicking **Load & Apply**")
+        top10m = valid_u.nlargest(10,"_chg")[["Flag","Ticker","Company","Price","_chg","_vol"]].copy()
+        top10m.columns = ["","Ticker","Company","Price €","1D %","Volume"]
+        top10m["Price €"] = top10m["Price €"].apply(lambda x: fv(x,2))
+        top10m["1D %"]    = top10m["1D %"].apply(fp)
+        top10m["Volume"]  = top10m["Volume"].apply(lambda x: f"{int(x):,}" if pd.notna(x) else "—")
+        st.dataframe(top10m, use_container_width=True, hide_index=True)
 
         st.markdown("---")
-        st.markdown('<div class="section-hdr">🏭 Sector Performance — Market Cap Weighted (top 200)</div>',unsafe_allow_html=True)
-        sec_raw=u200.dropna(subset=["Sector"]).copy()
-        sec_raw=sec_raw[sec_raw["Sector"].str.strip()!=""]
-        if not sec_raw.empty:
-            sector_rows=[]
-            for sec,grp in sec_raw.groupby("Sector"):
-                g1=grp.dropna(subset=["_mc","_chg"])
-                if g1.empty: continue
-                w=g1["_mc"]; tot=w.sum()
-                if tot==0: continue
-                wr_1d=(g1["_chg"]*w).sum()/tot
-                g2=grp.dropna(subset=["_mc","_m12"])
-                wr_12m=None
-                if not g2.empty:
-                    w2=g2["_mc"]; t2=w2.sum()
-                    if t2>0: wr_12m=(g2["_m12"]*w2).sum()/t2
-                sector_rows.append({"Sector":sec,"Stocks":len(grp),"1D % (MCW)":wr_1d,"12M % (MCW)":wr_12m,"Total Mkt Cap €B":tot})
-            if sector_rows:
-                sec_tbl=pd.DataFrame(sector_rows).sort_values("12M % (MCW)",ascending=False,na_position="last")
-                fig_sec=px.bar(sec_tbl,x="Sector",y="12M % (MCW)",color="12M % (MCW)",
-                    color_continuous_scale=["#e84560","#131720","#22d48a"],color_continuous_midpoint=0,
-                    template="plotly_dark",title="12M Return by Sector — Market Cap Weighted (top 200)")
-                fig_sec.update_layout(paper_bgcolor="#0d1017",plot_bgcolor="#07090d",
-                    font_color="#dde4f0",height=300,margin=dict(l=0,r=0,t=40,b=0),
-                    showlegend=False,coloraxis_showscale=False)
-                st.plotly_chart(fig_sec,use_container_width=True)
-                disp_sec=sec_tbl.copy()
-                disp_sec["1D % (MCW)"]=disp_sec["1D % (MCW)"].apply(fp)
-                disp_sec["12M % (MCW)"]=disp_sec["12M % (MCW)"].apply(fp)
-                disp_sec["Total Mkt Cap €B"]=disp_sec["Total Mkt Cap €B"].apply(lambda x:fv(x,1))
-                st.dataframe(disp_sec,use_container_width=True,hide_index=True)
-
-                st.markdown('<div class="section-hdr">🔍 Sector Drill-Down</div>',unsafe_allow_html=True)
-                sec_dd=st.selectbox("Select sector",sorted(sec_raw["Sector"].dropna().unique()))
-                sec_stocks=sec_raw[sec_raw["Sector"]==sec_dd].copy()
-                if not sec_stocks.empty:
-                    dd=sec_stocks[["Flag","Ticker","Company","Country","Price","_chg","_mc","_m12","_dv","P/E Fwd 12M"]].copy()
-                    dd.columns=["","Ticker","Company","Country","Price €","1D %","MktCap €B","Mom 12M","Div Yield %","P/E Fwd"]
-                    for c in ["Price €","MktCap €B","P/E Fwd"]: dd[c]=dd[c].apply(lambda x:fv(x,2 if c=="Price €" else 1))
-                    for c in ["1D %","Mom 12M","Div Yield %"]: dd[c]=dd[c].apply(fp)
-                    st.dataframe(dd,use_container_width=True,hide_index=True,height=350)
-        else:
-            st.info("Sector data will appear once the top-200 universe is enriched. Reload the dashboard.")
+        st.markdown('<div class="section-hdr">Performance by Country Today</div>', unsafe_allow_html=True)
+        country_rows = []
+        for country, grp in u200.groupby("Country"):
+            valid_grp = grp[grp["_chg"].notna()]
+            if valid_grp.empty: continue
+            ew_1d = valid_grp["_chg"].mean()
+            meta  = next((v for v in EXCHANGES.values() if v["label"]==country), {})
+            country_rows.append({
+                "":        meta.get("flag",""),
+                "Country": country,
+                "Stocks":  len(valid_grp),
+                "EW 1D %": ew_1d,
+                "Best":    valid_grp.loc[valid_grp["_chg"].idxmax(), "Ticker"] if not valid_grp.empty else "-",
+                "Worst":   valid_grp.loc[valid_grp["_chg"].idxmin(), "Ticker"] if not valid_grp.empty else "-",
+            })
+        if country_rows:
+            ctbl = pd.DataFrame(country_rows).sort_values("EW 1D %", ascending=False)
+            fig_c = px.bar(ctbl, x="Country", y="EW 1D %",
+                color="EW 1D %",
+                color_continuous_scale=["#e84560","#131720","#22d48a"],
+                color_continuous_midpoint=0, template="plotly_dark",
+                title="Today's Return by Country — Equally Weighted (top 200 by volume)")
+            fig_c.update_layout(paper_bgcolor="#0d1017", plot_bgcolor="#07090d",
+                font_color="#dde4f0", height=280, margin=dict(l=0,r=0,t=40,b=0),
+                showlegend=False, coloraxis_showscale=False)
+            st.plotly_chart(fig_c, use_container_width=True)
+            ctbl["EW 1D %"] = ctbl["EW 1D %"].apply(fp)
+            st.dataframe(ctbl, use_container_width=True, hide_index=True)
+            st.caption("💡 Sector breakdown with market cap weights available in each national screen after Load & Apply")
     else:
         st.warning("No market data. Press Refresh.")
 
