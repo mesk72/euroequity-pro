@@ -243,9 +243,13 @@ def build_exchange_df(exchange_code):
         info  = ticker_info.get(code,{})
         itype = info.get("Type","")
         if itype in ["ETF","Fund","FUND","Preferred Stock"]: continue
-        chg = row.get("change_p")
-        try:    chg = float(chg) if chg is not None else None
-        except: chg = None
+        # EODHD bulk EOD non include change_p — calcoliamo da close e open
+        try:
+            close = float(row.get("close") or row.get("adjusted_close") or 0)
+            open_ = float(row.get("open") or 0)
+            chg   = (close / open_ - 1) * 100 if open_ and open_ != 0 else None
+        except:
+            chg = None
         name = info.get("Name", code)
         rows.append({
             "EODHD_Ticker":   f"{code}.{source_exch}",
@@ -693,27 +697,7 @@ if page=="🏠 Dashboard":
     with st.spinner("Loading all Eurozone prices…"):
         all_df = _load_all_prices()
 
-    # Debug: mostra quanti titoli caricati per exchange
-    if all_df.empty:
-        st.error("No data loaded from EODHD. Check API key and connection.")
-    else:
-        # Diagnostica temporanea
-        debug_info = []
-        for code in EXCHANGES:
-            n = len(all_df[all_df["Exchange"]==code])
-            chg_ok = all_df[all_df["Exchange"]==code]["1D %"].notna().sum()
-            debug_info.append(f"{EXCHANGES[code]['flag']} {code}: {n} stocks, {chg_ok} with 1D%")
-        with st.expander("🔍 Debug data (remove before launch)", expanded=False):
-            for d in debug_info:
-                st.write(d)
-            st.write(f"Total: {len(all_df)} stocks")
-            st.write(f"1D % not null: {all_df['1D %'].notna().sum()}")
-            st.write(f"Sample 1D % values: {all_df['1D %'].dropna().head(5).tolist()}")
-            # Mostra i campi raw del bulk XETRA
-            raw_xetra = get_bulk_eod("XETRA")
-            if not raw_xetra.empty:
-                st.write(f"Bulk XETRA columns: {list(raw_xetra.columns)}")
-                st.write(f"Sample row: {raw_xetra.iloc[0].to_dict()}")
+
 
     u200 = all_df.copy() if not all_df.empty else pd.DataFrame()
     if not u200.empty:
