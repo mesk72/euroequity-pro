@@ -13,6 +13,8 @@ import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { DEMO_STOCKS } from '@/lib/demoData'
+import { computeScores } from '@/lib/ranking'
 
 // ── HELPERS ───────────────────────────────────────────────────────
 const fp = (v: number | null | undefined, d = 1): string => {
