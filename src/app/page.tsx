@@ -538,7 +538,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All' }: {
     const BATCH = 10
     let updated = [...rawStocks]
     const idxMap = new Map(candidates.map((s, i) => [`${s.ticker}.${s.exchange}`, i]))
-
     for (let i = 0; i < candidates.length; i += BATCH) {
       const batch = candidates.slice(i, i + BATCH)
       const enriched = await apiEnrich(batch)
