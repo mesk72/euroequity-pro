@@ -535,8 +535,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All' }: {
 
   async function runEnrich() {
     setEnriching(true); setProgress(0)
-    const BATCH = 10
-    let updated = [...rawStocks]
+    const BATCH = 10 let updated = [...rawStocks]
     const idxMap = new Map(candidates.map((s, i) => [`${s.ticker}.${s.exchange}`, i]))
 
     for (let i = 0; i < candidates.length; i += BATCH) {
@@ -834,6 +833,9 @@ function Dashboard({ onSectorClick }: { onSectorClick: (s: string) => void }) {
 // ── PORTFOLIO ─────────────────────────────────────────────────────
 
 // ── PIE CHART COMPONENT ─────────────────────────────────────────
+const PIE_COLORS = ['#f97316','#3b82f6','#22c55e','#eab308','#8b5cf6',
+  '#14b8a6','#ef4444','#0ea5e9','#84cc16','#f59e0b','#6366f1','#ec4899']
+
 function PieChart({ data, title }: { data: Record<string,number>; title: string }) {
   const entries = Object.entries(data).sort((a,b) => b[1]-a[1])
   const total   = entries.reduce((a,[,v])=>a+v,0)
@@ -1038,11 +1040,6 @@ function Portfolio() {
     growthScore: wAvg(r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.growthScore),
   }
 
-  // Colors for pie charts
-  const PIE_COLORS = ['#f97316','#3b82f6','#22c55e','#eab308','#8b5cf6',
-    '#14b8a6','#ef4444','#0ea5e9','#84cc16','#f59e0b','#6366f1','#ec4899']
-
-
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }} className="fade-in">
       <div className="section-hdr">💼 Portfolio Management</div>
@@ -1075,8 +1072,7 @@ function Portfolio() {
         </div>
         <div style={{ position:'relative', marginBottom: searchRes.length > 0 ? 0 : 12 }}>
           <Search size={14} style={{ position:'absolute', left:10, top:'50%',
-            transform:'translateY(-50%)', color:'var(--text4)', pointerEvents:'none' }} />
-          <input value={searchQ} onChange={e=>{setSearchQ(e.target.value);setSelectedStock(null)}}
+            transform:'translateY(-50%)', color:'var(--text4)', pointerEvents:'none' }} /> <input value={searchQ} onChange={e=>{setSearchQ(e.target.value);setSelectedStock(null)}}
             placeholder="Search by ticker or company name (e.g. ENI, ASML, Intesa...)"
             className="input-field" style={{ paddingLeft:32, fontSize:13 }} />
           {searchQ && (
