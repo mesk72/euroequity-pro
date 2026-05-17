@@ -104,7 +104,7 @@ def eodhd_get(endpoint, params=None):
     params["api_token"] = EODHD_KEY
     params["fmt"] = "json"
     try:
-        r = requests.get(f"{EODHD_BASE}/{endpoint}", params=params, timeout=30)
+        r = requests.get(f"{EODHD_BASE}/{endpoint}", params=params, timeout=60)
         if r.status_code == 200:
             return r.json()
     except Exception:
@@ -135,8 +135,11 @@ def get_italian_stocks_from_xetra():
     return bulk[bulk["code"].isin(italian_codes)].copy(), ticker_info
 
 @st.cache_data(ttl=7200, show_spinner=False)
+@st.cache_data(ttl=7200, show_spinner=False)
 def get_fundamentals(ticker_exchange):
-    data = eodhd_get(f"fundamentals/{ticker_exchange}")
+    # filter riduce la risposta da 20MB a ~5KB — essenziale per evitare timeout
+    data = eodhd_get(f"fundamentals/{ticker_exchange}",
+                     {"filter": "Highlights,Valuation,Technicals,General,Earnings"})
     if not data: return {}
     h = data.get("Highlights", {}) or {}
     v = data.get("Valuation",   {}) or {}
@@ -494,6 +497,16 @@ def show_screener(df, title="", exchange_code=""):
 
     if st.button(f"⚡ Load & Apply — enrich {len(candidates)} stocks",
                  key=f"btn_{title[:8]}", type="primary"):
+        # Quick test: mostra cosa ritorna l'API per il primo titolo
+        if not candidates.empty:
+            test_tk = candidates.iloc[0]["EODHD_Ticker"]
+            test_data = eodhd_get(f"fundamentals/{test_tk}",
+                {"filter": "Highlights,Valuation,Technicals,General"})
+            if test_data:
+                h = test_data.get("Highlights", {}) or {}
+                st.info(f"API test OK: {test_tk} — PE={h.get('PERatio','N/A')} | MarketCap={h.get('MarketCapitalization','N/A')}")
+            else:
+                st.error(f"API test FAILED for {test_tk} — fundamentals not available. Check EODHD plan.")
         enriched_df = enrich_rows(df, candidates.index.tolist())
         st.session_state[state_key] = enriched_df
 
