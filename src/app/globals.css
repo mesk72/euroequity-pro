@@ -5,16 +5,16 @@
 @tailwind utilities;
 
 :root {
-  --bg:        #0a0e1a;
-  --bg2:       #0d1221;
-  --surface:   #111827;
-  --surface2:  #161d2e;
+  --bg:        #070b14;
+  --bg2:       #0a0f1e;
+  --surface:   #0f1623;
+  --surface2:  #131a28;
   --border:    #1e2d45;
   --border2:   #243550;
   --text:      #ffffff;
-  --text2:     #cbd5e1;
-  --text3:     #94a3b8;
-  --text4:     #64748b;
+  --text2:     #e2e8f0;
+  --text3:     #cbd5e1;
+  --text4:     #94a3b8;
   --orange:    #f97316;
   --orange2:   #ea6c0a;
   --blue:      #3b82f6;
@@ -24,14 +24,14 @@
 }
 
 * { box-sizing: border-box; }
-html { font-size: 13px; }
+html { font-size: 15px; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -46,7 +46,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 5px 8px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text);
   font-family: 'IBM Plex Sans', sans-serif;
   transition: border-color 0.15s;
@@ -100,7 +100,7 @@ select.input-field option { background: var(--surface); color: var(--text); }
 }
 .metric-value {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--orange);
   letter-spacing: -0.02em;
@@ -120,17 +120,17 @@ select.input-field option { background: var(--surface); color: var(--text); }
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
 }
 .data-table th {
   background: var(--surface2);
   color: var(--text3);
   font-family: 'IBM Plex Sans Condensed', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 6px 8px;
+  padding: 8px 10px;
   text-align: left;
   border-bottom: 2px solid var(--border);
   border-right: 1px solid var(--border);
@@ -144,11 +144,11 @@ select.input-field option { background: var(--surface); color: var(--text); }
 .data-table th:last-child { border-right: none; }
 .data-table th:hover { color: var(--orange); }
 .data-table td {
-  padding: 5px 8px;
+  padding: 7px 10px;
   border-bottom: 1px solid rgba(30,45,69,0.6);
   border-right: 1px solid rgba(30,45,69,0.3);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11.5px;
+  font-size: 13px;
   white-space: nowrap;
 }
 .data-table td:last-child { border-right: none; }
