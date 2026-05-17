@@ -331,6 +331,16 @@ def enrich_rows(df, indices, show_progress=True):
 
 # ── DASHBOARD UNIVERSE ────────────────────────────────────────────
 @st.cache_data(ttl=3600, show_spinner=False)
+def _load_all_prices():
+    frames = []
+    for code in EXCHANGES:
+        df_ex = build_exchange_df(code)
+        if not df_ex.empty:
+            frames.append(df_ex)
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_dashboard_universe():
     """
     Dashboard universe built from BULK EOD only — zero fundamental API calls.
@@ -680,16 +690,8 @@ if page=="🏠 Dashboard":
 
     st.markdown("---")
 
-    @st.cache_data(ttl=3600,show_spinner=False)
-    def load_all_prices():
-        frames=[]
-        for code in EXCHANGES:
-            df_ex=build_exchange_df(code)
-            if not df_ex.empty: frames.append(df_ex)
-        return pd.concat(frames,ignore_index=True) if frames else pd.DataFrame()
-
     with st.spinner("Loading all Eurozone prices…"):
-        all_df=load_all_prices()
+        all_df=_load_all_prices()
 
     # Dashboard usa solo prezzi bulk — istantaneo
     u200 = all_df.copy() if not all_df.empty else pd.DataFrame()
