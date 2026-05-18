@@ -460,9 +460,10 @@ function StockDetail({ stock, onClose, onAddPortfolio }: {
 }
 
 // ── SCREENER ──────────────────────────────────────────────────────
-function Screener({ initExchange = 'MIL', initSector = 'All' }: {
+function Screener({ initExchange = 'MIL', initSector = 'All', onSelectStock }: {
   initExchange?: string
   initSector?:   string
+  onSelectStock?: (s: Stock) => void
 }) {
   const [exchange,    setExchange]   = useState(initExchange)
   const [rawStocks,   setRawStocks]  = useState<Stock[]>([])
