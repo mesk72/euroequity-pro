@@ -46,7 +46,7 @@ export const STOCK_LINKS: Record<string, { isin: string; borseUrl: string; compa
 
   // ── FRANCE ────────────────────────────────────────────────────
   'MC.PA':    { isin:'FR0000121014', borseUrl:'https://live.euronext.com/en/product/equities/FR0000121014-XPAR', companyUrl:'https://www.lvmh.com' },
-  'TTE.PA':   { isin:'FR0014000MR3', borseUrl:'https://live.euronext.com/en/product/equities/FR0014000MR3-XPAR', companyUrl:'https://totalenergies.com' },
+  'TTE.PA':   { isin:'FR0000120271', borseUrl:'https://live.euronext.com/en/product/equities/FR0000120271-XPAR', companyUrl:'https://totalenergies.com' },
   'SAN.PA':   { isin:'FR0000120578', borseUrl:'https://live.euronext.com/en/product/equities/FR0000120578-XPAR', companyUrl:'https://www.sanofi.com' },
   'BNP.PA':   { isin:'FR0000131104', borseUrl:'https://live.euronext.com/en/product/equities/FR0000131104-XPAR', companyUrl:'https://group.bnpparibas' },
   'AIR.PA':   { isin:'NL0000235190', borseUrl:'https://live.euronext.com/en/product/equities/NL0000235190-XPAR', companyUrl:'https://www.airbus.com' },
@@ -76,7 +76,7 @@ export const STOCK_LINKS: Record<string, { isin: string; borseUrl: string; compa
   // ── SPAIN ─────────────────────────────────────────────────────
   'ITX.MC':   { isin:'ES0148396007', borseUrl:'https://www.bolsasymercados.es/bme-exchange/es/Mercados-y-Cotizaciones/Acciones/Mercado-Continuo/Precios/ITX', companyUrl:'https://www.inditex.com' },
   'BBVA.MC':  { isin:'ES0113211835', borseUrl:'https://www.bolsasymercados.es/bme-exchange/es/Mercados-y-Cotizaciones/Acciones/Mercado-Continuo/Precios/BBVA', companyUrl:'https://www.bbva.com' },
-  'BSAN.MC':  { isin:'ES0113900J37', borseUrl:'https://www.bolsasymercados.es/bme-exchange/es/Mercados-y-Cotizaciones/Acciones/Mercado-Continuo/Precios/SAN', companyUrl:'https://www.santander.com' },
+  'BSAN.MC':  { isin:'ES0113900J37', borseUrl:'https://www.bolsasymercados.es/en/bme-exchange/prices-and-markets/shares/detail.banco-santander-es0113900j37.html#/', companyUrl:'https://www.santander.com' },
   'IBE.MC':   { isin:'ES0144580Y14', borseUrl:'https://www.bolsasymercados.es/bme-exchange/es/Mercados-y-Cotizaciones/Acciones/Mercado-Continuo/Precios/IBE', companyUrl:'https://www.iberdrola.com' },
   'TEF.MC':   { isin:'ES0178430E18', borseUrl:'https://www.bolsasymercados.es/bme-exchange/es/Mercados-y-Cotizaciones/Acciones/Mercado-Continuo/Precios/TEF', companyUrl:'https://www.telefonica.com' },
   'REP.MC':   { isin:'ES0173516115', borseUrl:'https://www.bolsasymercados.es/bme-exchange/es/Mercados-y-Cotizaciones/Acciones/Mercado-Continuo/Precios/REP', companyUrl:'https://www.repsol.com' },
@@ -90,7 +90,7 @@ export const STOCK_LINKS: Record<string, { isin: string; borseUrl: string; compa
   'ARGX.BR':  { isin:'BE0003763779', borseUrl:'https://live.euronext.com/en/product/equities/BE0003763779-XBRU', companyUrl:'https://www.argenx.com' },
 
   // ── FINLAND ───────────────────────────────────────────────────
-  'NOKIA.HE':  { isin:'FI0009000681', borseUrl:'https://live.euronext.com/en/product/equities/FI0009000681-XHEL', companyUrl:'https://www.nokia.com' },
+  'NOKIA.HE':  { isin:'FI0009000681', borseUrl:'https://live.euronext.com/en/product/equities/FI0009000681-BGEM', companyUrl:'https://www.nokia.com' },
   'FORTUM.HE': { isin:'FI0009007132', borseUrl:'https://live.euronext.com/en/product/equities/FI0009007132-XHEL', companyUrl:'https://www.fortum.com' },
   'SAMPO.HE':  { isin:'FI0009003305', borseUrl:'https://live.euronext.com/en/product/equities/FI0009003305-XHEL', companyUrl:'https://www.sampo.com' },
 
@@ -107,6 +107,6 @@ export const STOCK_LINKS: Record<string, { isin: string; borseUrl: string; compa
   'DRVN.IR':  { isin:'IE0004906560', borseUrl:'https://live.euronext.com/en/product/equities/IE0004906560-XDUB', companyUrl:'https://www.kerry.com' },
 
   // ── GREECE ────────────────────────────────────────────────────
-  'OPAP.AT':  { isin:'GRS419003009', borseUrl:'https://www.athexgroup.gr/web/guest/market-shares?p_p_id=Athex_Equity_Prices_WAR_AthexPortletsharedservices&selectedId=GRS419003009', companyUrl:'https://www.opap.gr' },
+  'OPAP.AT':  { isin:'GRS419003009', borseUrl:'https://www.athexgroup.gr/en/web/guest/market-alternative-market', companyUrl:'https://www.opap.gr' },
   'ETE.AT':   { isin:'GRS003003014', borseUrl:'https://www.athexgroup.gr/web/guest/market-shares?p_p_id=Athex_Equity_Prices_WAR_AthexPortletsharedservices&selectedId=GRS003003014', companyUrl:'https://www.nbg.gr' },
 }
