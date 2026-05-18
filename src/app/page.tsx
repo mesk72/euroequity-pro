@@ -19,8 +19,10 @@ import StockDetailPage from '@/components/dashboard/StockDetailPage'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
 
-// ── DEMO MODE — set false when Leeway API is active ─────────────
-const USE_DEMO = true  // Cambia in false quando Leeway è attivo
+// ── FLAGS ────────────────────────────────────────────────────────
+const USE_DEMO = true   // true = dati demo hardcoded
+const USE_DB   = false  // true = legge da Supabase (dopo seed.py)
+// Quando Leeway risponde: imposta USE_DEMO=false, USA_DB=true
 
 // ── HELPERS ───────────────────────────────────────────────────────
 const fp = (v: number | null | undefined, d = 1): string => {
@@ -50,13 +52,26 @@ type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal'
 
 // ── API CALLS (client-side → Next.js API routes with shared cache) ──
 async function apiExchange(code: string): Promise<Stock[]> {
-  // Demo mode — mostra dati MSCI EMU hardcoded mentre Leeway non è attivo
+  // Demo mode — dati hardcoded
   if (USE_DEMO) {
     const scored = computeScores([...DEMO_STOCKS])
     if (code === 'EZ') return scored
-    if (code === 'MIL') return scored.filter(s => s.exchange === 'MIL')
     return scored.filter(s => s.exchange === code)
   }
+  // Database mode — legge da Supabase (velocissimo)
+  if (USE_DB) {
+    try {
+      const url = code === 'EZ'
+        ? '/api/db/stocks'
+        : `/api/db/stocks?exchange=${code}`
+      const r = await fetch(url)
+      if (r.ok) {
+        const d = await r.json()
+        return d.stocks || []
+      }
+    } catch {}
+  }
+  // Live mode — chiama Leeway direttamente
   try {
     const codes = code === 'EZ' ? Object.keys(EXCHANGES) : [code]
     const results = await Promise.all(
@@ -96,17 +111,26 @@ async function apiEnrich(stocks: Stock[]): Promise<Stock[]> {
 }
 
 async function apiHistory(ticker: string, exchange: string, days: number) {
-  const r = await fetch(`/api/history?ticker=${ticker}&exchange=${exchange}&days=${days}`)
-  if (!r.ok) return []
-  const d = await r.json()
-  return d.history || []
+  // Se DB attivo, usa lo storico da Supabase (più veloce e nessuna chiamata a Leeway)
+  const endpoint = USE_DB
+    ? `/api/db/history?ticker=${ticker}&exchange=${exchange}&days=${days}`
+    : `/api/history?ticker=${ticker}&exchange=${exchange}&days=${days}`
+  try {
+    const r = await fetch(endpoint)
+    if (!r.ok) return []
+    const d = await r.json()
+    return d.history || []
+  } catch { return [] }
 }
 
 async function apiIndices() {
-  const r = await fetch('/api/indices')
-  if (!r.ok) return []
-  const d = await r.json()
-  return d.indices || []
+  const endpoint = USE_DB ? '/api/db/indices' : '/api/indices'
+  try {
+    const r = await fetch(endpoint)
+    if (!r.ok) return []
+    const d = await r.json()
+    return d.indices || []
+  } catch { return [] }
 }
 
 async function apiSearch(q: string) {
@@ -528,6 +552,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', onSelectStock }: {
     }
     return true
   })
+
   const candidates = [...filtered]
     .sort((a, b) => (b.volume || 0) - (a.volume || 0))
     .slice(0, 100)
