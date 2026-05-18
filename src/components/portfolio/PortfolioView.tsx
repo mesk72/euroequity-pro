@@ -1,117 +1,499 @@
-import { Stock } from './ranking'
+'use client'
 
-// MSCI EMU components — realistic demo data (prices approximate May 2026)
-// Covers ~230 major Eurozone stocks across all 11 markets
-// Automatically replaced by live Leeway data when API is activated
+import { useState, useEffect } from 'react'
+import { Briefcase, Search, X } from 'lucide-react'
+import { Stock, computeScores } from '@/lib/ranking'
+import { DEMO_STOCKS } from '@/lib/demoData'
+import toast from 'react-hot-toast'
 
-export const DEMO_STOCKS: Stock[] = [
+function fp(v: number | null | undefined, d = 2): string {
+  if (v == null || isNaN(v as number)) return '—'
+  return `${(v as number) >= 0 ? '+' : ''}${(v as number).toFixed(d)}%`
+}
+function fv(v: number | null | undefined, d = 2): string {
+  if (v == null || isNaN(v as number)) return '—'
+  return (v as number).toFixed(d)
+}
 
-  // ── ITALY (MIL) ──────────────────────────────────────────────────
-  { ticker:'ENI', company:'ENI SpA', sector:'Energy', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:14.82, change1d:0.84, volume:18200000, mktCap:47.2, peTrail:8.2, peFwd:7.8, pb:1.1, evEbitda:3.8, roe:14.2, divYield:6.8, beta:0.82, epsGrowth:12.4, revGrowth:3.2, epsMom30d:2.1, mom1w:1.2, mom1m:3.4, mom6m:8.2, mom12m:14.6, valueScore:77, growthScore:43 },
-  { ticker:'ENEL', company:'Enel SpA', sector:'Utilities', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:7.14, change1d:-0.42, volume:32100000, mktCap:73.8, peTrail:13.4, peFwd:12.1, pb:1.8, evEbitda:7.2, roe:13.8, divYield:4.2, beta:0.71, epsGrowth:8.2, revGrowth:2.4, epsMom30d:1.2, mom1w:-0.8, mom1m:2.1, mom6m:5.4, mom12m:11.2, valueScore:44, growthScore:27 },
-  { ticker:'ISP', company:'Intesa Sanpaolo SpA', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:4.28, change1d:1.24, volume:82400000, mktCap:74.6, peTrail:9.8, peFwd:8.9, pb:1.2, evEbitda:null, roe:18.4, divYield:7.2, beta:1.12, epsGrowth:22.4, revGrowth:12.4, epsMom30d:4.2, mom1w:2.1, mom1m:6.8, mom6m:18.4, mom12m:34.2, valueScore:66, growthScore:82 },
-  { ticker:'UCG', company:'UniCredit SpA', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:42.18, change1d:2.14, volume:12800000, mktCap:54.8, peTrail:7.2, peFwd:6.8, pb:1.4, evEbitda:null, roe:22.8, divYield:5.4, beta:1.34, epsGrowth:28.4, revGrowth:14.2, epsMom30d:6.2, mom1w:3.2, mom1m:8.4, mom6m:22.1, mom12m:48.4, valueScore:74, growthScore:93 },
-  { ticker:'RACE',   company:'Ferrari NV',                 sector:'Consumer Discretionary',exchange:'MIL', flag:'🇮🇹', country:'Italy',       price:418.40,change1d:1.24,  volume:428000,   mktCap:76.4,  peTrail:52.4, peFwd:42.4, pb:28.4,evEbitda:34.4, roe:48.4, divYield:0.6, beta:0.62, epsGrowth:18.4,  revGrowth:14.4,  epsMom30d:3.4,  mom1w:1.8,  mom1m:5.4,  mom6m:14.4,  mom12m:32.4,  valueScore:3, growthScore:81 },
-  { ticker:'STM', company:'STMicroelectronics NV', sector:'Technology', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:28.44, change1d:-1.82, volume:8200000, mktCap:25.6, peTrail:18.4, peFwd:14.2, pb:2.8, evEbitda:8.4, roe:18.2, divYield:0.8, beta:1.62, epsGrowth:-12.4, revGrowth:-8.2, epsMom30d:-3.4, mom1w:-2.4, mom1m:-8.2, mom6m:-18.4, mom12m:-28.2, valueScore:23, growthScore:3 },
-  { ticker:'G', company:'Assicurazioni Generali SpA', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:28.44, change1d:0.84, volume:4840000, mktCap:44.8, peTrail:12.4, peFwd:11.4, pb:1.4, evEbitda:null, roe:14.8, divYield:5.4, beta:0.84, epsGrowth:12.4, revGrowth:8.4, epsMom30d:2.4, mom1w:1.2, mom1m:3.8, mom6m:8.4, mom12m:16.4, valueScore:54, growthScore:57 },
-  { ticker:'MB', company:'Mediobanca SpA', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:18.84, change1d:1.84, volume:4280000, mktCap:14.8, peTrail:12.4, peFwd:11.2, pb:1.8, evEbitda:null, roe:14.4, divYield:4.8, beta:1.04, epsGrowth:14.4, revGrowth:8.4, epsMom30d:2.8, mom1w:2.2, mom1m:6.4, mom6m:14.4, mom12m:28.4, valueScore:51, growthScore:68 },
-  { ticker:'STLAM',  company:'Stellantis NV',              sector:'Consumer Discretionary',exchange:'MIL', flag:'🇮🇹', country:'Italy',       price:12.44, change1d:-0.42, volume:14280000, mktCap:38.4,  peTrail:4.2,  peFwd:6.4,  pb:0.6, evEbitda:2.4,  roe:8.4,  divYield:0.0, beta:1.24, epsGrowth:-58.4, revGrowth:-14.4, epsMom30d:-8.4, mom1w:-1.8, mom1m:-6.4, mom6m:-22.4, mom12m:-48.4, valueScore:91, growthScore:2 },
-  { ticker:'BAMI', company:'Banco BPM SpA', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:8.44, change1d:2.84, volume:12840000, mktCap:8.4, peTrail:6.4, peFwd:6.0, pb:0.8, evEbitda:null, roe:14.4, divYield:8.4, beta:1.44, epsGrowth:28.4, revGrowth:18.4, epsMom30d:4.8, mom1w:3.4, mom1m:8.4, mom6m:22.4, mom12m:48.4, valueScore:89, growthScore:94 },
-  { ticker:'NEXI', company:'Nexi SpA', sector:'Technology', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:6.84, change1d:1.24, volume:8400000, mktCap:9.8, peTrail:null, peFwd:14.4, pb:1.2, evEbitda:12.4, roe:-4.4, divYield:0.0, beta:1.44, epsGrowth:null, revGrowth:8.4, epsMom30d:2.4, mom1w:1.8, mom1m:5.4, mom6m:14.4, mom12m:24.4, valueScore:46, growthScore:65 },
-  { ticker:'BPER', company:'BPER Banca SpA', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:5.84, change1d:1.84, volume:8400000, mktCap:4.8, peTrail:6.4, peFwd:5.8, pb:0.6, evEbitda:null, roe:12.4, divYield:7.8, beta:1.34, epsGrowth:18.4, revGrowth:12.4, epsMom30d:3.4, mom1w:2.4, mom1m:6.4, mom6m:18.4, mom12m:38.4, valueScore:95, growthScore:80 },
-  { ticker:'A2A', company:'A2A SpA', sector:'Utilities', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:2.84, change1d:0.42, volume:18400000, mktCap:6.8, peTrail:14.4, peFwd:12.4, pb:1.8, evEbitda:7.4, roe:12.4, divYield:4.8, beta:0.72, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:37, growthScore:31 },
-  { ticker:'TIT',    company:'Telecom Italia SpA',         sector:'Communication',         exchange:'MIL', flag:'🇮🇹', country:'Italy',       price:0.28,  change1d:-0.84, volume:184000000,mktCap:5.2,   peTrail:null, peFwd:null, pb:0.4, evEbitda:4.4,  roe:-8.4, divYield:0.0, beta:0.84, epsGrowth:null,  revGrowth:-4.4,  epsMom30d:-2.4, mom1w:-1.4, mom1m:-4.8, mom6m:-14.4, mom12m:-22.4, valueScore:98, growthScore:12 },
-  { ticker:'ERG', company:'ERG SpA', sector:'Utilities', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:22.44, change1d:0.24, volume:984000, mktCap:3.8, peTrail:22.4, peFwd:18.4, pb:2.8, evEbitda:12.4, roe:12.4, divYield:4.2, beta:0.62, epsGrowth:4.4, revGrowth:2.4, epsMom30d:0.8, mom1w:0.4, mom1m:1.4, mom6m:3.8, mom12m:7.4, valueScore:14, growthScore:13 },
-  { ticker:'TRN', company:'Terna SpA', sector:'Utilities', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:7.42, change1d:0.14, volume:4280000, mktCap:15.2, peTrail:18.4, peFwd:16.8, pb:3.2, evEbitda:10.4, roe:18.4, divYield:4.8, beta:0.42, epsGrowth:6.4, revGrowth:4.4, epsMom30d:1.2, mom1w:0.2, mom1m:0.8, mom6m:2.4, mom12m:5.8, valueScore:15, growthScore:18 },
-  { ticker:'PSTM', company:'Poste Italiane SpA', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:14.82, change1d:0.54, volume:3840000, mktCap:18.4, peTrail:14.2, peFwd:13.4, pb:2.8, evEbitda:null, roe:22.4, divYield:5.2, beta:0.54, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.8, mom1w:0.4, mom1m:1.8, mom6m:4.8, mom12m:9.4, valueScore:31, growthScore:37 },
-  { ticker:'AMP', company:'Amplifon SpA', sector:'Health Care', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:28.44, change1d:0.84, volume:984000, mktCap:6.2, peTrail:38.4, peFwd:28.4, pb:6.4, evEbitda:18.4, roe:18.4, divYield:0.8, beta:0.84, epsGrowth:14.4, revGrowth:8.4, epsMom30d:2.4, mom1w:1.2, mom1m:3.8, mom6m:8.4, mom12m:16.4, valueScore:3, growthScore:60 },
-  { ticker:'MONC',   company:'Moncler SpA',                sector:'Consumer Discretionary',exchange:'MIL', flag:'🇮🇹', country:'Italy',       price:52.44, change1d:1.24,  volume:1240000,  mktCap:13.4,  peTrail:28.4, peFwd:24.4, pb:8.4, evEbitda:18.4, roe:28.4, divYield:1.2, beta:0.84, epsGrowth:12.4,  revGrowth:8.4,   epsMom30d:2.8,  mom1w:1.8,  mom1m:4.8,  mom6m:12.4,  mom12m:22.4,  valueScore:12, growthScore:62 },
-  { ticker:'EXPD', company:'Mediobanca Prem', sector:'Financials', exchange:'MIL', flag:'🇮🇹', country:'Italy', price:4.82, change1d:0.42, volume:2840000, mktCap:2.4, peTrail:8.4, peFwd:7.8, pb:0.6, evEbitda:null, roe:8.4, divYield:6.4, beta:0.94, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:80, growthScore:31 },
+function weightedAvg(rows: any[], field: string): number | null {
+  const valid = rows.filter((r: any) => r[field] != null && !isNaN(r[field]))
+  const sumW = valid.reduce((a: number, r: any) => a + (r.weight || 0), 0)
+  if (sumW === 0) return null
+  return valid.reduce((a: number, r: any) => a + r[field] * (r.weight || 0), 0) / sumW
+}
 
-  // ── GERMANY (XETRA) ───────────────────────────────────────────────
-  { ticker:'SAP',    company:'SAP SE',                     sector:'Technology',            exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:224.80,change1d:0.62,  volume:2840000,  mktCap:275.2, peTrail:42.4, peFwd:34.2, pb:8.4, evEbitda:28.4, roe:18.2, divYield:0.8, beta:0.82, epsGrowth:24.2,  revGrowth:18.4,  epsMom30d:3.2,  mom1w:1.4,  mom1m:4.2,  mom6m:12.4,  mom12m:28.4,  valueScore:4, growthScore:91 },
-  { ticker:'ALV',    company:'Allianz SE',                 sector:'Financials',            exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:318.40,change1d:0.84,  volume:1240000,  mktCap:138.4, peTrail:14.2, peFwd:12.8, pb:2.1, evEbitda:null, roe:14.8, divYield:4.2, beta:0.84, epsGrowth:12.4,  revGrowth:8.4,   epsMom30d:2.4,  mom1w:1.2,  mom1m:3.8,  mom6m:8.4,   mom12m:18.2,  valueScore:59, growthScore:62 },
-  { ticker:'SIE',    company:'Siemens AG',                 sector:'Industrials',           exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:198.24,change1d:-0.34, volume:1820000,  mktCap:158.2, peTrail:22.4, peFwd:18.4, pb:3.8, evEbitda:14.2, roe:16.4, divYield:2.2, beta:1.02, epsGrowth:14.2,  revGrowth:8.2,   epsMom30d:1.8,  mom1w:0.8,  mom1m:2.4,  mom6m:6.8,   mom12m:14.2,  valueScore:33, growthScore:54 },
-  { ticker:'MUV2',   company:'Munich Re',                  sector:'Financials',            exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:524.80,change1d:1.24,  volume:428000,   mktCap:72.4,  peTrail:14.8, peFwd:13.2, pb:2.4, evEbitda:null, roe:16.8, divYield:2.8, beta:0.62, epsGrowth:18.4,  revGrowth:12.4,  epsMom30d:2.8,  mom1w:1.4,  mom1m:4.2,  mom6m:10.4,  mom12m:22.4,  valueScore:50, growthScore:78 },
-  { ticker:'DTE',    company:'Deutsche Telekom AG',        sector:'Communication',         exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:28.84, change1d:0.42,  volume:8240000,  mktCap:138.2, peTrail:18.4, peFwd:16.2, pb:2.8, evEbitda:8.4,  roe:12.4, divYield:3.2, beta:0.52, epsGrowth:12.4,  revGrowth:4.2,   epsMom30d:1.4,  mom1w:0.6,  mom1m:1.8,  mom6m:4.2,   mom12m:8.4,   valueScore:43, growthScore:33 },
-  { ticker:'MBG',    company:'Mercedes-Benz Group AG',     sector:'Consumer Discretionary',exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:58.44, change1d:-0.84, volume:4280000,  mktCap:62.4,  peTrail:6.4,  peFwd:6.0,  pb:0.7, evEbitda:3.8,  roe:10.4, divYield:8.4, beta:1.14, epsGrowth:-18.4, revGrowth:-8.4,  epsMom30d:-3.4, mom1w:-1.4, mom1m:-4.8, mom6m:-12.4, mom12m:-22.4, valueScore:89, growthScore:9 },
-  { ticker:'BMW',    company:'Bayerische Motoren Werke AG',sector:'Consumer Discretionary',exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:82.44, change1d:-0.84, volume:2840000,  mktCap:52.4,  peTrail:6.8,  peFwd:6.2,  pb:0.8, evEbitda:4.2,  roe:12.4, divYield:5.8, beta:1.14, epsGrowth:-8.4,  revGrowth:-2.4,  epsMom30d:-1.8, mom1w:-1.2, mom1m:-4.2, mom6m:-8.4,  mom12m:-14.2, valueScore:82, growthScore:17 },
-  { ticker:'ADS',    company:'Adidas AG',                  sector:'Consumer Discretionary',exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:248.40,change1d:1.84,  volume:984000,   mktCap:42.8,  peTrail:32.4, peFwd:24.8, pb:6.2, evEbitda:18.4, roe:18.4, divYield:1.4, beta:1.24, epsGrowth:84.2,  revGrowth:12.4,  epsMom30d:8.4,  mom1w:2.4,  mom1m:8.4,  mom6m:22.4,  mom12m:48.4,  valueScore:10, growthScore:94 },
-  { ticker:'BAYN',   company:'Bayer AG',                   sector:'Health Care',           exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:24.82, change1d:-1.24, volume:8420000,  mktCap:24.2,  peTrail:null, peFwd:8.4,  pb:0.6, evEbitda:6.8,  roe:-8.4, divYield:0.0, beta:0.74, epsGrowth:null,  revGrowth:-4.2,  epsMom30d:-2.4, mom1w:-2.2, mom1m:-8.4, mom6m:-22.4, mom12m:-42.4, valueScore:80, growthScore:8 },
-  { ticker:'DBK',    company:'Deutsche Bank AG',           sector:'Financials',            exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:24.82, change1d:1.24,  volume:14280000, mktCap:48.4,  peTrail:8.4,  peFwd:7.8,  pb:0.6, evEbitda:null, roe:8.4,  divYield:2.8, beta:1.44, epsGrowth:18.4,  revGrowth:8.4,   epsMom30d:2.8,  mom1w:1.8,  mom1m:5.4,  mom6m:12.4,  mom12m:24.4,  valueScore:83, growthScore:77 },
-  { ticker:'VOW3',   company:'Volkswagen AG',              sector:'Consumer Discretionary',exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:88.44, change1d:-0.42, volume:2840000,  mktCap:44.4,  peTrail:4.2,  peFwd:4.8,  pb:0.4, evEbitda:2.4,  roe:4.4,  divYield:6.8, beta:1.04, epsGrowth:-28.4, revGrowth:-8.4,  epsMom30d:-4.8, mom1w:-1.2, mom1m:-4.2, mom6m:-12.4, mom12m:-22.4, valueScore:97, growthScore:5 },
-  { ticker:'EOAN',   company:'E.ON SE',                    sector:'Utilities',             exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:12.84, change1d:0.24,  volume:8240000,  mktCap:32.4,  peTrail:14.4, peFwd:12.8, pb:1.4, evEbitda:7.4,  roe:8.4,  divYield:4.8, beta:0.62, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.4,  mom1m:1.4,  mom6m:3.8,   mom12m:7.4,   valueScore:60, growthScore:29 },
-  { ticker:'RWE',    company:'RWE AG',                     sector:'Utilities',             exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:28.84, change1d:0.42,  volume:4280000,  mktCap:18.4,  peTrail:8.4,  peFwd:8.0,  pb:0.8, evEbitda:4.4,  roe:8.4,  divYield:4.2, beta:0.72, epsGrowth:18.4,  revGrowth:4.4,   epsMom30d:2.4,  mom1w:0.6,  mom1m:2.4,  mom6m:6.4,   mom12m:12.4,  valueScore:76, growthScore:56 },
-  { ticker:'HEI',    company:'Heidelberg Materials AG',    sector:'Materials',             exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:118.40,change1d:0.84,  volume:984000,   mktCap:22.4,  peTrail:12.4, peFwd:11.2, pb:1.4, evEbitda:7.4,  roe:12.4, divYield:2.8, beta:1.04, epsGrowth:14.4,  revGrowth:4.4,   epsMom30d:2.4,  mom1w:1.2,  mom1m:3.8,  mom6m:8.4,   mom12m:16.4,  valueScore:66, growthScore:59 },
-  { ticker:'HFCL',   company:'Henkel AG',                  sector:'Consumer Staples',      exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:82.44, change1d:0.24,  volume:984000,   mktCap:16.8,  peTrail:18.4, peFwd:16.4, pb:2.4, evEbitda:10.4, roe:12.4, divYield:2.8, beta:0.62, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.4,  mom1m:1.4,  mom6m:3.8,   mom12m:7.4,   valueScore:43, growthScore:29 },
-  { ticker:'BEI',    company:'Beiersdorf AG',              sector:'Consumer Staples',      exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:118.40,change1d:0.42,  volume:428000,   mktCap:28.4,  peTrail:28.4, peFwd:24.4, pb:4.8, evEbitda:16.4, roe:18.4, divYield:0.8, beta:0.52, epsGrowth:12.4,  revGrowth:8.4,   epsMom30d:2.4,  mom1w:0.6,  mom1m:2.4,  mom6m:6.4,   mom12m:12.4,  valueScore:17, growthScore:55 },
-  { ticker:'MRK',    company:'Merck KGaA',                 sector:'Health Care',           exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:148.40,change1d:0.62,  volume:428000,   mktCap:64.4,  peTrail:22.4, peFwd:18.4, pb:4.4, evEbitda:14.4, roe:18.4, divYield:1.2, beta:0.72, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.8,  mom1w:0.8,  mom1m:2.8,  mom6m:6.4,   mom12m:12.4,  valueScore:30, growthScore:38 },
-  { ticker:'MTX',    company:'MTU Aero Engines AG',        sector:'Industrials',           exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:298.40,change1d:1.24,  volume:284000,   mktCap:12.4,  peTrail:28.4, peFwd:22.4, pb:8.4, evEbitda:16.4, roe:28.4, divYield:1.4, beta:0.82, epsGrowth:22.4,  revGrowth:14.4,  epsMom30d:3.4,  mom1w:1.8,  mom1m:5.4,  mom6m:14.4,  mom12m:28.4,  valueScore:15, growthScore:90 },
-  { ticker:'SHL',    company:'Siemens Healthineers AG',    sector:'Health Care',           exchange:'XETRA',flag:'🇩🇪', country:'Germany',    price:52.44, change1d:0.42,  volume:1240000,  mktCap:46.8,  peTrail:28.4, peFwd:22.4, pb:4.4, evEbitda:16.4, roe:14.4, divYield:1.2, beta:0.72, epsGrowth:14.4,  revGrowth:8.4,   epsMom30d:2.4,  mom1w:0.8,  mom1m:2.8,  mom6m:6.4,   mom12m:12.4,  valueScore:22, growthScore:55 },
+const PIE_COLORS = ['#f97316','#3b82f6','#22c55e','#eab308','#8b5cf6',
+  '#14b8a6','#ef4444','#0ea5e9','#84cc16','#f59e0b','#6366f1','#ec4899']
 
-  // ── FRANCE (PA) ───────────────────────────────────────────────────
-  { ticker:'MC',     company:'LVMH Moët Hennessy Louis Vuitton',sector:'Consumer Discretionary',exchange:'PA',flag:'🇫🇷',country:'France',  price:584.40,change1d:-0.62, volume:428000,   mktCap:292.4, peTrail:24.8, peFwd:20.4, pb:4.8, evEbitda:14.2, roe:18.4, divYield:1.8, beta:0.92, epsGrowth:-8.4,  revGrowth:-4.2,  epsMom30d:-1.8, mom1w:-0.8, mom1m:-2.4, mom6m:-8.4,  mom12m:-12.4, valueScore:25, growthScore:20 },
-  { ticker:'TTE', company:'TotalEnergies SE', sector:'Energy', exchange:'PA', flag:'🇫🇷', country:'France', price:58.42, change1d:0.42, volume:8240000, mktCap:148.2, peTrail:9.8, peFwd:9.2, pb:1.4, evEbitda:4.2, roe:14.8, divYield:5.8, beta:0.74, epsGrowth:-4.2, revGrowth:-8.2, epsMom30d:-1.2, mom1w:0.4, mom1m:1.8, mom6m:4.2, mom12m:8.4, valueScore:73, growthScore:28 },
-  { ticker:'SAN', company:'Sanofi SA', sector:'Health Care', exchange:'PA', flag:'🇫🇷', country:'France', price:98.82, change1d:0.84, volume:2840000, mktCap:124.8, peTrail:18.4, peFwd:14.8, pb:2.4, evEbitda:12.4, roe:14.4, divYield:3.2, beta:0.42, epsGrowth:12.4, revGrowth:8.4, epsMom30d:2.4, mom1w:1.2, mom1m:3.4, mom6m:8.2, mom12m:14.8, valueScore:33, growthScore:64 },
-  { ticker:'BNP', company:'BNP Paribas SA', sector:'Financials', exchange:'PA', flag:'🇫🇷', country:'France', price:72.48, change1d:1.42, volume:4820000, mktCap:88.4, peTrail:8.4, peFwd:7.8, pb:0.8, evEbitda:null, roe:12.4, divYield:5.8, beta:1.24, epsGrowth:14.2, revGrowth:8.4, epsMom30d:2.8, mom1w:1.8, mom1m:5.4, mom6m:12.4, mom12m:24.2, valueScore:85, growthScore:84 },
-  { ticker:'AIR',    company:'Airbus SE',                   sector:'Industrials',           exchange:'PA',  flag:'🇫🇷', country:'France',     price:164.82,change1d:1.24,  volume:1240000,  mktCap:128.4, peTrail:28.4, peFwd:22.4, pb:8.4, evEbitda:18.4, roe:28.4, divYield:1.2, beta:0.84, epsGrowth:28.4,  revGrowth:14.2,  epsMom30d:4.2,  mom1w:2.2,  mom1m:6.4,  mom6m:14.2,  mom12m:28.4,  valueScore:15, growthScore:93 },
-  { ticker:'OR',     company:"L'Oréal SA",                  sector:'Consumer Staples',      exchange:'PA',  flag:'🇫🇷', country:'France',     price:342.40,change1d:0.24,  volume:428000,   mktCap:192.4, peTrail:38.4, peFwd:32.4, pb:8.4, evEbitda:24.8, roe:22.4, divYield:2.2, beta:0.62, epsGrowth:8.4,   revGrowth:6.2,   epsMom30d:1.8,  mom1w:0.6,  mom1m:1.8,  mom6m:4.8,   mom12m:8.4,   valueScore:5, growthScore:51 },
-  { ticker:'AXA', company:'AXA SA', sector:'Financials', exchange:'PA', flag:'🇫🇷', country:'France', price:38.82, change1d:0.84, volume:4280000, mktCap:62.4, peTrail:12.4, peFwd:11.2, pb:1.4, evEbitda:null, roe:14.8, divYield:5.2, beta:0.92, epsGrowth:12.4, revGrowth:8.4, epsMom30d:2.4, mom1w:1.2, mom1m:3.8, mom6m:8.4, mom12m:16.4, valueScore:63, growthScore:70 },
-  { ticker:'KER',    company:'Kering SA',                   sector:'Consumer Discretionary',exchange:'PA',  flag:'🇫🇷', country:'France',     price:198.40,change1d:-1.24, volume:428000,   mktCap:24.8,  peTrail:18.4, peFwd:16.2, pb:2.4, evEbitda:8.4,  roe:14.4, divYield:4.2, beta:0.94, epsGrowth:-22.4, revGrowth:-8.4,  epsMom30d:-4.2, mom1w:-1.8, mom1m:-6.4, mom6m:-18.4, mom12m:-32.4, valueScore:53, growthScore:3 },
-  { ticker:'DG',     company:'Vinci SA',                    sector:'Industrials',           exchange:'PA',  flag:'🇫🇷', country:'France',     price:118.40,change1d:0.62,  volume:984000,   mktCap:82.4,  peTrail:18.4, peFwd:16.4, pb:3.2, evEbitda:10.4, roe:18.4, divYield:3.8, beta:0.72, epsGrowth:8.4,   revGrowth:6.4,   epsMom30d:1.8,  mom1w:0.8,  mom1m:2.4,  mom6m:6.4,   mom12m:12.4,  valueScore:41, growthScore:56 },
-  { ticker:'CAP',    company:'Capgemini SE',                sector:'Technology',            exchange:'PA',  flag:'🇫🇷', country:'France',     price:182.40,change1d:0.42,  volume:428000,   mktCap:23.4,  peTrail:18.4, peFwd:16.4, pb:3.4, evEbitda:10.4, roe:18.4, divYield:2.4, beta:0.82, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.6,  mom1m:1.8,  mom6m:4.4,   mom12m:8.4,   valueScore:39, growthScore:41 },
-  { ticker:'SU',     company:'Schneider Electric SE',       sector:'Industrials',           exchange:'PA',  flag:'🇫🇷', country:'France',     price:238.40,change1d:1.24,  volume:984000,   mktCap:138.4, peTrail:32.4, peFwd:26.4, pb:6.4, evEbitda:22.4, roe:18.4, divYield:1.4, beta:0.92, epsGrowth:18.4,  revGrowth:12.4,  epsMom30d:3.4,  mom1w:1.8,  mom1m:5.4,  mom6m:14.4,  mom12m:28.4,  valueScore:15, growthScore:92 },
-  { ticker:'SGO', company:'Compagnie de Saint-Gobain', sector:'Materials', exchange:'PA', flag:'🇫🇷', country:'France', price:82.44, change1d:0.84, volume:1840000, mktCap:42.4, peTrail:12.4, peFwd:11.2, pb:1.8, evEbitda:7.4, roe:14.4, divYield:2.8, beta:1.04, epsGrowth:12.4, revGrowth:4.4, epsMom30d:2.4, mom1w:1.2, mom1m:3.8, mom6m:8.4, mom12m:16.4, valueScore:58, growthScore:63 },
-  { ticker:'RI', company:'Pernod Ricard SA', sector:'Consumer Staples', exchange:'PA', flag:'🇫🇷', country:'France', price:82.44, change1d:-0.42, volume:984000, mktCap:21.8, peTrail:18.4, peFwd:16.4, pb:2.4, evEbitda:12.4, roe:12.4, divYield:3.4, beta:0.62, epsGrowth:-12.4, revGrowth:-4.4, epsMom30d:-2.4, mom1w:-0.8, mom1m:-2.8, mom6m:-8.4, mom12m:-14.4, valueScore:28, growthScore:16 },
-  { ticker:'GLE', company:'Société Générale SA', sector:'Financials', exchange:'PA', flag:'🇫🇷', country:'France', price:28.44, change1d:1.24, volume:8240000, mktCap:23.4, peTrail:7.4, peFwd:6.8, pb:0.5, evEbitda:null, roe:8.4, divYield:6.4, beta:1.44, epsGrowth:22.4, revGrowth:8.4, epsMom30d:3.4, mom1w:2.2, mom1m:6.4, mom6m:14.4, mom12m:28.4, valueScore:95, growthScore:92 },
-  { ticker:'VIE', company:'Veolia Environnement SA', sector:'Utilities', exchange:'PA', flag:'🇫🇷', country:'France', price:28.44, change1d:0.42, volume:4280000, mktCap:18.4, peTrail:18.4, peFwd:16.4, pb:2.4, evEbitda:8.4, roe:12.4, divYield:4.2, beta:0.72, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:28, growthScore:41 },
-  { ticker:'STM', company:'STMicroelectronics NV', sector:'Technology', exchange:'PA', flag:'🇫🇷', country:'France', price:28.44, change1d:-1.82, volume:4200000, mktCap:25.6, peTrail:18.4, peFwd:14.2, pb:2.8, evEbitda:8.4, roe:18.2, divYield:0.8, beta:1.62, epsGrowth:-12.4, revGrowth:-8.2, epsMom30d:-3.4, mom1w:-2.4, mom1m:-8.2, mom6m:-18.4, mom12m:-28.2, valueScore:30, growthScore:7 },
-  { ticker:'DSY', company:'Dassault Systèmes SE', sector:'Technology', exchange:'PA', flag:'🇫🇷', country:'France', price:32.44, change1d:0.24, volume:2840000, mktCap:42.4, peTrail:38.4, peFwd:28.4, pb:6.4, evEbitda:22.4, roe:14.4, divYield:0.6, beta:0.82, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.4, mom1m:1.4, mom6m:3.8, mom12m:7.4, valueScore:5, growthScore:35 },
-  { ticker:'ML',     company:'Michelin SA',                 sector:'Consumer Discretionary',exchange:'PA',  flag:'🇫🇷', country:'France',     price:32.44, change1d:0.42,  volume:984000,   mktCap:22.4,  peTrail:12.4, peFwd:11.2, pb:2.4, evEbitda:6.4,  roe:18.4, divYield:3.4, beta:0.72, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.6,  mom1m:1.8,  mom6m:4.4,   mom12m:8.4,   valueScore:69, growthScore:41 },
+function PieChart(props: { data: Record<string, number>; title: string }) {
+  const entries = Object.entries(props.data).sort((a, b) => b[1] - a[1])
+  const total = entries.reduce((a, e) => a + e[1], 0)
+  let cum = -90
+  return (
+    <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, padding:16 }}>
+      <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+        letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text3)', marginBottom:12 }}>
+        {props.title}
+      </div>
+      <div style={{ display:'flex', gap:20, alignItems:'center', flexWrap:'wrap' }}>
+        <svg width="140" height="140" viewBox="0 0 140 140" style={{ flexShrink:0 }}>
+          {entries.map((e, i) => {
+            const angle = (e[1] / total) * 360
+            const s = cum * Math.PI / 180
+            cum += angle
+            const en = cum * Math.PI / 180
+            const x1 = 70 + 60 * Math.cos(s), y1 = 70 + 60 * Math.sin(s)
+            const x2 = 70 + 60 * Math.cos(en), y2 = 70 + 60 * Math.sin(en)
+            return (
+              <path key={e[0]}
+                d={`M70,70 L${x1.toFixed(1)},${y1.toFixed(1)} A60,60 0 ${angle > 180 ? 1 : 0},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`}
+                fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="var(--bg)" strokeWidth="1.5">
+                <title>{e[0]}: {e[1].toFixed(1)}%</title>
+              </path>
+            )
+          })}
+          <circle cx="70" cy="70" r="32" fill="var(--surface)" />
+        </svg>
+        <div style={{ display:'flex', flexDirection:'column', gap:5, flex:1 }}>
+          {entries.map((e, i) => (
+            <div key={e[0]} style={{ display:'flex', alignItems:'center', gap:7 }}>
+              <div style={{ width:10, height:10, borderRadius:2, background:PIE_COLORS[i % PIE_COLORS.length] }} />
+              <span style={{ fontSize:11, color:'var(--text2)', flex:1 }}>{e[0]}</span>
+              <span style={{ fontSize:11, fontFamily:'IBM Plex Mono', color:'var(--orange)', fontWeight:600 }}>
+                {e[1].toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
-  // ── NETHERLANDS (AS) ──────────────────────────────────────────────
-  { ticker:'ASML',   company:'ASML Holding NV',            sector:'Technology',            exchange:'AS',  flag:'🇳🇱', country:'Netherlands',price:742.40,change1d:-0.84, volume:824000,   mktCap:292.4, peTrail:38.4, peFwd:28.4, pb:18.4,evEbitda:28.4, roe:68.4, divYield:0.8, beta:1.42, epsGrowth:28.4,  revGrowth:22.4,  epsMom30d:4.8,  mom1w:-1.2, mom1m:-4.2, mom6m:-8.4,  mom12m:8.4,   valueScore:12, growthScore:70 },
-  { ticker:'INGA',   company:'ING Groep NV',               sector:'Financials',            exchange:'AS',  flag:'🇳🇱', country:'Netherlands',price:18.42, change1d:1.24,  volume:18400000, mktCap:68.4,  peTrail:9.4,  peFwd:8.4,  pb:0.9, evEbitda:null, roe:14.4, divYield:6.4, beta:1.14, epsGrowth:14.4,  revGrowth:8.4,   epsMom30d:2.8,  mom1w:1.8,  mom1m:5.4,  mom6m:12.4,  mom12m:24.4,  valueScore:93, growthScore:79 },
-  { ticker:'PHIA',   company:'Philips NV',                 sector:'Health Care',           exchange:'AS',  flag:'🇳🇱', country:'Netherlands',price:28.44, change1d:0.42,  volume:2840000,  mktCap:26.4,  peTrail:42.4, peFwd:22.4, pb:2.8, evEbitda:14.4, roe:4.4,  divYield:1.8, beta:0.84, epsGrowth:124.4, revGrowth:4.4,   epsMom30d:4.2,  mom1w:0.8,  mom1m:2.8,  mom6m:8.4,   mom12m:14.4,  valueScore:19, growthScore:72 },
-  { ticker:'AD',     company:'Ahold Delhaize NV',          sector:'Consumer Staples',      exchange:'AS',  flag:'🇳🇱', country:'Netherlands',price:32.44, change1d:0.24,  volume:3840000,  mktCap:32.4,  peTrail:14.4, peFwd:13.2, pb:2.4, evEbitda:8.4,  roe:18.4, divYield:3.8, beta:0.42, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.4,  mom1m:1.8,  mom6m:4.4,   mom12m:8.4,   valueScore:62, growthScore:36 },
-  { ticker:'RAND',   company:'Randstad NV',                sector:'Industrials',           exchange:'AS',  flag:'🇳🇱', country:'Netherlands',price:42.44, change1d:0.42,  volume:984000,   mktCap:7.4,   peTrail:18.4, peFwd:16.4, pb:2.4, evEbitda:8.4,  roe:14.4, divYield:4.8, beta:1.04, epsGrowth:8.4,   revGrowth:2.4,   epsMom30d:1.4,  mom1w:0.6,  mom1m:1.8,  mom6m:4.4,   mom12m:8.4,   valueScore:52, growthScore:26 },
-  { ticker:'NN',     company:'NN Group NV',                sector:'Financials',            exchange:'AS',  flag:'🇳🇱', country:'Netherlands',price:48.44, change1d:0.62,  volume:984000,   mktCap:9.8,   peTrail:12.4, peFwd:11.2, pb:1.4, evEbitda:null, roe:12.4, divYield:5.8, beta:0.84, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.8,  mom1m:2.4,  mom6m:6.4,   mom12m:12.4,  valueScore:79, growthScore:43 },
-  { ticker:'HEIA',   company:'Heineken NV',                sector:'Consumer Staples',      exchange:'AS',  flag:'🇳🇱', country:'Netherlands',price:82.44, change1d:0.24,  volume:984000,   mktCap:46.4,  peTrail:22.4, peFwd:18.4, pb:2.8, evEbitda:12.4, roe:14.4, divYield:2.4, beta:0.62, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.4,  mom1m:1.4,  mom6m:3.8,   mom12m:7.4,   valueScore:34, growthScore:26 },
+export default function Portfolio() {
+  const [portfolios,    setPortfolios]    = useState<Record<string, any[]>>({})
+  const [active,        setActive]        = useState('Portfolio 1')
+  const [newName,       setNewName]       = useState('')
+  const [searchQ,       setSearchQ]       = useState('')
+  const [searchRes,     setSearchRes]     = useState<Stock[]>([])
+  const [selectedStock, setSelectedStock] = useState<Stock | null>(null)
+  const [addQty,        setAddQty]        = useState('')
+  const [addPrice,      setAddPrice]      = useState('')
 
-  // ── SPAIN (MC) ────────────────────────────────────────────────────
-  { ticker:'ITX',    company:'Inditex SA',                 sector:'Consumer Discretionary',exchange:'MC',  flag:'🇪🇸', country:'Spain',      price:48.42, change1d:0.84,  volume:4280000,  mktCap:152.4, peTrail:28.4, peFwd:24.4, pb:8.4, evEbitda:18.4, roe:28.4, divYield:2.8, beta:0.62, epsGrowth:12.4,  revGrowth:8.4,   epsMom30d:2.4,  mom1w:1.2,  mom1m:3.8,  mom6m:8.4,   mom12m:18.4,  valueScore:10, growthScore:59 },
-  { ticker:'BBVA',   company:'Banco Bilbao Vizcaya Argentaria',sector:'Financials',       exchange:'MC',  flag:'🇪🇸', country:'Spain',      price:12.48, change1d:1.42,  volume:28400000, mktCap:82.4,  peTrail:8.4,  peFwd:7.8,  pb:1.2, evEbitda:null, roe:18.4, divYield:5.8, beta:1.24, epsGrowth:18.4,  revGrowth:12.4,  epsMom30d:3.4,  mom1w:2.2,  mom1m:6.4,  mom6m:14.4,  mom12m:28.4,  valueScore:75, growthScore:93 },
-  { ticker:'BSAN', company:'Banco Santander SA', sector:'Financials', exchange:'MC', flag:'🇪🇸', country:'Spain', price:5.84, change1d:1.24, volume:84200000, mktCap:98.4, peTrail:9.4, peFwd:8.4, pb:0.9, evEbitda:null, roe:14.8, divYield:4.8, beta:1.34, epsGrowth:14.4, revGrowth:8.4, epsMom30d:2.8, mom1w:1.8, mom1m:5.4, mom6m:12.4, mom12m:24.4, valueScore:75, growthScore:83 },
-  { ticker:'IBE', company:'Iberdrola SA', sector:'Utilities', exchange:'MC', flag:'🇪🇸', country:'Spain', price:14.84, change1d:0.42, volume:18400000, mktCap:98.4, peTrail:22.4, peFwd:18.4, pb:2.4, evEbitda:10.4, roe:10.4, divYield:4.2, beta:0.52, epsGrowth:12.4, revGrowth:8.4, epsMom30d:2.4, mom1w:0.8, mom1m:2.8, mom6m:6.4, mom12m:12.4, valueScore:25, growthScore:61 },
-  { ticker:'TEF', company:'Telefonica SA', sector:'Communication', exchange:'MC', flag:'🇪🇸', country:'Spain', price:4.42, change1d:0.24, volume:28400000, mktCap:25.4, peTrail:14.4, peFwd:12.4, pb:1.2, evEbitda:4.4, roe:8.4, divYield:7.4, beta:0.52, epsGrowth:8.4, revGrowth:2.4, epsMom30d:1.4, mom1w:0.4, mom1m:1.4, mom6m:3.8, mom12m:7.4, valueScore:47, growthScore:37 },
-  { ticker:'REP', company:'Repsol SA', sector:'Energy', exchange:'MC', flag:'🇪🇸', country:'Spain', price:12.84, change1d:0.42, volume:8240000, mktCap:18.4, peTrail:7.4, peFwd:7.0, pb:0.8, evEbitda:3.4, roe:10.4, divYield:7.8, beta:0.84, epsGrowth:-8.4, revGrowth:-4.4, epsMom30d:-1.4, mom1w:0.4, mom1m:1.4, mom6m:3.8, mom12m:7.4, valueScore:92, growthScore:18 },
-  { ticker:'AMS', company:'Amadeus IT Group SA', sector:'Technology', exchange:'MC', flag:'🇪🇸', country:'Spain', price:68.44, change1d:0.84, volume:984000, mktCap:28.4, peTrail:28.4, peFwd:22.4, pb:8.4, evEbitda:16.4, roe:28.4, divYield:1.4, beta:0.82, epsGrowth:18.4, revGrowth:8.4, epsMom30d:2.8, mom1w:1.2, mom1m:3.8, mom6m:8.4, mom12m:16.4, valueScore:8, growthScore:80 },
-  { ticker:'ENG', company:'Enagás SA', sector:'Utilities', exchange:'MC', flag:'🇪🇸', country:'Spain', price:14.84, change1d:0.24, volume:1840000, mktCap:3.8, peTrail:12.4, peFwd:11.4, pb:1.4, evEbitda:6.4, roe:8.4, divYield:8.4, beta:0.42, epsGrowth:4.4, revGrowth:2.4, epsMom30d:0.8, mom1w:0.2, mom1m:0.8, mom6m:2.4, mom12m:4.8, valueScore:53, growthScore:20 },
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
+    setPortfolios({ 'Portfolio 1':[], 'Portfolio 2':[], 'Portfolio 3':[], ...stored })
+  }, [])
 
-  // ── BELGIUM (BR) ──────────────────────────────────────────────────
-  { ticker:'ABI', company:'Anheuser-Busch InBev NV', sector:'Consumer Staples', exchange:'BR', flag:'🇧🇪', country:'Belgium', price:52.44, change1d:0.24, volume:2840000, mktCap:102.4, peTrail:18.4, peFwd:14.4, pb:2.4, evEbitda:10.4, roe:8.4, divYield:1.2, beta:0.62, epsGrowth:12.4, revGrowth:4.4, epsMom30d:1.8, mom1w:0.4, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:25, growthScore:70 },
-  { ticker:'UCB',    company:'UCB SA',                    sector:'Health Care',           exchange:'BR',  flag:'🇧🇪', country:'Belgium',    price:182.40,change1d:1.24,  volume:428000,   mktCap:36.4,  peTrail:48.4, peFwd:28.4, pb:6.4, evEbitda:28.4, roe:14.4, divYield:0.8, beta:0.62, epsGrowth:48.4,  revGrowth:22.4,  epsMom30d:6.4,  mom1w:1.8,  mom1m:5.4,  mom6m:14.4,  mom12m:28.4,  valueScore:31, growthScore:66 },
-  { ticker:'SOLB', company:'Solvay SA', sector:'Materials', exchange:'BR', flag:'🇧🇪', country:'Belgium', price:28.44, change1d:0.42, volume:984000, mktCap:4.8, peTrail:12.4, peFwd:11.2, pb:1.2, evEbitda:6.4, roe:8.4, divYield:3.8, beta:0.84, epsGrowth:8.4, revGrowth:2.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:75, growthScore:30 },
-  { ticker:'ARGX',   company:'argenx SE',                 sector:'Health Care',           exchange:'BR',  flag:'🇧🇪', country:'Belgium',    price:542.40,change1d:2.24,  volume:284000,   mktCap:34.4,  peTrail:null, peFwd:48.4, pb:8.4, evEbitda:null, roe:4.4,  divYield:0.0, beta:0.62, epsGrowth:null,  revGrowth:48.4,  epsMom30d:8.4,  mom1w:3.4,  mom1m:8.4,  mom6m:22.4,  mom12m:48.4,  valueScore:12, growthScore:88 },
+  useEffect(() => {
+    if (searchQ.length < 2) { setSearchRes([]); return }
+    const q = searchQ.toLowerCase()
+    const results = computeScores([...DEMO_STOCKS])
+      .filter(s => s.ticker.toLowerCase().includes(q) || (s.company || '').toLowerCase().includes(q))
+      .slice(0, 8)
+    setSearchRes(results)
+  }, [searchQ])
 
-  // ── FINLAND (HE) ─────────────────────────────────────────────────
-  { ticker:'NOKIA', company:'Nokia Oyj', sector:'Technology', exchange:'HE', flag:'🇫🇮', country:'Finland', price:4.82, change1d:-0.42, volume:28400000, mktCap:26.4, peTrail:18.4, peFwd:12.4, pb:1.8, evEbitda:8.4, roe:8.4, divYield:3.8, beta:0.84, epsGrowth:42.4, revGrowth:-4.4, epsMom30d:-1.4, mom1w:-0.8, mom1m:-2.8, mom6m:-6.4, mom12m:-8.4, valueScore:55, growthScore:30 },
-  { ticker:'FORTUM', company:'Fortum Oyj', sector:'Utilities', exchange:'HE', flag:'🇫🇮', country:'Finland', price:14.84, change1d:0.42, volume:4280000, mktCap:13.4, peTrail:18.4, peFwd:14.4, pb:1.4, evEbitda:7.4, roe:8.4, divYield:4.8, beta:0.72, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:44, growthScore:50 },
-  { ticker:'SAMPO', company:'Sampo Oyj', sector:'Financials', exchange:'HE', flag:'🇫🇮', country:'Finland', price:42.44, change1d:0.62, volume:984000, mktCap:22.4, peTrail:14.4, peFwd:12.8, pb:2.4, evEbitda:null, roe:14.4, divYield:5.8, beta:0.72, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.8, mom1w:0.8, mom1m:2.4, mom6m:6.4, mom12m:12.4, valueScore:50, growthScore:70 },
+  function save(pfs: typeof portfolios) {
+    setPortfolios(pfs)
+    localStorage.setItem('portfolios', JSON.stringify(pfs))
+  }
 
-  // ── AUSTRIA (VI) ─────────────────────────────────────────────────
-  { ticker:'VER', company:'Verbund AG', sector:'Utilities', exchange:'VI', flag:'🇦🇹', country:'Austria', price:68.44, change1d:0.42, volume:428000, mktCap:23.4, peTrail:22.4, peFwd:18.4, pb:3.4, evEbitda:12.4, roe:18.4, divYield:3.2, beta:0.52, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:25, growthScore:25 },
-  { ticker:'EBS', company:'Erste Group Bank AG', sector:'Financials', exchange:'VI', flag:'🇦🇹', country:'Austria', price:48.44, change1d:1.24, volume:1840000, mktCap:18.4, peTrail:8.4, peFwd:7.8, pb:0.8, evEbitda:null, roe:14.4, divYield:4.8, beta:1.14, epsGrowth:14.4, revGrowth:8.4, epsMom30d:2.8, mom1w:1.8, mom1m:5.4, mom6m:12.4, mom12m:24.4, valueScore:75, growthScore:75 },
+  function createPortfolio() {
+    if (!newName.trim() || portfolios[newName]) return
+    save({ ...portfolios, [newName]: [] })
+    setActive(newName); setNewName('')
+  }
 
-  // ── PORTUGAL (LS) ────────────────────────────────────────────────
-  { ticker:'GALP', company:'Galp Energia SGPS SA', sector:'Energy', exchange:'LS', flag:'🇵🇹', country:'Portugal', price:12.84, change1d:0.42, volume:4280000, mktCap:10.4, peTrail:12.4, peFwd:11.2, pb:2.4, evEbitda:5.4, roe:18.4, divYield:5.8, beta:0.84, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:50, growthScore:50 },
-  { ticker:'EDP',    company:'EDP Energias de Portugal SA',sector:'Utilities',            exchange:'LS',  flag:'🇵🇹', country:'Portugal',   price:3.42,  change1d:0.24,  volume:8240000,  mktCap:13.4,  peTrail:18.4, peFwd:14.4, pb:1.4, evEbitda:8.4,  roe:8.4,  divYield:5.2, beta:0.62, epsGrowth:4.4,   revGrowth:2.4,   epsMom30d:0.8,  mom1w:0.2,  mom1m:0.8,  mom6m:2.4,   mom12m:4.8,   valueScore:42, growthScore:25 },
+  function removePosition(idx: number) {
+    save({ ...portfolios, [active]: (portfolios[active] || []).filter((_: any, i: number) => i !== idx) })
+  }
 
-  // ── IRELAND (IR) ─────────────────────────────────────────────────
-  { ticker:'CRH', company:'CRH plc', sector:'Materials', exchange:'IR', flag:'🇮🇪', country:'Ireland', price:84.42, change1d:0.84, volume:1840000, mktCap:48.4, peTrail:18.4, peFwd:16.2, pb:3.4, evEbitda:12.4, roe:18.4, divYield:1.4, beta:0.82, epsGrowth:22.4, revGrowth:8.4, epsMom30d:3.4, mom1w:1.4, mom1m:4.2, mom6m:10.4, mom12m:22.4, valueScore:58, growthScore:75 },
-  { ticker:'DRVN', company:'Kerry Group plc', sector:'Consumer Staples', exchange:'IR', flag:'🇮🇪', country:'Ireland', price:82.44, change1d:0.42, volume:428000, mktCap:14.4, peTrail:22.4, peFwd:18.4, pb:2.8, evEbitda:14.4, roe:12.4, divYield:1.4, beta:0.52, epsGrowth:8.4, revGrowth:4.4, epsMom30d:1.4, mom1w:0.6, mom1m:1.8, mom6m:4.4, mom12m:8.4, valueScore:42, growthScore:25 },
+  function selectStock(s: Stock) {
+    setSelectedStock(s)
+    setAddPrice(s.price?.toFixed(2) || '')
+    setSearchQ(s.ticker + ' — ' + s.company)
+    setSearchRes([])
+  }
 
-  // ── GREECE (AT) ──────────────────────────────────────────────────
-  { ticker:'OPAP',   company:'OPAP SA',                   sector:'Consumer Discretionary',exchange:'AT',  flag:'🇬🇷', country:'Greece',     price:18.44, change1d:0.42,  volume:984000,   mktCap:5.8,   peTrail:14.4, peFwd:12.8, pb:4.4, evEbitda:8.4,  roe:28.4, divYield:7.8, beta:0.74, epsGrowth:8.4,   revGrowth:4.4,   epsMom30d:1.4,  mom1w:0.6,  mom1m:1.8,  mom6m:4.4,   mom12m:8.4,   valueScore:25, growthScore:25 },
-  { ticker:'ETE',    company:'National Bank of Greece SA',sector:'Financials',            exchange:'AT',  flag:'🇬🇷', country:'Greece',     price:8.44,  change1d:1.24,  volume:8240000,  mktCap:7.8,   peTrail:6.4,  peFwd:5.8,  pb:0.8, evEbitda:null, roe:14.4, divYield:4.8, beta:1.44, epsGrowth:22.4,  revGrowth:12.4,  epsMom30d:3.4,  mom1w:2.2,  mom1m:6.4,  mom6m:14.4,  mom12m:28.4,  valueScore:75, growthScore:75 },
-]
+  function addToPortfolio() {
+    if (!selectedStock || !addQty || !addPrice) return
+    const pfs = { ...portfolios }
+    if (!pfs[active]) pfs[active] = []
+    if (pfs[active].length >= 50) { toast.error('Max 50 positions'); return }
+    pfs[active].push({
+      ticker: selectedStock.ticker, exchange: selectedStock.exchange,
+      company: selectedStock.company, flag: selectedStock.flag,
+      sector: selectedStock.sector, country: selectedStock.country,
+      qty: parseFloat(addQty), buy_price: parseFloat(addPrice),
+      added_at: new Date().toISOString(),
+    })
+    save(pfs)
+    toast.success(`${selectedStock.ticker} added to ${active}`)
+    setSelectedStock(null); setSearchQ(''); setAddQty(''); setAddPrice('')
+  }
+
+  const allScored = computeScores([...DEMO_STOCKS])
+  const positions = portfolios[active] || []
+
+  const rows = positions.map((p: any) => {
+    const live = allScored.find(s => s.ticker === p.ticker && s.exchange === p.exchange)
+    const lastPx   = live?.price ?? p.buy_price
+    const chg1d    = live?.change1d ?? null
+    const costVal  = p.qty * p.buy_price
+    const mktVal   = p.qty * lastPx
+    const gainEur  = mktVal - costVal
+    const gainPct  = costVal > 0 ? (gainEur / costVal) * 100 : null
+    const dailyChg = chg1d != null ? mktVal * chg1d / 100 : null
+    return {
+      ...p, lastPx, chg1d, costVal, mktVal, gainEur, gainPct, dailyChg,
+      peTrail: live?.peTrail, peFwd: live?.peFwd, pb: live?.pb,
+      evEbitda: live?.evEbitda, roe: live?.roe, divYield: live?.divYield,
+      beta: live?.beta, epsGrowth: live?.epsGrowth, revGrowth: live?.revGrowth,
+      epsMom30d: live?.epsMom30d, mom1w: live?.mom1w, mom1m: live?.mom1m,
+      mom6m: live?.mom6m, mom12m: live?.mom12m,
+      valueScore: live?.valueScore, growthScore: live?.growthScore,
+    }
+  })
+
+  const totalCost    = rows.reduce((a: number, r: any) => a + r.costVal, 0)
+  const totalMkt     = rows.reduce((a: number, r: any) => a + r.mktVal, 0)
+  const totalGain    = totalMkt - totalCost
+  const totalGainPct = totalCost > 0 ? (totalGain / totalCost) * 100 : null
+  const totalDaily   = rows.reduce((a: number, r: any) => a + (r.dailyChg || 0), 0)
+  const ewChg1d      = totalMkt > 0
+    ? rows.reduce((a: number, r: any) => a + (r.chg1d || 0) * r.mktVal, 0) / totalMkt
+    : null
+
+  const rowsW = rows.map((r: any) => ({
+    ...r, weight: totalMkt > 0 ? (r.mktVal / totalMkt) * 100 : 0
+  }))
+
+  const sectorMap:  Record<string, number> = {}
+  const countryMap: Record<string, number> = {}
+  rowsW.forEach((r: any) => {
+    const sec = r.sector  || 'Other'
+    const cty = r.country || 'Other'
+    sectorMap[sec]  = (sectorMap[sec]  || 0) + r.weight
+    countryMap[cty] = (countryMap[cty] || 0) + r.weight
+  })
+
+  const wm: Record<string, number | null> = {}
+  ;['peTrail','peFwd','pb','evEbitda','roe','divYield','beta',
+    'epsGrowth','revGrowth','epsMom30d','mom1w','mom1m','mom6m','mom12m',
+    'valueScore','growthScore'].forEach(f => { wm[f] = weightedAvg(rowsW, f) })
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+      <div className="section-hdr">Portfolio Management</div>
+
+      <div style={{ background:'rgba(249,115,22,0.08)', border:'1px solid rgba(249,115,22,0.2)',
+        borderRadius:3, padding:'8px 12px', fontSize:11, color:'var(--text3)' }}>
+        Beta: portfolios stored in browser. Cloud sync via Supabase coming in full version.
+      </div>
+
+      <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:8 }}>
+        {Object.keys(portfolios).map(name => (
+          <button key={name} onClick={() => setActive(name)}
+            className={`tab-btn ${active === name ? 'active' : ''}`}>
+            {name} ({(portfolios[name] || []).length})
+          </button>
+        ))}
+        <div style={{ display:'flex', gap:6, marginLeft:'auto' }}>
+          <input value={newName} onChange={e => setNewName(e.target.value)}
+            placeholder="New portfolio name" className="input-field" style={{ width:160 }}
+            onKeyDown={e => { if (e.key === 'Enter') createPortfolio() }} />
+          <button onClick={createPortfolio} className="btn-ghost">+ Create</button>
+        </div>
+      </div>
+
+      <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, padding:16 }}>
+        <div style={{ fontSize:11, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+          letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--orange)', marginBottom:12 }}>
+          + Add Stock to {active}
+        </div>
+        <div style={{ position:'relative' }}>
+          <Search size={14} style={{ position:'absolute', left:10, top:'50%',
+            transform:'translateY(-50%)', color:'var(--text4)', pointerEvents:'none' }} />
+          <input value={searchQ} onChange={e => { setSearchQ(e.target.value); setSelectedStock(null) }}
+            placeholder="Search ticker or company (ENI, ASML, Intesa...)"
+            className="input-field" style={{ paddingLeft:32 }} />
+          {searchQ && (
+            <button onClick={() => { setSearchQ(''); setSearchRes([]); setSelectedStock(null) }}
+              style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)',
+                color:'var(--text4)', background:'none', border:'none', cursor:'pointer' }}>
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {searchRes.length > 0 && (
+          <div style={{ border:'1px solid var(--border2)', borderRadius:3, overflow:'hidden', marginTop:4, marginBottom:8 }}>
+            {searchRes.map((s, i) => (
+              <div key={i} onClick={() => selectStock(s)}
+                style={{ padding:'8px 12px', borderBottom: i < searchRes.length - 1 ? '1px solid var(--border)' : 'none',
+                  display:'flex', alignItems:'center', gap:12, cursor:'pointer',
+                  background: i % 2 === 0 ? 'var(--surface)' : 'var(--surface2)' }}>
+                <span style={{ fontSize:16 }}>{s.flag}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', fontWeight:700, color:'var(--orange)', width:60 }}>{s.ticker}</span>
+                <span style={{ color:'var(--text2)', fontSize:12, flex:1 }}>{s.company}</span>
+                <span style={{ color:'var(--text3)', fontSize:11 }}>{s.exchange}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', color:'var(--text)', fontSize:12 }}>€{s.price?.toFixed(2) || '—'}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {selectedStock && (
+          <div style={{ display:'flex', alignItems:'flex-end', gap:10, flexWrap:'wrap',
+            background:'var(--bg2)', border:'1px solid var(--orange)', borderRadius:3, padding:12, marginTop:8 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, flex:1 }}>
+              <span style={{ fontSize:20 }}>{selectedStock.flag}</span>
+              <div>
+                <div style={{ fontFamily:'IBM Plex Mono', fontWeight:700, color:'var(--orange)', fontSize:15 }}>
+                  {selectedStock.ticker}
+                </div>
+                <div style={{ fontSize:11, color:'var(--text3)' }}>{selectedStock.company}</div>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize:10, color:'var(--text3)', marginBottom:4,
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700, textTransform:'uppercase' }}>Qty</div>
+              <input type="number" placeholder="100" value={addQty}
+                onChange={e => setAddQty(e.target.value)} className="input-field" style={{ width:90 }} />
+            </div>
+            <div>
+              <div style={{ fontSize:10, color:'var(--text3)', marginBottom:4,
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700, textTransform:'uppercase' }}>Buy Price €</div>
+              <input type="number" value={addPrice}
+                onChange={e => setAddPrice(e.target.value)} className="input-field" style={{ width:100 }} />
+            </div>
+            <button onClick={addToPortfolio} className="btn-primary">+ Add</button>
+            <button onClick={() => { setSelectedStock(null); setSearchQ(''); setAddQty(''); setAddPrice('') }}
+              style={{ color:'var(--text4)', background:'none', border:'none', cursor:'pointer' }}>
+              <X size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
+        {([
+          ['Cost Value', `€${totalCost.toLocaleString('de-DE',{maximumFractionDigits:0})}`, 0],
+          ['Market Value', `€${totalMkt.toLocaleString('de-DE',{maximumFractionDigits:0})}`, 0],
+          ['Total Gain €', `€${totalGain>=0?'+':''}${totalGain.toLocaleString('de-DE',{maximumFractionDigits:0})}`, totalGain],
+          ['Total Gain %', fp(totalGainPct), totalGainPct ?? 0],
+          ['Daily Change €', `€${totalDaily>=0?'+':''}${totalDaily.toLocaleString('de-DE',{maximumFractionDigits:0})}`, totalDaily],
+          ['Daily Change %', fp(ewChg1d), ewChg1d ?? 0],
+        ] as [string,string,number][]).map(([label, value, colorVal], i) => (
+          <div key={i} className="metric-card">
+            <div className="metric-label">{label}</div>
+            <div className="metric-value" style={{
+              color: i < 2 ? 'var(--orange)' : colorVal > 0 ? 'var(--green)' : colorVal < 0 ? 'var(--red)' : 'var(--text3)'
+            }}>{value}</div>
+          </div>
+        ))}
+      </div>
+
+      {positions.length === 0 ? (
+        <div style={{ padding:48, textAlign:'center', color:'var(--text4)',
+          border:'1px dashed var(--border)', borderRadius:4 }}>
+          <Briefcase size={28} style={{ margin:'0 auto 10px', opacity:0.3 }} />
+          <p style={{ fontSize:13 }}>No positions. Search above or add from the Screener.</p>
+        </div>
+      ) : (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, overflow:'hidden' }}>
+            <div style={{ overflowX:'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Ticker</th><th>Company</th><th>Sector</th>
+                    <th>Qty</th><th>Buy €</th><th>Last €</th><th>1D %</th>
+                    <th>Cost €</th><th>Mkt Val €</th><th>Weight %</th>
+                    <th>Gain €</th><th>Gain %</th><th>Daily €</th><th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rowsW.map((r: any, i: number) => (
+                    <tr key={i}>
+                      <td>
+                        <span style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700, color:'var(--orange)' }}>
+                          {r.flag} {r.ticker}
+                        </span>
+                      </td>
+                      <td><span style={{ color:'var(--text2)', fontSize:12 }}>{r.company}</span></td>
+                      <td><span style={{ color:'var(--text3)', fontSize:11 }}>{r.sector || '—'}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono' }}>{r.qty}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono' }}>€{(+r.buy_price).toFixed(2)}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono', color:'var(--text)' }}>€{r.lastPx.toFixed(2)}</span></td>
+                      <td>
+                        <span style={{ fontFamily:'IBM Plex Mono', fontWeight:600,
+                          color: r.chg1d != null ? (r.chg1d >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--text3)' }}>
+                          {fp(r.chg1d)}
+                        </span>
+                      </td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono' }}>€{r.costVal.toLocaleString('de-DE',{maximumFractionDigits:0})}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono', fontWeight:600, color:'var(--text)' }}>€{r.mktVal.toLocaleString('de-DE',{maximumFractionDigits:0})}</span></td>
+                      <td>
+                        <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                          <div style={{ height:4, background:'var(--orange)', borderRadius:2,
+                            width:`${Math.min(r.weight,100)}%`, maxWidth:50, minWidth:2 }} />
+                          <span style={{ fontFamily:'IBM Plex Mono', fontSize:11 }}>{r.weight.toFixed(1)}%</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ fontFamily:'IBM Plex Mono', fontWeight:600,
+                          color: r.gainEur >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                          €{r.gainEur >= 0 ? '+' : ''}{r.gainEur.toLocaleString('de-DE',{maximumFractionDigits:0})}
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontFamily:'IBM Plex Mono', fontWeight:600,
+                          color: r.gainPct != null ? (r.gainPct >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--text3)' }}>
+                          {fp(r.gainPct)}
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontFamily:'IBM Plex Mono',
+                          color: r.dailyChg != null ? (r.dailyChg >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--text3)' }}>
+                          {r.dailyChg != null ? `€${r.dailyChg>=0?'+':''}${r.dailyChg.toLocaleString('de-DE',{maximumFractionDigits:0})}` : '—'}
+                        </span>
+                      </td>
+                      <td>
+                        <button onClick={() => removePosition(i)}
+                          style={{ color:'var(--red)', fontSize:12, cursor:'pointer', background:'none', border:'none' }}>✕</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr style={{ background:'var(--surface2)', borderTop:'2px solid var(--border)' }}>
+                    <td colSpan={3} style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                      fontSize:11, color:'var(--orange)', textTransform:'uppercase' }}>
+                      TOTAL ({positions.length})
+                    </td>
+                    <td></td><td></td><td></td>
+                    <td>
+                      <span style={{ fontFamily:'IBM Plex Mono', fontWeight:700,
+                        color: ewChg1d != null ? (ewChg1d >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--text3)' }}>
+                        {fp(ewChg1d)}
+                      </span>
+                    </td>
+                    <td><span style={{ fontFamily:'IBM Plex Mono', fontWeight:700 }}>€{totalCost.toLocaleString('de-DE',{maximumFractionDigits:0})}</span></td>
+                    <td><span style={{ fontFamily:'IBM Plex Mono', fontWeight:700 }}>€{totalMkt.toLocaleString('de-DE',{maximumFractionDigits:0})}</span></td>
+                    <td><span style={{ fontFamily:'IBM Plex Mono', fontWeight:700, color:'var(--orange)' }}>100%</span></td>
+                    <td>
+                      <span style={{ fontFamily:'IBM Plex Mono', fontWeight:700,
+                        color: totalGain >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                        €{totalGain>=0?'+':''}{totalGain.toLocaleString('de-DE',{maximumFractionDigits:0})}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ fontFamily:'IBM Plex Mono', fontWeight:700,
+                        color: totalGainPct != null ? (totalGainPct >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--text3)' }}>
+                        {fp(totalGainPct)}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ fontFamily:'IBM Plex Mono', fontWeight:700,
+                        color: totalDaily >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                        €{totalDaily>=0?'+':''}{totalDaily.toLocaleString('de-DE',{maximumFractionDigits:0})}
+                      </span>
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, padding:16 }}>
+            <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text3)',
+              marginBottom:12, paddingBottom:8, borderBottom:'1px solid var(--border)' }}>
+              Portfolio Weighted Metrics — Market Value Weighted Averages
+            </div>
+            <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--orange)', marginBottom:8 }}>
+              Valuation
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, marginBottom:16 }}>
+              {(['P/E Trailing|peTrail|fv1','P/E Forward|peFwd|fv1','P/B|pb|fv2',
+                'EV/EBITDA|evEbitda|fv1','ROE %|roe|fp1','Div Yield %|divYield|fp2','Beta|beta|fv2'
+              ]).map(spec => {
+                const [label, field, fmt] = spec.split('|')
+                const val = wm[field]
+                const display = fmt === 'fp1' ? fp(val,1) : fmt === 'fp2' ? fp(val,2) : fmt === 'fv1' ? fv(val,1) : fv(val,2)
+                return (
+                  <div key={field} className="metric-card">
+                    <div className="metric-label">{label}</div>
+                    <div className="metric-value" style={{ fontSize:'0.9rem' }}>{display}</div>
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--orange)', marginBottom:8 }}>
+              Growth &amp; Momentum
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, marginBottom:16 }}>
+              {(['EPS Growth %|epsGrowth','Rev Growth %|revGrowth','EPS Mom 30d|epsMom30d',
+                'Mom 1W|mom1w','Mom 1M|mom1m','Mom 6M|mom6m','Mom 12M|mom12m'
+              ]).map(spec => {
+                const [label, field] = spec.split('|')
+                return (
+                  <div key={field} className="metric-card">
+                    <div className="metric-label">{label}</div>
+                    <div className="metric-value" style={{ fontSize:'0.9rem',
+                      color: wm[field] != null ? (wm[field]! >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--orange)' }}>
+                      {fp(wm[field],1)}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--orange)', marginBottom:8 }}>
+              Composite Scores
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+              {(['Weighted Value Score|valueScore','Weighted Growth Score|growthScore']).map(spec => {
+                const [label, field] = spec.split('|')
+                const val = wm[field]
+                return (
+                  <div key={field} className="metric-card" style={{ display:'flex', alignItems:'center', gap:16 }}>
+                    <div style={{ flex:1 }}>
+                      <div className="metric-label">{label}</div>
+                      <div style={{ fontFamily:'IBM Plex Mono', fontSize:'1.4rem', fontWeight:700,
+                        color: val != null ? (val >= 60 ? 'var(--green)' : val >= 40 ? 'var(--orange)' : 'var(--red)') : 'var(--text3)' }}>
+                        {val != null ? Math.round(val) : '—'}
+                      </div>
+                    </div>
+                    {val != null && (
+                      <div style={{ width:80 }}>
+                        <div style={{ height:8, background:'var(--border)', borderRadius:4, overflow:'hidden' }}>
+                          <div style={{ height:'100%', borderRadius:4, width:`${Math.min(val,100)}%`,
+                            background: val >= 60 ? 'var(--green)' : val >= 40 ? 'var(--orange)' : 'var(--red)' }} />
+                        </div>
+                        <div style={{ fontSize:9, color:'var(--text3)', textAlign:'right', marginTop:3,
+                          fontFamily:'IBM Plex Mono' }}>{Math.round(val)}/100</div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {Object.keys(sectorMap).length > 0 && (
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              <PieChart data={sectorMap}  title="Sector Exposure — Market Value Weight %" />
+              <PieChart data={countryMap} title="Country Exposure — Market Value Weight %" />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
