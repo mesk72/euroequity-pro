@@ -485,9 +485,10 @@ function StockDetail({ stock, onClose, onAddPortfolio }: {
 }
 
 // ── SCREENER ──────────────────────────────────────────────────────
-function Screener({ initExchange = 'MIL', initSector = 'All', onSelectStock }: {
+function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock }: {
   initExchange?: string
   initSector?:   string
+  initEpsMom?:   string
   onSelectStock?: (s: Stock) => void
 }) {
   const [exchange,    setExchange]   = useState(initExchange)
@@ -696,7 +697,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', onSelectStock }: {
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────
-function Dashboard({ onSectorClick, onSelectStock }: { onSectorClick: (s: string) => void; onSelectStock?: (s: Stock) => void }) {
+function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: { onSectorClick: (s: string) => void; onSelectStock?: (s: Stock) => void; onGoScreener?: (filter: string) => void }) {
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -747,6 +748,18 @@ function Dashboard({ onSectorClick, onSelectStock }: { onSectorClick: (s: string
   const ewReturn = valid.length > 0
     ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length
     : null
+
+  // EPS Momentum 30d
+  const allWithEpsMom = allStocks.filter(s => s.epsMom30d != null)
+  const epsMomPos  = allWithEpsMom.filter(s => (s.epsMom30d || 0) > 0)
+  const epsMomNeg  = allWithEpsMom.filter(s => (s.epsMom30d || 0) < 0)
+  const topEpsMom  = [...allWithEpsMom].sort((a, b) => (b.epsMom30d || 0) - (a.epsMom30d || 0)).slice(0, 10)
+  const botEpsMom  = [...allWithEpsMom].sort((a, b) => (a.epsMom30d || 0) - (b.epsMom30d || 0)).slice(0, 10)
+
+  // Price Momentum 12M
+  const allWithMom12 = allStocks.filter(s => s.mom12m != null)
+  const topMom12   = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
+  const botMom12   = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
   return (
     <div className="space-y-6 fade-in">
@@ -851,6 +864,112 @@ function Dashboard({ onSectorClick, onSelectStock }: { onSectorClick: (s: string
         </div>
       )}
 
+      {/* EPS Momentum 30d — contatori cliccabili */}
+      {!loading && allWithEpsMom.length > 0 && (
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          {[
+            { label:'Stocks with Positive EPS Momentum 30d', count: epsMomPos.length, color:'var(--green)', filter:'epsMomPos' },
+            { label:'Stocks with Negative EPS Momentum 30d', count: epsMomNeg.length, color:'var(--red)',   filter:'epsMomNeg' },
+          ].map(({ label, count, color, filter }) => (
+            <div key={label}
+              onClick={() => onGoScreener && onGoScreener(filter)}
+              style={{ background:'var(--surface)', border:`1px solid ${color}30`,
+                borderLeft:`3px solid ${color}`, borderRadius:4, padding:'14px 18px',
+                cursor: onGoScreener ? 'pointer' : 'default',
+                transition:'background 0.15s' }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--surface2)'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--surface)'}>
+              <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:6 }}>
+                {label}
+              </div>
+              <div style={{ fontFamily:'IBM Plex Mono', fontSize:28, fontWeight:700, color }}>
+                {count}
+              </div>
+              {onGoScreener && (
+                <div style={{ fontSize:10, color:'var(--text4)', marginTop:4 }}>
+                  Click to open Eurozone Screener →
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Top 10 EPS Momentum 30d */}
+      {!loading && topEpsMom.length > 0 && (
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          {[
+            { title:'📈 Top 10 EPS Momentum 30d', list: topEpsMom, color:'var(--green)', field: 'epsMom30d' },
+            { title:'📉 Bottom 10 EPS Momentum 30d', list: botEpsMom, color:'var(--red)', field: 'epsMom30d' },
+          ].map(({ title, list, color, field }) => (
+            <div key={title} style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, overflow:'hidden' }}>
+              <div style={{ padding:'6px 12px', background:'var(--surface2)', borderBottom:'1px solid var(--border)',
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:10,
+                letterSpacing:'0.12em', textTransform:'uppercase', color }}>
+                {title}
+              </div>
+              <table className="data-table">
+                <thead><tr>
+                  <th>Ticker</th><th>Company</th><th>Price €</th><th>EPS Mom 30d</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      style={{ cursor:'pointer' }}>
+                      <td><span style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700, color:'var(--orange)' }}>{s.flag} {s.ticker}</span></td>
+                      <td><span style={{ color:'var(--text3)', fontSize:11 }}>{s.company}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono' }}>{fv(s.price, 2)}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono', fontWeight:600,
+                        color: (s.epsMom30d||0) >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                        {fp(s.epsMom30d)}
+                      </span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Top 10 Price Momentum 12M */}
+      {!loading && topMom12.length > 0 && (
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          {[
+            { title:'🚀 Top 10 Gainers — Price Mom 12M', list: topMom12, color:'var(--green)' },
+            { title:'💣 Top 10 Losers — Price Mom 12M',  list: botMom12, color:'var(--red)'   },
+          ].map(({ title, list, color }) => (
+            <div key={title} style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:4, overflow:'hidden' }}>
+              <div style={{ padding:'6px 12px', background:'var(--surface2)', borderBottom:'1px solid var(--border)',
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:10,
+                letterSpacing:'0.12em', textTransform:'uppercase', color }}>
+                {title}
+              </div>
+              <table className="data-table">
+                <thead><tr>
+                  <th>Ticker</th><th>Company</th><th>Price €</th><th>Mom 12M %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      style={{ cursor:'pointer' }}>
+                      <td><span style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700, color:'var(--orange)' }}>{s.flag} {s.ticker}</span></td>
+                      <td><span style={{ color:'var(--text3)', fontSize:11 }}>{s.company}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono' }}>{fv(s.price, 2)}</span></td>
+                      <td><span style={{ fontFamily:'IBM Plex Mono', fontWeight:700,
+                        color: (s.mom12m||0) >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                        {fp(s.mom12m)}
+                      </span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Heatmap settoriale */}
       {!loading && u200.length > 0 && (
         <div className="bg-surface border border-border rounded-lg p-4">
@@ -946,6 +1065,7 @@ export default function App() {
   const [sidebarOpen, setSidebar]    = useState(false)
   const [scrExchange, setScrExchange]= useState('MIL')
   const [scrSector,   setScrSector]  = useState('All')
+  const [scrEpsMom,   setScrEpsMom]  = useState<string>('')
   const [detailStock, setDetailStock] = useState<Stock | null>(null)
 
   useEffect(() => {
@@ -957,10 +1077,11 @@ export default function App() {
   }, [])
 
   function goSector(sector: string) {
-    setScrExchange('EZ')
-    setScrSector(sector)
-    setPage('screener')
-    setSidebar(false)
+    setScrExchange('EZ'); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
+  }
+
+  function goScreenerEpsMom(filter: string) {
+    setScrExchange('EZ'); setScrSector('All'); setScrEpsMom(filter); setPage('screener'); setSidebar(false)
   }
 
   const nav = [
@@ -1055,8 +1176,8 @@ export default function App() {
 
         {/* Page content */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
-          {page === 'dashboard' && <Dashboard onSectorClick={goSector} />}
-          {page === 'screener'  && <Screener key={`${scrExchange}-${scrSector}`} initExchange={scrExchange} initSector={scrSector} />}
+          {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
+          {page === 'screener'  && <Screener key={`${scrExchange}-${scrSector}-${scrEpsMom}`} initExchange={scrExchange} initSector={scrSector} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} />}
           {page === 'portfolio' && <Portfolio />}
           {page === 'legal'     && <Legal />}
         </div>
