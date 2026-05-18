@@ -200,6 +200,7 @@ const COLUMNS: ColDef[] = [
   { key: 'evEbitda',    label: 'EV/EBITDA',  width: 88  },
   { key: 'roe',         label: 'ROE %',      width: 82  },
   { key: 'divYield',    label: 'Div Yld %',  width: 82  },
+  { key: 'divPayout',   label: 'Payout %',   width: 82  },
   { key: 'beta',        label: 'Beta',       width: 72  },
   { key: 'epsGrowth',   label: 'EPS Gr %',   width: 88  },
   { key: 'revGrowth',   label: 'Rev Gr %',   width: 88  },
@@ -228,6 +229,7 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string } {
     case 'evEbitda':    return { val: v != null ? fv(v, 1)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
     case 'roe':         return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
     case 'divYield':    return { val: v != null ? fp(v)     : 'NA', cls: v != null ? (v > 0 ? 'pos' : 'neu')  : 'neu' }
+    case 'divPayout':   return { val: v != null ? fp(v)     : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
     case 'beta':        return { val: v != null ? fv(v, 2)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
     case 'epsGrowth':   return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
     case 'revGrowth':   return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
@@ -622,7 +624,8 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       added_at:  new Date().toISOString(),
     })
     localStorage.setItem('portfolios', JSON.stringify(stored))
-  }
+    }
+
   return (
     <div className="space-y-4 fade-in">
       {/* Exchange tabs */}
