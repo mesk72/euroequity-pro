@@ -517,17 +517,19 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   const [valMin,    setValMin]    = useState(0)
   const [growMin,   setGrowMin]   = useState(0)
 
-  // Load prices when exchange changes
+  // Load prices when exchange changes (or epsMom filter)
   useEffect(() => {
     setEnriched(false); setEnriching(false)
     setRawStocks([]); setStocks([])
     setSelected(null); setProgress(0)
     setLoading(true)
-    apiExchange(exchange).then(data => {
+    // Se arriva con filtro EPS Mom dal Dashboard, carica sempre tutto EZ
+    const exchToLoad = initEpsMom ? 'EZ' : exchange
+    apiExchange(exchToLoad).then(data => {
       setRawStocks(data)
       setLoading(false)
     })
-  }, [exchange])
+  }, [exchange, initEpsMom])
 
   // Filter
   const filtered = rawStocks.filter(s => {
@@ -536,6 +538,9 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       if (!s.ticker.toLowerCase().includes(q) && !(s.company || '').toLowerCase().includes(q)) return false
     }
     if (sector !== 'All' && s.sector !== sector) return false
+    // Filtro EPS Momentum dal Dashboard — applicato SEMPRE (non solo dopo enrich)
+    if (initEpsMom === 'epsMomPos' && (s.epsMom30d == null || s.epsMom30d <= 0)) return false
+    if (initEpsMom === 'epsMomNeg' && (s.epsMom30d == null || s.epsMom30d >= 0)) return false
     if (priceMin > 0 && (s.price || 0) < priceMin) return false
     if (priceMax > 0 && (s.price || 0) > priceMax) return false
     if (volMin   > 0 && (s.volume || 0) < volMin * 1000) return false
@@ -598,7 +603,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     })
     localStorage.setItem('portfolios', JSON.stringify(stored))
   }
-
   return (
     <div className="space-y-4 fade-in">
       {/* Exchange tabs */}
@@ -749,15 +753,16 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: { onSectorCli
     ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length
     : null
 
-  // EPS Momentum 30d
-  const allWithEpsMom = allStocks.filter(s => s.epsMom30d != null)
+  // EPS Momentum 30d — usa tutti gli stock demo per contatori accurati
+  const allScoredStocks = USE_DEMO ? computeScores([...DEMO_STOCKS]) : allStocks
+  const allWithEpsMom = allScoredStocks.filter(s => s.epsMom30d != null)
   const epsMomPos  = allWithEpsMom.filter(s => (s.epsMom30d || 0) > 0)
   const epsMomNeg  = allWithEpsMom.filter(s => (s.epsMom30d || 0) < 0)
   const topEpsMom  = [...allWithEpsMom].sort((a, b) => (b.epsMom30d || 0) - (a.epsMom30d || 0)).slice(0, 10)
   const botEpsMom  = [...allWithEpsMom].sort((a, b) => (a.epsMom30d || 0) - (b.epsMom30d || 0)).slice(0, 10)
 
-  // Price Momentum 12M
-  const allWithMom12 = allStocks.filter(s => s.mom12m != null)
+  // Price Momentum 12M — usa tutti gli stock demo
+  const allWithMom12 = allScoredStocks.filter(s => s.mom12m != null)
   const topMom12   = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
   const botMom12   = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
