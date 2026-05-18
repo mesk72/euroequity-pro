@@ -14,6 +14,7 @@ import AuthModal from '@/components/auth/AuthModal'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import Portfolio from '@/components/portfolio/PortfolioView'
+import StockDetailPage from '@/components/dashboard/StockDetailPage'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
 
@@ -522,7 +523,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All' }: {
       if (mom12Min>0 && (s.mom12m  || 0)                 < mom12Min) return false
       if (valMin > 0 && (s.valueScore  || 0)             < valMin) return false
       if (growMin> 0 && (s.growthScore || 0)             < growMin) return false
-      }
+    }
     return true
   })
 
@@ -651,7 +652,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All' }: {
       <div className="bg-surface border border-border rounded-lg overflow-hidden">
         <StockTable
           stocks={enriched ? filtered : candidates}
-          onSelect={setSelected}
+          onSelect={(s) => { setSelected(s); if (onSelectStock) onSelectStock(s) }}
           loading={loading}
         />
       </div>
@@ -669,7 +670,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All' }: {
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────
-function Dashboard({ onSectorClick }: { onSectorClick: (s: string) => void }) {
+function Dashboard({ onSectorClick, onSelectStock }: { onSectorClick: (s: string) => void; onSelectStock?: (s: Stock) => void }) {
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -800,7 +801,9 @@ function Dashboard({ onSectorClick }: { onSectorClick: (s: string) => void }) {
                 </thead>
                 <tbody>
                   {list.map((s, i) => (
-                    <tr key={`${s.ticker}.${s.exchange}.${i}`}>
+                    <tr key={`${s.ticker}.${s.exchange}.${i}`}
+                      onClick={() => onSelectStock && onSelectStock(s)}
+                      style={{ cursor: onSelectStock ? 'pointer' : 'default' }}>
                       <td className="font-700 text-text">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]">{s.company}</td>
                       <td className="font-mono">{fv(s.price, 2)}</td>
@@ -910,6 +913,7 @@ export default function App() {
   const [sidebarOpen, setSidebar]    = useState(false)
   const [scrExchange, setScrExchange]= useState('MIL')
   const [scrSector,   setScrSector]  = useState('All')
+  const [detailStock, setDetailStock] = useState<Stock | null>(null)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
