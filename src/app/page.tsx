@@ -146,16 +146,36 @@ function IndexCard({ name, close, changeP, loading }: {
 }) {
   return (
     <div className="index-card">
-      <div className="text-[9px] font-700 uppercase tracking-wide text-muted mb-1 truncate">{name}</div>
+      <div style={{
+        fontSize: 12,
+        fontFamily: 'IBM Plex Sans Condensed, sans-serif',
+        fontWeight: 700,
+        color: '#ffffff',
+        letterSpacing: '0.03em',
+        marginBottom: 5,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}>{name}</div>
       {loading ? (
         <div className="shimmer h-4 w-16 mt-1" />
       ) : close ? (
         <>
-          <div className={`font-mono font-600 text-sm ${clr(changeP)}`}>{fp(changeP)}</div>
-          <div className="font-mono text-[9px] text-sub">{close.toLocaleString('de-DE', { maximumFractionDigits: 1 })}</div>
+          <div style={{
+            fontFamily: 'IBM Plex Mono, monospace',
+            fontWeight: 700,
+            fontSize: 15,
+            color: (changeP || 0) >= 0 ? 'var(--green)' : 'var(--red)',
+          }}>{fp(changeP)}</div>
+          <div style={{
+            fontFamily: 'IBM Plex Mono, monospace',
+            fontSize: 11,
+            color: 'var(--text3)',
+            marginTop: 2,
+          }}>{close.toLocaleString('de-DE', { maximumFractionDigits: 1 })}</div>
         </>
       ) : (
-        <div className="text-[10px] text-muted">N/A</div>
+        <div style={{ fontSize: 11, color: 'var(--text4)' }}>N/A</div>
       )}
     </div>
   )
@@ -603,6 +623,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     })
     localStorage.setItem('portfolios', JSON.stringify(stored))
   }
+
   return (
     <div className="space-y-4 fade-in">
       {/* Exchange tabs */}
