@@ -174,26 +174,26 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string } {
     case 'ticker':      return { val: `${s.flag || ''} ${s.ticker}`, cls: 'font-600 text-text' }
     case 'company':     return { val: s.company || '—',   cls: 'text-sub' }
     case 'sector':      return { val: s.sector  || '—',   cls: 'text-muted text-[10px]' }
-    case 'price':       return { val: fv(v, 2),           cls: 'text-text' }
-    case 'change1d':    return { val: fp(v),              cls: clr(v) }
-    case 'volume':      return { val: fmtVol(v),          cls: 'text-sub' }
-    case 'mktCap':      return { val: fv(v, 1),           cls: 'text-sub' }
-    case 'peTrail':     return { val: fv(v, 1),           cls: 'text-sub' }
-    case 'peFwd':       return { val: fv(v, 1),           cls: 'text-sub' }
-    case 'pb':          return { val: fv(v, 2),           cls: 'text-sub' }
-    case 'evEbitda':    return { val: fv(v, 1),           cls: 'text-sub' }
-    case 'roe':         return { val: fp(v),              cls: clr(v) }
-    case 'divYield':    return { val: fp(v),              cls: v && v > 0 ? 'text-green' : 'text-sub' }
-    case 'beta':        return { val: fv(v, 2),           cls: 'text-sub' }
-    case 'epsGrowth':   return { val: fp(v),              cls: clr(v) }
-    case 'revGrowth':   return { val: fp(v),              cls: clr(v) }
-    case 'epsMom30d':   return { val: fp(v),              cls: clr(v) }
-    case 'mom1w':       return { val: fp(v),              cls: clr(v) }
-    case 'mom1m':       return { val: fp(v),              cls: clr(v) }
-    case 'mom6m':       return { val: fp(v),              cls: clr(v) }
-    case 'mom12m':      return { val: fp(v),              cls: clr(v) }
-    case 'valueScore':  return { val: fn(v), cls: v != null && v >= 70 ? 'text-green font-700' : v != null && v <= 30 ? 'text-red' : 'text-gold font-600' }
-    case 'growthScore': return { val: fn(v), cls: v != null && v >= 70 ? 'text-green font-700' : v != null && v <= 30 ? 'text-red' : 'text-gold font-600' }
+    case 'price':       return { val: v != null ? fv(v, 2)  : 'NA', cls: v != null ? 'text-text'                : 'neu' }
+    case 'change1d':    return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'volume':      return { val: v != null ? fmtVol(v) : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
+    case 'mktCap':      return { val: v != null ? fv(v, 1)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
+    case 'peTrail':     return { val: v != null ? fv(v, 1)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
+    case 'peFwd':       return { val: v != null ? fv(v, 1)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
+    case 'pb':          return { val: v != null ? fv(v, 2)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
+    case 'evEbitda':    return { val: v != null ? fv(v, 1)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
+    case 'roe':         return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'divYield':    return { val: v != null ? fp(v)     : 'NA', cls: v != null ? (v > 0 ? 'pos' : 'neu')  : 'neu' }
+    case 'beta':        return { val: v != null ? fv(v, 2)  : 'NA', cls: v != null ? 'text-sub'               : 'neu' }
+    case 'epsGrowth':   return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'revGrowth':   return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'epsMom30d':   return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'mom1w':       return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'mom1m':       return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'mom6m':       return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'mom12m':      return { val: v != null ? fp(v)     : 'NA', cls: v != null ? clr(v)                   : 'neu' }
+    case 'valueScore':  return { val: v != null ? fn(v)     : 'NA', cls: v != null ? (v >= 70 ? 'pos font-700' : v <= 30 ? 'neg' : 'gold font-600') : 'neu' }
+    case 'growthScore': return { val: v != null ? fn(v)     : 'NA', cls: v != null ? (v >= 70 ? 'pos font-700' : v <= 30 ? 'neg' : 'gold font-600') : 'neu' }
     default:            return { val: '—', cls: 'text-muted' }
   }
 }
@@ -528,7 +528,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', onSelectStock }: {
     }
     return true
   })
-const candidates = [...filtered]
+  const candidates = [...filtered]
     .sort((a, b) => (b.volume || 0) - (a.volume || 0))
     .slice(0, 100)
 
@@ -1059,4 +1059,3 @@ export default function App() {
     </div>
   )
 }
-      
