@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     const n      = closes.length
     const last   = closes[n - 1]
 
-    function mom(offset: number) {
+    const mom = (offset: number) => {
       const idx = Math.max(0, n - offset)
       return closes[idx] ? (last / closes[idx] - 1) * 100 : null
     }
