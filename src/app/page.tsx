@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   LayoutDashboard, Search, Briefcase, Globe,
@@ -257,7 +258,7 @@ function StockTable({ stocks, onSelect, loading }: {
           {sorted.map((s, i) => (
             <tr
               key={`${s.ticker}.${s.exchange}.${i}`}
-              onClick={() => onSelect(s)}
+              onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
               className="cursor-pointer"
             >
               {COLUMNS.map(c => {
@@ -527,7 +528,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', onSelectStock }: {
     }
     return true
   })
-
   const candidates = [...filtered]
     .sort((a, b) => (b.volume || 0) - (a.volume || 0))
     .slice(0, 100)
@@ -699,8 +699,12 @@ function Dashboard({ onSectorClick, onSelectStock }: { onSectorClick: (s: string
     clearTimeout(searchTimer.current)
     if (search.length < 2) { setSearchRes([]); return }
     searchTimer.current = setTimeout(() => {
-      apiSearch(search).then(setSearchRes)
-    }, 400)
+      const q = search.toLowerCase()
+      const results = computeScores([...DEMO_STOCKS])
+        .filter((s: any) => s.ticker.toLowerCase().includes(q) || (s.company||'').toLowerCase().includes(q))
+        .slice(0, 10)
+      setSearchRes(results)
+    }, 200)
   }, [search])
 
   // Top 200 per market cap — gainers/losers su titoli più grandi per capitalizzazione
@@ -735,9 +739,12 @@ function Dashboard({ onSectorClick, onSelectStock }: { onSectorClick: (s: string
           <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
             {searchRes.map((r: any) => (
               <div key={`${r.ticker}.${r.exchange}`}
+                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}`}
                 className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
+                <span style={{ fontSize:15 }}>{r.flag || ''}</span>
                 <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
                 <span className="text-sub flex-1 truncate">{r.company}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', fontSize:11, color:'var(--text3)' }}>€{r.price?.toFixed(2)||'—'}</span>
                 <span className="badge badge-delay text-[9px]">{r.exchange}</span>
               </div>
             ))}
@@ -803,8 +810,8 @@ function Dashboard({ onSectorClick, onSelectStock }: { onSectorClick: (s: string
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={`${s.ticker}.${s.exchange}.${i}`}
-                      onClick={() => onSelectStock && onSelectStock(s)}
-                      style={{ cursor: onSelectStock ? 'pointer' : 'default' }}>
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      style={{ cursor:'pointer' }}>
                       <td className="font-700 text-text">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]">{s.company}</td>
                       <td className="font-mono">{fv(s.price, 2)}</td>
