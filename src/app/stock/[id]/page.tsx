@@ -4,69 +4,12 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { computeScores } from '@/lib/ranking'
+import { STOCK_LINKS } from '@/lib/stockLinks'
 import { DEMO_STOCKS } from '@/lib/demoData'
 
-// Genera link ufficiale alla borsa per il titolo
-function getBorseLink(ticker: string, exchange: string): { url: string; label: string } | null {
-  switch (exchange) {
-    case 'MIL':
-      return {
-        url: `https://www.borsaitaliana.it/borsa/azioni/scheda/${ticker}.html`,
-        label: 'Borsa Italiana'
-      }
-    case 'XETRA':
-      return {
-        url: `https://www.boerse-frankfurt.de/equity/${ticker.toLowerCase()}-de`,
-        label: 'Börse Frankfurt'
-      }
-    case 'PA':
-      return {
-        url: `https://live.euronext.com/en/product/equities/${ticker}-XPAR`,
-        label: 'Euronext Paris'
-      }
-    case 'AS':
-      return {
-        url: `https://live.euronext.com/en/product/equities/${ticker}-XAMS`,
-        label: 'Euronext Amsterdam'
-      }
-    case 'BR':
-      return {
-        url: `https://live.euronext.com/en/product/equities/${ticker}-XBRU`,
-        label: 'Euronext Brussels'
-      }
-    case 'LS':
-      return {
-        url: `https://live.euronext.com/en/product/equities/${ticker}-XLIS`,
-        label: 'Euronext Lisbon'
-      }
-    case 'MC':
-      return {
-        url: `https://www.bolsasymercados.es/bme-exchange/es/Mercados-y-Cotizaciones/Acciones/Mercado-Continuo/Precios/${ticker}`,
-        label: 'BME Madrid'
-      }
-    case 'VI':
-      return {
-        url: `https://www.wienerborse.at/en/stocks-market/stocks/stock-detail/?ISIN=&ID_NOTATION=&ID_INSTRUMENT=&MNEMONIC=${ticker}`,
-        label: 'Wiener Börse'
-      }
-    case 'HE':
-      return {
-        url: `https://www.nasdaq.com/market-activity/stocks/${ticker.toLowerCase()}`,
-        label: 'Nasdaq Helsinki'
-      }
-    case 'IR':
-      return {
-        url: `https://live.euronext.com/en/product/equities/${ticker}-XDUB`,
-        label: 'Euronext Dublin'
-      }
-    case 'AT':
-      return {
-        url: `https://www.athexgroup.gr/en/web/guest/market-alternative-market?p_p_id=PriceDynamics_WAR_AthexPortlet&p_p_lifecycle=0&tickerSymbol=${ticker}`,
-        label: 'Athens Stock Exchange'
-      }
-    default:
-      return null
-  }
+// Recupera link ufficiali dalla mappa
+function getLinks(ticker: string, exchange: string) {
+  return STOCK_LINKS[`${ticker}.${exchange}`] || null
 }
 
 function fp(v?: number | null, d = 2): string {
@@ -523,28 +466,38 @@ export default function StockPage() {
           )}
         </div>
 
-        {/* Official exchange link */}
-        {getBorseLink(ticker, exchangeCode) && (() => {
-          const link = getBorseLink(ticker, exchangeCode)!
+        {/* Official links */}
+        {(() => {
+          const links = getLinks(ticker, exchangeCode)
+          if (!links) return null
           return (
             <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-              borderRadius:4, padding:'12px 16px', display:'flex', alignItems:'center',
-              justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
+              borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
+              justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
               <div>
                 <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                   letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)',
-                  marginBottom:4 }}>Official Listing</div>
-                <div style={{ fontSize:13, color:'var(--text2)' }}>
-                  {stock.company} — {link.label}
+                  marginBottom:6 }}>Official Links</div>
+                <div style={{ fontSize:12, color:'var(--text3)', fontFamily:'IBM Plex Mono' }}>
+                  ISIN: {links.isin}
                 </div>
               </div>
-              <a href={link.url} target="_blank" rel="noopener noreferrer"
-                style={{ background:'var(--orange)', color:'#fff',
-                  fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                  fontSize:12, padding:'7px 16px', borderRadius:3,
-                  textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                🔗 View on {link.label} ↗
-              </a>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                <a href={links.borseUrl} target="_blank" rel="noopener noreferrer"
+                  style={{ background:'var(--surface2)', color:'var(--text2)',
+                    fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                    fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
+                    textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+                  📊 Official Listing ↗
+                </a>
+                <a href={links.companyUrl} target="_blank" rel="noopener noreferrer"
+                  style={{ background:'var(--orange)', color:'#fff',
+                    fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                    fontSize:12, padding:'7px 14px', borderRadius:3,
+                    textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+                  🌐 Company Website ↗
+                </a>
+              </div>
             </div>
           )
         })()}
