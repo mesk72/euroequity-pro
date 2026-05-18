@@ -623,7 +623,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     })
     localStorage.setItem('portfolios', JSON.stringify(stored))
   }
-
   return (
     <div className="space-y-4 fade-in">
       {/* Exchange tabs */}
@@ -1111,10 +1110,16 @@ export default function App() {
   }
 
   const nav = [
-    { id: 'dashboard' as Page, label: 'Dashboard',  icon: <LayoutDashboard size={16} /> },
-    { id: 'screener'  as Page, label: 'Screener',   icon: <Search size={16} /> },
-    { id: 'portfolio' as Page, label: 'Portfolios', icon: <Briefcase size={16} /> },
-    { id: 'legal'     as Page, label: 'Legal',      icon: <Globe size={16} /> },
+    { id: 'dashboard' as Page, label: 'Dashboard',  icon: <LayoutDashboard size={16} />, internal: true },
+    { id: 'screener'  as Page, label: 'Screener',   icon: <Search size={16} />,          internal: true },
+    { id: 'portfolio' as Page, label: 'Portfolios', icon: <Briefcase size={16} />,       internal: true },
+    { id: 'legal'     as Page, label: 'Legal',      icon: <Globe size={16} />,           internal: true },
+  ]
+
+  const externalNav = [
+    { href: '/value',     label: '⭐ Best Value',  },
+    { href: '/sectors',   label: '🏭 Sectors',     },
+    { href: '/dividends', label: '💰 Dividends',   },
   ]
 
   return (
@@ -1151,6 +1156,17 @@ export default function App() {
             >
               {item.icon}{item.label}
             </button>
+          ))}
+          <div style={{ height:1, background:'var(--border)', margin:'8px 4px' }} />
+          {externalNav.map(item => (
+            <a key={item.href} href={item.href}
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px',
+                borderRadius:4, color:'var(--text3)', fontSize:13, fontWeight:500,
+                textDecoration:'none', transition:'all 0.12s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color='var(--text)'; (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.05)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color='var(--text3)'; (e.currentTarget as HTMLElement).style.background='transparent' }}>
+              {item.label}
+            </a>
           ))}
         </nav>
 
