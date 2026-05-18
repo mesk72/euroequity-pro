@@ -130,7 +130,7 @@ select.input-field option { background: var(--surface); color: var(--text); }
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 8px 10px;
+  padding: 9px 12px;
   text-align: left;
   border-bottom: 2px solid var(--border);
   border-right: 1px solid var(--border);
@@ -144,11 +144,11 @@ select.input-field option { background: var(--surface); color: var(--text); }
 .data-table th:last-child { border-right: none; }
 .data-table th:hover { color: var(--orange); }
 .data-table td {
-  padding: 7px 10px;
+  padding: 7px 12px;
   border-bottom: 1px solid rgba(30,45,69,0.6);
   border-right: 1px solid rgba(30,45,69,0.3);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
+  font-size: 12.5px;
   white-space: nowrap;
 }
 .data-table td:last-child { border-right: none; }
