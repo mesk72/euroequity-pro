@@ -201,23 +201,19 @@ export default function Portfolio() {
 
   // ── WEIGHTED PORTFOLIO METRICS ──────────────────────────────
   const live = allScored
+  const getM = (ticker: string, exchange: string, field: string): number | null => {
+    const s = live.find((x: any) => x.ticker === ticker && x.exchange === exchange) as any
+    const v = s ? s[field] : null
+    return v != null && !isNaN(v) ? v : null
+  }
+  const wM = (field: string) => wAvg(rowsWithWeight, (r: any) => getM(r.ticker, r.exchange, field))
   const wMetrics = {
-    peTrail:     wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.peTrail),
-    peFwd:       wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.peFwd),
-    pb:          wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.pb),
-    evEbitda:    wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.evEbitda),
-    roe:         wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.roe),
-    divYield:    wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.divYield),
-    beta:        wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.beta),
-    epsGrowth:   wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.epsGrowth),
-    revGrowth:   wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.revGrowth),
-    epsMom30d:   wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.epsMom30d),
-    mom1w:       wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.mom1w),
-    mom1m:       wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.mom1m),
-    mom6m:       wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.mom6m),
-    mom12m:      wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.mom12m),
-    valueScore:  wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.valueScore),
-    growthScore: wAvg(rowsWithWeight, r => live.find((s:Stock)=>s.ticker===r.ticker&&s.exchange===r.exchange)?.growthScore),
+    peTrail: wM('peTrail'), peFwd: wM('peFwd'), pb: wM('pb'),
+    evEbitda: wM('evEbitda'), roe: wM('roe'), divYield: wM('divYield'),
+    beta: wM('beta'), epsGrowth: wM('epsGrowth'), revGrowth: wM('revGrowth'),
+    epsMom30d: wM('epsMom30d'), mom1w: wM('mom1w'), mom1m: wM('mom1m'),
+    mom6m: wM('mom6m'), mom12m: wM('mom12m'),
+    valueScore: wM('valueScore'), growthScore: wM('growthScore'),
   }
 
   return (
