@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/update-live",
+      "schedule": "*/5 8-18 * * 1-5"
+    }
+  ]
+}
