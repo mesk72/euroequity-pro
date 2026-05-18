@@ -153,17 +153,17 @@ const COLUMNS: ColDef[] = [
   { key: 'peTrail',     label: 'P/E Tr.',   width: 65  },
   { key: 'peFwd',       label: 'P/E Fwd',   width: 65  },
   { key: 'pb',          label: 'P/B',       width: 55  },
-  { key: 'evEbitda',    label: 'EV/EBITDA', width: 75  },
-  { key: 'roe',         label: 'ROE %',     width: 65  },
-  { key: 'divYield',    label: 'Div %',     width: 60  },
-  { key: 'beta',        label: 'Beta',      width: 55  },
-  { key: 'epsGrowth',   label: 'EPS Gr%',   width: 70  },
-  { key: 'revGrowth',   label: 'Rev Gr%',   width: 70  },
-  { key: 'epsMom30d',   label: 'EPSMom30',  width: 75  },
-  { key: 'mom1w',       label: '1W %',      width: 60  },
-  { key: 'mom1m',       label: '1M %',      width: 60  },
-  { key: 'mom6m',       label: '6M %',      width: 60  },
-  { key: 'mom12m',      label: '12M %',     width: 65  },
+  { key: 'evEbitda',    label: 'EV/EBITDA',  width: 88  },
+  { key: 'roe',         label: 'ROE %',      width: 82  },
+  { key: 'divYield',    label: 'Div Yld %',  width: 82  },
+  { key: 'beta',        label: 'Beta',       width: 72  },
+  { key: 'epsGrowth',   label: 'EPS Gr %',   width: 88  },
+  { key: 'revGrowth',   label: 'Rev Gr %',   width: 88  },
+  { key: 'epsMom30d',   label: 'EPS Mom 30', width: 92  },
+  { key: 'mom1w',       label: '1W %',       width: 78  },
+  { key: 'mom1m',       label: '1M %',       width: 78  },
+  { key: 'mom6m',       label: '6M %',       width: 78  },
+  { key: 'mom12m',      label: '12M %',      width: 82  },
   { key: 'valueScore',  label: 'Value',     width: 55  },
   { key: 'growthScore', label: 'Growth',    width: 60  },
 ]
@@ -528,7 +528,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', onSelectStock }: {
     }
     return true
   })
-  const candidates = [...filtered]
+const candidates = [...filtered]
     .sort((a, b) => (b.volume || 0) - (a.volume || 0))
     .slice(0, 100)
 
@@ -1059,3 +1059,4 @@ export default function App() {
     </div>
   )
 }
+      
