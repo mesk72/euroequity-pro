@@ -20,8 +20,8 @@ import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
 
 // ── FLAGS ────────────────────────────────────────────────────────
-const USE_DEMO = false
-const USE_DB   = true
+const USE_DEMO = true   // true = dati demo hardcoded
+const USE_DB   = false  // true = legge da Supabase (dopo seed.py)
 // Quando Leeway risponde: imposta USE_DEMO=false, USA_DB=true
 
 // ── HELPERS ───────────────────────────────────────────────────────
@@ -1029,7 +1029,7 @@ function Legal() {
     ['Limitation of Liability',
      'To the maximum extent permitted by applicable law, Andrea Meschini shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages arising from use of the service, reliance on data, or any investment decisions made based on information from this platform.'],
     ['Privacy Policy (GDPR)',
-     'Andrea Meschini is the data controller. We collect: name, email, country, and usage data. Legal basis: contract performance (Art. 6.1.b GDPR), legitimate interest (Art. 6.1.f), consent (Art. 6.1.a). You have the right to access, rectify, erase, restrict, and port your data. Contact: langskltdlondon@gmail.com. We respond within 30 days. Data is stored on Supabase (EU servers, Frankfurt). We do not sell personal data to third parties.'],
+     'Andrea Meschini is the data controller. We collect: name, email, country, and usage data. Legal basis: contract performance (Art. 6.1.b GDPR), legitimate interest (Art. 6.1.f), consent (Art. 6.1.a). You have the right to access, rectify, erase, restrict, and port your data. Contact: andrea@forwardalpha.pro. We respond within 30 days. Data is stored on Supabase (EU servers, Frankfurt). We do not sell personal data to third parties.'],
     ['Cookie Policy',
      'We use strictly necessary cookies only (session management, security). No advertising or third-party tracking cookies. If analytics are introduced in future, explicit consent will be requested.'],
     ['Intellectual Property',
@@ -1052,7 +1052,7 @@ function Legal() {
       ))}
       <div className="text-xs text-muted border-t border-border pt-4">
         Andrea Meschini · Verona, Italy ·{' '}
-        <a href="mailto:langskltdlondon@gmail.com" className="text-gold underline">langskltdlondon@gmail.com</a>{' '}
+        <a href="mailto:andrea@forwardalpha.pro" className="text-gold underline">andrea@forwardalpha.pro</a>{' '}
         · © 2026
       </div>
     </div>
@@ -1178,9 +1178,9 @@ export default function App() {
           {user ? (
             <>
               <div className="text-[10px] text-green font-600 truncate">👤 {user.email}</div>
-              <button onClick={() => supabase.auth.signOut()}
-                className="flex items-center gap-1.5 text-xs text-muted hover:text-text">
-                <LogOut size={12} /> Sign out
+              <button onClick={async () => { await supabase.auth.signOut(); window.location.reload() }}
+                className="flex items-center gap-1.5 text-xs text-red hover:text-red-400 font-600">
+                <LogOut size={12} /> Log Out
               </button>
             </>
           ) : (
@@ -1193,7 +1193,7 @@ export default function App() {
 
         {/* Data source */}
         <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
-          <span className="text-green font-700">● DATA</span> · Leeway<br />
+          <span className="text-green font-700">● DATA</span> · TIKR / EODHD<br />
           Prices: 15-20 min delay · Cache: 60s<br />
           Fundamentals: daily · Cache: 1h
         </div>
@@ -1236,7 +1236,7 @@ export default function App() {
           <button onClick={() => setPage('legal')} className="hover:text-gold underline">Terms</button>
           <button onClick={() => setPage('legal')} className="hover:text-gold underline">Privacy</button>
           <button onClick={() => setPage('legal')} className="hover:text-gold underline">Disclaimer</button>
-          <a href="mailto:langskltdlondon@gmail.com" className="hover:text-gold">Contact</a>
+          <a href="mailto:andrea@forwardalpha.pro" className="hover:text-gold">Contact</a>
           <span>© 2026 Andrea Meschini</span>
         </footer>
       </main>
