@@ -199,7 +199,7 @@ const COLUMNS: ColDef[] = [
   { key: 'sector',      label: 'Sector',    width: 130 },
   { key: 'price',       label: 'Price',     width: 75  },
   { key: 'change1d',    label: '1D %',      width: 65  },
-  { key: 'mktCap',      label: 'MktCap B',  width: 80  },
+  { key: 'mktCap',      label: 'MktCap €B', width: 80  },
   { key: 'peTrail',     label: 'P/E Tr.',   width: 65  },
   { key: 'peFwd',       label: 'P/E Fwd',   width: 65  },
   { key: 'pb',          label: 'P/B',       width: 55  },
@@ -620,7 +620,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     apiExchange(exchToLoad).then(data => {
       setStocks(data)
       setLoading(false)
-      })
+    })
   }, [exchange, initEpsMom])
 
   const filtered = stocks.filter(s => {
@@ -752,6 +752,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const [loading,   setLoading]   = useState(true)
   const [search,    setSearch]    = useState('')
   const [searchRes, setSearchRes] = useState<any[]>([])
+  const [usdToEur,  setUsdToEur]  = useState(0.92)
   const searchTimer = useRef<any>(null)
 
   useEffect(() => {
@@ -759,6 +760,11 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     const loadIndices = () => apiIndices().then(setIndices)
     loadIndices()
     const timer = setInterval(loadIndices, 60000)
+
+    // Carica tasso USD/EUR
+    fetch('/api/fx').then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.usdToEur) setUsdToEur(d.usdToEur) })
+      .catch(() => {})
 
     setLoading(true)
     // Carica da tutti gli exchange — EMU + ex-EMU
@@ -796,12 +802,18 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     }, 200)
   }, [search])
 
+  // Applica conversione USD→EUR alla market cap
+  const stocksWithEurCap = allStocks.map(s => ({
+    ...s,
+    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur).toFixed(2)) : null
+  }))
+
   // Top 200 per market cap
-  const u200 = allStocks
+  const u200 = stocksWithEurCap
     .sort((a, b) => (b.mktCap || 0) - (a.mktCap || 0))
     .slice(0, 200)
 
-  const valid   = u200.filter(s => s.change1d != null)
+  const valid   = u200.filter((s:any) => s.change1d != null)
   const gainers = [...valid].sort((a, b) => (b.change1d || 0) - (a.change1d || 0)).slice(0, 10)
   const losers  = [...valid].sort((a, b) => (a.change1d || 0) - (b.change1d || 0)).slice(0, 10)
   const ewReturn = valid.length > 0
@@ -809,17 +821,17 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     : null
 
   // EPS Growth top/bottom 10 su tutto l'universo
-  const allWithEpsGrowth = allStocks.filter(s => s.epsGrowth != null)
+  const allWithEpsGrowth = stocksWithEurCap.filter(s => s.epsGrowth != null)
   const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10)
   const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10)
 
   // Price Momentum 12M top/bottom 10
-  const allWithMom12 = allStocks.filter(s => s.mom12m != null)
+  const allWithMom12 = stocksWithEurCap.filter(s => s.mom12m != null)
   const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
   // KPI V+G >= 80 — entrambi i rank >= 70 (titoli con buon value E buon growth)
-  const highVG = allStocks.filter(s =>
+  const highVG = stocksWithEurCap.filter(s =>
     s.valueScore != null && s.growthScore != null &&
     s.valueScore >= 70 && s.growthScore >= 70
   ).length
