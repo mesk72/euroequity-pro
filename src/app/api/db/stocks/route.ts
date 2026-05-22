@@ -8,70 +8,93 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-// Tutti gli exchange nel DB
 const ALL_EXCHANGES = [
   'MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT',
   'LSE','AIM','SWX','OM','NGM','OB','CPSE'
 ]
 
+async function fetchAllPaged(table: string, selectStr: string, exchangeFilter: string[]) {
+  const results: any[] = []
+  let from = 0
+  const pageSize = 1000
+  while (true) {
+    const { data, error } = await supabase
+      .from(table)
+      .select(selectStr)
+      .in('exchange', exchangeFilter)
+      .range(from, from + pageSize - 1)
+    if (error || !data?.length) break
+    results.push(...data)
+    if (data.length < pageSize) break
+    from += pageSize
+  }
+  return results
+}
+
 export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const ticker   = req.nextUrl.searchParams.get('ticker')   || ''
   const search   = req.nextUrl.searchParams.get('search')   || ''
-  const limit    = parseInt(req.nextUrl.searchParams.get('limit') || '500')
+  const limit    = parseInt(req.nextUrl.searchParams.get('limit') || '1000')
 
   try {
+    const exchanges = (exchange && exchange !== 'EZ')
+      ? [exchange]
+      : ALL_EXCHANGES
+
     // Query stocks
     let stocksQ = supabase
       .from('stocks')
       .select('ticker,exchange,isin,company,sector,country,flag,currency')
 
     if (ticker && exchange) {
-      // Ricerca singolo titolo
       stocksQ = stocksQ.eq('ticker', ticker).eq('exchange', exchange)
-    } else if (exchange && exchange !== 'EZ') {
-      stocksQ = stocksQ.eq('exchange', exchange)
     } else if (search) {
-      stocksQ = stocksQ.or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
+      stocksQ = stocksQ
+        .or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
+        .in('exchange', exchanges)
         .limit(limit)
+    } else {
+      stocksQ = stocksQ.in('exchange', exchanges)
     }
 
-    const { data: stocksData, error: stocksErr } = await stocksQ
+    // Paginazione per stocks
+    let stocksData: any[] = []
+    if (ticker && exchange) {
+      const { data } = await stocksQ
+      stocksData = data || []
+    } else if (search) {
+      const { data } = await stocksQ
+      stocksData = data || []
+    } else {
+      stocksData = await fetchAllPaged(
+        'stocks',
+        'ticker,exchange,isin,company,sector,country,flag,currency',
+        exchanges
+      )
+    }
 
-    if (stocksErr) return NextResponse.json({ error: stocksErr.message }, { status: 500 })
-    if (!stocksData?.length) return NextResponse.json({ stocks: [] })
+    if (!stocksData.length) return NextResponse.json({ stocks: [] })
 
-    const exchanges = ticker && exchange
-      ? [exchange]
-      : exchange && exchange !== 'EZ'
-        ? [exchange]
-        : ALL_EXCHANGES
+    // Prezzi live — paginati
+    const liveData = await fetchAllPaged(
+      'prices_live',
+      'ticker,exchange,price,change_1d,volume',
+      exchanges
+    )
 
-    // Prezzi live
-    let liveQ = supabase
-      .from('prices_live')
-      .select('ticker,exchange,price,change_1d,volume,updated_at')
-      .in('exchange', exchanges)
-    const { data: liveData } = await liveQ
-
-    // Fondamentali con momentum
-    let fundQ = supabase
-      .from('fundamentals')
-      .select(`ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,
-               roe,div_yield,div_payout,beta,eps_growth,rev_growth,
-               epsMom30d,mom1w,mom1m,mom6m,mom12m,
-               value_score,growth_score,fiscal_month,last_report_date`)
-      .in('exchange', exchanges)
-    const { data: fundData } = await fundQ
+    // Fondamentali — paginati
+    const fundData = await fetchAllPaged(
+      'fundamentals',
+      'ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,div_payout,beta,eps_growth,rev_growth,epsMom30d,mom1w,mom1m,mom6m,mom12m,value_score,growth_score',
+      exchanges
+    )
 
     const liveMap: Record<string, any> = {}
-    for (const l of (liveData || [])) {
-      liveMap[`${l.ticker}.${l.exchange}`] = l
-    }
+    for (const l of liveData) liveMap[`${l.ticker}.${l.exchange}`] = l
+
     const fundMap: Record<string, any> = {}
-    for (const f of (fundData || [])) {
-      fundMap[`${f.ticker}.${f.exchange}`] = f
-    }
+    for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
     const stocks = stocksData.map(s => {
       const key  = `${s.ticker}.${s.exchange}`
@@ -110,8 +133,8 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    return NextResponse.json({ stocks, source: 'supabase' })
-  } catch {
+    return NextResponse.json({ stocks, total: stocks.length, source: 'supabase' })
+  } catch (e) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
   }
 }
