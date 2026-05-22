@@ -1,35 +1,56 @@
-// ── EXCHANGES ────────────────────────────────────────────────────
+// ── EXCHANGES EMU ─────────────────────────────────────────────────
 export const EXCHANGES: Record<string, { flag: string; label: string; market: string; isin: string }> = {
-  MIL:   { flag: '🇮🇹', label: 'Italy',       market: 'FTSE MIB — Borsa Italiana',    isin: 'IT' },
-  XETRA: { flag: '🇩🇪', label: 'Germany',     market: 'DAX — Deutsche Börse',         isin: 'DE' },
-  PA:    { flag: '🇫🇷', label: 'France',      market: 'CAC 40 — Euronext Paris',      isin: 'FR' },
-  AS:    { flag: '🇳🇱', label: 'Netherlands', market: 'AEX — Euronext Amsterdam',     isin: 'NL' },
-  MC:    { flag: '🇪🇸', label: 'Spain',       market: 'IBEX 35 — BME Madrid',         isin: 'ES' },
-  BR:    { flag: '🇧🇪', label: 'Belgium',     market: 'BEL 20 — Euronext Brussels',   isin: 'BE' },
-  LS:    { flag: '🇵🇹', label: 'Portugal',    market: 'PSI — Euronext Lisbon',        isin: 'PT' },
-  VI:    { flag: '🇦🇹', label: 'Austria',     market: 'ATX — Wiener Börse',           isin: 'AT' },
-  HE:    { flag: '🇫🇮', label: 'Finland',     market: 'OMX Helsinki',                 isin: 'FI' },
-  IR:    { flag: '🇮🇪', label: 'Ireland',     market: 'ISEQ — Euronext Dublin',       isin: 'IE' },
-  AT:    { flag: '🇬🇷', label: 'Greece',      market: 'ASE — Athens SE',              isin: 'GR' },
+  MIL:   { flag: '🇮🇹', label: 'Italy',       market: 'Borsa Italiana MTA',     isin: 'IT' },
+  XETRA: { flag: '🇩🇪', label: 'Germany',     market: 'Deutsche Börse XETRA',   isin: 'DE' },
+  PA:    { flag: '🇫🇷', label: 'France',      market: 'Euronext Paris',         isin: 'FR' },
+  AS:    { flag: '🇳🇱', label: 'Netherlands', market: 'Euronext Amsterdam',     isin: 'NL' },
+  MC:    { flag: '🇪🇸', label: 'Spain',       market: 'BME Madrid',             isin: 'ES' },
+  BR:    { flag: '🇧🇪', label: 'Belgium',     market: 'Euronext Brussels',      isin: 'BE' },
+  LS:    { flag: '🇵🇹', label: 'Portugal',    market: 'Euronext Lisbon',        isin: 'PT' },
+  VI:    { flag: '🇦🇹', label: 'Austria',     market: 'Wiener Börse',           isin: 'AT' },
+  HE:    { flag: '🇫🇮', label: 'Finland',     market: 'Nasdaq Helsinki',        isin: 'FI' },
+  IR:    { flag: '🇮🇪', label: 'Ireland',     market: 'Euronext Dublin',        isin: 'IE' },
+  AT:    { flag: '🇬🇷', label: 'Greece',      market: 'Athens SE',              isin: 'GR' },
 }
 
-// ── INDICES ──────────────────────────────────────────────────────
-export const INDICES = [
-  { name: 'Euro Stoxx 50',      ticker: 'STOXX50E.INDX' },
-  { name: 'FTSE MIB All Share', ticker: 'ITLMS.INDX'    },
-  { name: 'DAX',                ticker: 'GDAXI.INDX'    },
-  { name: 'CAC 40',             ticker: 'FCHI.INDX'     },
-  { name: 'AEX',                ticker: 'AEX.INDX'      },
-  { name: 'IBEX 35',            ticker: 'IBEX.INDX'     },
-  { name: 'BEL 20',             ticker: 'BFX.INDX'      },
-  { name: 'PSI',                ticker: 'PSI20.INDX'    },
-  { name: 'ATX',                ticker: 'ATX.VI'        },
-  { name: 'OMX Helsinki 25',    ticker: 'OMXH25.HE'    },
-  { name: 'ISEQ',               ticker: 'ISEQ.IR'       },
-  { name: 'ASE',                ticker: 'ATG.AT'        },
+// ── EXCHANGES EX-EMU ──────────────────────────────────────────────
+export const EXCHANGES_EXEMU: Record<string, { flag: string; label: string; market: string; currency: string }> = {
+  LSE:  { flag: '🇬🇧', label: 'UK (LSE)',      market: 'London Stock Exchange',  currency: 'GBP' },
+  AIM:  { flag: '🇬🇧', label: 'UK (AIM)',      market: 'AIM London',             currency: 'GBP' },
+  SWX:  { flag: '🇨🇭', label: 'Switzerland',   market: 'SIX Swiss Exchange',     currency: 'CHF' },
+  OM:   { flag: '🇸🇪', label: 'Sweden (OM)',   market: 'Nasdaq Stockholm',       currency: 'SEK' },
+  NGM:  { flag: '🇸🇪', label: 'Sweden (NGM)',  market: 'NGM Stockholm',          currency: 'SEK' },
+  OB:   { flag: '🇳🇴', label: 'Norway',        market: 'Oslo Børs',              currency: 'NOK' },
+  CPSE: { flag: '🇩🇰', label: 'Denmark',       market: 'Nasdaq Copenhagen',      currency: 'DKK' },
+}
+
+// Tutti gli exchange
+export const ALL_EXCHANGES = [
+  ...Object.keys(EXCHANGES),
+  ...Object.keys(EXCHANGES_EXEMU),
 ]
 
-// ── SECTORS ──────────────────────────────────────────────────────
+// ── INDICES EMU ───────────────────────────────────────────────────
+export const INDICES = [
+  { name: 'Euro Stoxx 50',   ticker: 'STOXX50E.INDX' },
+  { name: 'FTSE MIB',        ticker: 'ITLMS.INDX'    },
+  { name: 'DAX',             ticker: 'GDAXI.INDX'    },
+  { name: 'CAC 40',          ticker: 'FCHI.INDX'     },
+  { name: 'AEX',             ticker: 'AEX.INDX'      },
+  { name: 'IBEX 35',         ticker: 'IBEX.INDX'     },
+  { name: 'BEL 20',          ticker: 'BFX.INDX'      },
+  { name: 'OMX Helsinki',    ticker: 'OMXH25.HE'     },
+  { name: 'ATX',             ticker: 'ATX.VI'        },
+  { name: 'ASE',             ticker: 'ATG.AT'        },
+  // Ex-EMU
+  { name: 'FTSE 100',        ticker: 'FTSE.INDX'     },
+  { name: 'SMI',             ticker: 'SSMI.INDX'     },
+  { name: 'OMX Stockholm',   ticker: 'OMXS30.INDX'   },
+  { name: 'OBX',             ticker: 'OBX.OL'        },
+  { name: 'OMX Copenhagen',  ticker: 'OMXC25.INDX'   },
+]
+
+// ── SECTORS ───────────────────────────────────────────────────────
 export const SECTOR_COLORS: Record<string, string> = {
   'Financials':             '#3b82f6',
   'Technology':             '#8b5cf6',
@@ -40,11 +61,9 @@ export const SECTOR_COLORS: Record<string, string> = {
   'Consumer Staples':       '#14b8a6',
   'Materials':              '#f97316',
   'Utilities':              '#06b6d4',
-  'Communication':          '#84cc16',
+  'Communication Services': '#84cc16',
   'Real Estate':            '#a855f7',
-  'Insurance':              '#0ea5e9',
   'Other':                  '#6b7280',
 }
 
 export const MAX_SCREEN = 100
-export const LEEWAY_BASE = 'https://api.leeway.tech/api/v1/public'
