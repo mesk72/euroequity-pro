@@ -33,18 +33,12 @@ export const ALL_EXCHANGES = [
 // Exchange EMU only
 export const EMU_EXCHANGES = Object.keys(EXCHANGES)
 
-// ── FX rates vs EUR (per conversione market cap) ──────────────────
-export const FX_TO_EUR: Record<string, number> = {
-  EUR: 1,
-  GBP: 1.18,   // aggiornato via API
-  CHF: 1.05,
-  SEK: 0.088,
-  NOK: 0.086,
-  DKK: 0.134,
-  USD: 0.92,
-}
+// ── FX rates ─────────────────────────────────────────────────────
+// Market cap da TIKR è in USD per tutti i titoli
+// Conversione USD → EUR per normalizzare la market cap
+export const USD_TO_EUR = 0.92  // aggiornato via ExchangeRate-API
 
-// Valuta per exchange
+// Valuta locale per exchange (per i prezzi — non per market cap)
 export const EXCHANGE_CURRENCY: Record<string, string> = {
   MIL:'EUR', XETRA:'EUR', PA:'EUR', AS:'EUR', MC:'EUR',
   BR:'EUR', LS:'EUR', VI:'EUR', HE:'EUR', IR:'EUR', AT:'EUR',
