@@ -578,7 +578,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       ticker: stock.ticker, exchange: stock.exchange,
       company: stock.company, flag: stock.flag,
       qty, buy_price: price, added_at: new Date().toISOString(),
-      })
+    })
     localStorage.setItem('portfolios', JSON.stringify(stored))
     const names = Object.keys(stored)
     setPortfolioNames(names)
@@ -677,9 +677,14 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     const timer = setInterval(loadIndices, 60000)
 
     setLoading(true)
+    // Carica da tutti gli exchange — EMU + ex-EMU
+    const ALL_EXCHANGES = [
+      'MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT',
+      'LSE','AIM','SWX','OM','NGM','OB','CPSE'
+    ]
     Promise.all(
-      Object.keys(EXCHANGES).map(code =>
-        apiExchange(code).then(stocks => stocks.slice(0, 30))
+      ALL_EXCHANGES.map(code =>
+        apiExchange(code).then(stocks => stocks.slice(0, 50))
       )
     ).then(arrays => {
       setAllStocks(arrays.flat())
@@ -733,10 +738,11 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
-  // KPI V+G >= 80
+  // KPI V+G >= 80 — almeno uno dei due rank deve essere >=80 (o media >=80)
   const highVG = allStocks.filter(s =>
     s.valueScore != null && s.growthScore != null &&
-    (s.valueScore + s.growthScore) >= 80
+    s.valueScore >= 40 && s.growthScore >= 40 &&
+    (s.valueScore + s.growthScore) / 2 >= 50
   ).length
 
   return (
