@@ -71,7 +71,7 @@ export interface Stock {
   evEbitda:     number | null
   roe:          number | null
   divYield:     number | null
-  divPayout:    number | null
+  divPayout?:   number | null
   beta:         number | null
   epsGrowth:    number | null
   revGrowth:    number | null
