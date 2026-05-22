@@ -8,7 +8,7 @@ import {
   ChevronUp, ChevronDown, TrendingUp, TrendingDown
 } from 'lucide-react'
 import { supabase, createProfile, ensureDefaultPortfolios } from '@/lib/supabase'
-import { EXCHANGES, INDICES } from '@/lib/constants'
+import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/constants'
 import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
@@ -582,7 +582,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     localStorage.setItem('portfolios', JSON.stringify(stored))
     const names = Object.keys(stored)
     setPortfolioNames(names)
-  }
+    }
 
   return (
     <div className="space-y-4 fade-in">
@@ -593,6 +593,13 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           🌍 All Eurozone
         </button>
         {Object.entries(EXCHANGES).map(([code, meta]) => (
+          <button key={code} onClick={() => setExchange(code)}
+            className={`px-3 py-1.5 rounded text-xs font-600 border transition-colors ${exchange === code ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
+            {meta.flag} {meta.label}
+          </button>
+        ))}
+        <div style={{ width:1, background:'var(--border)', margin:'0 4px' }} />
+        {Object.entries(EXCHANGES_EXEMU).map(([code, meta]) => (
           <button key={code} onClick={() => setExchange(code)}
             className={`px-3 py-1.5 rounded text-xs font-600 border transition-colors ${exchange === code ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
             {meta.flag} {meta.label}
@@ -678,10 +685,6 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
     setLoading(true)
     // Carica da tutti gli exchange — EMU + ex-EMU
-    const ALL_EXCHANGES = [
-      'MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT',
-      'LSE','AIM','SWX','OM','NGM','OB','CPSE'
-    ]
     Promise.all(
       ALL_EXCHANGES.map(code =>
         apiExchange(code).then(stocks => stocks.slice(0, 50))
