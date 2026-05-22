@@ -13,15 +13,15 @@ function getLinks(ticker: string, exchange: string) {
 }
 
 function fp(v?: number | null, d = 2): string {
-  if (v == null || isNaN(v as number)) return '—'
+  if (v == null || isNaN(v as number)) return '-'
   return `${(v as number) >= 0 ? '+' : ''}${(v as number).toFixed(d)}%`
 }
 function fv(v?: number | null, d = 2): string {
-  if (v == null || isNaN(v as number)) return '—'
+  if (v == null || isNaN(v as number)) return '-'
   return (v as number).toFixed(d)
 }
 function fn(v?: number | null): string {
-  if (v == null || isNaN(v as number)) return '—'
+  if (v == null || isNaN(v as number)) return '-'
   return String(Math.round(v as number))
 }
 function clr(v?: number | null): string {
@@ -201,10 +201,32 @@ export default function StockPage() {
   const id      = (params?.id as string) || ''
   const [ticker, exchangeCode] = id.split('-')
 
-  const allStocks = computeScores([...DEMO_STOCKS])
-  const stock = allStocks.find(s =>
-    s.ticker === ticker && s.exchange === exchangeCode
-  )
+  const [stock, setStock] = useState<any>(null)
+  const [loadingStock, setLoadingStock] = useState(true)
+
+  useEffect(() => {
+    if (!ticker || !exchangeCode) return
+    // Prova prima dal DB
+    fetch(`/api/db/stocks?ticker=${ticker}&exchange=${exchangeCode}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.stocks?.[0]) {
+          setStock(d.stocks[0])
+        } else {
+          // Fallback a demo
+          const allStocks = computeScores([...DEMO_STOCKS])
+          const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
+          setStock(found || null)
+        }
+        setLoadingStock(false)
+      })
+      .catch(() => {
+        const allStocks = computeScores([...DEMO_STOCKS])
+        const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
+        setStock(found || null)
+        setLoadingStock(false)
+      })
+  }, [ticker, exchangeCode])
 
   const [chartDays, setChartDays]   = useState(365)
   const [history,   setHistory]     = useState<any[]>([])
@@ -217,7 +239,7 @@ export default function StockPage() {
   useEffect(() => {
     if (!ticker || !exchangeCode) return
     setLoading(true)
-    fetch(`/api/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays, 400)}`)
+    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays, 400)}`)
       .then(r => r.ok ? r.json() : { history: [] })
       .then(d => { setHistory(d.history || []); setLoading(false) })
       .catch(() => setLoading(false))
