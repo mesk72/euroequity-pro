@@ -255,6 +255,14 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
 }) {
   const [sortKey, setSortKey] = useState<SortKey>('mktCap')
   const [sortAsc, setSortAsc] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const sorted = [...stocks].sort((a, b) => {
     const av = a[sortKey] as any
@@ -282,6 +290,66 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
     <div className="p-8 text-center text-muted text-sm">No stocks match your filters.</div>
   )
 
+  // ── MOBILE: card list ────────────────────────────────────────────
+  if (isMobile) return (
+    <div>
+      <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
+        ⚠️ Prices delayed 15-20 min
+      </div>
+      {sorted.map((s, i) => {
+        const sColor = getSectorColor(s.sector)
+        return (
+          <div key={i}
+            onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
+            className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
+            {/* Row 1: flag+ticker | price | change */}
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="font-700 text-sm text-orange">{s.flag} {s.ticker}</span>
+                <span className="text-[9px] text-muted">{s.exchange}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-600 text-sm text-text">
+                  {s.price != null ? s.price.toFixed(2) : '-'}
+                </span>
+                <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-green' : 'text-red') : 'text-muted'}`}>
+                  {s.change1d != null ? `${s.change1d >= 0 ? '+' : ''}${s.change1d.toFixed(2)}%` : '-'}
+                </span>
+              </div>
+            </div>
+            {/* Row 2: company | sector */}
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
+              <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
+            </div>
+            {/* Row 3: mktcap | PE | PB | Value | Growth */}
+            <div className="flex items-center gap-3 text-[10px] font-mono">
+              <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${s.mktCap.toFixed(1)}B` : '-'}</span></span>
+              <span className="text-muted">P/E: <span className="text-sub">{s.peTrail != null ? s.peTrail.toFixed(1) : '-'}</span></span>
+              <span className="text-muted">P/B: <span className="text-sub">{s.pb != null ? s.pb.toFixed(2) : '-'}</span></span>
+              {s.valueScore != null && (
+                <span style={{ color: s.valueScore >= 70 ? '#22c55e' : s.valueScore >= 40 ? '#f97316' : '#ef4444' }}>
+                  V:{Math.round(s.valueScore)}
+                </span>
+              )}
+              {s.growthScore != null && (
+                <span style={{ color: s.growthScore >= 70 ? '#22c55e' : s.growthScore >= 40 ? '#f97316' : '#ef4444' }}>
+                  G:{Math.round(s.growthScore)}
+                </span>
+              )}
+            </div>
+          </div>
+        )
+      })}
+      {stocks.length > maxRows && (
+        <div className="text-[10px] text-muted text-center py-2 border-t border-border">
+          Showing top {maxRows} of {stocks.length} by market cap
+        </div>
+      )}
+    </div>
+  )
+
+  // ── DESKTOP: full table ──────────────────────────────────────────
   return (
     <div className="overflow-x-auto">
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
@@ -552,7 +620,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     apiExchange(exchToLoad).then(data => {
       setStocks(data)
       setLoading(false)
-    })
+      })
   }, [exchange, initEpsMom])
 
   const filtered = stocks.filter(s => {
@@ -592,7 +660,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   return (
     <div className="space-y-4 fade-in">
       {/* Exchange tabs */}
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 flex-nowrap md:flex-wrap">
         <button onClick={() => setExchange('EZ')}
           className={`px-3 py-1.5 rounded text-xs font-600 border transition-colors ${exchange === 'EZ' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
           🌍 All Europe
@@ -791,7 +859,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           📈 Index Performance
           <span className="text-[9px] text-muted font-normal">· auto-refresh 60s · delayed 15-20 min</span>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0">
           {INDICES.map((idx) => {
             const d = indices.find((x: any) => x.ticker === idx.ticker)
             return (
