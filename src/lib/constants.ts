@@ -36,7 +36,7 @@ export const EMU_EXCHANGES = Object.keys(EXCHANGES)
 // ── FX rates ─────────────────────────────────────────────────────
 // Market cap da TIKR è in USD per tutti i titoli
 // Conversione USD → EUR per normalizzare la market cap
-export const USD_TO_EUR = 0.92  // aggiornato via ExchangeRate-API
+export const USD_TO_EUR = 0.8615  // aggiornato via ExchangeRate-API
 
 // Valuta locale per exchange (per i prezzi — non per market cap)
 export const EXCHANGE_CURRENCY: Record<string, string> = {
