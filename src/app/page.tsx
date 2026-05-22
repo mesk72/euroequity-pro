@@ -752,7 +752,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const [loading,   setLoading]   = useState(true)
   const [search,    setSearch]    = useState('')
   const [searchRes, setSearchRes] = useState<any[]>([])
-  const [usdToEur,  setUsdToEur]  = useState(0.92)
+  const [usdToEur,  setUsdToEur]  = useState(0.8615)
   const searchTimer = useRef<any>(null)
 
   useEffect(() => {
