@@ -97,7 +97,12 @@ async function apiExchange(code: string): Promise<Stock[]> {
   }
   if (USE_DB) {
     try {
-      const url = code === 'EZ' ? '/api/db/stocks' : `/api/db/stocks?exchange=${code}`
+      const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,AT'
+      const url = code === 'EZ'
+        ? '/api/db/stocks'
+        : code === 'EMU'
+          ? `/api/db/stocks?exchanges=${EMU_EXCHANGES}`
+          : `/api/db/stocks?exchange=${encodeURIComponent(code)}`
       const r = await fetch(url)
       if (r.ok) {
         const d = await r.json()
@@ -582,7 +587,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     localStorage.setItem('portfolios', JSON.stringify(stored))
     const names = Object.keys(stored)
     setPortfolioNames(names)
-    }
+  }
 
   return (
     <div className="space-y-4 fade-in">
@@ -591,6 +596,10 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
         <button onClick={() => setExchange('EZ')}
           className={`px-3 py-1.5 rounded text-xs font-600 border transition-colors ${exchange === 'EZ' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
           🌍 All Europe
+        </button>
+        <button onClick={() => setExchange('EMU')}
+          className={`px-3 py-1.5 rounded text-xs font-600 border transition-colors ${exchange === 'EMU' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
+          🇪🇺 Eurozone
         </button>
         {Object.entries(EXCHANGES).map(([code, meta]) => (
           <button key={code} onClick={() => setExchange(code)}
@@ -741,11 +750,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
-  // KPI V+G >= 80 — almeno uno dei due rank deve essere >=80 (o media >=80)
+  // KPI V+G >= 80 — entrambi i rank >= 70 (titoli con buon value E buon growth)
   const highVG = allStocks.filter(s =>
     s.valueScore != null && s.growthScore != null &&
-    s.valueScore >= 40 && s.growthScore >= 40 &&
-    (s.valueScore + s.growthScore) / 2 >= 50
+    s.valueScore >= 70 && s.growthScore >= 70
   ).length
 
   return (
