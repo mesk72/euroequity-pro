@@ -30,24 +30,49 @@ export const ALL_EXCHANGES = [
   ...Object.keys(EXCHANGES_EXEMU),
 ]
 
-// ── INDICES EMU ───────────────────────────────────────────────────
-export const INDICES = [
-  { name: 'Euro Stoxx 50',   ticker: 'STOXX50E.INDX' },
-  { name: 'FTSE MIB',        ticker: 'ITLMS.INDX'    },
-  { name: 'DAX',             ticker: 'GDAXI.INDX'    },
-  { name: 'CAC 40',          ticker: 'FCHI.INDX'     },
-  { name: 'AEX',             ticker: 'AEX.INDX'      },
-  { name: 'IBEX 35',         ticker: 'IBEX.INDX'     },
-  { name: 'BEL 20',          ticker: 'BFX.INDX'      },
-  { name: 'OMX Helsinki',    ticker: 'OMXH25.HE'     },
-  { name: 'ATX',             ticker: 'ATX.VI'        },
-  { name: 'ASE',             ticker: 'ATG.AT'        },
+// Exchange EMU only
+export const EMU_EXCHANGES = Object.keys(EXCHANGES)
+
+// ── FX rates vs EUR (per conversione market cap) ──────────────────
+export const FX_TO_EUR: Record<string, number> = {
+  EUR: 1,
+  GBP: 1.18,   // aggiornato via API
+  CHF: 1.05,
+  SEK: 0.088,
+  NOK: 0.086,
+  DKK: 0.134,
+  USD: 0.92,
+}
+
+// Valuta per exchange
+export const EXCHANGE_CURRENCY: Record<string, string> = {
+  MIL:'EUR', XETRA:'EUR', PA:'EUR', AS:'EUR', MC:'EUR',
+  BR:'EUR', LS:'EUR', VI:'EUR', HE:'EUR', IR:'EUR', AT:'EUR',
+  LSE:'GBP', AIM:'GBP', SWX:'CHF', OM:'SEK', NGM:'SEK',
+  OB:'NOK', CPSE:'DKK',
+}
+
+// ── INDICES ───────────────────────────────────────────────────────
+// source: 'eodhd' | 'yahoo'
+export const INDICES: { name: string; ticker: string; source: 'eodhd' | 'yahoo'; flag: string }[] = [
+  // EMU
+  { name: 'STOXX 600',     ticker: 'SXXP.INDX',     source: 'eodhd', flag: '🌍' },
+  { name: 'Euro Stoxx 50', ticker: 'STOXX50E.INDX',  source: 'eodhd', flag: '🇪🇺' },
+  { name: 'FTSE MIB',      ticker: 'FTSEMIB.MI',     source: 'yahoo', flag: '🇮🇹' },
+  { name: 'DAX',           ticker: 'GDAXI.INDX',     source: 'eodhd', flag: '🇩🇪' },
+  { name: 'CAC 40',        ticker: 'FCHI.INDX',      source: 'eodhd', flag: '🇫🇷' },
+  { name: 'IBEX 35',       ticker: 'IBEX.INDX',      source: 'eodhd', flag: '🇪🇸' },
+  { name: 'AEX',           ticker: 'AEX.INDX',       source: 'eodhd', flag: '🇳🇱' },
+  { name: 'BEL 20',        ticker: 'BFX.INDX',       source: 'eodhd', flag: '🇧🇪' },
+  { name: 'ATX',           ticker: 'ATX.INDX',       source: 'eodhd', flag: '🇦🇹' },
+  { name: 'OMX Helsinki',  ticker: 'OMXHPI.INDX',    source: 'eodhd', flag: '🇫🇮' },
+  { name: 'PSI 20',        ticker: 'PSI20.INDX',     source: 'eodhd', flag: '🇵🇹' },
   // Ex-EMU
-  { name: 'FTSE 100',        ticker: 'FTSE.INDX'     },
-  { name: 'SMI',             ticker: 'SSMI.INDX'     },
-  { name: 'OMX Stockholm',   ticker: 'OMXS30.INDX'   },
-  { name: 'OBX',             ticker: 'OBX.OL'        },
-  { name: 'OMX Copenhagen',  ticker: 'OMXC25.INDX'   },
+  { name: 'FTSE 100',      ticker: '^FTSE',           source: 'yahoo', flag: '🇬🇧' },
+  { name: 'SMI',           ticker: 'SSMI.INDX',      source: 'eodhd', flag: '🇨🇭' },
+  { name: 'OMX Stockholm', ticker: 'OMXS30.INDX',    source: 'eodhd', flag: '🇸🇪' },
+  { name: 'OBX',           ticker: 'OBX.OL',         source: 'eodhd', flag: '🇳🇴' },
+  { name: 'OMX Copenhagen',ticker: 'OMXC25.INDX',    source: 'eodhd', flag: '🇩🇰' },
 ]
 
 // ── SECTORS ───────────────────────────────────────────────────────
@@ -65,5 +90,3 @@ export const SECTOR_COLORS: Record<string, string> = {
   'Real Estate':            '#a855f7',
   'Other':                  '#6b7280',
 }
-
-export const MAX_SCREEN = 100
