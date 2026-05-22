@@ -20,8 +20,8 @@ import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
 
 // ── FLAGS ────────────────────────────────────────────────────────
-const USE_DEMO = true   // true = dati demo hardcoded
-const USE_DB   = false  // true = legge da Supabase (dopo seed.py)
+const USE_DEMO = false
+const USE_DB   = true00000000000000000  // true = legge da Supabase (dopo seed.py)
 // Quando Leeway risponde: imposta USE_DEMO=false, USA_DB=true
 
 // ── HELPERS ───────────────────────────────────────────────────────
