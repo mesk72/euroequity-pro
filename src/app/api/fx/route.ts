@@ -11,10 +11,10 @@ export async function GET() {
     )
     if (!r.ok) throw new Error('FX fetch failed')
     const d = await r.json()
-    const usdToEur = d.rates?.EUR ?? 0.92
+    const usdToEur = d.rates?.EUR ?? 0.8615
     return NextResponse.json({ usdToEur, source: 'open.er-api.com' })
   } catch {
     // Fallback tasso fisso
-    return NextResponse.json({ usdToEur: 0.92, source: 'fallback' })
+    return NextResponse.json({ usdToEur: 0.8615, source: 'fallback' })
   }
 }
