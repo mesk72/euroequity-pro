@@ -590,7 +590,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       <div className="flex flex-wrap gap-1.5">
         <button onClick={() => setExchange('EZ')}
           className={`px-3 py-1.5 rounded text-xs font-600 border transition-colors ${exchange === 'EZ' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
-          🌍 All Eurozone
+          🌍 All Europe
         </button>
         {Object.entries(EXCHANGES).map(([code, meta]) => (
           <button key={code} onClick={() => setExchange(code)}
@@ -687,7 +687,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     // Carica da tutti gli exchange — EMU + ex-EMU
     Promise.all(
       ALL_EXCHANGES.map(code =>
-        apiExchange(code).then(stocks => stocks.slice(0, 50))
+        apiExchange(code).then(stocks => stocks.slice(0, 250))
       )
     ).then(arrays => {
       setAllStocks(arrays.flat())
