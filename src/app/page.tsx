@@ -655,6 +655,12 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     })
   }, [exchange, initEpsMom])
 
+  // Applica conversione USD→EUR alla market cap
+  const stocksWithEurCap = stocks.map(s => ({
+    ...s,
+    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e6).toFixed(2)) : null
+  }))
+
   const filtered = stocksWithEurCap.filter(s => {
     if (search) {
       const q = search.toLowerCase()
@@ -830,11 +836,6 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     }, 200)
   }, [search])
 
-  // Applica conversione USD→EUR alla market cap
-  const stocksWithEurCap = allStocks.map(s => ({
-    ...s,
-    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e6).toFixed(2)) : null
-  }))
 
   // Top 200 per market cap
   const u200 = stocksWithEurCap
