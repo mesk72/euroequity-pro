@@ -354,18 +354,28 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
 
   // ── DESKTOP: full table ──────────────────────────────────────────
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
         ⚠️ Prices delayed 15-20 min · Fundamentals updated daily
       </div>
       <table className="data-table">
         <thead>
           <tr>
-            {COLUMNS.map(c => (
+            {COLUMNS.map((c, ci) => (
               <th
                 key={c.key}
                 onClick={() => toggle(c.key)}
-                style={{ minWidth: c.width, userSelect: 'none' }}
+                style={{
+                  minWidth: c.width,
+                  userSelect: 'none',
+                  ...(ci === 0 ? {
+                    position: 'sticky',
+                    left: 0,
+                    zIndex: 2,
+                    background: '#0d1017',
+                    boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
+                  } : {})
+                }}
               >
                 <span className="flex items-center gap-1">
                   {c.label}
@@ -385,10 +395,19 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
               onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
               className="cursor-pointer"
             >
-              {COLUMNS.map(c => {
+              {COLUMNS.map((c, ci) => {
                 const { val, cls, style: cellStyle, sectorColor } = cellFmt(s, c.key)
                 return (
-                  <td key={c.key} style={{ maxWidth: c.width }}>
+                  <td key={c.key} style={{
+                    maxWidth: c.width,
+                    ...(ci === 0 ? {
+                      position: 'sticky',
+                      left: 0,
+                      zIndex: 1,
+                      background: '#0d1017',
+                      boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
+                    } : {})
+                  }}>
                     {c.key === 'sector' && sectorColor ? (
                       <span className="truncate block text-[10px] font-600"
                         style={{ color: sectorColor }}>
@@ -615,7 +634,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     const names = Object.keys(stored)
     if (names.length > 0) setPortfolioNames(names)
   }, [])
-
   useEffect(() => {
     setStocks([]); setSelected(null); setLoading(true)
     const exchToLoad = initEpsMom ? 'EZ' : exchange
@@ -624,6 +642,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       setLoading(false)
     })
   }, [exchange, initEpsMom])
+
   const filtered = stocks.filter(s => {
     if (search) {
       const q = search.toLowerCase()
