@@ -49,6 +49,11 @@ const fv = (v: number | null | undefined, d = 2): string => {
   if (v == null || isNaN(v)) return '-'
   return v.toFixed(d)
 }
+const fpd = (v: number | null | undefined, d = 1): string => {
+  if (v == null) return '-'
+  const pct = v * 100
+  return `${pct >= 0 ? '+' : ''}${pct.toFixed(d)}%`
+}
 const fn = (v: number | null | undefined): string => {
   if (v == null || isNaN(v as number)) return '-'
   return String(Math.round(v as number))
@@ -633,7 +638,8 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
     const names = Object.keys(stored)
     if (names.length > 0) setPortfolioNames(names)
-  }, [])
+    }, [])
+
   useEffect(() => {
     setStocks([]); setSelected(null); setLoading(true)
     const exchToLoad = initEpsMom ? 'EZ' : exchange
