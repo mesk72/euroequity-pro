@@ -207,7 +207,6 @@ const COLUMNS: ColDef[] = [
   { key: 'roe',         label: 'ROE %',     width: 72  },
   { key: 'divYield',    label: 'Div %',     width: 72  },
   { key: 'divPayout',   label: 'Payout %',  width: 72  },
-  { key: 'beta',        label: 'Beta',      width: 60  },
   { key: 'epsGrowth',   label: 'EPS Gr%',   width: 72  },
   { key: 'revGrowth',   label: 'Rev Gr%',   width: 72  },
   { key: 'mom1w',       label: '1W %',      width: 65  },
@@ -234,7 +233,6 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; sectorColo
     case 'roe':         return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
     case 'divYield':    return { val: v != null ? fp(v)     : '-', cls: v != null ? (v > 0 ? 'text-green' : 'text-sub') : 'text-muted' }
     case 'divPayout':   return { val: v != null ? fp(v)     : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'beta':        return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'epsGrowth':   return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
     case 'revGrowth':   return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
     case 'mom1w':       return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
@@ -494,7 +492,6 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['EV/EBITDA',    fv(stock.evEbitda, 1),     ''],
     ['ROE %',        fp(stock.roe),             clr(stock.roe)],
     ['Div Yield %',  fp(stock.divYield),        stock.divYield && stock.divYield > 0 ? 'text-green' : ''],
-    ['Beta',         fv(stock.beta, 2),         ''],
     ['EPS Gr %',     fp(stock.epsGrowth),       clr(stock.epsGrowth)],
     ['Rev Gr %',     fp(stock.revGrowth),       clr(stock.revGrowth)],
     ['Mom 1W %',     fp(stock.mom1w),           clr(stock.mom1w)],
