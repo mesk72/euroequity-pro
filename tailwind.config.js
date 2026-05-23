@@ -24,5 +24,9 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    'text-green', 'text-red', 'text-sub', 'text-muted', 'text-text',
+    'text-yellow-400', 'font-700', 'font-600',
+  ],
   plugins: [],
 }
