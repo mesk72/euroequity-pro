@@ -54,8 +54,8 @@ const fn = (v: number | null | undefined): string => {
   return String(Math.round(v as number))
 }
 const clr = (v: number | null | undefined): string => {
-  if (v == null) return 'text-sub'
-  return v > 0 ? 'text-[#22d48a]' : v < 0 ? 'text-[#e84560]' : 'text-sub'
+  // Restituisce stringa vuota — usa sempre clrStyle per i colori
+  return ''
 }
 const clrStyle = (v: number | null | undefined): React.CSSProperties => {
   if (v == null) return { color: '#8a9ab8' }
@@ -222,7 +222,7 @@ const COLUMNS: ColDef[] = [
   { key: 'growthScore', label: 'Growth',    width: 60  },
 ]
 
-function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; sectorColor?: string } {
+function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: React.CSSProperties; sectorColor?: string } {
   const v = s[key] as number | null
   switch (key) {
     case 'ticker':      return { val: `${s.flag || ''} ${s.ticker}`, cls: 'font-600 text-text' }
@@ -386,7 +386,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
               className="cursor-pointer"
             >
               {COLUMNS.map(c => {
-                const { val, cls, sectorColor } = cellFmt(s, c.key)
+                const { val, cls, style: cellStyle, sectorColor } = cellFmt(s, c.key)
                 return (
                   <td key={c.key} style={{ maxWidth: c.width }}>
                     {c.key === 'sector' && sectorColor ? (
@@ -395,7 +395,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                         {val}
                       </span>
                     ) : (
-                      <span className={`truncate block ${cls}`}>{val}</span>
+                      <span className={`truncate block ${cls}`} style={cellStyle}>{val}</span>
                     )}
                   </td>
                 )
