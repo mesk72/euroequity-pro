@@ -15,7 +15,7 @@ const ALL_EXCHANGES = [
   'LSE','AIM','SWX','OM','NGM','OB','CPSE'
 ]
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
-const FUND_SELECT   = 'ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,div_payout,beta,eps_growth,rev_growth,mom1w,mom1m,mom6m,mom12m,value_score,growth_score'
+const FUND_SELECT   = 'ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,div_payout,eps_growth,rev_growth,mom1w,mom1m,mom6m,mom12m,value_score,growth_score'
 
 async function fetchPaged(table: string, select: string, exList: string[]) {
   const all: any[] = []
@@ -78,7 +78,6 @@ function buildStocks(stocksData: any[], liveData: any[], fundData: any[]) {
       roe:         fund.roe         ?? null,
       divYield:    fund.div_yield   ?? null,
       divPayout:   fund.div_payout  ?? null,
-      beta:        fund.beta        ?? null,
       epsGrowth:   fund.eps_growth  ?? null,
       revGrowth:   fund.rev_growth  ?? null,
       epsMom30d:   null,
