@@ -55,7 +55,7 @@ const fn = (v: number | null | undefined): string => {
 }
 const clr = (v: number | null | undefined): string => {
   if (v == null) return 'text-sub'
-  return v > 0 ? 'text-green' : v < 0 ? 'text-red' : 'text-sub'
+  return v > 0 ? 'text-[#22d48a]' : v < 0 ? 'text-[#e84560]' : 'text-sub'
 }
 const fmtVol = (v: number | null | undefined): string => {
   if (!v) return '-'
@@ -231,7 +231,7 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; sectorColo
     case 'pb':          return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'evEbitda':    return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'roe':         return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'divYield':    return { val: v != null ? fp(v)     : '-', cls: v != null ? (v > 0 ? 'text-green' : 'text-sub') : 'text-muted' }
+    case 'divYield':    return { val: v != null ? fp(v)     : '-', cls: v != null ? (v > 0 ? 'text-[#22d48a]' : 'text-sub') : 'text-muted' }
     case 'divPayout':   return { val: v != null ? fp(v)     : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'epsGrowth':   return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
     case 'revGrowth':   return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
@@ -239,8 +239,8 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; sectorColo
     case 'mom1m':       return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
     case 'mom6m':       return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
     case 'mom12m':      return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'valueScore':  return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-red' : 'text-yellow-400 font-600') : 'text-muted' }
-    case 'growthScore': return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-red' : 'text-yellow-400 font-600') : 'text-muted' }
+    case 'valueScore':  return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
+    case 'growthScore': return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
     default:            return { val: '-', cls: 'text-muted' }
   }
 }
@@ -310,7 +310,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                 <span className="font-mono font-600 text-sm text-text">
                   {s.price != null ? s.price.toFixed(2) : '-'}
                 </span>
-                <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-green' : 'text-red') : 'text-muted'}`}>
+                <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
                   {s.change1d != null ? `${s.change1d >= 0 ? '+' : ''}${s.change1d.toFixed(2)}%` : '-'}
                 </span>
               </div>
@@ -437,7 +437,7 @@ function PriceChart({ history }: { history: any[] }) {
 
   return (
     <div className="relative">
-      <div className={`absolute top-2 right-2 text-xs font-700 font-mono ${isUp ? 'text-green' : 'text-red'}`}>
+      <div className={`absolute top-2 right-2 text-xs font-700 font-mono ${isUp ? 'text-[#22d48a]' : 'text-[#e84560]'}`}>
         {isUp ? '+' : ''}{perf}%
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 192 }}>
@@ -491,7 +491,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['P/B',          fv(stock.pb, 2),           ''],
     ['EV/EBITDA',    fv(stock.evEbitda, 1),     ''],
     ['ROE %',        fp(stock.roe),             clr(stock.roe)],
-    ['Div Yield %',  fp(stock.divYield),        stock.divYield && stock.divYield > 0 ? 'text-green' : ''],
+    ['Div Yield %',  fp(stock.divYield),        stock.divYield && stock.divYield > 0 ? 'text-[#22d48a]' : ''],
     ['EPS Gr %',     fp(stock.epsGrowth),       clr(stock.epsGrowth)],
     ['Rev Gr %',     fp(stock.revGrowth),       clr(stock.revGrowth)],
     ['Mom 1W %',     fp(stock.mom1w),           clr(stock.mom1w)],
@@ -903,8 +903,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {!loading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
-            { title: '🟢 Top 10 Gainers Today', list: gainers, color: 'text-green', field: 'change1d' },
-            { title: '🔴 Top 10 Losers Today',  list: losers,  color: 'text-red',   field: 'change1d' },
+            { title: '🟢 Top 10 Gainers Today', list: gainers, color: 'text-[#22d48a]', field: 'change1d' },
+            { title: '🔴 Top 10 Losers Today',  list: losers,  color: 'text-[#e84560]',   field: 'change1d' },
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
