@@ -240,9 +240,9 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'pb':          return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'evEbitda':    return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'roe':         return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
-    case 'divYield':    return { val: v != null ? fpd(v)    : '-', cls: v != null ? (v > 0 ? 'text-[#22d48a]' : 'text-sub') : 'text-muted' }
-    case 'divPayout':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
+    case 'roe':         return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'divYield':    return { val: v != null ? fp(v)     : '-', cls: v != null ? (v > 0 ? 'text-[#22d48a]' : 'text-sub') : 'text-muted' }
+    case 'divPayout':   return { val: v != null ? fp(v)     : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'epsGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'revGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mom1w':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
@@ -359,11 +359,11 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
 
   // ── DESKTOP: full table ──────────────────────────────────────────
   return (
-    <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+    <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
         ⚠️ Prices delayed 15-20 min · Fundamentals updated daily
       </div>
-      <table className="data-table">
+      <table className="data-table" style={{ minWidth: "900px", width: "max-content" }}>
         <thead>
           <tr>
             {COLUMNS.map((c, ci) => (
@@ -519,8 +519,8 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
     ['P/B',          fv(stock.pb, 2),           ''],
     ['EV/EBITDA',    fv(stock.evEbitda, 1),     ''],
-    ['ROE %',        fpd(stock.roe),            clr(stock.roe)],
-    ['Div Yield %',  fpd(stock.divYield),       stock.divYield && stock.divYield > 0 ? 'text-[#22d48a]' : ''],
+    ['ROE %',        fp(stock.roe),             clr(stock.roe)],
+    ['Div Yield %',  fp(stock.divYield),        stock.divYield && stock.divYield > 0 ? 'text-[#22d48a]' : ''],
     ['EPS Gr %',     fpd(stock.epsGrowth),      clr(stock.epsGrowth)],
     ['Rev Gr %',     fpd(stock.revGrowth),      clr(stock.revGrowth)],
     ['Mom 1W %',     fpd(stock.mom1w),          clr(stock.mom1w)],
@@ -638,7 +638,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
     const names = Object.keys(stored)
     if (names.length > 0) setPortfolioNames(names)
-    }, [])
+  }, [])
 
   useEffect(() => {
     setStocks([]); setSelected(null); setLoading(true)
