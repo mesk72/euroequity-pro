@@ -57,6 +57,10 @@ const clr = (v: number | null | undefined): string => {
   if (v == null) return 'text-sub'
   return v > 0 ? 'text-[#22d48a]' : v < 0 ? 'text-[#e84560]' : 'text-sub'
 }
+const clrStyle = (v: number | null | undefined): React.CSSProperties => {
+  if (v == null) return { color: '#8a9ab8' }
+  return { color: v > 0 ? '#22d48a' : v < 0 ? '#e84560' : '#8a9ab8' }
+}
 const fmtVol = (v: number | null | undefined): string => {
   if (!v) return '-'
   if (v >= 1e6) return `${(v/1e6).toFixed(1)}M`
@@ -98,8 +102,9 @@ async function apiExchange(code: string): Promise<Stock[]> {
   if (USE_DB) {
     try {
       const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,AT'
-      const url = code === 'EZ'
-        ? '/api/db/stocks'
+      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,AT,LSE,AIM,SWX,OM,NGM,OB,CPSE'
+      const url = code === 'EZ' || code === 'ALL'
+        ? `/api/db/stocks?exchanges=${ALL_EX}`
         : code === 'EMU'
           ? `/api/db/stocks?exchanges=${EMU_EXCHANGES}`
           : `/api/db/stocks?exchange=${encodeURIComponent(code)}`
@@ -174,7 +179,7 @@ function IndexCard({ name, close, changeP, loading }: {
         <>
           <div style={{
             fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, fontSize: 14,
-            color: (changeP || 0) >= 0 ? 'var(--green)' : 'var(--red)',
+            color: (changeP || 0) >= 0 ? '#22d48a' : '#e84560',
           }}>{fp(changeP)}</div>
           <div style={{
             fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
@@ -224,21 +229,21 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; sectorColo
     case 'company':     return { val: s.company || '-',   cls: 'text-sub' }
     case 'sector':      return { val: s.sector  || '-',   cls: 'text-[10px]', sectorColor: getSectorColor(s.sector) }
     case 'price':       return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-text'  : 'text-muted' }
-    case 'change1d':    return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
+    case 'change1d':    return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mktCap':      return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peTrail':     return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'pb':          return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'evEbitda':    return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'roe':         return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'divYield':    return { val: v != null ? fp(v)     : '-', cls: v != null ? (v > 0 ? 'text-[#22d48a]' : 'text-sub') : 'text-muted' }
-    case 'divPayout':   return { val: v != null ? fp(v)     : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'epsGrowth':   return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'revGrowth':   return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'mom1w':       return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'mom1m':       return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'mom6m':       return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
-    case 'mom12m':      return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted' }
+    case 'roe':         return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'divYield':    return { val: v != null ? fpd(v)    : '-', cls: v != null ? (v > 0 ? 'text-[#22d48a]' : 'text-sub') : 'text-muted' }
+    case 'divPayout':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
+    case 'epsGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'revGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'mom1w':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'mom1m':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'mom6m':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'mom12m':      return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'valueScore':  return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
     case 'growthScore': return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
     default:            return { val: '-', cls: 'text-muted' }
@@ -311,7 +316,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                   {s.price != null ? s.price.toFixed(2) : '-'}
                 </span>
                 <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
-                  {s.change1d != null ? `${s.change1d >= 0 ? '+' : ''}${s.change1d.toFixed(2)}%` : '-'}
+                  {s.change1d != null ? fpd(s.change1d/100) : '-'}
                 </span>
               </div>
             </div>
@@ -490,14 +495,14 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
     ['P/B',          fv(stock.pb, 2),           ''],
     ['EV/EBITDA',    fv(stock.evEbitda, 1),     ''],
-    ['ROE %',        fp(stock.roe),             clr(stock.roe)],
-    ['Div Yield %',  fp(stock.divYield),        stock.divYield && stock.divYield > 0 ? 'text-[#22d48a]' : ''],
-    ['EPS Gr %',     fp(stock.epsGrowth),       clr(stock.epsGrowth)],
-    ['Rev Gr %',     fp(stock.revGrowth),       clr(stock.revGrowth)],
-    ['Mom 1W %',     fp(stock.mom1w),           clr(stock.mom1w)],
-    ['Mom 1M %',     fp(stock.mom1m),           clr(stock.mom1m)],
-    ['Mom 6M %',     fp(stock.mom6m),           clr(stock.mom6m)],
-    ['Mom 12M %',    fp(stock.mom12m),          clr(stock.mom12m)],
+    ['ROE %',        fpd(stock.roe),            clr(stock.roe)],
+    ['Div Yield %',  fpd(stock.divYield),       stock.divYield && stock.divYield > 0 ? 'text-[#22d48a]' : ''],
+    ['EPS Gr %',     fpd(stock.epsGrowth),      clr(stock.epsGrowth)],
+    ['Rev Gr %',     fpd(stock.revGrowth),      clr(stock.revGrowth)],
+    ['Mom 1W %',     fpd(stock.mom1w),          clr(stock.mom1w)],
+    ['Mom 1M %',     fpd(stock.mom1m),          clr(stock.mom1m)],
+    ['Mom 6M %',     fpd(stock.mom6m),          clr(stock.mom6m)],
+    ['Mom 12M %',    fpd(stock.mom12m),         clr(stock.mom12m)],
     ['Sector',       stock.sector || '-',       ''],
     ['Country',      stock.country || '-',      ''],
   ]
@@ -619,7 +624,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       setLoading(false)
     })
   }, [exchange, initEpsMom])
-
   const filtered = stocks.filter(s => {
     if (search) {
       const q = search.toLowerCase()
@@ -765,12 +769,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
     setLoading(true)
     // Carica da tutti gli exchange — EMU + ex-EMU
-    Promise.all(
-      ALL_EXCHANGES.map(code =>
-        apiExchange(code).then(stocks => stocks.slice(0, 250))
-      )
-    ).then(arrays => {
-      setAllStocks(arrays.flat())
+    apiExchange('ALL').then(stocks => {
+      setAllStocks(stocks)
       setLoading(false)
     })
 
@@ -802,7 +802,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   // Applica conversione USD→EUR alla market cap
   const stocksWithEurCap = allStocks.map(s => ({
     ...s,
-    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur).toFixed(2)) : null
+    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e6).toFixed(2)) : null
   }))
 
   // Top 200 per market cap
@@ -922,7 +922,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       <td className="font-700 text-text">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]">{s.company}</td>
                       <td className="font-mono">{fv(s.price, 2)}</td>
-                      <td className={`font-mono font-600 ${clr(s.change1d)}`}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -963,7 +963,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                         </span>
                       </td>
                       <td>
-                        <span className="font-mono font-600" style={{ color: (s.epsGrowth||0) >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                        <span className="font-mono font-600" style={{ color: (s.epsGrowth||0) >= 0 ? '#22d48a' : '#e84560' }}>
                           {fp(s.epsGrowth)}
                         </span>
                       </td>
@@ -1007,7 +1007,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                         </span>
                       </td>
                       <td>
-                        <span className="font-mono font-700" style={{ color: (s.mom12m||0) >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                        <span className="font-mono font-700" style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
                           {fp(s.mom12m)}
                         </span>
                       </td>
