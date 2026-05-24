@@ -330,16 +330,28 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
               <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
               <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
             </div>
-            {/* Row 3: mktcap | PE | PB | Value | Growth */}
-            <div className="flex items-center gap-3 text-[10px] font-mono flex-wrap">
+            {/* Row 3: valuation */}
+            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
               <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${s.mktCap.toFixed(1)}B` : '-'}</span></span>
+              <span className="text-[#444]">|</span>
               <span className="text-muted">P/E: <span className="text-sub">{s.peTrail != null ? s.peTrail.toFixed(1) : '-'}</span></span>
-              <span className="text-muted">P/E Fwd: <span className="text-sub">{s.peFwd != null ? s.peFwd.toFixed(1) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Fwd: <span className="text-sub">{s.peFwd != null ? s.peFwd.toFixed(1) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
               <span className="text-muted">P/B: <span className="text-sub">{s.pb != null ? s.pb.toFixed(2) : '-'}</span></span>
-              <span className="text-muted">EPS Gr: <span style={s.epsGrowth != null ? {color: s.epsGrowth >= 0 ? '#22d48a' : '#e84560'} : {}}>{s.epsGrowth != null ? `${(s.epsGrowth*100).toFixed(1)}%` : '-'}</span></span>
-              <span className="text-muted">Rev Gr: <span style={s.revGrowth != null ? {color: s.revGrowth >= 0 ? '#22d48a' : '#e84560'} : {}}>{s.revGrowth != null ? `${(s.revGrowth*100).toFixed(1)}%` : '-'}</span></span>
-              <span className="text-muted">1M: <span style={s.mom1m != null ? {color: s.mom1m >= 0 ? '#22d48a' : '#e84560'} : {}}>{s.mom1m != null ? `${(s.mom1m*100).toFixed(1)}%` : '-'}</span></span>
-              <span className="text-muted">6M: <span style={s.mom6m != null ? {color: s.mom6m >= 0 ? '#22d48a' : '#e84560'} : {}}>{s.mom6m != null ? `${(s.mom6m*100).toFixed(1)}%` : '-'}</span></span>
+            </div>
+            {/* Row 4: growth */}
+            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
+              <span className="text-muted">EPS: <span style={{color: s.epsGrowth != null ? (s.epsGrowth >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.epsGrowth != null ? `${(s.epsGrowth*100).toFixed(1)}%` : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Rev: <span style={{color: s.revGrowth != null ? (s.revGrowth >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.revGrowth != null ? `${(s.revGrowth*100).toFixed(1)}%` : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom1m != null ? `${(s.mom1m*100).toFixed(1)}%` : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">6M: <span style={{color: s.mom6m != null ? (s.mom6m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom6m != null ? `${(s.mom6m*100).toFixed(1)}%` : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-'}</span></span>
+            </div>
               <span className="text-muted">12M: <span style={s.mom12m != null ? {color: s.mom12m >= 0 ? '#22d48a' : '#e84560'} : {}}>{s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-'}</span></span>
               {s.valueScore != null && (
                 <span style={{ color: s.valueScore >= 70 ? '#22c55e' : s.valueScore >= 40 ? '#f97316' : '#ef4444' }}>
