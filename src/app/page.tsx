@@ -227,10 +227,10 @@ const COLUMNS: ColDef[] = [
   { key: 'growthScore', label: 'Growth',    width: 60  },
 ]
 
-function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: React.CSSProperties; sectorColor?: string } {
+function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: React.CSSProperties; sectorColor?: string; flag?: string } {
   const v = s[key] as number | null
   switch (key) {
-    case 'ticker':      return { val: `${s.flag || ''} ${s.ticker}`, cls: 'font-600 text-text' }
+    case 'ticker':      return { val: s.ticker, cls: 'font-600 text-text', flag: s.flag }
     case 'company':     return { val: s.company || '-',   cls: 'text-sub' }
     case 'sector':      return { val: s.sector  || '-',   cls: 'text-[10px]', sectorColor: getSectorColor(s.sector) }
     case 'price':       return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-text'  : 'text-muted' }
@@ -407,7 +407,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
               className="cursor-pointer"
             >
               {COLUMNS.map((c, ci) => {
-                const { val, cls, style: cellStyle, sectorColor } = cellFmt(s, c.key)
+                const { val, cls, style: cellStyle, sectorColor, flag: cellFlag } = cellFmt(s, c.key)
                 return (
                   <td key={c.key} style={{
                     maxWidth: c.width,
@@ -425,7 +425,9 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                         {val}
                       </span>
                     ) : (
-                      <span className={`truncate block ${cls}`} style={cellStyle}>{val}</span>
+                      <span className={`truncate block ${cls}`} style={cellStyle}>
+                        {cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}
+                      </span>
                     )}
                   </td>
                 )
@@ -658,7 +660,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // Applica conversione USD→EUR alla market cap
   const stocksWithEurCap = stocks.map(s => ({
     ...s,
-    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e6).toFixed(2)) : null
+    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null
   }))
 
   const filtered = stocksWithEurCap.filter(s => {
@@ -682,7 +684,27 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     new Set(stocks.map(s => s.sector).filter(Boolean) as string[])
   ).sort()]
 
-  function addToPortfolio(stock: Stock, qty: number, price: number, pf: string) {
+  
+const FLAG_ISO: Record<string, string> = {
+  '🇮🇹': 'it', '🇩🇪': 'de', '🇫🇷': 'fr', '🇳🇱': 'nl',
+  '🇪🇸': 'es', '🇧🇪': 'be', '🇵🇹': 'pt', '🇦🇹': 'at',
+  '🇫🇮': 'fi', '🇮🇪': 'ie', '🇬🇷': 'gr', '🇬🇧': 'gb',
+  '🇨🇭': 'ch', '🇸🇪': 'se', '🇳🇴': 'no', '🇩🇰': 'dk',
+  '🇱🇺': 'lu',
+}
+
+function FlagIcon({ flag }: { flag: string }) {
+  const iso = FLAG_ISO[flag]
+  if (!iso) return <span>{flag}</span>
+  return (
+    <span
+      className={`fi fi-${iso}`}
+      style={{ fontSize: '14px', marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}
+    />
+  )
+}
+
+function addToPortfolio(stock: Stock, qty: number, price: number, pf: string) {
     const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
     if (!stored[pf]) stored[pf] = []
     stored[pf].push({
