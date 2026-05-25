@@ -36,7 +36,7 @@ function scoreClr(v?: number | null): string {
 // Simple SVG price chart
 function PriceChart({ history }: { history: any[] }) {
   const prices = history
-    .map((d: any) => parseFloat(d.adjusted_close || d.close || '0'))
+    .map((d: any) => parseFloat(d.adj_close || d.adjusted_close || d.close || '0'))
     .filter(v => !isNaN(v) && v > 0)
 
   if (prices.length < 2) return (
@@ -268,9 +268,22 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
           {/* Chart */}
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:3, padding:12 }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-              <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)' }}>
-                Price Chart
+              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                  letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)' }}>
+                  Price Chart (Total Return)
+                </div>
+                {history.length >= 2 && (() => {
+                  const first = parseFloat(history[0]?.adj_close || history[0]?.close || '0')
+                  const last = parseFloat(history[history.length-1]?.adj_close || history[history.length-1]?.close || '0')
+                  const pct = first > 0 ? ((last/first - 1) * 100) : null
+                  return pct != null ? (
+                    <span style={{ fontSize:12, fontFamily:'IBM Plex Mono', fontWeight:700,
+                      color: pct >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                      {pct >= 0 ? '+' : ''}{pct.toFixed(1)}%
+                    </span>
+                  ) : null
+                })()}
               </div>
               <div style={{ display:'flex', gap:4 }}>
                 {([['1Y',365],['3Y',1095],['5Y',1825]] as [string,number][]).map(([lbl, d]) => (
@@ -284,6 +297,9 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
                   </button>
                 ))}
               </div>
+            </div>
+            <div style={{ fontSize:9, color:'var(--text3)', marginBottom:6, fontFamily:'IBM Plex Sans Condensed' }}>
+              Adjusted close price · includes dividends &amp; split adjustments
             </div>
             {loadingChart ? (
               <div style={{ height:200, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--text3)' }}>
