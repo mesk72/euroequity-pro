@@ -298,9 +298,10 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
     <div className="p-8 text-center text-muted text-sm">No stocks match your filters.</div>
   )
 
-  // - MOBILE: card list -
-  if (isMobile) return (<div>
+  // - MOBILE + DESKTOP -
+  return isMobile ? (
     <div>
+<div>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
         Prices delayed 15-20 min
       </div>
@@ -373,11 +374,9 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
         </div>
       )}
     </div>
-  </div>)
-
-  // - DESKTOP: full table -
-  return (
-    <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
+    </div>
+  ) : (
+<div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
         Prices delayed 15-20 min · Fundamentals updated daily
       </div>
@@ -458,6 +457,8 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
 }
 
 // - PRICE CHART (SVG) -
+  )
+}
 function PriceChart({ history }: { history: any[] }) {
   const prices = history
     .map((d: any) => parseFloat(d.adjusted_close || d.close || '0'))
