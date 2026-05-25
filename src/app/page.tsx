@@ -677,7 +677,13 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     new Set(stocks.map(s => s.sector).filter(Boolean) as string[])
   ).sort()]
 
-  
+  return (
+    <div className="flex flex-col h-full">
+      <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} />
+    </div>
+  )
+}
+
 const FLAG_ISO: Record<string, string> = {
   '🇮🇹': 'it', '🇩🇪': 'de', '🇫🇷': 'fr', '🇳🇱': 'nl',
   '🇪🇸': 'es', '🇧🇪': 'be', '🇵🇹': 'pt', '🇦🇹': 'at',
@@ -792,7 +798,6 @@ function addToPortfolio(stock: Stock, qty: number, price: number, pf: string) {
       )}
     </div>
   )
-}
 
 // - DASHBOARD -
 function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
