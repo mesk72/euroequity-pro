@@ -19,11 +19,11 @@ import StockDetailPage from '@/components/dashboard/StockDetailPage'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
 
-// ── FLAGS ────────────────────────────────────────────────────────
+// - FLAGS -
 const USE_DEMO = false  // true = dati demo hardcoded
 const USE_DB   = true   // true = legge da Supabase
 
-// ── SECTOR COLORS ─────────────────────────────────────────────────
+// - SECTOR COLORS -
 const SECTOR_COLORS: Record<string, string> = {
   'Technology':             '#3b82f6',
   'Financials':             '#f59e0b',
@@ -40,7 +40,7 @@ const SECTOR_COLORS: Record<string, string> = {
 const getSectorColor = (sector: string | null | undefined): string =>
   SECTOR_COLORS[sector || ''] || '#6b7280'
 
-// ── HELPERS ───────────────────────────────────────────────────────
+// - HELPERS -
 const fp = (v: number | null | undefined, d = 1): string => {
   if (v == null || isNaN(v)) return '-'
   return `${v >= 0 ? '+' : ''}${v.toFixed(d)}%`
@@ -73,7 +73,7 @@ const fmtVol = (v: number | null | undefined): string => {
   return String(v)
 }
 
-// ── SCORE BAR ─────────────────────────────────────────────────────
+// - SCORE BAR -
 function ScoreBar({ value, label }: { value: number | null | undefined; label: string }) {
   if (value == null) return (
     <div>
@@ -97,7 +97,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
 
 type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal' | 'about'
 
-// ── API CALLS ──────────────────────────────────────────────────────
+// - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
   if (USE_DEMO) {
     const scored = computeScores([...DEMO_STOCKS])
@@ -167,7 +167,7 @@ async function apiIndices() {
   } catch { return [] }
 }
 
-// ── INDEX CARD ─────────────────────────────────────────────────────
+// - INDEX CARD -
 function IndexCard({ name, close, changeP, loading }: {
   name: string; close: number | null; changeP: number | null; loading: boolean
 }) {
@@ -198,7 +198,7 @@ function IndexCard({ name, close, changeP, loading }: {
   )
 }
 
-// ── STOCK TABLE ────────────────────────────────────────────────────
+// - STOCK TABLE -
 type SortKey = keyof Stock
 
 interface ColDef { key: SortKey; label: string; width?: number }
@@ -298,7 +298,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
     <div className="p-8 text-center text-muted text-sm">No stocks match your filters.</div>
   )
 
-  // ── MOBILE: card list ────────────────────────────────────────────
+  // - MOBILE: card list -
   if (isMobile) return (
     <div>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
@@ -375,7 +375,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
     </div>
   )
 
-  // ── DESKTOP: full table ──────────────────────────────────────────
+  // - DESKTOP: full table -
   return (
     <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
@@ -457,7 +457,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
   )
 }
 
-// ── PRICE CHART (SVG) ──────────────────────────────────────────────
+// - PRICE CHART (SVG) -
 function PriceChart({ history }: { history: any[] }) {
   const prices = history
     .map((d: any) => parseFloat(d.adjusted_close || d.close || '0'))
@@ -509,7 +509,7 @@ function PriceChart({ history }: { history: any[] }) {
   )
 }
 
-// ── STOCK DETAIL PANEL ────────────────────────────────────────────
+// - STOCK DETAIL PANEL -
 function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
   stock: Stock
   onClose: () => void
@@ -630,7 +630,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
   )
 }
 
-// ── SCREENER ──────────────────────────────────────────────────────
+// - SCREENER -
 function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock }: {
   initExchange?: string
   initSector?:   string
@@ -813,7 +813,7 @@ function addToPortfolio(stock: Stock, qty: number, price: number, pf: string) {
   )
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────────
+// - DASHBOARD -
 function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   onSectorClick: (s: string) => void
   onSelectStock?: (s: Stock) => void
@@ -1103,7 +1103,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   )
 }
 
-// ── ABOUT ─────────────────────────────────────────────────────────
+// - ABOUT -
 function AboutPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -1131,7 +1131,7 @@ function AboutPage() {
   )
 }
 
-// ── LEGAL ─────────────────────────────────────────────────────────
+// - LEGAL -
 function Legal() {
   const sections = [
     ['Disclaimer & No Investment Advice',
@@ -1165,7 +1165,7 @@ function Legal() {
   )
 }
 
-// ── COOKIE BANNER ─────────────────────────────────────────────────
+// - COOKIE BANNER -
 function CookieBanner() {
   const [visible, setVisible] = useState(false)
   useEffect(() => {
@@ -1186,7 +1186,7 @@ function CookieBanner() {
   )
 }
 
-// ── ROOT APP ──────────────────────────────────────────────────────
+// - ROOT APP -
 export default function App() {
   const [page,        setPage]        = useState<Page>('dashboard')
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
@@ -1230,7 +1230,7 @@ export default function App() {
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
 
-      {/* ── SIDEBAR ── */}
+      {/* - SIDEBAR - */}
       <aside className={`
         flex-col w-52 bg-surface border-r border-border flex-shrink-0 transition-all
         ${sidebarOpen ? 'flex fixed inset-y-0 left-0 z-40' : 'hidden md:flex'}
@@ -1300,7 +1300,7 @@ export default function App() {
         <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebar(false)} />
       )}
 
-      {/* ── MAIN ── */}
+      {/* - MAIN - */}
       <main className="flex-1 flex flex-col overflow-hidden">
 
         <div className="md:hidden flex items-center px-4 py-3 border-b border-border bg-surface gap-3">
