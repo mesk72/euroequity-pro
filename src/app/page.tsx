@@ -299,7 +299,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
   )
 
   // - MOBILE: card list -
-  if (isMobile) return (
+  if (isMobile) return (<div>
     <div>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
         Prices delayed 15-20 min
@@ -373,7 +373,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
         </div>
       )}
     </div>
-  )
+  </div>)
 
   // - DESKTOP: full table -
   return (
