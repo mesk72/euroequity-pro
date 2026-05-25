@@ -290,7 +290,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
   if (loading) return (
     <div className="p-8 text-center text-muted text-sm space-y-2">
       <RefreshCw size={20} className="animate-spin mx-auto text-gold" />
-      <p>Loading market data…</p>
+      <p>Loading market data...</p>
     </div>
   )
 
@@ -298,8 +298,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
     <div className="p-8 text-center text-muted text-sm">No stocks match your filters.</div>
   )
 
-  // - MOBILE + DESKTOP -
-  return isMobile ? (
+  if (isMobile) return (
     <div>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
         Prices delayed 15-20 min
@@ -310,7 +309,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
           <div key={i}
             onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
             className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
-            {/* Row 1: flag+ticker | price | change */}
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
                 <span className="font-700 text-sm text-orange">{s.flag} {s.ticker}</span>
@@ -325,12 +323,10 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                 </span>
               </div>
             </div>
-            {/* Row 2: company | sector */}
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
               <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
             </div>
-            {/* Row 3: valuation */}
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
               <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${s.mktCap.toFixed(1)}B` : '-'}</span></span>
               <span className="text-[#444]">|</span>
@@ -340,7 +336,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
               <span className="text-[#444]">|</span>
               <span className="text-muted">P/B: <span className="text-sub">{s.pb != null ? s.pb.toFixed(2) : '-'}</span></span>
             </div>
-            {/* Row 4: growth */}
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
               <span className="text-muted">EPS: <span style={{color: s.epsGrowth != null ? (s.epsGrowth >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.epsGrowth != null ? `${(s.epsGrowth*100).toFixed(1)}%` : '-'}</span></span>
               <span className="text-[#444]">|</span>
@@ -352,18 +347,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
               <span className="text-[#444]">|</span>
               <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-'}</span></span>
             </div>
-              <span className="text-muted">12M: <span style={s.mom12m != null ? {color: s.mom12m >= 0 ? '#22d48a' : '#e84560'} : {}}>{s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-'}</span></span>
-              {s.valueScore != null && (
-                <span style={{ color: s.valueScore >= 70 ? '#22c55e' : s.valueScore >= 40 ? '#f97316' : '#ef4444' }}>
-                  V:{Math.round(s.valueScore)}
-                </span>
-              )}
-              {s.growthScore != null && (
-                <span style={{ color: s.growthScore >= 70 ? '#22c55e' : s.growthScore >= 40 ? '#f97316' : '#ef4444' }}>
-                  G:{Math.round(s.growthScore)}
-                </span>
-              )}
-            </div>
           </div>
         )
       })}
@@ -373,9 +356,10 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
         </div>
       )}
     </div>
-    </div>
-  ) : (
-<div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
+  )
+
+  return (
+    <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
         Prices delayed 15-20 min · Fundamentals updated daily
       </div>
@@ -455,9 +439,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
   )
 }
 
-// - PRICE CHART (SVG) -
-  )
-}
 function PriceChart({ history }: { history: any[] }) {
   const prices = history
     .map((d: any) => parseFloat(d.adjusted_close || d.close || '0'))
