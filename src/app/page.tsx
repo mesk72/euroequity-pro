@@ -95,7 +95,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal'
+type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal' | 'about'
 
 // ── API CALLS ──────────────────────────────────────────────────────
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -1103,6 +1103,34 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   )
 }
 
+// ── ABOUT ─────────────────────────────────────────────────────────
+function AboutPage() {
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <div className="text-gold font-700 text-xl mb-6 font-condensed">How ForwardAlpha Works</div>
+
+      {[
+        { title: 'Our Philosophy', text: 'ForwardAlpha covers 3,700+ stocks across 18 European exchanges, combining Value and Growth investing into a single quantitative framework. European equity markets are underanalyzed — we help investors find exceptional opportunities others miss.' },
+        { title: 'The Value Score', text: 'Inspired by Benjamin Graham and Warren Buffett, the Value Score measures how attractively priced a stock is relative to its peers. We evaluate earnings yield (P/E forward and trailing) and book value (P/B), ranking each stock against all others in its market. A Value Score of 80 means the stock is cheaper than 80% of its peers.' },
+        { title: 'The Growth Score', text: 'The Growth Score measures growth momentum across four dimensions: EPS Growth (expected earnings growth next 12 months), Revenue Growth (top-line validation), Price Momentum (6M and 12M performance), and Earnings Momentum (analyst estimate revisions). A Growth Score of 70 means the stock grows faster than 70% of its peers.' },
+        { title: 'Best Ideas (V≥70, G≥70)', text: 'The sweet spot — companies that are reasonably priced AND growing faster than peers. Historically the most rewarding combination.' },
+        { title: 'Best Value (V≥80, G≥30)', text: 'Deep value opportunities. Companies trading at significant discounts to peers with at least some growth. Classic value investing territory.' },
+        { title: 'Practical Tips', text: '• Start with Best Ideas — value + growth is the optimal combination
+• Use country filters — Italian/Spanish financials often lead on value; Nordic tech on growth
+• Check the sector — P/E of 15x means different things for a utility vs software company
+• High Value Score + negative EPS growth may signal a value trap
+• EPS estimates change around earnings dates — always check the latest data' },
+        { title: 'Disclaimer', text: 'ForwardAlpha is a screening and research tool, not an investment advisor. All data is for informational purposes only and does not constitute investment advice. Markets involve risk. Past performance is not indicative of future results.' },
+      ].map(({ title, text }) => (
+        <div key={title} className="mb-4 bg-surface border border-border rounded overflow-hidden">
+          <div className="bg-surface/80 px-4 py-2.5 border-b border-border text-gold font-condensed font-700 text-sm">{title}</div>
+          <div className="px-4 py-3 text-sub text-xs leading-relaxed whitespace-pre-line">{text}</div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── LEGAL ─────────────────────────────────────────────────────────
 function Legal() {
   const sections = [
@@ -1189,6 +1217,7 @@ export default function App() {
     { id: 'dashboard' as Page, label: 'Dashboard',  icon: <LayoutDashboard size={16} /> },
     { id: 'screener'  as Page, label: 'Screener',   icon: <Search size={16} /> },
     { id: 'portfolio' as Page, label: 'Portfolios', icon: <Briefcase size={16} /> },
+    { id: 'about'     as Page, label: 'How It Works', icon: <Globe size={16} /> },
     { id: 'legal'     as Page, label: 'Legal',      icon: <Globe size={16} /> },
   ]
 
@@ -1297,6 +1326,7 @@ export default function App() {
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
           {page === 'screener'  && <Screener key={`${scrExchange}-${scrSector}-${scrEpsMom}`} initExchange={scrExchange} initSector={scrSector} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} />}
           {page === 'portfolio' && <Portfolio />}
+          {page === 'about'     && <AboutPage />}
           {page === 'legal'     && <Legal />}
         </div>
 
