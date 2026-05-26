@@ -8,6 +8,11 @@ function fp(v?: number | null, d = 2): string {
   if (v == null || isNaN(v as number)) return '—'
   return `${(v as number) >= 0 ? '+' : ''}${(v as number).toFixed(d)}%`
 }
+function fpPct(v?: number | null, d = 1): string {
+  if (v == null || isNaN(v as number)) return '—'
+  const pct = (v as number) * 100
+  return `${pct >= 0 ? '+' : ''}${pct.toFixed(d)}%`
+}
 function fv(v?: number | null, d = 2): string {
   if (v == null || isNaN(v as number)) return '—'
   return (v as number).toFixed(d)
@@ -146,7 +151,7 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
   const chg = stock.change1d || 0
 
   const leftMetrics: [string, string, string][] = [
-    ['Price €',      fv(stock.price, 2),       ''],
+    ['Price',   (stock.exchange === 'SWX' ? 'CHF ' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp ' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK ' : stock.exchange === 'OB' ? 'NOK ' : stock.exchange === 'CPSE' ? 'DKK ' : 'EUR ') + fv(stock.price, 2), ''],
     ['1D Change %',  fp(chg, 2),               chg >= 0 ? 'var(--green)' : 'var(--red)'],
     ['Mkt Cap €B',   fv(stock.mktCap, 2),      ''],
     ['P/E Trailing', fv(stock.peTrail, 1),     ''],
@@ -159,13 +164,13 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
   ]
 
   const rightMetrics: [string, string, string][] = [
-    ['EPS Growth %',   fp(stock.epsGrowth, 1),  clr(stock.epsGrowth)],
-    ['Rev Growth %',   fp(stock.revGrowth, 1),  clr(stock.revGrowth)],
+    ['EPS Growth %',   fpPct(stock.epsGrowth),  clr(stock.epsGrowth)],
+    ['Rev Growth %',   fpPct(stock.revGrowth),  clr(stock.revGrowth)],
     ['EPS Mom 30d',    fp(stock.epsMom30d, 1),  clr(stock.epsMom30d)],
-    ['Mom 1 Week',     fp(stock.mom1w, 1),      clr(stock.mom1w)],
-    ['Mom 1 Month',    fp(stock.mom1m, 1),      clr(stock.mom1m)],
-    ['Mom 6 Months',   fp(stock.mom6m, 1),      clr(stock.mom6m)],
-    ['Mom 12 Months',  fp(stock.mom12m, 1),     clr(stock.mom12m)],
+    ['Mom 1 Week %',   fpPct(stock.mom1w),      clr(stock.mom1w)],
+    ['Mom 1 Month %',  fpPct(stock.mom1m),      clr(stock.mom1m)],
+    ['Mom 6 Months %', fpPct(stock.mom6m),      clr(stock.mom6m)],
+    ['Mom 12 Months %',fpPct(stock.mom12m),     clr(stock.mom12m)],
     ['Value Score',    fn(stock.valueScore),    scoreClr(stock.valueScore)],
     ['Growth Score',   fn(stock.growthScore),   scoreClr(stock.growthScore)],
     ['Sector',         stock.sector || '—',     ''],
