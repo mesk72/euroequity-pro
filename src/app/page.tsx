@@ -827,10 +827,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   }, [search])
 
 
-  // Top 200 per market cap
+  // Top 600 Europe per market cap
   const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null}))
     .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
-    .slice(0, 200)
+    .slice(0, 600)
 
   const valid   = u200.filter((s:any) => s.change1d != null)
   const gainers = [...valid].sort((a, b) => (b.change1d || 0) - (a.change1d || 0)).slice(0, 10)
@@ -841,8 +841,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
   // EPS Growth top/bottom 10 su tutto l'universo
   const allWithEpsGrowth = u200.filter(s => s.epsGrowth != null)
-  const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10)
-  const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10)
+  const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10).slice(0, 10)
+  const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10).slice(0, 10)
 
   // Price Momentum 12M top/bottom 10
   const allWithMom12 = u200.filter(s => s.mom12m != null)
@@ -850,9 +850,9 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
   // KPI V+G >= 80 - entrambi i rank >= 70 (titoli con buon value E buon growth)
-  const highVG = u200.filter(s =>
+  const highVG = u200.filter((s:any) =>
     s.valueScore != null && s.growthScore != null &&
-    s.valueScore >= 70 && s.growthScore >= 70
+    (s.valueScore + s.growthScore) / 2 >= 80
   ).length
 
   return (
@@ -890,7 +890,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           📈 Index Performance
           <span className="text-[9px] text-muted font-normal">· auto-refresh 60s · delayed 15-20 min</span>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {INDICES.map((idx) => {
             const d = indices.find((x: any) => x.ticker === idx.ticker)
             return (
@@ -910,9 +910,9 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : allStocks.length.toLocaleString() },
-          { label: 'EW 1D Return (top 200)',    value: loading ? '…' : fp(ewReturn) },
-          { label: 'V+G >= 80 (All Markets)',    value: loading ? '…' : highVG.toString() },
-          { label: 'Gainers Today (top 200)',   value: loading ? '…' : gainers.length.toString() },
+          { label: 'EW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
+          { label: 'Gainers Today (top 600)',   value: loading ? '…' : gainers.length.toString() },
         ].map(({ label, value }) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
@@ -930,7 +930,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
-                {title} - Top 200 by Market Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
+                {title} - Top 600 Europe by Mkt Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
               </div>
               <table className="data-table">
                 <thead><tr>
@@ -958,8 +958,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {!loading && topEpsGrowth.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
-            { title: '📈 Top 10 EPS Growth (All Universe)', list: topEpsGrowth, color: 'var(--green)' },
-            { title: '📉 Bottom 10 EPS Growth (All Universe)', list: botEpsGrowth, color: 'var(--red)' },
+            { title: '📈 Top 10 EPS Growth (Top 600 Europe)', list: topEpsGrowth, color: 'var(--green)' },
+            { title: '📉 Bottom 10 EPS Growth (Top 600 Europe)', list: botEpsGrowth, color: 'var(--red)' },
           ].map(({ title, list, color }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
@@ -1002,8 +1002,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {!loading && topMom12.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
-            { title: '🚀 Top 10 Price Mom 12M (All Universe)', list: topMom12, color: 'var(--green)' },
-            { title: '💣 Bottom 10 Price Mom 12M (All Universe)', list: botMom12, color: 'var(--red)' },
+            { title: '🚀 Top 10 Price Mom 12M (Top 600 Europe)', list: topMom12, color: 'var(--green)' },
+            { title: '💣 Bottom 10 Price Mom 12M (Top 600 Europe)', list: botMom12, color: 'var(--red)' },
           ].map(({ title, list, color }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
@@ -1045,6 +1045,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {/* Heatmap settoriale */}
       {!loading && u200.length > 0 && (
         <div className="bg-surface border border-border rounded-lg p-4">
+          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · Top 600 Europe</div>
           <SectorHeatmap stocks={u200} onSectorClick={onSectorClick} />
         </div>
       )}
@@ -1267,6 +1268,8 @@ export default function App() {
           {page === 'bestvalue'  && <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} />}
           {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={70} initGrowMin={70} />}
           {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0}  initGrowMin={80} />}
+          {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
+          {page === 'sectors'   && <Screener key="sectors"   initExchange="EZ"  initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'portfolio' && <div className="p-8 text-muted text-sm">Portfolio coming soon.</div>}
           {page === 'legal'     && <Legal />}
         </div>
