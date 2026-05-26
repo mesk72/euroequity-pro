@@ -229,6 +229,7 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
   switch (key) {
     case 'ticker':      return { val: s.ticker, cls: 'font-600 text-text', flag: s.flag }
     case 'company':     return { val: s.company || '-',   cls: 'text-sub' }
+    case 'country':     return { val: s.country  || '-',   cls: 'text-[10px] text-muted' }
     case 'sector':      return { val: s.sector  || '-',   cls: 'text-[10px]', sectorColor: getSectorColor(s.sector) }
     case 'price':       return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-text'  : 'text-muted' }
     case 'change1d':    return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
@@ -833,8 +834,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     .slice(0, 600)
 
   const valid   = u200.filter((s:any) => s.change1d != null)
-  const gainers = [...valid].sort((a, b) => (b.change1d || 0) - (a.change1d || 0)).slice(0, 10)
-  const losers  = [...valid].sort((a, b) => (a.change1d || 0) - (b.change1d || 0)).slice(0, 10)
+  const gainers = [...valid].filter((s:any) => (s.change1d || 0) >= 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
+  const losers  = [...valid].filter((s:any) => (s.change1d || 0) <  0).sort((a, b) => (a.change1d || 0) - (b.change1d || 0))
   const ewReturn = valid.length > 0
     ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length
     : null
@@ -912,7 +913,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           { label: 'Total Stocks',              value: loading ? '…' : allStocks.length.toLocaleString() },
           { label: 'EW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
-          { label: 'Gainers Today (top 600)',   value: loading ? '…' : gainers.length.toString() },
+          { label: 'Gainers Today (top 600)',   value: loading ? '…' : `${gainers.length} / ${losers.length}` },
         ].map(({ label, value }) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
@@ -1143,12 +1144,14 @@ export default function App() {
   }
 
   const nav = [
-    { id: 'dashboard'  as Page, label: 'Dashboard',   icon: <LayoutDashboard size={16} /> },
-    { id: 'screener'   as Page, label: 'All Europe',   icon: <Globe size={16} /> },
-    { id: 'bestvalue'  as Page, label: 'Best Value',   icon: <TrendingUp size={16} /> },
-    { id: 'bestideas'  as Page, label: 'Best Ideas',   icon: <TrendingUp size={16} /> },
-    { id: 'bestgrowth' as Page, label: 'Best Growth',  icon: <TrendingUp size={16} /> },
-    { id: 'MIL'        as Page, label: 'Italy',        icon: <Globe size={16} /> },
+    { id: 'dashboard'  as Page, label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
+    { id: 'screener'   as Page, label: 'All Europe',    icon: <Globe size={16} /> },
+    { id: 'eurozone'   as Page, label: 'Eurozone',      icon: <Globe size={16} /> },
+    { id: 'bestideas'  as Page, label: 'Best Ideas',    icon: <TrendingUp size={16} /> },
+    { id: 'bestvalue'  as Page, label: 'Best Value',    icon: <TrendingUp size={16} /> },
+    { id: 'bestgrowth' as Page, label: 'Best Growth',   icon: <TrendingUp size={16} /> },
+    { id: 'sectors'    as Page, label: 'Sectors',       icon: <Globe size={16} /> },
+    { id: 'MIL'        as Page, label: 'Italy',         icon: <Globe size={16} /> },
     { id: 'PA'         as Page, label: 'France',       icon: <Globe size={16} /> },
     { id: 'XETRA'      as Page, label: 'Germany',      icon: <Globe size={16} /> },
     { id: 'LSE'        as Page, label: 'UK (LSE)',      icon: <Globe size={16} /> },
