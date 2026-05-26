@@ -95,7 +95,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal' | 'about'
+type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -1080,7 +1080,6 @@ export default function App() {
     { id: 'dashboard' as Page, label: 'Dashboard',  icon: <LayoutDashboard size={16} /> },
     { id: 'screener'  as Page, label: 'Screener',   icon: <Search size={16} /> },
     { id: 'portfolio' as Page, label: 'Portfolios', icon: <Briefcase size={16} /> },
-    { id: 'about'     as Page, label: 'How It Works', icon: <Globe size={16} /> },
     { id: 'legal'     as Page, label: 'Legal',      icon: <Globe size={16} /> },
   ]
 
@@ -1188,8 +1187,7 @@ export default function App() {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
           {page === 'screener'  && <Screener key={`${scrExchange}-${scrSector}-${scrEpsMom}`} initExchange={scrExchange} initSector={scrSector} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} />}
-          {page === 'portfolio' && <Portfolio />}
-          {page === 'about'     && <AboutPage />}
+          {page === 'portfolio' && <div className="p-8 text-muted text-sm">Portfolio coming soon.</div>}
           {page === 'legal'     && <Legal />}
         </div>
 
