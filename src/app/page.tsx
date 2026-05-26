@@ -1,5 +1,4 @@
 'use client'
-// ForwardAlpha v2.0 - 20260526_020148
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -705,6 +704,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
           Best Ideas (V>=70, G>=70)
         </button>
+        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setMom12Min(0); setSearch(''); setSector('All') }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
           Reset
         </button>
