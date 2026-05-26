@@ -3,12 +3,12 @@ export default function LegalPage() {
     {
       title: '1. Terms of Use',
       items: [
-        ['Operator', 'EuroEquity Pro is operated by Andrea Meschini, an individual based in Verona, Italy (Via Lorenzo Fava 24, 37139 Verona VR). Contact: langskltdlondon@gmail.com · Tel: +39 351 837 3385'],
+        ['Operator', 'EuroEquity Pro is operated by Andrea Meschini, an individual based in Verona, Italy (Via Lorenzo Fava 24, 37139 Verona VR). Contact: andrea@forwardalpha.pro · Tel: +39 351 837 3385'],
         ['Acceptance of Terms', 'By accessing or using EuroEquity Pro, you confirm that you have read, understood, and agree to be bound by these Terms. If you do not agree, do not use this service.'],
         ['Description of Service', 'EuroEquity Pro provides financial data, quantitative analytics, equity screening tools, and portfolio tracking for informational purposes only. Market data is sourced from Leeway (leeway.tech) under commercial licence.'],
         ['Free Trial', 'New registered users receive a 14-day free trial with full access to all features. No credit card is required to start the trial.'],
         ['Subscription', 'After the trial, access to premium features requires a paid subscription of €4.99/month (IVA inclusa dove applicabile), automatically renewed unless cancelled.'],
-        ['Cancellation', 'You may cancel at any time. In accordance with D.Lgs. 206/2005 (Codice del Consumo) and EU Consumer Rights Directive 2011/83/EU, you have a 14-day cooling-off right from initial subscription. Refund requests: langskltdlondon@gmail.com.'],
+        ['Cancellation', 'You may cancel at any time. In accordance with D.Lgs. 206/2005 (Codice del Consumo) and EU Consumer Rights Directive 2011/83/EU, you have a 14-day cooling-off right from initial subscription. Refund requests: andrea@forwardalpha.pro.'],
         ['Prohibited Uses', 'You may not reverse-engineer, bulk-scrape, or resell data; share account credentials; or use the service to provide unauthorised investment advice to third parties.'],
         ['Governing Law', 'These Terms are governed exclusively by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona (Tribunale di Verona), without prejudice to mandatory EU consumer protection rights.'],
       ]
@@ -44,13 +44,13 @@ export default function LegalPage() {
     {
       title: '5. Privacy Policy (GDPR / D.Lgs. 196/2003)',
       items: [
-        ['Data Controller', 'The data controller is Andrea Meschini, Via Lorenzo Fava 24, 37139 Verona VR, Italy. Contact for data protection matters: langskltdlondon@gmail.com'],
+        ['Data Controller', 'The data controller is Andrea Meschini, Via Lorenzo Fava 24, 37139 Verona VR, Italy. Contact for data protection matters: andrea@forwardalpha.pro'],
         ['Data We Collect', 'We collect: full name, email address, country of residence, hashed password, newsletter preference, and anonymised usage data.'],
         ['Legal Basis (GDPR Art. 6)', 'Contract performance (Art. 6.1.b): processing necessary to provide the service. Legitimate interest (Art. 6.1.f): security and fraud prevention. Consent (Art. 6.1.a): marketing communications, only if you opt in.'],
         ['Data Sharing', 'Data is shared only with: Supabase Inc. (database infrastructure, EU Frankfurt servers, under Standard Contractual Clauses) and Stripe Inc. (payment processing, under SCCs). No personal data is sold or shared with advertising networks.'],
-        ['Your Rights', 'Under GDPR and D.Lgs. 196/2003 you have the right to: access (Art. 15), rectify (Art. 16), erase (Art. 17), restrict processing (Art. 18), data portability (Art. 20), and object to processing (Art. 21). Contact langskltdlondon@gmail.com — responses within 30 days. You may lodge a complaint with the Garante per la protezione dei dati personali (garanteprivacy.it) or your local EU data protection authority.'],
+        ['Your Rights', 'Under GDPR and D.Lgs. 196/2003 you have the right to: access (Art. 15), rectify (Art. 16), erase (Art. 17), restrict processing (Art. 18), data portability (Art. 20), and object to processing (Art. 21). Contact andrea@forwardalpha.pro — responses within 30 days. You may lodge a complaint with the Garante per la protezione dei dati personali (garanteprivacy.it) or your local EU data protection authority.'],
         ['Retention', 'Account data retained for the duration of your account plus 2 years after closure. Payment records retained for 10 years (Italian tax law, Art. 2220 c.c.). You may request deletion of personal data at any time, subject to legal retention obligations.'],
-        ['Newsletter', 'If you opt in, your email will be used to send product updates and market commentary. You may unsubscribe at any time via any email link or by contacting langskltdlondon@gmail.com.'],
+        ['Newsletter', 'If you opt in, your email will be used to send product updates and market commentary. You may unsubscribe at any time via any email link or by contacting andrea@forwardalpha.pro.'],
       ]
     },
     {
@@ -78,7 +78,7 @@ export default function LegalPage() {
             LEGAL DOCUMENTATION · ANDREA MESCHINI · VERONA, ITALY
           </div>
           <div style={{ fontSize:11, color:'#64748b', marginTop:8 }}>
-            Last updated: May 2026 · <a href="mailto:langskltdlondon@gmail.com" style={{ color:'#f97316' }}>langskltdlondon@gmail.com</a>
+            Last updated: May 2026 · <a href="mailto:andrea@forwardalpha.pro" style={{ color:'#f97316' }}>andrea@forwardalpha.pro</a>
           </div>
         </div>
 
@@ -101,7 +101,7 @@ export default function LegalPage() {
         ))}
 
         <div style={{ fontSize:10, color:'#3d5068', textAlign:'center', paddingTop:16, borderTop:'1px solid #1e2d45', marginTop:8 }}>
-          Andrea Meschini · Via Lorenzo Fava 24, 37139 Verona VR, Italy · langskltdlondon@gmail.com · © 2026
+          Andrea Meschini · Via Lorenzo Fava 24, 37139 Verona VR, Italy · andrea@forwardalpha.pro · © 2026
         </div>
       </div>
     </div>
