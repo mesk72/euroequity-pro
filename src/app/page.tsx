@@ -770,6 +770,128 @@ function FlagIcon({ flag }: { flag: string }) {
   )
 }
 
+// - SECTORS -
+function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void }) {
+  const [stocks, setStocks] = useState<Stock[]>([])
+  const [loading, setLoading] = useState(true)
+  const usdToEur = 0.8615
+
+  useEffect(() => {
+    setLoading(true)
+    apiExchange('EZ').then(data => { setStocks(data); setLoading(false) })
+  }, [])
+
+  const stocksEur = stocks.map(s => ({
+    ...s,
+    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null
+  }))
+
+  // Aggrega per settore
+  const sectorMap: Record<string, {
+    mktCap: number, count: number,
+    change1d: number[], epsGrowth: number[], revGrowth: number[],
+    mom12m: number[], valueScore: number[], growthScore: number[]
+  }> = {}
+
+  for (const s of stocksEur) {
+    const sec = s.sector || 'Other'
+    if (!sectorMap[sec]) sectorMap[sec] = {
+      mktCap: 0, count: 0,
+      change1d: [], epsGrowth: [], revGrowth: [],
+      mom12m: [], valueScore: [], growthScore: []
+    }
+    const g = sectorMap[sec]
+    g.count++
+    if (s.mktCap) g.mktCap += s.mktCap
+    if (s.change1d != null) g.change1d.push(s.change1d)
+    if (s.epsGrowth != null) g.epsGrowth.push(s.epsGrowth)
+    if (s.revGrowth != null) g.revGrowth.push(s.revGrowth)
+    if (s.mom12m != null) g.mom12m.push(s.mom12m)
+    if (s.valueScore != null) g.valueScore.push(s.valueScore)
+    if (s.growthScore != null) g.growthScore.push(s.growthScore)
+  }
+
+  const avg = (arr: number[]) => arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : null
+
+  const sectors = Object.entries(sectorMap)
+    .map(([name, g]) => ({
+      name,
+      count: g.count,
+      mktCap: g.mktCap,
+      change1d: avg(g.change1d),
+      epsGrowth: avg(g.epsGrowth),
+      revGrowth: avg(g.revGrowth),
+      mom12m: avg(g.mom12m),
+      valueScore: avg(g.valueScore),
+      growthScore: avg(g.growthScore),
+    }))
+    .sort((a, b) => b.mktCap - a.mktCap)
+
+  const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
+  const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
+  const clr = (v: number | null) => ({ color: v == null ? 'var(--muted)' : v >= 0 ? '#22d48a' : '#e84560' })
+
+  return (
+    <div className="space-y-4 p-3">
+      <div className="section-hdr">Sector Heatmap - All Europe</div>
+
+      {loading ? (
+        <div className="text-center py-12 text-muted">
+          <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-gold" />
+          <p className="text-sm">Loading…</p>
+        </div>
+      ) : (
+        <>
+          <div className="bg-surface border border-border rounded-lg p-4">
+            <SectorHeatmap stocks={stocksEur} onSectorClick={onSectorClick} />
+          </div>
+
+          <div className="bg-surface border border-border rounded-lg overflow-hidden">
+            <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
+              Sector Aggregates - All Europe ({stocks.length} stocks)
+            </div>
+            <div className="overflow-x-auto">
+              <table className="data-table w-full">
+                <thead><tr>
+                  <th>Sector</th>
+                  <th>Stocks</th>
+                  <th>Mkt Cap €B</th>
+                  <th>1D %</th>
+                  <th>EPS Gr %</th>
+                  <th>Rev Gr %</th>
+                  <th>Mom 12M %</th>
+                  <th>Value</th>
+                  <th>Growth</th>
+                </tr></thead>
+                <tbody>
+                  {sectors.map(s => (
+                    <tr key={s.name} onClick={() => onSectorClick(s.name)} className="cursor-pointer">
+                      <td>
+                        <span className="text-[11px] font-600" style={{ color: getSectorColor(s.name) }}>
+                          {s.name}
+                        </span>
+                      </td>
+                      <td className="font-mono text-muted">{s.count}</td>
+                      <td className="font-mono">{fv(s.mktCap, 0)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth)}</td>
+                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth)}</td>
+                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m)}</td>
+                      <td className="font-mono">{fv(s.valueScore, 0)}</td>
+                      <td className="font-mono">{fv(s.growthScore, 0)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+
 // - DASHBOARD -
 function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   onSectorClick: (s: string) => void
@@ -1272,7 +1394,7 @@ export default function App() {
           {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={70} initGrowMin={70} />}
           {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0}  initGrowMin={80} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
-          {page === 'sectors'   && <Screener key="sectors"   initExchange="EZ"  initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
+          {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'portfolio' && <div className="p-8 text-muted text-sm">Portfolio coming soon.</div>}
           {page === 'legal'     && <Legal />}
         </div>
