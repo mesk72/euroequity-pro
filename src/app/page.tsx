@@ -512,7 +512,6 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['P/E Trailing', fv(stock.peTrail, 1),      ''],
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
     ['P/B',          fv(stock.pb, 2),           ''],
-            ' : ''],
     ['EPS Gr %',     fpd(stock.epsGrowth),      clr(stock.epsGrowth)],
     ['Rev Gr %',     fpd(stock.revGrowth),      clr(stock.revGrowth)],
     ['Mom 1W %',     fpd(stock.mom1w),          clr(stock.mom1w)],
