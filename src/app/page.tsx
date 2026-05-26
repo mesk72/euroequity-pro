@@ -212,7 +212,6 @@ const COLUMNS: ColDef[] = [
   { key: 'mktCap',      label: 'MktCap €B', width: 80  },
   { key: 'peTrail',     label: 'P/E Tr.',   width: 65  },
   { key: 'peFwd',       label: 'P/E Fwd',   width: 65  },
-  { key: 'pb',          label: 'P/B',       width: 55  },
 
   { key: 'epsGrowth',   label: 'EPS Gr%',   width: 72  },
   { key: 'revGrowth',   label: 'Rev Gr%',   width: 72  },
@@ -236,7 +235,6 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'mktCap':      return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peTrail':     return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'pb':          return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'epsGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'revGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mom1w':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
@@ -956,8 +954,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     .slice(0, 600)
 
   const valid   = u200.filter((s:any) => s.change1d != null)
-  const gainers = [...valid].filter((s:any) => (s.change1d || 0) >= 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
-  const losers  = [...valid].filter((s:any) => (s.change1d || 0) <  0).sort((a, b) => (a.change1d || 0) - (b.change1d || 0))
+  const allGainers = [...valid].filter((s:any) => (s.change1d || 0) > 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
+  const allLosers  = [...valid].filter((s:any) => (s.change1d || 0) < 0).sort((a, b) => (a.change1d || 0) - (b.change1d || 0))
+  const gainers = allGainers.slice(0, 10)
+  const losers  = allLosers.slice(0, 10)
   const ewReturn = valid.length > 0
     ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length
     : null
@@ -1035,7 +1035,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           { label: 'Total Stocks',              value: loading ? '…' : allStocks.length.toLocaleString() },
           { label: 'EW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
-          { label: 'Gainers Today (top 600)',   value: loading ? '…' : `${gainers.length} / ${losers.length}` },
+          { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
@@ -1057,7 +1057,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
               </div>
               <table className="data-table">
                 <thead><tr>
-                  <th>Ticker</th><th>Company</th><th>Price</th><th>1D %</th>
+                  <th>Ticker</th><th style={{maxWidth:100}}>Company</th><th>Price</th><th>1D %</th>
                 </tr></thead>
                 <tbody>
                   {list.map((s, i) => (
@@ -1067,7 +1067,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       <td className="font-700 text-text">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]">{s.company}</td>
                       <td className="font-mono">{fv(s.price, 2)}</td>
-                      <td className="font-mono font-600" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-600 whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
                     </tr>
                   ))}
                 </tbody>
