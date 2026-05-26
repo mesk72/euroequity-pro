@@ -95,7 +95,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'bestvalue' | 'bestideas' | 'bestgrowth' | 'portfolio' | 'legal' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'sectors' | 'portfolio' | 'legal' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
