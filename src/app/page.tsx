@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
-  LayoutDashboard, Search, Briefcase, Globe,
+  LayoutDashboard, Search, Briefcase, Globe, Info,
   LogIn, LogOut, User, Menu, X, RefreshCw,
   ChevronUp, ChevronDown, TrendingUp, TrendingDown
 } from 'lucide-react'
@@ -95,7 +95,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'sectors' | 'portfolio' | 'legal' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -1266,6 +1266,7 @@ export default function App() {
   }
 
   const nav = [
+    { id: 'about'      as Page, label: 'About',         icon: <Info size={16} />, bold: true },
     { id: 'dashboard'  as Page, label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
     { id: 'screener'   as Page, label: 'All Europe',    icon: <Globe size={16} /> },
     { id: 'eurozone'   as Page, label: 'Eurozone',      icon: <Globe size={16} /> },
@@ -1395,7 +1396,12 @@ export default function App() {
           {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0}  initGrowMin={80} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
-          {page === 'portfolio' && <div className="p-8 text-muted text-sm">Portfolio coming soon.</div>}
+          {page === 'about'     && (
+          <div className="flex-1 overflow-y-auto">
+            <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
+          </div>
+        )}
+        {page === 'portfolio' && <Portfolio />}
           {page === 'legal'     && <Legal />}
         </div>
 
