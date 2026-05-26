@@ -95,7 +95,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'portfolio' | 'legal'
+type Page = 'dashboard' | 'screener' | 'bestvalue' | 'bestideas' | 'bestgrowth' | 'portfolio' | 'legal' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -213,10 +213,7 @@ const COLUMNS: ColDef[] = [
   { key: 'peTrail',     label: 'P/E Tr.',   width: 65  },
   { key: 'peFwd',       label: 'P/E Fwd',   width: 65  },
   { key: 'pb',          label: 'P/B',       width: 55  },
-  { key: 'evEbitda',    label: 'EV/EBITDA', width: 88  },
-  { key: 'roe',         label: 'ROE %',     width: 72  },
-  { key: 'divYield',    label: 'Div %',     width: 72  },
-  { key: 'divPayout',   label: 'Payout %',  width: 72  },
+
   { key: 'epsGrowth',   label: 'EPS Gr%',   width: 72  },
   { key: 'revGrowth',   label: 'Rev Gr%',   width: 72  },
   { key: 'mom1w',       label: '1W %',      width: 65  },
@@ -239,10 +236,6 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'peTrail':     return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'pb':          return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'evEbitda':    return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'roe':         return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
-    case 'divYield':    return { val: v != null ? fp(v)     : '-', cls: v != null ? (v > 0 ? 'text-[#22d48a]' : 'text-sub') : 'text-muted' }
-    case 'divPayout':   return { val: v != null ? fp(v)     : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'epsGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'revGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mom1w':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
@@ -519,9 +512,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['P/E Trailing', fv(stock.peTrail, 1),      ''],
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
     ['P/B',          fv(stock.pb, 2),           ''],
-    ['EV/EBITDA',    fv(stock.evEbitda, 1),     ''],
-    ['ROE %',        fp(stock.roe),             clr(stock.roe)],
-    ['Div Yield %',  fp(stock.divYield),        stock.divYield && stock.divYield > 0 ? 'text-[#22d48a]' : ''],
+            ' : ''],
     ['EPS Gr %',     fpd(stock.epsGrowth),      clr(stock.epsGrowth)],
     ['Rev Gr %',     fpd(stock.revGrowth),      clr(stock.revGrowth)],
     ['Mom 1W %',     fpd(stock.mom1w),          clr(stock.mom1w)],
@@ -612,11 +603,13 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 }
 
 // - SCREENER -
-function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock }: {
+function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, initValMin = 0, initGrowMin = 0 }: {
   initExchange?: string
   initSector?:   string
   initEpsMom?:   string
   onSelectStock?: (s: Stock) => void
+  initValMin?: number
+  initGrowMin?: number
 }) {
   const [exchange,  setExchange]  = useState(initExchange)
   const [stocks,    setStocks]    = useState<Stock[]>([])
@@ -627,11 +620,10 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // Filters
   const [search,   setSearch]   = useState('')
   const [sector,   setSector]   = useState(initSector)
-  const [valMin,   setValMin]   = useState(0)
-  const [growMin,  setGrowMin]  = useState(0)
+  const [valMin,   setValMin]   = useState(initValMin)
+  const [growMin,  setGrowMin]  = useState(initGrowMin)
   const [peMax,    setPeMax]    = useState(0)
   const [pbMax,    setPbMax]    = useState(0)
-  const [divMin,   setDivMin]   = useState(0)
   const [mom12Min, setMom12Min] = useState(0)
 
   useEffect(() => {
@@ -667,7 +659,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (initEpsMom === 'epsMomNeg' && (s.epsMom30d == null || s.epsMom30d >= 0)) return false
     if (peMax  > 0 && s.peFwd    != null && s.peFwd    > peMax)  return false
     if (pbMax  > 0 && s.pb       != null && s.pb       > pbMax)  return false
-    if (divMin > 0 && (s.divYield || 0)                < divMin) return false
     if (mom12Min>0 && (s.mom12m  || 0)                 < mom12Min) return false
     if (valMin > 0 && (s.valueScore  || 0)             < valMin) return false
     if (growMin> 0 && (s.growthScore || 0)             < growMin) return false
@@ -714,7 +705,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
           Best Ideas (V≥70, G≥70)
         </button>
-        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setDivMin(0); setMom12Min(0); setSearch(''); setSector('All') }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
           Reset
         </button>
@@ -1152,17 +1142,29 @@ export default function App() {
   }
 
   const nav = [
-    { id: 'dashboard' as Page, label: 'Dashboard',  icon: <LayoutDashboard size={16} /> },
-    { id: 'screener'  as Page, label: 'Screener',   icon: <Search size={16} /> },
-    { id: 'portfolio' as Page, label: 'Portfolios', icon: <Briefcase size={16} /> },
+    { id: 'dashboard'  as Page, label: 'Dashboard',   icon: <LayoutDashboard size={16} /> },
+    { id: 'screener'   as Page, label: 'All Europe',   icon: <Globe size={16} /> },
+    { id: 'bestvalue'  as Page, label: 'Best Value',   icon: <TrendingUp size={16} /> },
+    { id: 'bestideas'  as Page, label: 'Best Ideas',   icon: <TrendingUp size={16} /> },
+    { id: 'bestgrowth' as Page, label: 'Best Growth',  icon: <TrendingUp size={16} /> },
+    { id: 'MIL'        as Page, label: 'Italy',        icon: <Globe size={16} /> },
+    { id: 'PA'         as Page, label: 'France',       icon: <Globe size={16} /> },
+    { id: 'XETRA'      as Page, label: 'Germany',      icon: <Globe size={16} /> },
+    { id: 'LSE'        as Page, label: 'UK (LSE)',      icon: <Globe size={16} /> },
+    { id: 'OM'         as Page, label: 'Sweden',       icon: <Globe size={16} /> },
+    { id: 'OB'         as Page, label: 'Norway',       icon: <Globe size={16} /> },
+    { id: 'SWX'        as Page, label: 'Switzerland',  icon: <Globe size={16} /> },
+    { id: 'MC'         as Page, label: 'Spain',        icon: <Globe size={16} /> },
+    { id: 'AS'         as Page, label: 'Netherlands',  icon: <Globe size={16} /> },
+    { id: 'HE'         as Page, label: 'Finland',      icon: <Globe size={16} /> },
+    { id: 'BR'         as Page, label: 'Belgium',      icon: <Globe size={16} /> },
+    { id: 'CPSE'       as Page, label: 'Denmark',      icon: <Globe size={16} /> },
+    { id: 'AT'         as Page, label: 'Greece',       icon: <Globe size={16} /> },
+    { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
     { id: 'legal'     as Page, label: 'Legal',      icon: <Globe size={16} /> },
   ]
 
-  const externalNav = [
-    { href: '/value',     label: 'Best Value'   },
-    { href: '/calendar',  label: 'Best Ideas'   },
-    { href: '/sectors',   label: 'Sectors'      },
-  ]
+  const externalNav: {href:string,label:string}[] = []
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
@@ -1261,7 +1263,10 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
-          {page === 'screener'  && <Screener key={`${scrExchange}-${scrSector}-${scrEpsMom}`} initExchange={scrExchange} initSector={scrSector} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} />}
+          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={page} initExchange={page === 'screener' ? 'EZ' : page} initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
+          {page === 'bestvalue'  && <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} />}
+          {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={70} initGrowMin={70} />}
+          {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0}  initGrowMin={80} />}
           {page === 'portfolio' && <div className="p-8 text-muted text-sm">Portfolio coming soon.</div>}
           {page === 'legal'     && <Legal />}
         </div>
