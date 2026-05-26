@@ -59,7 +59,7 @@ const fn = (v: number | null | undefined): string => {
   return String(Math.round(v as number))
 }
 const clr = (v: number | null | undefined): string => {
-  // Restituisce stringa vuota — usa sempre clrStyle per i colori
+  // Restituisce stringa vuota - usa sempre clrStyle per i colori
   return ''
 }
 const clrStyle = (v: number | null | undefined): React.CSSProperties => {
@@ -593,7 +593,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
               toast.success(`${stock.ticker} added to ${pf}`)
             }}
             className="btn-primary">
-            ➕ Add
+            + Add
           </button>
         </div>
       </div>
@@ -641,7 +641,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     })
   }, [exchange, initEpsMom])
 
-  // Applica conversione USD→EUR alla market cap
+  // Applica conversione USD->EUR alla market cap
   const usdToEur = 0.8615
   const stocksWithEurCap = stocks.map(s => ({
     ...s,
@@ -698,11 +698,11 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       <div className="flex gap-2 flex-wrap">
         <button onClick={() => { setValMin(80); setGrowMin(30) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          Best Value (V≥80, G≥30)
+          Best Value (V>=80, G>=30)
         </button>
         <button onClick={() => { setValMin(70); setGrowMin(70) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          Best Ideas (V≥70, G≥70)
+          Best Ideas (V>=70, G>=70)
         </button>
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
           Reset
@@ -794,7 +794,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       .catch(() => {})
 
     setLoading(true)
-    // Carica da tutti gli exchange — EMU + ex-EMU
+    // Carica da tutti gli exchange - EMU + ex-EMU
     apiExchange('ALL').then(stocks => {
       setAllStocks(stocks)
       setLoading(false)
@@ -848,7 +848,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
-  // KPI V+G >= 80 — entrambi i rank >= 70 (titoli con buon value E buon growth)
+  // KPI V+G >= 80 - entrambi i rank >= 70 (titoli con buon value E buon growth)
   const highVG = u200.filter(s =>
     s.valueScore != null && s.growthScore != null &&
     s.valueScore >= 70 && s.growthScore >= 70
@@ -883,7 +883,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
         )}
       </div>
 
-      {/* Indices — aggiornati automaticamente ogni 60s */}
+      {/* Indices - aggiornati automaticamente ogni 60s */}
       <div>
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
@@ -910,7 +910,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
         {[
           { label: 'Total Stocks',              value: loading ? '…' : allStocks.length.toLocaleString() },
           { label: 'EW 1D Return (top 200)',    value: loading ? '…' : fp(ewReturn) },
-          { label: 'V+G ≥ 80 (All Markets)',    value: loading ? '…' : highVG.toString() },
+          { label: 'V+G >= 80 (All Markets)',    value: loading ? '…' : highVG.toString() },
           { label: 'Gainers Today (top 200)',   value: loading ? '…' : gainers.length.toString() },
         ].map(({ label, value }) => (
           <div key={label} className="metric-card">
@@ -920,7 +920,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
         ))}
       </div>
 
-      {/* Gainers / Losers today — top 200 market cap */}
+      {/* Gainers / Losers today - top 200 market cap */}
       {!loading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
@@ -929,7 +929,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
-                {title} — Top 200 by Market Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
+                {title} - Top 200 by Market Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
               </div>
               <table className="data-table">
                 <thead><tr>
@@ -1075,7 +1075,7 @@ function Legal() {
 
   return (
     <div className="max-w-2xl space-y-5 fade-in">
-      <div className="section-hdr">📋 Legal — ForwardAlpha</div>
+      <div className="section-hdr">📋 Legal - ForwardAlpha</div>
       <div className="text-xs text-muted">Last updated: May 2026</div>
       {sections.map(([title, body]) => (
         <div key={title} className="bg-surface border border-border rounded-lg p-4">
