@@ -15,8 +15,8 @@ module.exports = {
         green:   '#22d48a',
         red:     '#e84560',
         text:    '#dde4f0',
-        muted:   '#5a6880',
-        sub:     '#8a9ab8',
+        muted:   '#8a9ab8',
+        sub:     '#b0bfd4',
       },
       fontFamily: {
         sans: ['Outfit', 'sans-serif'],
