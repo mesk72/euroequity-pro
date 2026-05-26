@@ -775,17 +775,17 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     : null
 
   // EPS Growth top/bottom 10 su tutto l'universo
-  const allWithEpsGrowth = stocksWithEurCap.filter(s => s.epsGrowth != null)
+  const allWithEpsGrowth = u200.filter(s => s.epsGrowth != null)
   const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10)
   const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10)
 
   // Price Momentum 12M top/bottom 10
-  const allWithMom12 = stocksWithEurCap.filter(s => s.mom12m != null)
+  const allWithMom12 = u200.filter(s => s.mom12m != null)
   const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
   // KPI V+G >= 80 — entrambi i rank >= 70 (titoli con buon value E buon growth)
-  const highVG = stocksWithEurCap.filter(s =>
+  const highVG = u200.filter(s =>
     s.valueScore != null && s.growthScore != null &&
     s.valueScore >= 70 && s.growthScore >= 70
   ).length
