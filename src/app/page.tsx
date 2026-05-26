@@ -763,9 +763,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
 
   // Top 200 per market cap
-  const usdToEurDash = 0.8615
-  const stocksEur = stocks.map((s:any) => ({...s, mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEurDash / 1e3).toFixed(2)) : null}))
-  const u200 = stocksEur
+  const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null}))
     .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
     .slice(0, 200)
 
