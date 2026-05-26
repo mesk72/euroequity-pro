@@ -698,11 +698,11 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       <div className="flex gap-2 flex-wrap">
         <button onClick={() => { setValMin(80); setGrowMin(30) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          Best Value (V>=80, G>=30)
+          Best Value V80+ G30+
         </button>
         <button onClick={() => { setValMin(70); setGrowMin(70) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          Best Ideas (V>=70, G>=70)
+          Best Ideas V70+ G70+
         </button>
         <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setMom12Min(0); setSearch(''); setSector('All') }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
