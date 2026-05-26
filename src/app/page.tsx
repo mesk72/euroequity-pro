@@ -679,8 +679,83 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   ).sort()]
 
   return (
-    <div className="flex flex-col h-full">
-      <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} />
+    <div className="space-y-3 p-3">
+      {/* Exchange tabs */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 flex-nowrap">
+        <button onClick={() => setExchange('EZ')}
+          className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === 'EZ' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
+          All Europe
+        </button>
+        <button onClick={() => setExchange('EMU')}
+          className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === 'EMU' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
+          Eurozone
+        </button>
+        {Object.entries(EXCHANGES).map(([code, meta]) => (
+          <button key={code} onClick={() => setExchange(code)}
+            className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === code ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
+            {(meta as any).flag} {(meta as any).label}
+          </button>
+        ))}
+        {Object.entries(EXCHANGES_EXEMU).map(([code, meta]) => (
+          <button key={code} onClick={() => setExchange(code)}
+            className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === code ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
+            {(meta as any).flag} {(meta as any).label}
+          </button>
+        ))}
+      </div>
+
+      {/* Preset screens */}
+      <div className="flex gap-2 flex-wrap">
+        <button onClick={() => { setValMin(80); setGrowMin(30) }}
+          className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
+          Best Value (V≥80, G≥30)
+        </button>
+        <button onClick={() => { setValMin(70); setGrowMin(70) }}
+          className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
+          Best Ideas (V≥70, G≥70)
+        </button>
+        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setDivMin(0); setMom12Min(0); setSearch(''); setSector('All') }}
+          className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
+          Reset
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-surface border border-border rounded p-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Valuation</div>
+            <input type="number" placeholder="P/E Fwd max" value={peMax || ''} onChange={e => setPeMax(+e.target.value || 0)} className="input-field" />
+            <input type="number" placeholder="P/B max" value={pbMax || ''} onChange={e => setPbMax(+e.target.value || 0)} className="input-field" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Momentum</div>
+            <input type="number" placeholder="Mom 12M % min" value={mom12Min || ''} onChange={e => setMom12Min(+e.target.value || 0)} className="input-field" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
+            <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" />
+            <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
+            <input type="text" placeholder="Ticker / name" value={search} onChange={e => setSearch(e.target.value)} className="input-field" />
+            <select value={sector} onChange={e => setSector(e.target.value)} className="input-field">
+              {sectors.map(s => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Status */}
+      <div className="text-xs text-muted">
+        <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100 · <span className="text-[10px]">Prices delayed 15-20 min</span>
+      </div>
+
+      {/* Table */}
+      <div className="bg-surface border border-border rounded overflow-hidden">
+        <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={100} />
+      </div>
     </div>
   )
 }
@@ -1084,9 +1159,9 @@ export default function App() {
   ]
 
   const externalNav = [
-    { href: '/value',     label: '⭐ Best Value'  },
-    { href: '/sectors',   label: '🏭 Sectors'    },
-    { href: '/dividends', label: '💰 Dividends'  },
+    { href: '/value',     label: 'Best Value'   },
+    { href: '/calendar',  label: 'Best Ideas'   },
+    { href: '/sectors',   label: 'Sectors'      },
   ]
 
   return (
