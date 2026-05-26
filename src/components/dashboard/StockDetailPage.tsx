@@ -156,17 +156,11 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
     ['Mkt Cap €B',   fv(stock.mktCap, 2),      ''],
     ['P/E Trailing', fv(stock.peTrail, 1),     ''],
     ['P/E Forward',  fv(stock.peFwd, 1),       ''],
-    ['P/B',          fv(stock.pb, 2),          ''],
-    ['EV/EBITDA',    fv(stock.evEbitda, 1),    ''],
-    ['ROE %',        fp(stock.roe, 1),         clr(stock.roe)],
-    ['Div Yield %',  fp(stock.divYield, 2),    stock.divYield && stock.divYield > 0 ? 'var(--green)' : ''],
-    ['Beta',         fv(stock.beta, 2),        ''],
   ]
 
   const rightMetrics: [string, string, string][] = [
     ['EPS Growth %',   fpPct(stock.epsGrowth),  clr(stock.epsGrowth)],
     ['Rev Growth %',   fpPct(stock.revGrowth),  clr(stock.revGrowth)],
-    ['EPS Mom 30d',    fp(stock.epsMom30d, 1),  clr(stock.epsMom30d)],
     ['Mom 1 Week %',   fpPct(stock.mom1w),      clr(stock.mom1w)],
     ['Mom 1 Month %',  fpPct(stock.mom1m),      clr(stock.mom1m)],
     ['Mom 6 Months %', fpPct(stock.mom6m),      clr(stock.mom6m)],
@@ -199,7 +193,7 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
               {stock.flag} {stock.ticker}
             </span>
             <span style={{ fontSize:18, fontFamily:'IBM Plex Mono', fontWeight:700, color:'var(--text)' }}>
-              €{fv(stock.price, 2)}
+              {stock.exchange === 'SWX' ? 'CHF' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK' : stock.exchange === 'OB' ? 'NOK' : stock.exchange === 'CPSE' ? 'DKK' : '€'} {fv(stock.price, 2)}
             </span>
             <span style={{ fontSize:16, fontFamily:'IBM Plex Mono', fontWeight:700,
               color: chg >= 0 ? 'var(--green)' : 'var(--red)' }}>
