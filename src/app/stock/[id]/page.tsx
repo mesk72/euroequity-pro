@@ -528,7 +528,7 @@ export default function StockPage() {
         <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
           textAlign:'center', paddingTop:12, borderTop:'1px solid var(--border)' }}>
           ⚠️ Data for informational purposes only · Not investment advice ·
-          Andrea Meschini · Verona, Italy · langskltdlondon@gmail.com
+          Andrea Meschini · Verona, Italy · andrea@forwardalpha.pro
         </div>
       </div>
     </div>
