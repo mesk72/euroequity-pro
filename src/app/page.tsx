@@ -651,6 +651,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   }, [exchange, initEpsMom])
 
   // Applica conversione USD→EUR alla market cap
+  const usdToEur = 0.8615
   const stocksWithEurCap = stocks.map(s => ({
     ...s,
     mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null
