@@ -602,7 +602,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 }
 
 // - SCREENER -
-function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, initValMin = 0, initGrowMin = 0, initCombinedMin = 0 }: {
+function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, initValMin = 0, initGrowMin = 0, initCombinedMin = 0, showAll = false }: {
   initExchange?: string
   initSector?:   string
   initEpsMom?:   string
@@ -610,6 +610,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   initValMin?: number
   initGrowMin?: number
   initCombinedMin?: number
+  showAll?: boolean
 }) {
   const [exchange,  setExchange]  = useState(initExchange)
   const [stocks,    setStocks]    = useState<Stock[]>([])
@@ -762,7 +763,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Table */}
       <div className="bg-surface border border-border rounded overflow-hidden">
-        <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={100} />
+        <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={showAll ? 9999 : 100} />
       </div>
     </div>
   )
@@ -1410,9 +1411,9 @@ export default function App() {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
           {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={page} initExchange={page === 'screener' ? 'EZ' : page} initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
-          {page === 'bestvalue'  && <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} />}
-          {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={0} initCombinedMin={80} />}
-          {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0}  initGrowMin={80} />}
+          {page === 'bestvalue'  && <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} showAll={true} />}
+          {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />}
+          {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={80} showAll={true} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'about'     && (
