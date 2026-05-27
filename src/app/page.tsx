@@ -620,8 +620,9 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // Filters
   const [search,   setSearch]   = useState('')
   const [sector,   setSector]   = useState(initSector)
-  const [valMin,   setValMin]   = useState(initValMin)
-  const [growMin,  setGrowMin]  = useState(initGrowMin)
+  const [valMin,      setValMin]      = useState(initValMin)
+  const [growMin,     setGrowMin]     = useState(initGrowMin)
+  const [combinedMin, setCombinedMin] = useState(initCombinedMin)
   const [peMax,    setPeMax]    = useState(0)
   const [pbMax,    setPbMax]    = useState(0)
   const [mom12Min, setMom12Min] = useState(0)
