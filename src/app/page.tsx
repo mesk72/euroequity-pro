@@ -14,7 +14,6 @@ import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
-import Portfolio from '@/components/portfolio/PortfolioView'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
@@ -1401,7 +1400,7 @@ export default function App() {
             <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
           </div>
         )}
-        {page === 'portfolio' && <Portfolio />}
+        {page === 'portfolio' && <div className="p-8 text-muted text-sm">Portfolio coming soon.</div>}
           {page === 'legal'     && <Legal />}
         </div>
 
