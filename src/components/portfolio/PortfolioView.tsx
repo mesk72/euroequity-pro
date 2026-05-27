@@ -1,8 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Briefcase, Search, X } from 'lucide-react'
-import { Stock, computeScores } from '@/lib/ranking'
-import { DEMO_STOCKS } from '@/lib/demoData'
+import { Stock } from '@/lib/ranking'
 import toast from 'react-hot-toast'
 
 
@@ -124,10 +123,10 @@ export default function Portfolio() {
   useEffect(() => {
     if (searchQ.length < 2) { setSearchRes([]); return }
     const q = searchQ.toLowerCase()
-    const results = computeScores([...DEMO_STOCKS])
-      .filter(s => s.ticker.toLowerCase().includes(q) || (s.company||'').toLowerCase().includes(q))
-      .slice(0, 8)
-    setSearchRes(results)
+    fetch(`/api/db/search?q=${encodeURIComponent(q)}&limit=8`)
+      .then(r => r.json())
+      .then(data => setSearchRes(data || []))
+      .catch(() => setSearchRes([]))
   }, [searchQ])
 
   const save = (pfs: typeof portfolios) => {
@@ -171,7 +170,7 @@ export default function Portfolio() {
 
   // ── CALCULATIONS ──────────────────────────────────────────────
   const positions = portfolios[active] || []
-  const allScored = computeScores([...DEMO_STOCKS])
+  const allScored: any[] = []  // Stocks loaded from Supabase via parent
 
   // Conversione valuta
   const toCcy = (amount: number, fromCcy: string, toCcy2: string): number => {
