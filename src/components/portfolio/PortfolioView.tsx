@@ -374,7 +374,7 @@ export default function Portfolio() {
           ['Total Gain %',  fp(totalGainPct),    totalGainPct],
           ['Daily Change',  sym+(totalDaily>=0?'+':'')+totalDaily.toLocaleString('de-DE',{maximumFractionDigits:0}), totalDaily],
           ['Daily Change %',fp(ewChg1d),         ewChg1d],
-        ] as [string,string,number|null][]).map(([label,value,colorVal]) => (
+        ] as Array<[string,string,number|null]>).map(([label,value,colorVal]) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
             <div className="metric-value" style={{
@@ -522,7 +522,7 @@ export default function Portfolio() {
               {[
                 ['Wgt Avg P/E Trailing', fv(wMetrics.peTrail,1), null],
                 ['Wgt Avg P/E Forward',  fv(wMetrics.peFwd,1),   null],
-              ] as [string,string,number|null][]).map(([label,value,colorVal]) => (
+              ] as Array<[string,string,number|null]>).map(([label,value,colorVal]) => (
                 <div key={label} className="metric-card">
                   <div className="metric-label">{label}</div>
                   <div className="metric-value" style={{ fontSize:'0.95rem',
@@ -546,7 +546,7 @@ export default function Portfolio() {
                 ['Wgt Avg Mom 1W %',      fp(wMetrics.mom1w ? wMetrics.mom1w*100 : null, 1),  wMetrics.mom1w],
                 ['Wgt Avg Mom 6M %',      fp(wMetrics.mom6m ? wMetrics.mom6m*100 : null, 1),  wMetrics.mom6m],
                 ['Wgt Avg Mom 12M %',     fp(wMetrics.mom12m ? wMetrics.mom12m*100 : null, 1), wMetrics.mom12m],
-              ] as [string,string,number|null][]).map(([label,value,colorVal]) => (
+              ] as Array<[string,string,number|null]>).map(([label,value,colorVal]) => (
                 <div key={label} className="metric-card">
                   <div className="metric-label">{label}</div>
                   <div className="metric-value" style={{ fontSize:'0.95rem',
@@ -566,7 +566,7 @@ export default function Portfolio() {
               {[
                 ['Weighted Value Score',  wMetrics.valueScore],
                 ['Weighted Growth Score', wMetrics.growthScore],
-              ] as [string,number|null][]).map(([label,val]) => (
+              ] as Array<[string,number|null]>).map(([label,val]) => (
                 <div key={label} className="metric-card" style={{ display:'flex', alignItems:'center', gap:16 }}>
                   <div style={{ flex:1 }}>
                     <div className="metric-label">{label}</div>
