@@ -114,6 +114,7 @@ export default function Portfolio() {
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null)
   const [addQty,        setAddQty]        = useState('')
   const [addPrice,      setAddPrice]      = useState('')
+  const [displayCcy,    setDisplayCcy]    = useState('EUR')
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
