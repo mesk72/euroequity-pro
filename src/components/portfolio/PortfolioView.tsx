@@ -368,12 +368,12 @@ export default function Portfolio() {
       {/* ── KPI SUMMARY ── */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr) repeat(3,1fr)', gap:8 }}>
         {[
-          [`Cost Value ${sym}`,    `${sym}${totalCost.toLocaleString('de-DE',{maximumFractionDigits:0})}`,    null],
-          [`Market Value ${sym}`,  `${sym}${totalMkt.toLocaleString('de-DE',{maximumFractionDigits:0})}`,     null],
-          [`Total Gain ${sym}`,    `${sym}${totalGain>=0?'+':''}${totalGain.toLocaleString('de-DE',{maximumFractionDigits:0})}`, totalGain],
-          ['Total Gain %',    fp(totalGainPct),    totalGainPct],
-          [`Daily Change ${sym}`,  `${sym}${totalDaily>=0?'+':''}${totalDaily.toLocaleString('de-DE',{maximumFractionDigits:0})}`, totalDaily],
-          ['Daily Change %',  fp(ewChg1d),         ewChg1d],
+          ['Cost Value',    sym+totalCost.toLocaleString('de-DE',{maximumFractionDigits:0}),    null],
+          ['Market Value',  sym+totalMkt.toLocaleString('de-DE',{maximumFractionDigits:0}),     null],
+          ['Total Gain',    sym+(totalGain>=0?'+':'')+totalGain.toLocaleString('de-DE',{maximumFractionDigits:0}), totalGain],
+          ['Total Gain %',  fp(totalGainPct),    totalGainPct],
+          ['Daily Change',  sym+(totalDaily>=0?'+':'')+totalDaily.toLocaleString('de-DE',{maximumFractionDigits:0}), totalDaily],
+          ['Daily Change %',fp(ewChg1d),         ewChg1d],
         ] as [string,string,number|null][]).map(([label,value,colorVal]) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
