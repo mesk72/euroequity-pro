@@ -602,13 +602,14 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 }
 
 // - SCREENER -
-function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, initValMin = 0, initGrowMin = 0 }: {
+function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, initValMin = 0, initGrowMin = 0, initCombinedMin = 0 }: {
   initExchange?: string
   initSector?:   string
   initEpsMom?:   string
   onSelectStock?: (s: Stock) => void
   initValMin?: number
   initGrowMin?: number
+  initCombinedMin?: number
 }) {
   const [exchange,  setExchange]  = useState(initExchange)
   const [stocks,    setStocks]    = useState<Stock[]>([])
