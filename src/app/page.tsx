@@ -218,6 +218,7 @@ const COLUMNS: ColDef[] = [
   { key: 'mom1m',       label: '1M %',      width: 65  },
   { key: 'mom6m',       label: '6M %',      width: 65  },
   { key: 'mom12m',      label: '12M %',     width: 72  },
+  { key: 'combinedRank',label: 'Best',      width: 55  },
   { key: 'valueScore',  label: 'Value',     width: 55  },
   { key: 'growthScore', label: 'Growth',    width: 60  },
 ]
@@ -240,6 +241,7 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'mom1m':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mom6m':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mom12m':      return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'combinedRank': return { val: v != null ? fn(v) : '-', cls: v != null ? (v >= 80 ? 'text-green font-700' : v >= 60 ? 'text-yellow-400' : 'text-muted') : 'text-muted' }
     case 'valueScore':  return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
     case 'growthScore': return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
     default:            return { val: '-', cls: 'text-muted' }
@@ -634,6 +636,21 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     setStocks([]); setSelected(null); setLoading(true)
     const exchToLoad = initEpsMom ? 'EZ' : exchange
     apiExchange(exchToLoad).then(data => {
+      // Calcola combined rank per paese
+      const byCountry: Record<string, any[]> = {}
+      data.forEach((s: any) => {
+        const c = s.exchange || 'OTHER'
+        if (!byCountry[c]) byCountry[c] = []
+        byCountry[c].push(s)
+      })
+      data.forEach((s: any) => {
+        if (s.valueScore == null || s.growthScore == null) { s.combinedRank = null; return }
+        const combined = (s.valueScore + s.growthScore) / 2
+        const peers = byCountry[s.exchange] || []
+        const peersWithBoth = peers.filter((p: any) => p.valueScore != null && p.growthScore != null)
+        const below = peersWithBoth.filter((p: any) => (p.valueScore + p.growthScore) / 2 < combined).length
+        s.combinedRank = Math.round(below / peersWithBoth.length * 100)
+      })
       setStocks(data)
       setLoading(false)
     })
@@ -659,6 +676,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (mom12Min>0 && (s.mom12m  || 0)                 < mom12Min) return false
     if (valMin > 0 && (s.valueScore  || 0)             < valMin) return false
     if (growMin> 0 && (s.growthScore || 0)             < growMin) return false
+    if (combinedMin > 0 && (s.combinedRank || 0)       < combinedMin) return false
     return true
   })
 
@@ -1391,7 +1409,7 @@ export default function App() {
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
           {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={page} initExchange={page === 'screener' ? 'EZ' : page} initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'bestvalue'  && <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} />}
-          {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={70} initGrowMin={70} />}
+          {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={0} initCombinedMin={80} />}
           {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0}  initGrowMin={80} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
