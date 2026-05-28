@@ -357,10 +357,7 @@ for _, row in df.iterrows():
         W1 = (diff_days % 365) / 365
         W2 = 1 - W1
 
-        if next_dt > today_dt:
-            fy0,fy1,fy2 = 25+N, 26+N, 27+N
-        else:
-            fy0,fy1,fy2 = 26+N, 27+N, 28+N
+        fy0,fy1,fy2 = 25+N, 26+N, 27+N
 
         # EPS LTM — formula FY
         if eps_fy.get(fy0) is not None and eps_fy.get(fy1) is not None:
@@ -556,4 +553,5 @@ def calc_ranks_for_group(group):
     for d in group:
         key=(d["ticker"],d["exchange"])
         m6=d.get("mom6m"); m12=d.get("mom12m")
-        m1w=mom1w_m
+        m1w=mom1w_map.get(key); m1m=mom1m_map.get(key)
+        if m6 is not None and m1w is not None: mom6_adj
