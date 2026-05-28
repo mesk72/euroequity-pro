@@ -639,20 +639,48 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     setStocks([]); setSelected(null); setLoading(true)
     const exchToLoad = initEpsMom ? 'EZ' : exchange
     apiExchange(exchToLoad).then(data => {
-      // Calcola combined rank per paese
-      const byCountry: Record<string, any[]> = {}
-      data.forEach((s: any) => {
-        const c = s.exchange || 'OTHER'
-        if (!byCountry[c]) byCountry[c] = []
-        byCountry[c].push(s)
+      // Calcola euroRank su All Europe usando metriche raw
+      const ey = (pe: number | null) => (pe && pe !== 0 && Math.abs(pe) <= 200) ? 1/pe : null
+      const pctRk = (vals: number[], v: number) => {
+        if (!vals.length) return null
+        return Math.round(vals.filter(x => x < v).length / vals.length * 100)
+      }
+      // Distribuzioni europee pre-calcolate
+      const eyTVals  = data.map((s:any) => ey(s.peTrail)).filter((v:any) => v != null) as number[]
+      const eyFVals  = data.map((s:any) => ey(s.peFwd)).filter((v:any) => v != null) as number[]
+      const pbVals   = data.map((s:any) => s.pb).filter((v:any) => v != null && v > 0 && v < 50) as number[]
+      const egVals   = data.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
+      const rgVals   = data.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
+      const m6AdjVals  = data.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
+      const m12AdjVals = data.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null).filter((v:any) => v != null) as number[]
+
+      // Calcola euroVal e euroGrow per ogni titolo
+      const euroScores = data.map((s:any) => {
+        const eyt = ey(s.peTrail); const eyf = ey(s.peFwd)
+        const pet = eyt != null ? (s.peTrail > 200 ? 1 : pctRk(eyTVals, eyt)) : null
+        const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pctRk(eyFVals, eyf)) : null
+        const pb  = s.pb != null && s.pb > 0 && s.pb < 50 ? (100 - pctRk(pbVals, s.pb)!) : null
+        const vc  = [pet,pef,pb].filter((v:any) => v != null) as number[]
+        const euroVal = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
+        const m6adj  = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
+        const m12adj = s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null
+        const eg  = s.epsGrowth != null ? pctRk(egVals,  s.epsGrowth) : null
+        const rg  = s.revGrowth != null ? pctRk(rgVals,  s.revGrowth) : null
+        const m6r = m6adj  != null ? pctRk(m6AdjVals,  m6adj)  : null
+        const m12r= m12adj != null ? pctRk(m12AdjVals, m12adj) : null
+        const gc  = [eg,rg,m6r,m12r].filter((v:any) => v != null) as number[]
+        const euroGrow = gc.length >= 2 ? gc.reduce((a:number,b:number)=>a+b,0)/gc.length : null
+        return euroVal != null && euroGrow != null ? (euroVal + euroGrow) / 2 : null
       })
-      data.forEach((s: any) => {
-        if (s.valueScore == null || s.growthScore == null) { s.combinedRank = null; return }
-        const combined = (s.valueScore + s.growthScore) / 2
-        const peers = byCountry[s.exchange] || []
-        const peersWithBoth = peers.filter((p: any) => p.valueScore != null && p.growthScore != null)
-        const below = peersWithBoth.filter((p: any) => (p.valueScore + p.growthScore) / 2 < combined).length
-        s.combinedRank = Math.round(below / peersWithBoth.length * 100)
+
+      // Calcola percentile combined su All Europe
+      const validCombined = euroScores.filter((v:any) => v != null) as number[]
+      data.forEach((s: any, i: number) => {
+        const c = euroScores[i]
+        if (c == null) { s.combinedRank = null; return }
+        s.combinedRank = Math.round(validCombined.filter(v => v < c).length / validCombined.length * 100)
+      })
+
       })
       setStocks(data)
       setLoading(false)
