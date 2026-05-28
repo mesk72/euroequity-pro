@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
+import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
-  title:       'EuroEquity Pro — European Equity Research',
-  description: 'Professional European equity screening and research platform. Real data for Borsa Italiana, DAX, CAC 40 and all major Eurozone markets.',
+  title:       'ForwardAlpha — European Equity Research',
+  description: 'ForwardAlpha — Professional European equity screening and research. Real-time data for Borsa Italiana, DAX, CAC 40 and all major European markets.',
   keywords:    'European stocks, Borsa Italiana, equity screening, fundamental analysis, CFA',
   authors:     [{ name: 'Andrea Meschini' }],
   openGraph: {
-    title:       'EuroEquity Pro',
+    title:       'ForwardAlpha',
     description: 'Professional European equity research platform',
     type:        'website',
   },
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
@@ -38,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         {children}
+        <Analytics />
       </body>
     </html>
   )
