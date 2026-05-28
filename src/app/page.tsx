@@ -1230,6 +1230,32 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   )
 }
 
+// - LOGIN GATE -
+function LoginGate({ onLogin, title }: { onLogin: () => void, title: string }) {
+  return (
+    <div className="p-8 space-y-4 fade-in">
+      <div className="section-hdr">⭐ {title}</div>
+      <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+        borderRadius:6, padding:'32px', textAlign:'center', maxWidth:400, margin:'0 auto' }}>
+        <div style={{ fontSize:40, marginBottom:12 }}>🔒</div>
+        <div style={{ fontSize:15, fontWeight:700, color:'var(--text)', marginBottom:8 }}>
+          Members only
+        </div>
+        <div style={{ fontSize:12, color:'var(--text3)', marginBottom:20, lineHeight:1.6 }}>
+          The <strong style={{ color:'var(--orange)' }}>{title}</strong> screen is reserved
+          for registered users. Create a free account to access our best investment ideas.
+        </div>
+        <button onClick={onLogin} className="btn-primary text-sm px-8 py-2.5">
+          Register for Free
+        </button>
+        <div style={{ fontSize:11, color:'var(--text4)', marginTop:12 }}>
+          14-day free trial · No credit card required
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // - LEGAL -
 function Legal() {
   const [tab, setTab] = useState<'terms'|'privacy'|'cookie'>('terms')
@@ -1512,9 +1538,18 @@ export default function App() {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
           {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={page} initExchange={page === 'screener' ? 'EZ' : page} initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
-          {page === 'bestvalue'  && <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} showAll={true} />}
-          {page === 'bestideas'  && <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />}
-          {page === 'bestgrowth' && <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={80} showAll={true} />}
+          {page === 'bestvalue'  && (user
+            ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} showAll={true} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value" />
+          )}
+          {page === 'bestideas'  && (user
+            ? <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas" />
+          )}
+          {page === 'bestgrowth' && (user
+            ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={80} showAll={true} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
+          )}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'about'     && (
@@ -1522,7 +1557,42 @@ export default function App() {
             <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
           </div>
         )}
-        {page === 'portfolio' && <div className="p-8 text-muted text-sm">Portfolio coming soon.</div>}
+        {page === 'portfolio' && (
+            user ? (
+              <div className="p-8 space-y-4 fade-in">
+                <div className="section-hdr">💼 Portfolio</div>
+                <div style={{ background:'rgba(249,115,22,0.08)', border:'1px solid rgba(249,115,22,0.2)',
+                  borderRadius:6, padding:'16px', fontSize:12, color:'var(--text3)' }}>
+                  <div style={{ fontSize:14, fontWeight:700, color:'var(--orange)', marginBottom:8 }}>
+                    🚧 Coming Soon
+                  </div>
+                  Portfolio tracking with multi-currency support, performance analytics,
+                  Value/Growth score overlay and sector breakdown is under development.
+                  <div style={{ marginTop:8, fontSize:11, color:'var(--text4)' }}>
+                    Logged in as: <span style={{ color:'var(--green)' }}>{user.email}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 space-y-4 fade-in">
+                <div className="section-hdr">💼 Portfolio</div>
+                <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+                  borderRadius:6, padding:'24px', textAlign:'center' }}>
+                  <div style={{ fontSize:32, marginBottom:12 }}>🔒</div>
+                  <div style={{ fontSize:14, fontWeight:700, color:'var(--text)', marginBottom:8 }}>
+                    Login required
+                  </div>
+                  <div style={{ fontSize:12, color:'var(--text3)', marginBottom:16 }}>
+                    Create a free account to track your portfolio and access personalised features.
+                  </div>
+                  <button onClick={() => setShowAuth(true)}
+                    className="btn-primary text-sm px-6 py-2">
+                    Register / Log In
+                  </button>
+                </div>
+              </div>
+            )
+          )}
           {page === 'legal'     && <Legal />}
         </div>
 
