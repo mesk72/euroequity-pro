@@ -1275,7 +1275,7 @@ function LoginGate({ onLogin, title }: { onLogin: () => void, title: string }) {
           Register for Free
         </button>
         <div style={{ fontSize:11, color:'var(--text4)', marginTop:12 }}>
-          14-day free trial · No credit card required
+          Free access during Beta · No credit card required
         </div>
       </div>
     </div>
