@@ -12,6 +12,7 @@ import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/consta
 import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
+import ResearchPage from '@/components/research/ResearchPage'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
@@ -94,7 +95,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'research' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -745,15 +746,19 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Preset screens */}
       <div className="flex gap-2 flex-wrap">
-        <button onClick={() => { setValMin(80); setGrowMin(30) }}
+        <button onClick={() => { setValMin(80); setGrowMin(30); setCombinedMin(0) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          Best Value V80+ G30+
+          ⭐ Best Value V≥80 G≥30
         </button>
-        <button onClick={() => { setValMin(70); setGrowMin(70) }}
+        <button onClick={() => { setValMin(0); setGrowMin(80); setCombinedMin(0) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          Best Ideas V70+ G70+
+          🚀 Best Growth G≥80
         </button>
-        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setMom12Min(0); setSearch(''); setSector('All') }}
+        <button onClick={() => { setValMin(0); setGrowMin(0); setCombinedMin(80) }}
+          className="px-3 py-1 rounded text-xs font-600 border border-border text-orange hover:bg-orange/10">
+          🏆 Best Combined ≥80
+        </button>
+        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setMom12Min(0); setCombinedMin(0); setSearch(''); setSector('All') }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
           Reset
         </button>
@@ -765,7 +770,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           <div className="space-y-1.5">
             <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Valuation</div>
             <input type="number" placeholder="P/E Fwd max" value={peMax || ''} onChange={e => setPeMax(+e.target.value || 0)} className="input-field" />
-            <input type="number" placeholder="P/B max" value={pbMax || ''} onChange={e => setPbMax(+e.target.value || 0)} className="input-field" />
+
           </div>
           <div className="space-y-1.5">
             <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Momentum</div>
@@ -775,7 +780,8 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
             <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
             <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" />
             <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" />
-          </div>
+            <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" />
+            <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
           <div className="space-y-1.5">
             <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
             <input type="text" placeholder="Ticker / name" value={search} onChange={e => setSearch(e.target.value)} className="input-field" />
@@ -1149,7 +1155,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
-                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}y}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
                       <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
                     </tr>
                   ))}
@@ -1182,7 +1188,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
-                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}y}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
                       <td className="font-mono font-700 text-right whitespace-nowrap"
                         style={{ color: (s.epsGrowth||0) >= 0 ? '#22d48a' : '#e84560' }}>
                         {s.epsGrowth != null ? fp(s.epsGrowth * 100) : '—'}
@@ -1218,7 +1224,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
-                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}y}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
                       <td className="font-mono font-700 text-right whitespace-nowrap"
                         style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
                         {s.mom12m != null ? fp(s.mom12m * 100) : '—'}
@@ -1315,7 +1321,7 @@ function Legal() {
             ['7. Clausole Vessatorie (Art. 1341–1342 c.c.)',
              'In accordance with Italian civil law, the following clauses are explicitly brought to your attention and require specific acceptance: (a) limitation of liability (clause 4); (b) exclusive jurisdiction of the Court of Verona (clause 8). By creating an account you confirm you have read and specifically accepted these clauses.'],
             ['8. Governing Law & Jurisdiction',
-             `These Terms are governed by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona, without prejudice to mandatory consumer protection rights in the user's country of residence.`],
+             `These Terms are governed by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona, without prejudice to mandatory consumer protection rights in the user's country of residence. Pursuant to Art. 14 of Regulation (EU) No 524/2013, users may also resolve disputes through the European Commission ODR platform: https://ec.europa.eu/consumers/odr/`],
           ] as [string,string][]).map(([title, body]) => (
             <div key={title} className="bg-surface border border-border rounded-lg p-4">
               <h3 className="font-700 text-text text-sm mb-2">{title}</h3>
@@ -1329,7 +1335,7 @@ function Legal() {
         <div className="space-y-4">
           {([
             ['1. Data Controller',
-             'Data Controller: Andrea Meschini, Verona, Italy. Contact: andrea@forwardalpha.pro.'],
+             'Data Controller: Andrea Meschini, Verona (VR), Italy. Contact: andrea@forwardalpha.pro. For GDPR-related requests, contact the Data Controller directly by email.'],
             ['2. Data We Collect',
              'We collect: full name, email address, country of residence, hashed password (via Supabase Auth). We also collect usage data (screens visited, filters applied) solely to improve the service. We do not collect payment data directly — this is handled by Stripe if and when subscriptions are activated.'],
             ['3. Legal Basis for Processing',
@@ -1460,6 +1466,7 @@ export default function App() {
     { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
     { id: 'AIM'        as Page, label: '🇬🇧 UK (AIM)',    icon: <Globe size={16} /> },
     { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
+    { id: 'research'   as Page, label: '📄 Research',    icon: <Globe size={16} /> },
     { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
   ]
 
