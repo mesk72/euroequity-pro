@@ -1110,17 +1110,16 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
               </div>
               <table className="data-table">
                 <thead><tr>
-                  <th>Ticker</th><th style={{maxWidth:100}}>Company</th><th>Price</th><th>1D %</th>
+                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:65}}>1D %</th>
                 </tr></thead>
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={i}
                       onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
                       className="cursor-pointer">
-                      <td className="font-700 text-text">{s.flag} {s.ticker}</td>
-                      <td className="text-sub text-[11px]">{s.company}</td>
-                      <td className="font-mono">{fv(s.price, 2)}</td>
-                      <td className="font-mono font-600 whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px] truncate" style={{maxWidth:160}}>{s.company}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
                     </tr>
                   ))}
                 </tbody>
