@@ -275,7 +275,9 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
     return sortAsc ? av - bv : bv - av
   }).slice(0, maxRows)
 
+  const NO_SORT = new Set(['peTrail','peFwd','epsGrowth','revGrowth'])
   const toggle = (key: SortKey) => {
+    if (NO_SORT.has(key)) return
     if (sortKey === key) setSortAsc(a => !a)
     else { setSortKey(key); setSortAsc(false) }
   }
@@ -366,6 +368,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
+                  cursor: ['peTrail','peFwd','epsGrowth','revGrowth'].includes(c.key) ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
@@ -1021,8 +1024,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
   // KPI V+G >= 80 - entrambi i rank >= 70 (titoli con buon value E buon growth)
+  // Best Combined: titoli con V>=60 G>=60 e media >= 80 (proxy per combinedRank>=80)
   const highVG = u200.filter((s:any) =>
     s.valueScore != null && s.growthScore != null &&
+    s.valueScore >= 60 && s.growthScore >= 60 &&
     (s.valueScore + s.growthScore) / 2 >= 80
   ).length
 
@@ -1422,21 +1427,26 @@ export default function App() {
     { id: 'bestvalue'  as Page, label: 'Best Value',    icon: <TrendingUp size={16} /> },
     { id: 'bestgrowth' as Page, label: 'Best Growth',   icon: <TrendingUp size={16} /> },
     { id: 'sectors'    as Page, label: 'Sectors',       icon: <Globe size={16} /> },
-    { id: 'MIL'        as Page, label: 'Italy',         icon: <Globe size={16} /> },
-    { id: 'PA'         as Page, label: 'France',       icon: <Globe size={16} /> },
-    { id: 'XETRA'      as Page, label: 'Germany',      icon: <Globe size={16} /> },
-    { id: 'LSE'        as Page, label: 'UK (LSE)',      icon: <Globe size={16} /> },
-    { id: 'OM'         as Page, label: 'Sweden',       icon: <Globe size={16} /> },
-    { id: 'OB'         as Page, label: 'Norway',       icon: <Globe size={16} /> },
-    { id: 'SWX'        as Page, label: 'Switzerland',  icon: <Globe size={16} /> },
-    { id: 'MC'         as Page, label: 'Spain',        icon: <Globe size={16} /> },
-    { id: 'AS'         as Page, label: 'Netherlands',  icon: <Globe size={16} /> },
-    { id: 'HE'         as Page, label: 'Finland',      icon: <Globe size={16} /> },
-    { id: 'BR'         as Page, label: 'Belgium',      icon: <Globe size={16} /> },
-    { id: 'CPSE'       as Page, label: 'Denmark',      icon: <Globe size={16} /> },
-    { id: 'AT'         as Page, label: 'Greece',       icon: <Globe size={16} /> },
+    { id: 'VI'         as Page, label: '🇦🇹 Austria',     icon: <Globe size={16} /> },
+    { id: 'BR'         as Page, label: '🇧🇪 Belgium',     icon: <Globe size={16} /> },
+    { id: 'CPSE'       as Page, label: '🇩🇰 Denmark',     icon: <Globe size={16} /> },
+    { id: 'HE'         as Page, label: '🇫🇮 Finland',     icon: <Globe size={16} /> },
+    { id: 'PA'         as Page, label: '🇫🇷 France',      icon: <Globe size={16} /> },
+    { id: 'XETRA'      as Page, label: '🇩🇪 Germany',     icon: <Globe size={16} /> },
+    { id: 'AT'         as Page, label: '🇬🇷 Greece',      icon: <Globe size={16} /> },
+    { id: 'IR'         as Page, label: '🇮🇪 Ireland',     icon: <Globe size={16} /> },
+    { id: 'MIL'        as Page, label: '🇮🇹 Italy',       icon: <Globe size={16} /> },
+    { id: 'AS'         as Page, label: '🇳🇱 Netherlands', icon: <Globe size={16} /> },
+    { id: 'OB'         as Page, label: '🇳🇴 Norway',      icon: <Globe size={16} /> },
+    { id: 'LS'         as Page, label: '🇵🇹 Portugal',    icon: <Globe size={16} /> },
+    { id: 'MC'         as Page, label: '🇪🇸 Spain',       icon: <Globe size={16} /> },
+    { id: 'SWX'        as Page, label: '🇨🇭 Switzerland', icon: <Globe size={16} /> },
+    { id: 'OM'         as Page, label: '🇸🇪 Sweden (OM)', icon: <Globe size={16} /> },
+    { id: 'NGM'        as Page, label: '🇸🇪 Sweden (NGM)',icon: <Globe size={16} /> },
+    { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
+    { id: 'AIM'        as Page, label: '🇬🇧 UK (AIM)',    icon: <Globe size={16} /> },
     { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
-    { id: 'legal'     as Page, label: 'Legal',      icon: <Globe size={16} /> },
+    { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
   ]
 
   const externalNav: {href:string,label:string}[] = []
@@ -1538,7 +1548,7 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
-          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={page} initExchange={page === 'screener' ? 'EZ' : page} initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
+          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} />}
           {page === 'bestvalue'  && (user
             ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value" />
