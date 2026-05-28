@@ -240,7 +240,7 @@ export default function StockPage() {
   useEffect(() => {
     if (!ticker || !exchangeCode) return
     setLoading(true)
-    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}`)
+    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store' })
       .then(r => r.ok ? r.json() : { history: [] })
       .then(d => { setHistory(d.history || []); setLoading(false) })
       .catch(() => setLoading(false))
@@ -282,7 +282,7 @@ export default function StockPage() {
   const metrics = [
     { label:'Price',       val: fv(stock.price, 2),    color: 'var(--text)' },
     { label:'1D Change',     val: fp(chg, 2),             color: clr(chg) },
-    { label:'Mkt Cap B',   val: fv(stock.mktCap, 1),   color: 'var(--text)' },
+    { label:'Mkt Cap €B',  val: stock.mktCap ? fv(stock.mktCap / 1000 * 0.92, 1) : '—', color: 'var(--text)' },
     { label:'P/E Trailing',  val: fv(stock.peTrail, 1),  color: 'var(--text)' },
     { label:'P/E Forward',   val: fv(stock.peFwd, 1),    color: 'var(--text)' },
     { label:'EPS Growth %',  val: stock.epsGrowth != null ? fp(stock.epsGrowth * 100, 1) : '—', color: clr(stock.epsGrowth) },
