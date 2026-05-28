@@ -93,6 +93,7 @@ function PriceChart({ history, days }: { history: any[]; days: number }) {
   const pricePoints = closes.map((p, i) => `${toX(i).toFixed(1)},${toY(p).toFixed(1)}`).join(' ')
   const isUp = closes[closes.length - 1] >= closes[0]
   const c = isUp ? 'var(--green)' : 'var(--red)'
+  // Performance calcolata sul periodo selezionato (prezzi adjusted close)
   const perf = ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
 
   // Y axis labels
@@ -228,7 +229,7 @@ export default function StockPage() {
       })
   }, [ticker, exchangeCode])
 
-  const [chartDays, setChartDays]   = useState(365)
+  const [chartDays, setChartDays]   = useState(252)
   const [history,   setHistory]     = useState<any[]>([])
   const [loadingChart, setLoading]  = useState(true)
   const [qty,   setQty]   = useState('')
@@ -239,7 +240,7 @@ export default function StockPage() {
   useEffect(() => {
     if (!ticker || !exchangeCode) return
     setLoading(true)
-    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays, 400)}`)
+    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}`)
       .then(r => r.ok ? r.json() : { history: [] })
       .then(d => { setHistory(d.history || []); setLoading(false) })
       .catch(() => setLoading(false))
@@ -279,19 +280,13 @@ export default function StockPage() {
   const chg = stock.change1d || 0
 
   const metrics = [
-    { label:'Price €',       val: fv(stock.price, 2),    color: 'var(--text)' },
+    { label:'Price',       val: fv(stock.price, 2),    color: 'var(--text)' },
     { label:'1D Change',     val: fp(chg, 2),             color: clr(chg) },
-    { label:'Mkt Cap €B',   val: fv(stock.mktCap, 1),   color: 'var(--text)' },
+    { label:'Mkt Cap B',   val: fv(stock.mktCap, 1),   color: 'var(--text)' },
     { label:'P/E Trailing',  val: fv(stock.peTrail, 1),  color: 'var(--text)' },
     { label:'P/E Forward',   val: fv(stock.peFwd, 1),    color: 'var(--text)' },
-    { label:'P/B',           val: fv(stock.pb, 2),       color: 'var(--text)' },
-    { label:'EV/EBITDA',     val: fv(stock.evEbitda, 1), color: 'var(--text)' },
-    { label:'ROE %',         val: fp(stock.roe, 1),      color: clr(stock.roe) },
-    { label:'Div Yield %',   val: fp(stock.divYield, 2), color: stock.divYield && stock.divYield > 0 ? 'var(--green)' : 'var(--text)' },
-    { label:'Beta',          val: fv(stock.beta, 2),     color: 'var(--text)' },
-    { label:'EPS Growth %',  val: fp(stock.epsGrowth, 1),color: clr(stock.epsGrowth) },
-    { label:'Rev Growth %',  val: fp(stock.revGrowth, 1),color: clr(stock.revGrowth) },
-    { label:'EPS Mom 30d',   val: fp(stock.epsMom30d, 1),color: clr(stock.epsMom30d) },
+    { label:'EPS Growth %',  val: fpPct(stock.epsGrowth, 1), color: clr(stock.epsGrowth) },
+    { label:'Rev Growth %',  val: fpPct(stock.revGrowth, 1), color: clr(stock.revGrowth) },
     { label:'Mom 1 Week',    val: fp(stock.mom1w, 1),    color: clr(stock.mom1w) },
     { label:'Mom 1 Month',   val: fp(stock.mom1m, 1),    color: clr(stock.mom1m) },
     { label:'Mom 6 Months',  val: fp(stock.mom6m, 1),    color: clr(stock.mom6m) },
@@ -334,7 +329,7 @@ export default function StockPage() {
         </button>
         <div style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
           fontSize:18, color:'var(--orange)' }}>
-          EURO<span style={{ color:'var(--text3)' }}>EQUITY</span> PRO
+          FORWARD<span style={{ color:'var(--text3)' }}>ALPHA</span>
         </div>
       </div>
 
@@ -353,7 +348,12 @@ export default function StockPage() {
               </span>
               <span style={{ fontSize:24, fontFamily:'IBM Plex Mono',
                 fontWeight:700, color:'var(--text)' }}>
-                €{fv(stock.price, 2)}
+                {['LSE','AIM'].includes(stock.exchange) ? 'p' :
+               ['SWX'].includes(stock.exchange) ? 'CHF' :
+               ['OM','NGM'].includes(stock.exchange) ? 'kr' :
+               ['OB'].includes(stock.exchange) ? 'kr' :
+               ['CPSE'].includes(stock.exchange) ? 'kr' :
+               '€'}{fv(stock.price, 2)}
               </span>
               <span style={{ fontSize:20, fontFamily:'IBM Plex Mono', fontWeight:700,
                 color: chg >= 0 ? 'var(--green)' : 'var(--red)' }}>
@@ -399,7 +399,7 @@ export default function StockPage() {
               Price Chart · MA50 · MA200
             </div>
             <div style={{ display:'flex', gap:4 }}>
-              {([['1Y',365],['3Y',1095],['5Y',1825]] as [string,number][]).map(([lbl,d]) => (
+              {([['1Y',252],['3Y',756],['5Y',1260]] as [string,number][]).map(([lbl,d]) => (
                 <button key={lbl} onClick={() => setChartDays(d)}
                   style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                     fontSize:11, padding:'4px 12px', borderRadius:2, cursor:'pointer',
@@ -418,6 +418,7 @@ export default function StockPage() {
             </div>
           ) : (
             <PriceChart history={history} days={chartDays} />
+
           )}
           <div style={{ display:'flex', gap:16, marginTop:8, fontSize:10,
             fontFamily:'IBM Plex Mono', color:'var(--text4)' }}>
@@ -471,7 +472,7 @@ export default function StockPage() {
             <div>
               <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
                 fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                textTransform:'uppercase' }}>Buy Price €</div>
+                textTransform:'uppercase' }}>Buy Price</div>
               <input type="number" value={px}
                 onChange={e => setPx(e.target.value)}
                 className="input-field" style={{ width:100 }} />
