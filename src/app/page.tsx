@@ -634,6 +634,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
   useEffect(() => {
     // Carica nomi portafogli
+    if (typeof window === 'undefined') return
     const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
     const names = Object.keys(stored)
     if (names.length > 0) setPortfolioNames(names)
@@ -780,8 +781,8 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
             <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
             <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" />
             <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" />
-            <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" />
             <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+          </div>
           <div className="space-y-1.5">
             <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
             <input type="text" placeholder="Ticker / name" value={search} onChange={e => setSearch(e.target.value)} className="input-field" />
