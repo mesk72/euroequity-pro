@@ -60,7 +60,7 @@ export default function SectorHeatmap({ stocks, onSectorClick }: Props) {
   return (
     <div>
       <div className="section-hdr mb-4">
-        🏭 Sector Heatmap — Market Cap Weighted Return (top 200)
+        🏭 Sector Heatmap — Market Cap Weighted Return (Top 600)
       </div>
       <p className="text-xs text-muted mb-3">
         Size = total market cap · Color = today's MCW return · Click to open sector screen
