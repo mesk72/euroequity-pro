@@ -878,7 +878,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
 
   return (
     <div className="space-y-4 p-3">
-      <div className="section-hdr">Sector Heatmap - All Europe</div>
+      <div className="section-hdr">Sector Heatmap (Top 600 Europe)</div>
 
       {loading ? (
         <div className="text-center py-12 text-muted">
@@ -1010,9 +1010,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     : null
 
   // EPS Growth top/bottom 10 su tutto l'universo
-  const allWithEpsGrowth = u200.filter(s => s.epsGrowth != null)
-  const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10).slice(0, 10)
-  const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10).slice(0, 10)
+  // EPS growth: cap +1000% (+10) e -200% (-2), epsGrowth è in decimale nel DB
+  const allWithEpsGrowth = u200.filter(s => s.epsGrowth != null && s.epsGrowth <= 10 && s.epsGrowth >= -2)
+  const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10)
+  const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10)
 
   // Price Momentum 12M top/bottom 10
   const allWithMom12 = u200.filter(s => s.mom12m != null)
@@ -1080,7 +1081,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : allStocks.length.toLocaleString() },
-          { label: 'EW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
@@ -1156,7 +1157,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       </td>
                       <td>
                         <span className="font-mono font-600" style={{ color: (s.epsGrowth||0) >= 0 ? '#22d48a' : '#e84560' }}>
-                          {fp(s.epsGrowth)}
+                          {s.epsGrowth != null ? fp(s.epsGrowth * 100) : '—'}
                         </span>
                       </td>
                     </tr>
