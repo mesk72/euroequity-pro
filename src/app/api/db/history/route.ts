@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-export const revalidate = 3600  // cache 1h — storico non cambia durante il giorno
+export const revalidate = 0  // no cache — sempre aggiornato
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
