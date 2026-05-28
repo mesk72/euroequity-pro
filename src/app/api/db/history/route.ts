@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-export const revalidate = 3600
+export const revalidate = 3600  // cache 1h — storico non cambia durante il giorno
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const fromDate = new Date(Date.now() - (days + 50) * 86400000)
+    // days è in giorni di borsa (~252/anno), convertiamo in giorni calendario (~365/anno)
+    // Fattore: 365/252 ≈ 1.45, aggiungiamo buffer di 60 giorni
+    const calDays = Math.ceil(days * 1.45) + 60
+    const fromDate = new Date(Date.now() - calDays * 86400000)
       .toISOString().slice(0, 10)
 
     const { data, error } = await supabase
@@ -31,6 +34,7 @@ export async function GET(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    // Normalizza formato compatibile con il frontend (usa adjusted_close)
     const history = (data || []).map((d: any) => ({
       date:           d.date,
       open:           d.open,
@@ -41,20 +45,21 @@ export async function GET(req: NextRequest) {
       volume:         d.volume,
     }))
 
-    const closes = history.map((d: any) => d.adjusted_close).filter(Boolean) as number[]
+    // Calcola momentum dai prezzi storici
+    const closes = history.map((d: any) => d.adjusted_close).filter(Boolean)
     const n      = closes.length
     const last   = closes[n - 1]
 
-    const getMom = (offset: number): number | null => {
+    const mom = (offset: number) => {
       const idx = Math.max(0, n - offset)
       return closes[idx] ? (last / closes[idx] - 1) * 100 : null
     }
 
     const momentum = {
-      mom1w:  getMom(5),
-      mom1m:  getMom(21),
-      mom6m:  getMom(126),
-      mom12m: getMom(252),
+      mom1w:  mom(5),
+      mom1m:  mom(21),
+      mom6m:  mom(126),
+      mom12m: mom(252),
     }
 
     return NextResponse.json({ history, momentum })
