@@ -12,7 +12,6 @@ import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/consta
 import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
-import ResearchPage from '@/components/research/ResearchPage'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
