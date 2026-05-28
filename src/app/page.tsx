@@ -681,7 +681,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
         s.combinedRank = Math.round(validCombined.filter(v => v < c).length / validCombined.length * 100)
       })
 
-      })
       setStocks(data)
       setLoading(false)
     })
