@@ -287,10 +287,10 @@ export default function StockPage() {
     { label:'P/E Forward',   val: fv(stock.peFwd, 1),    color: 'var(--text)' },
     { label:'EPS Growth %',  val: stock.epsGrowth != null ? fp(stock.epsGrowth * 100, 1) : '—', color: clr(stock.epsGrowth) },
     { label:'Rev Growth %',  val: stock.revGrowth != null ? fp(stock.revGrowth * 100, 1) : '—', color: clr(stock.revGrowth) },
-    { label:'Mom 1 Week',    val: fp(stock.mom1w, 1),    color: clr(stock.mom1w) },
-    { label:'Mom 1 Month',   val: fp(stock.mom1m, 1),    color: clr(stock.mom1m) },
-    { label:'Mom 6 Months',  val: fp(stock.mom6m, 1),    color: clr(stock.mom6m) },
-    { label:'Mom 12 Months', val: fp(stock.mom12m, 1),   color: clr(stock.mom12m) },
+    { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
+    { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
+    { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
+    { label:'Mom 12 Months', val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—', color: clr(stock.mom12m) },
   ]
 
   return (
