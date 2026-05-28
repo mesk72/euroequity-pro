@@ -881,7 +881,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
 
   return (
     <div className="space-y-4 p-3">
-      <div className="section-hdr">Sector Heatmap (Top 600 Europe)</div>
+      <div className="section-hdr">Sector Heatmap — All Europe</div>
 
       {loading ? (
         <div className="text-center py-12 text-muted">
@@ -896,7 +896,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
 
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
             <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
-              Sector Aggregates - All Europe ({stocks.length} stocks)
+              Sector Aggregates - All Europe ({stocksEur.length} stocks)
             </div>
             <div className="overflow-x-auto">
               <table className="data-table w-full">
@@ -1149,7 +1149,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
-                      <td className="text-sub text-[11px] truncate" style={{maxWidth:160}}>{s.company}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}y}</td>
                       <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
                     </tr>
                   ))}
@@ -1172,28 +1172,20 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                 style={{ color }}>
                 {title}
               </div>
-              <table className="data-table">
+              <table className="data-table w-full">
                 <thead><tr>
-                  <th>Ticker</th><th>Company</th><th>Sector</th><th>EPS Gr %</th>
+                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:72}}>EPS Gr%</th>
                 </tr></thead>
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={i}
                       onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
                       className="cursor-pointer">
-                      <td>
-                        <span className="font-700" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</span>
-                      </td>
-                      <td className="text-sub text-[11px]">{s.company}</td>
-                      <td>
-                        <span className="text-[10px] font-600" style={{ color: getSectorColor(s.sector) }}>
-                          {s.sector || '-'}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="font-mono font-600" style={{ color: (s.epsGrowth||0) >= 0 ? '#22d48a' : '#e84560' }}>
-                          {s.epsGrowth != null ? fp(s.epsGrowth * 100) : '—'}
-                        </span>
+                      <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}y}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap"
+                        style={{ color: (s.epsGrowth||0) >= 0 ? '#22d48a' : '#e84560' }}>
+                        {s.epsGrowth != null ? fp(s.epsGrowth * 100) : '—'}
                       </td>
                     </tr>
                   ))}
@@ -1216,28 +1208,20 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                 style={{ color }}>
                 {title}
               </div>
-              <table className="data-table">
+              <table className="data-table w-full">
                 <thead><tr>
-                  <th>Ticker</th><th>Company</th><th>Sector</th><th>Mom 12M %</th>
+                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:72}}>12M %</th>
                 </tr></thead>
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={i}
                       onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
                       className="cursor-pointer">
-                      <td>
-                        <span className="font-700" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</span>
-                      </td>
-                      <td className="text-sub text-[11px]">{s.company}</td>
-                      <td>
-                        <span className="text-[10px] font-600" style={{ color: getSectorColor(s.sector) }}>
-                          {s.sector || '-'}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="font-mono font-700" style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
-                          {fp(s.mom12m)}
-                        </span>
+                      <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}y}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap"
+                        style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
+                        {s.mom12m != null ? fp(s.mom12m * 100) : '—'}
                       </td>
                     </tr>
                   ))}
