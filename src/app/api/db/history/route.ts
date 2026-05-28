@@ -30,12 +30,16 @@ export async function GET(req: NextRequest) {
       .eq('ticker', ticker)
       .eq('exchange', exchange)
       .gte('date', fromDate)
-      .order('date', { ascending: true })
+      .order('date', { ascending: false })
+      .limit(2000)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    // Reinverte per ordine cronologico (abbiamo caricato DESC)
+    const sortedData = (data || []).reverse()
+
     // Normalizza formato compatibile con il frontend (usa adjusted_close)
-    const history = (data || []).map((d: any) => ({
+    const history = sortedData.map((d: any) => ({
       date:           d.date,
       open:           d.open,
       high:           d.high,
