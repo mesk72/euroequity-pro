@@ -1232,33 +1232,77 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
 // - LEGAL -
 function Legal() {
-  const sections = [
-    ['Disclaimer & No Investment Advice',
-     'ForwardAlpha is operated by Andrea Meschini (Verona, Italy). All data and tools are for informational purposes only and do not constitute investment advice under MiFID II or any other applicable regulation. Nothing on this platform constitutes a personal recommendation to buy, sell, or hold any financial instrument. All investment decisions are made solely at your own risk.'],
-    ['Data Accuracy & Delay',
-     'Market prices are delayed by 15–20 minutes from real-time. Fundamental data is updated at end of trading day. Andrea Meschini makes no warranty as to accuracy, completeness, timeliness, or fitness for purpose of any data.'],
-    ['Quantitative Models',
-     'Value Score and Growth Score are proprietary ranking models. Rankings are calculated as percentile scores from 1 (worst) to 100 (best). These scores do not guarantee future performance.'],
-    ['Privacy Policy (GDPR)',
-     'Andrea Meschini is the data controller. Contact: andrea@forwardalpha.pro. Data is stored on Supabase (EU servers). We do not sell personal data to third parties.'],
-    ['Governing Law',
-     'These terms are governed by the laws of Italy. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona.'],
-  ]
+  const [tab, setTab] = useState<'terms'|'cookie'>('terms')
 
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
       <div className="text-xs text-muted">Last updated: May 2026</div>
-      {sections.map(([title, body]) => (
-        <div key={title} className="bg-surface border border-border rounded-lg p-4">
-          <h3 className="font-700 text-text text-sm mb-2">{title}</h3>
-          <p className="text-xs text-sub leading-relaxed">{body}</p>
+
+      <div style={{ display:'flex', gap:8 }}>
+        {(['terms','cookie'] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)}
+            style={{ padding:'6px 16px', borderRadius:4, fontSize:11, fontWeight:600, cursor:'pointer',
+              background: tab===t ? 'var(--orange)' : 'var(--surface)',
+              color: tab===t ? '#000' : 'var(--text3)',
+              border: '1px solid var(--border)' }}>
+            {t === 'terms' ? 'Terms of Use' : 'Cookie Policy'}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'terms' && (
+        <div className="space-y-4">
+          {([
+            ['1. Service Ownership',
+             'ForwardAlpha is developed and operated by Andrea Meschini, based in Verona, Italy. For any communication or support request: andrea@forwardalpha.pro.'],
+            ['2. Service Description & Beta Phase',
+             'ForwardAlpha is a web-based quantitative financial screening, analysis and research tool. The Platform offers proprietary ranking models including the Value Score and Growth Score, expressed as percentile scores from 1 (worst) to 100 (best). The Platform is currently in Beta. Upon registration, users may benefit from a 14-day free trial with no credit card required.'],
+            ['3. Legal Disclaimer – No Financial Advice',
+             'ForwardAlpha is a platform for informational and educational purposes only. The Owner is not a registered financial advisor and does not provide investment advisory services. No data, score, analysis or content on the Platform constitutes a personalised recommendation, investment solicitation, or offer to buy, sell or hold financial instruments under MiFID II or any applicable regulation. Investing in financial markets involves significant risk of capital loss. Past performance is not indicative of future results. Always consult a qualified financial professional before making investment decisions.'],
+            ['4. Data Accuracy & Limitation of Liability',
+             'Market prices are delayed by approximately 15–20 minutes from real-time. Fundamental data is updated at end of day. The Owner makes no warranties, express or implied, regarding the accuracy, completeness, timeliness or fitness for purpose of any data, scores or models. The service is provided "as is" without guarantee of uninterrupted availability. To the fullest extent permitted by Italian law, the Owner shall not be liable for any direct or indirect losses arising from reliance on Platform data.'],
+            ['5. Intellectual Property',
+             'All Platform content (including trademarks, logos, UI design, source code and the proprietary algorithms underlying the Value Score and Growth Score) is the exclusive property of Andrea Meschini. Prohibited: automated scraping or crawling, reverse engineering of algorithms, redistribution or resale of ForwardAlpha data to third parties without prior written consent.'],
+            ['6. Account & Suspension',
+             'Users are responsible for maintaining the confidentiality of their login credentials and all activities conducted through their account. The Owner reserves the right to suspend or terminate any account at any time without notice in case of breach of these Terms or fraudulent use of the Platform.'],
+            ['7. Governing Law & Jurisdiction',
+             'These Terms are governed by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona, without prejudice to mandatory consumer protection rights applicable in the user's country of residence.'],
+          ] as [string,string][]).map(([title, body]) => (
+            <div key={title} className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="font-700 text-text text-sm mb-2">{title}</h3>
+              <p className="text-xs text-sub leading-relaxed">{body}</p>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
+
+      {tab === 'cookie' && (
+        <div className="space-y-4">
+          {([
+            ['1. What are Cookies?',
+             'Cookies are small text files that websites send to your device (computer, tablet or smartphone), stored locally and retransmitted on subsequent visits.'],
+            ['2. Cookies used by ForwardAlpha',
+             'ForwardAlpha uses only strictly necessary technical cookies: Authentication & Session cookies (to manage login and maintain secure access, via Supabase on EU servers), Security cookies (to prevent fraudulent use), Preference cookies (to remember user choices such as cookie banner acceptance). No profiling or third-party advertising tracking cookies are active on this Platform.'],
+            ['3. Legal Basis',
+             'Processing of data collected via technical cookies is based on contract performance (Art. 6.1.b GDPR). Since only strictly necessary technical cookies are used, no prior consent is required under Art. 122 of the Italian Privacy Code and GDPR guidelines.'],
+            ['4. Managing Cookies',
+             'You can control, block or delete cookies through your browser settings (Chrome, Firefox, Safari, Edge). Please note that disabling technical cookies may prevent login and impair core Platform functionality.'],
+            ['5. Contact & Data Controller',
+             'Data Controller: Andrea Meschini, Verona, Italy. Contact: andrea@forwardalpha.pro. Data is stored on Supabase (EU-based servers). You may request deletion of your personal data at any time by contacting us directly.'],
+          ] as [string,string][]).map(([title, body]) => (
+            <div key={title} className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="font-700 text-text text-sm mb-2">{title}</h3>
+              <p className="text-xs text-sub leading-relaxed">{body}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="text-xs text-muted border-t border-border pt-4">
         Andrea Meschini · Verona, Italy ·{' '}
-        <a href="mailto:andrea@forwardalpha.pro" className="text-gold underline">andrea@forwardalpha.pro</a>{' '}
-        · © 2026
+        <a href="mailto:andrea@forwardalpha.pro" className="text-gold underline">andrea@forwardalpha.pro</a>
+        {' '}· © 2026 ForwardAlpha
       </div>
     </div>
   )
