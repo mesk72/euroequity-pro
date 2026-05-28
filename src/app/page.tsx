@@ -1267,7 +1267,7 @@ function Legal() {
             ['6. Account & Suspension',
              'Users are responsible for maintaining the confidentiality of their login credentials and all activities conducted through their account. The Owner reserves the right to suspend or terminate any account at any time without notice in case of breach of these Terms or fraudulent use of the Platform.'],
             ['7. Governing Law & Jurisdiction',
-             'These Terms are governed by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona, without prejudice to mandatory consumer protection rights applicable in the user's country of residence.'],
+             `These Terms are governed by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona, without prejudice to mandatory consumer protection rights applicable in the user's country of residence.`],
           ] as [string,string][]).map(([title, body]) => (
             <div key={title} className="bg-surface border border-border rounded-lg p-4">
               <h3 className="font-700 text-text text-sm mb-2">{title}</h3>
