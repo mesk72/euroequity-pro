@@ -346,59 +346,18 @@ for _, row in df.iterrows():
 
     next_report = next_earn_map.get((ticker, exchange))
     eps_ltm = eps_ntm = rev_ltm = rev_ntm = None
-    W_CURR = (12-MONTH+1)/12
-    W_NEXT = 1-W_CURR
+    W_CURR = (12 - MONTH) / 12
+    W_NEXT = 1 - W_CURR
 
-    if next_report and next_report <= TODAY: # Solo se report già passato
-        next_dt = datetime.strptime(next_report, "%Y-%m-%d")
-        last_report = next_dt # next_report è già passata
-        diff_days = (today_dt - last_report).days
-        W1 = (diff_days % 365) / 365
-        W2 = 1 - W1
-
-        # fy0 = anno del last report (es. 2026 -> 26)
-        fy0 = last_report.year - 2000
-        fy1 = fy0 + 1
-        fy2 = fy0 + 2
-        if eps_fy.get(fy0) is not None and eps_fy.get(fy1) is not None:
-            eps_ltm = W2*eps_fy[fy0] + W1*eps_fy[fy1]
-        elif eps_fy.get(fy0) is not None:
-            eps_ltm = eps_fy[fy0]
-        # fallback CY
-        if eps_ltm is None and eps_cy.get(25) is not None and eps_cy.get(26) is not None:
-            eps_ltm = W_CURR*eps_cy[25] + W_NEXT*eps_cy[26]
-
-        # EPS NTM — formula FY
-        if eps_fy.get(fy1) is not None and eps_fy.get(fy2) is not None:
-            eps_ntm = W2*eps_fy[fy1] + W1*eps_fy[fy2]
-        elif eps_fy.get(fy1) is not None:
-            eps_ntm = eps_fy[fy1]
-        # fallback CY
-        if eps_ntm is None and eps_cy.get(26) is not None and eps_cy.get(27) is not None:
-            eps_ntm = W_CURR*eps_cy[26] + W_NEXT*eps_cy[27]
-
-        # REV LTM — formula FY
-        if rev_fy.get(fy0) is not None and rev_fy.get(fy1) is not None:
-            rev_ltm = W2*rev_fy[fy0] + W1*rev_fy[fy1]
-        if rev_ltm is None and rev_cy.get(25) is not None and rev_cy.get(26) is not None:
-            rev_ltm = W_CURR*rev_cy[25] + W_NEXT*rev_cy[26]
-
-        # REV NTM — formula FY
-        if rev_fy.get(fy1) is not None and rev_fy.get(fy2) is not None:
-            rev_ntm = W2*rev_fy[fy1] + W1*rev_fy[fy2]
-        if rev_ntm is None and rev_cy.get(26) is not None and rev_cy.get(27) is not None:
-            rev_ntm = W_CURR*rev_cy[26] + W_NEXT*rev_cy[27]
-
-    else:
-        # Fallback CY completo
-        if eps_cy.get(25) is not None and eps_cy.get(26) is not None:
-            eps_ltm = W_CURR*eps_cy[25] + W_NEXT*eps_cy[26]
-        if eps_cy.get(26) is not None and eps_cy.get(27) is not None:
-            eps_ntm = W_CURR*eps_cy[26] + W_NEXT*eps_cy[27]
-        if rev_cy.get(25) is not None and rev_cy.get(26) is not None:
-            rev_ltm = W_CURR*rev_cy[25] + W_NEXT*rev_cy[26]
-        if rev_cy.get(26) is not None and rev_cy.get(27) is not None:
-            rev_ntm = W_CURR*rev_cy[26] + W_NEXT*rev_cy[27]
+    # Usa sempre CY — più affidabile finché non abbiamo Leeway
+    if eps_cy.get(25) is not None and eps_cy.get(26) is not None:
+        eps_ltm = W_CURR*eps_cy[25] + W_NEXT*eps_cy[26]
+    if eps_cy.get(26) is not None and eps_cy.get(27) is not None:
+        eps_ntm = W_CURR*eps_cy[26] + W_NEXT*eps_cy[27]
+    if rev_cy.get(25) is not None and rev_cy.get(26) is not None:
+        rev_ltm = W_CURR*rev_cy[25] + W_NEXT*rev_cy[26]
+    if rev_cy.get(26) is not None and rev_cy.get(27) is not None:
+        rev_ntm = W_CURR*rev_cy[26] + W_NEXT*rev_cy[27]
 
     if price_usd and eps_ltm and eps_ltm != 0:
         pe_our = price_usd/eps_ltm
