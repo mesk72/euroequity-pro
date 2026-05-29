@@ -711,6 +711,9 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (valMin > 0 && (s.valueScore  || 0)             < valMin) return false
     if (growMin> 0 && (s.growthScore || 0)             < growMin) return false
     if (combinedMin > 0 && (s.combinedRank || 0)       < combinedMin) return false
+    // Escludi mercati senza rank dai Best screens
+    if ((valMin > 0 || growMin > 0 || combinedMin > 0) &&
+        ['AT','VI','LS','IR','NGM'].includes(s.exchange)) return false
     return true
   })
 
@@ -1018,11 +1021,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length
     : null
 
-  // EPS Growth top/bottom 10 su tutto l'universo
-  // EPS growth: cap +1000% (+10) e -200% (-2), epsGrowth è in decimale nel DB
-  const allWithEpsGrowth = u200.filter(s => s.epsGrowth != null && s.epsGrowth <= 10 && s.epsGrowth >= -2)
-  const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10)
-  const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10)
+
 
   // Price Momentum 12M top/bottom 10
   const allWithMom12 = u200.filter(s => s.mom12m != null)
@@ -1157,42 +1156,6 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
                       <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Top 10 EPS Growth */}
-      {!loading && topEpsGrowth.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {[
-            { title: '📈 Top 10 EPS Growth (Top 600 Europe)', list: topEpsGrowth, color: 'var(--green)' },
-            { title: '📉 Bottom 10 EPS Growth (Top 600 Europe)', list: botEpsGrowth, color: 'var(--red)' },
-          ].map(({ title, list, color }) => (
-            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
-              <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
-                style={{ color }}>
-                {title}
-              </div>
-              <table className="data-table w-full">
-                <thead><tr>
-                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:72}}>EPS Gr%</th>
-                </tr></thead>
-                <tbody>
-                  {list.map((s, i) => (
-                    <tr key={i}
-                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
-                      className="cursor-pointer">
-                      <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
-                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap"
-                        style={{ color: (s.epsGrowth||0) >= 0 ? '#22d48a' : '#e84560' }}>
-                        {s.epsGrowth != null ? fp(s.epsGrowth * 100) : '—'}
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1535,7 +1498,7 @@ export default function App() {
         </div>
 
         <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
-          <span className="text-green font-700">● DATA</span> · TIKR / EODHD<br />
+          <span className="text-green font-700">● DATA</span> · EODHD<br />
           ⚠️ Prices: 15-20 min delay<br />
           Fundamentals: daily
         </div>
