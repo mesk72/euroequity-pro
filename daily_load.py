@@ -349,9 +349,9 @@ for _, row in df.iterrows():
     W_CURR = (12-MONTH+1)/12
     W_NEXT = 1-W_CURR
 
-    if next_report and next_report <= TODAY:  # Solo se report già passato
+    if next_report and next_report <= TODAY: # Solo se report già passato
         next_dt = datetime.strptime(next_report, "%Y-%m-%d")
-        last_report = next_dt  # next_report è già passata
+        last_report = next_dt # next_report è già passata
         diff_days = (today_dt - last_report).days
         W1 = (diff_days % 365) / 365
         W2 = 1 - W1
@@ -405,13 +405,8 @@ for _, row in df.iterrows():
         if abs(pe_our) > 500:
             pe_trailing = pe_trail_tikr
         elif pe_trail_tikr and pe_trail_tikr != 0:
-            # Se TIKR negativo e nostro positivo → nostro (GAAP vs Normalized)
-            if pe_trail_tikr < 0 and pe_our > 0:
-                pe_trailing = pe_our
-            # Se differenza > 3% usiamo TIKR
-            else:
-                diff_pct = abs(pe_our - pe_trail_tikr) / abs(pe_trail_tikr)
-                pe_trailing = pe_trail_tikr if diff_pct > 0.03 else pe_our
+            diff_pct = abs(pe_our - pe_trail_tikr) / abs(pe_trail_tikr)
+            pe_trailing = pe_trail_tikr if diff_pct > 0.03 else pe_our
         else:
             pe_trailing = pe_our
     else:
