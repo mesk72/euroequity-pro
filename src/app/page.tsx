@@ -12,6 +12,7 @@ import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/consta
 import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
+import ResearchPage from '@/components/research/ResearchPage'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
@@ -1460,7 +1461,7 @@ export default function App() {
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
           {nav.map(item => (
             <button key={item.id}
-              onClick={() => { setPage(item.id); setSidebar(false) }}
+              onClick={() => { if (item.id === 'research') { window.location.href = '/research'; } else { setPage(item.id); setSidebar(false) } }}
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-500 transition-colors text-left ${
                 page === item.id ? 'bg-gold/15 text-gold' : 'text-muted hover:text-text hover:bg-white/5'
               }`}>
@@ -1554,6 +1555,7 @@ export default function App() {
             <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
           </div>
         )}
+          {page === 'research' && <ResearchPage />}
         {page === 'portfolio' && (
             user ? (
               <div className="p-8 space-y-4 fade-in">
