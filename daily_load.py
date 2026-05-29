@@ -349,7 +349,7 @@ for _, row in df.iterrows():
     W_CURR = (12-MONTH+1)/12
     W_NEXT = 1-W_CURR
 
-    if next_report and next_report >= "2026-01-01":
+    if next_report and next_report <= TODAY: # Solo se report già passato
         next_dt = datetime.strptime(next_report, "%Y-%m-%d")
         last_report = next_dt - timedelta(days=365) if next_dt > today_dt else next_dt
         diff_days = (today_dt - last_report).days
@@ -425,14 +425,11 @@ for _, row in df.iterrows():
 
     eps_growth = None
     if eps_ltm and eps_ntm and eps_ltm != 0:
-        if eps_ltm > 0 and eps_ntm < 0:
-            eps_growth = None # da positivo a negativo — non interpretabile
-        else:
-            eps_growth = round(eps_ntm / abs(eps_ltm) - 1, 6)
+        eps_growth = round(eps_ntm / abs(eps_ltm) - 1, 6)
 
     rev_growth = None
-    if rev_ltm and rev_ntm and rev_ltm>0:
-        rev_growth = round(rev_ntm/rev_ltm-1, 6)
+    if rev_ltm and rev_ntm and rev_ltm != 0:
+        rev_growth = round(rev_ntm / abs(rev_ltm) - 1, 6)
 
     fund_updates.append({
         "ticker":ticker,"exchange":exchange,"mkt_cap":mkt_cap,"pb":pb,
@@ -555,3 +552,4 @@ def calc_ranks_for_group(group):
         m6=d.get("mom6m"); m12=d.get("mom12m")
         m1w=mom1w_map.get(key); m1m=mom1m_map.get(key)
         if m6 is not None and m1w is not None: mom6_adj
+
