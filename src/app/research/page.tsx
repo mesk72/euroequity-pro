@@ -70,7 +70,7 @@ export default function ResearchHubPage() {
             ForwardAlpha · Quantitative Equity Research
           </div>
           <h1 style={{ fontSize: 28, fontWeight: 800, margin: '0 0 8px' }}>European Equity Research Coverage</h1>
-          <p style={{ fontSize: 14, color: '#64748b', margin: 0, maxWidth: 600 }}>
+          <p style={{ fontSize: 14, color: '#cbd5e1', margin: 0, maxWidth: 600 }}>
             Institutional-grade quantitative analysis combining our proprietary Value &amp; Growth scoring models
             with fundamental research across the European equity universe.
           </p>
@@ -91,15 +91,15 @@ export default function ResearchHubPage() {
                       <span style={{ fontSize: 18 }}>{note.flag}</span>
                       <span style={{ fontWeight: 800, color: '#f97316', fontSize: 14 }}>{note.ticker}</span>
                     </div>
-                    <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 4 }}>{note.company}</div>
-                    <div style={{ fontSize: 12, color: '#cbd5e1', marginBottom: 12, lineHeight: 1.4 }}>{note.tagline}</div>
+                    <div style={{ fontSize: 11, color: '#cbd5e1', marginBottom: 4 }}>{note.company}</div>
+                    <div style={{ fontSize: 12, color: '#f1f5f9', marginBottom: 12, lineHeight: 1.4 }}>{note.tagline}</div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <div style={{ flex: 1, background: '#eff6ff', borderRadius: 4, padding: '4px 8px', textAlign: 'center' }}>
-                        <div style={{ fontSize: 9, color: '#3b82f6' }}>VALUE</div>
+                        <div style={{ fontSize: 9, color: '#93c5fd' }}>VALUE</div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: '#3b82f6' }}>{note.value}</div>
                       </div>
                       <div style={{ flex: 1, background: '#f0fdf4', borderRadius: 4, padding: '4px 8px', textAlign: 'center' }}>
-                        <div style={{ fontSize: 9, color: '#22c55e' }}>GROWTH</div>
+                        <div style={{ fontSize: 9, color: '#86efac' }}>GROWTH</div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: '#22c55e' }}>{note.growth}</div>
                       </div>
                     </div>
@@ -113,7 +113,7 @@ export default function ResearchHubPage() {
         {/* CTA */}
         <div style={{ background: '#0f1923', border: '1px solid #f9731633', borderRadius: 8, padding: '24px', textAlign: 'center', marginTop: 16 }}>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Access the Full European Universe</div>
-          <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16 }}>
+          <p style={{ fontSize: 13, color: '#cbd5e1', marginBottom: 16 }}>
             Screen 3,600+ European equities by Value Score, Growth Score, PE, momentum and more.
           </p>
           <Link href="/" style={{ display: 'inline-block', background: '#f97316', color: '#000', padding: '12px 28px', borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: 'none' }}>
