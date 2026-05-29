@@ -659,7 +659,9 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       const m12AdjVals = data.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null).filter((v:any) => v != null) as number[]
 
       // Calcola euroVal e euroGrow per ogni titolo
+      const NO_RANK_EX = new Set(['AT','VI','LS','IR','NGM'])
       const euroScores = data.map((s:any) => {
+        if (NO_RANK_EX.has(s.exchange)) return null
         const eyt = ey(s.peTrail); const eyf = ey(s.peFwd)
         const pet = eyt != null ? (s.peTrail > 200 ? 1 : pctRk(eyTVals, eyt)) : null
         const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pctRk(eyFVals, eyf)) : null
@@ -681,7 +683,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       const validCombined = euroScores.filter((v:any) => v != null) as number[]
       data.forEach((s: any, i: number) => {
         const c = euroScores[i]
-        if (c == null) { s.combinedRank = null; return }
+        if (c == null || NO_RANK_EX.has(s.exchange)) { s.combinedRank = null; return }
         s.combinedRank = Math.round(validCombined.filter(v => v < c).length / validCombined.length * 100)
       })
 
