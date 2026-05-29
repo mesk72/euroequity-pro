@@ -349,17 +349,17 @@ for _, row in df.iterrows():
     W_CURR = (12-MONTH+1)/12
     W_NEXT = 1-W_CURR
 
-    if next_report and next_report <= TODAY: # Solo se report già passato
+    if next_report and next_report <= TODAY:  # Solo se report già passato
         next_dt = datetime.strptime(next_report, "%Y-%m-%d")
-        last_report = next_dt - timedelta(days=365) if next_dt > today_dt else next_dt
+        last_report = next_dt  # next_report è già passata
         diff_days = (today_dt - last_report).days
-        N = diff_days // 365
         W1 = (diff_days % 365) / 365
         W2 = 1 - W1
 
-        fy0,fy1,fy2 = 25+N, 26+N, 27+N
-
-        # EPS LTM — formula FY
+        # fy0 = anno del last report (es. 2026 -> 26)
+        fy0 = last_report.year - 2000
+        fy1 = fy0 + 1
+        fy2 = fy0 + 2
         if eps_fy.get(fy0) is not None and eps_fy.get(fy1) is not None:
             eps_ltm = W2*eps_fy[fy0] + W1*eps_fy[fy1]
         elif eps_fy.get(fy0) is not None:
