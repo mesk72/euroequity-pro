@@ -203,13 +203,13 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 28, fontWeight: 800, color: '#f97316' }}>{note.ticker}</span>
-                <span style={{ fontSize: 12, padding: '2px 8px', border: '1px solid #334155', borderRadius: 4, color: '#64748b' }}>{note.exchange}</span>
+                <span style={{ fontSize: 12, padding: '2px 8px', border: '1px solid #334155', borderRadius: 4, color: '#cbd5e1' }}>{note.exchange}</span>
               </div>
-              <div style={{ fontSize: 14, color: '#94a3b8' }}>{note.company}</div>
+              <div style={{ fontSize: 14, color: '#e2e8f0' }}>{note.company}</div>
             </div>
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: '8px 0 4px', lineHeight: 1.3 }}>{note.tagline}</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>{note.subsector}</p>
+          <p style={{ fontSize: 13, color: '#cbd5e1', margin: 0 }}>{note.subsector}</p>
         </div>
 
         {/* Scores */}
@@ -220,7 +220,7 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
             { label: 'Universe', value: note.universe, color: '#f97316', bg: '#fff7ed' },
           ].map(s => (
             <div key={s.label} style={{ background: s.bg, borderRadius: 8, padding: '14px 12px', textAlign: 'center', border: `1px solid ${s.color}33` }}>
-              <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 4 }}>{s.label}</div>
+              <div style={{ fontSize: 10, color: '#e2e8f0', marginBottom: 4 }}>{s.label}</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
             </div>
           ))}
@@ -228,13 +228,13 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
 
         {/* KPIs */}
         <div style={{ marginBottom: 28 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: 12 }}>Key Quantitative Metrics</h2>
-          <div style={{ border: '1px solid #1e293b', borderRadius: 8, overflow: 'hidden' }}>
+          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', marginBottom: 12 }}>Key Quantitative Metrics</h2>
+          <div style={{ border: '1px solid #334155', borderRadius: 8, overflow: 'hidden' }}>
             {note.kpis.map(([label, value, insight], i) => (
-              <div key={label} style={{ display: 'grid', gridTemplateColumns: '160px 100px 1fr', gap: 0, borderBottom: i < note.kpis.length - 1 ? '1px solid #1e293b' : 'none', background: i % 2 === 0 ? '#0f1923' : '#0d1117' }}>
-                <div style={{ padding: '10px 14px', fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>{label}</div>
-                <div style={{ padding: '10px 14px', fontSize: 13, fontWeight: 800, color: '#e2e8f0' }}>{value}</div>
-                <div style={{ padding: '10px 14px', fontSize: 11, color: '#64748b' }}>{insight}</div>
+              <div key={label} style={{ display: 'grid', gridTemplateColumns: '160px 100px 1fr', gap: 0, borderBottom: i < note.kpis.length - 1 ? '1px solid #334155' : 'none', background: i % 2 === 0 ? '#111827' : '#0f172a' }}>
+                <div style={{ padding: '10px 14px', fontSize: 12, color: '#e2e8f0', fontWeight: 600 }}>{label}</div>
+                <div style={{ padding: '10px 14px', fontSize: 13, fontWeight: 800, color: '#ffffff' }}>{value}</div>
+                <div style={{ padding: '10px 14px', fontSize: 11, color: '#cbd5e1' }}>{insight}</div>
               </div>
             ))}
           </div>
@@ -242,12 +242,12 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
 
         {/* Highlights */}
         <div style={{ marginBottom: 28 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: 12 }}>Investment Highlights</h2>
+          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', marginBottom: 12 }}>Investment Highlights</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {note.highlights.map((h, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                 <span style={{ color: '#f97316', fontSize: 16, marginTop: 1, flexShrink: 0 }}>→</span>
-                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: '#cbd5e1' }} dangerouslySetInnerHTML={{ __html: h }} />
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: '#f1f5f9' }} dangerouslySetInnerHTML={{ __html: h }} />
               </div>
             ))}
           </div>
@@ -256,7 +256,7 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
         {/* Thesis */}
         <div style={{ background: '#0f1923', border: '1px solid #f9731633', borderRadius: 8, padding: '20px 24px', marginBottom: 28 }}>
           <h2 style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#f97316', marginBottom: 10 }}>ForwardAlpha Investment Thesis</h2>
-          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: '#cbd5e1' }}>{note.thesis}</p>
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: '#f1f5f9' }}>{note.thesis}</p>
         </div>
 
         {/* Download */}
@@ -265,7 +265,7 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
             style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#f97316', color: '#000', padding: '14px 32px', borderRadius: 8, fontWeight: 800, fontSize: 14, textDecoration: 'none' }}>
             ↓ Download Full {note.ticker} Quantitative Research Report — PDF
           </a>
-          <p style={{ fontSize: 11, color: '#475569', marginTop: 8 }}>
+          <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 8 }}>
             Free access during Beta · No credit card required ·{' '}
             <Link href="/" style={{ color: '#f97316', textDecoration: 'none' }}>Access the full ForwardAlpha screener →</Link>
           </p>
@@ -273,7 +273,7 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
 
         {/* Disclaimer */}
         <div style={{ borderTop: '1px solid #1e293b', paddingTop: 16 }}>
-          <p style={{ fontSize: 10, color: '#475569', lineHeight: 1.5, margin: 0 }}>
+          <p style={{ fontSize: 10, color: '#94a3b8', lineHeight: 1.5, margin: 0 }}>
             <strong>DISCLAIMER — NOT INVESTMENT ADVICE.</strong> This document is produced by ForwardAlpha (forwardalpha.pro) for informational and educational purposes only.
             It does not constitute investment advice, a solicitation, or a recommendation to buy, sell or hold any financial instrument.
             ForwardAlpha is not a registered investment adviser. All data and projections are sourced from third-party providers and believed to be reliable but not guaranteed.
