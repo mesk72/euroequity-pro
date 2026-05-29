@@ -43,7 +43,7 @@ const NOTES: Note[] = [
     subtitle: 'BNP Paribas presents a classic case of an institutional-grade value compounder trading at a massive disconnect from its fundamental strength.',
     kpis: [['Value Score','79/100','Strong discount across multiples'],['Growth Score','64/100','Stable capital compounding'],['NTM P/E','7.80x','Deeply compressed multiple'],['Price / Book','0.78x','22% discount to book value'],['Dividend Yield','6.6%','+14.4% DPS growth 2026E'],['Fwd 2-Yr EPS CAGR','+7.6%','Resilient earnings growth']],
     highlights: ['<strong>Valuation Gap:</strong> Trading at 7.80x NTM P/E and 0.78x P/BV — massive margin of safety.','<strong>Growing Cash Machine:</strong> Net Income scaling from €12,225M to €13,283M by next fiscal cycle.','<strong>Operational Efficiency:</strong> ROE structurally expanding from 9.6% toward 10.77%.','<strong>Income Engine:</strong> 6.6% dividend yield with +14.4% YoY DPS growth.'],
-    thesis: 'BNP Paribas ranks in the Top 20% of our European Universe with Value Score 79/100. Trading at 7.80x NTM P/E and 0.78x P/BV, investors buy one of Europe's largest systemically important banks at a 22% discount to book value.',
+    thesis: 'BNP Paribas ranks in the Top 20% of our European Universe with Value Score 79/100. Trading at 7.80x NTM P/E and 0.78x P/BV, investors buy one of Europe\'s largest systemically important banks at a 22% discount to book value.',
   },
   {
     ticker: 'ENR', exchange: 'XETRA', slug: 'enr',
