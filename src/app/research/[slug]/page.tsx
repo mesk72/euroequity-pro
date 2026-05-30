@@ -189,6 +189,29 @@ const NOTES: Note[] = [
   },
 
 ]
+  {
+    ticker: 'ABBN', exchange: 'SWX', slug: 'abbn',
+    company: 'ABB Ltd', sector: 'Industrials', subsector: 'Industrials / Electrification & Automation',
+    flag: '🇨🇭', country: 'Switzerland', value_score: 17, growth_score: 82, universe: 'Top Growth',
+    pdf: '/research/ABBN_ForwardAlpha.pdf',
+    tagline: 'Industrial Megatrends Unleashed — The Quality Growth Profile',
+    subtitle: 'ABB targets structural momentum where execution justifies a premium — Growth Rank 82/100.',
+    kpis: [['Value Score','17/100','Quality premium valuation'],['Growth Score','82/100','Top Growth — Top 20%'],['Revenue Growth 2026E','+12.8%','CHF 37.5B'],['Net Income Growth','+26.5%','YoY to CHF 6.0B'],['LTM ROE','33.6%','Expanding to 34.5%'],['Net Debt/EBITDA','0.44x','Moving to net cash']],
+    highlights: ['<strong>Top-Line Velocity:</strong> Revenues projected to surge +12.8% YoY to CHF 37,481M by late 2026.','<strong>Profitability Inflection:</strong> Normalised Net Income jumping +26.5% YoY to CHF 6,022M.','<strong>Elite Capital Returns:</strong> LTM ROE of 33.6% expanding to 34.5%, alongside ROIC of 24.5%.','<strong>Fortress Balance Sheet:</strong> Net Debt/EBITDA at 0.44x moving to net cash (-CHF 3,900M).'],
+    thesis: 'ABB Ltd scores Growth 82/100 — top 20% of our entire European coverage universe. With Value Score 17/100, it trades at an institutional quality premium backed by exploding demand for electrification, smart motion and automation. Revenue +12.8%, Net Income +26.5%, ROE 33.6%, ROIC 24.5% and a Forward 2-Year EPS CAGR of 14.4%. The definitive structural growth compounder for the modern industrial era.',
+  },
+  {
+    ticker: 'BARC', exchange: 'LSE', slug: 'barc',
+    company: 'Barclays PLC', sector: 'Financials', subsector: 'Financials / Banking',
+    flag: '🇬🇧', country: 'United Kingdom', value_score: 77, growth_score: 62, universe: 'Top 20%',
+    pdf: '/research/BARC_ForwardAlpha.pdf',
+    tagline: 'Re-Accelerating Capital Machine — The Quantitative Case for Barclays',
+    subtitle: 'Value 77/100 combined with Growth 62/100 — a powerful mix of valuation discount and earnings acceleration.',
+    kpis: [['Value Score','77/100','Top 20% European Universe'],['Growth Score','62/100','Structural earnings acceleration'],['LTM P/BV','0.98x','Below tangible book value'],['NTM P/E','8.40x','Deeply discounted'],['Fwd 2-Yr EPS CAGR','+21.5%','High-octane growth'],['DPS Growth 2026E','+75.7%','Massive payout expansion']],
+    highlights: ['<strong>Valuation Disconnect:</strong> 0.98x P/BV and 8.40x NTM P/E — buying a global banking powerhouse below tangible assets.','<strong>EPS Acceleration:</strong> Forward 2-Year EPS CAGR of +21.5% — far above European banking peers.','<strong>Profitability Leap:</strong> Net Income scaling from £6,209M to £7,114M (+14.6% YoY).','<strong>Dividend Surge:</strong> DPS projected +75.7% YoY from £0.09 to £0.15, supported by EBIT margins expanding to 42.2%.'],
+    thesis: 'Barclays scores Value 77/100 and Growth 62/100 — firmly in the Top 20% of our 3,700+ European equity universe. Trading at 0.98x P/BV and 8.40x NTM P/E, the market heavily discounts a structurally more profitable business. ROE expanding from 8.29% to 10.70% is the primary catalyst for re-rating. With +21.5% Forward EPS CAGR and +75.7% DPS growth, BARC is a high-conviction compounder.',
+  },
+
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
 }
