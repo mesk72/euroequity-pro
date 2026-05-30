@@ -212,7 +212,7 @@ const NOTES: ResearchNote[] = [
     sector: 'Consumer Discretionary',
     tags: ['Red Flag', 'FCF Collapse', 'Value Score 8/100', 'Anti-Hype'],
     summary: 'MC scores Value 8/100, Growth 36/100. Revenue flat +0.2% YoY, EBITDA -4.2%, interest expense +102.1% to €810M, CF/Share -11.6%. Paying 20.51x NTM P/E for structural stagnation. The era of effortless luxury compounding is over. A quantitative red flag.',
-    pdf_url: '/research/MC_ForwardAlpha.pdf',
+    pdf_url: '/research/MC_ForwardAlpha_v2.pdf',
     flag: '🇫🇷',
   },
   {
