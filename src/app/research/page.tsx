@@ -69,8 +69,6 @@ const MONTHS = [
       },
     ],
   },
-    ],
-  },
 ]
 
 export default function ResearchHubPage() {
