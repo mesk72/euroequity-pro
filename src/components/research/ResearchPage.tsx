@@ -215,6 +215,20 @@ const NOTES: ResearchNote[] = [
     pdf_url: '/research/MC_ForwardAlpha.pdf',
     flag: '🇫🇷',
   },
+  {
+    id: 'or-2026-05',
+    ticker: 'OR',
+    exchange: 'PA',
+    company: "L'Oréal S.A.",
+    title: "High Quality, Deflating Premium",
+    subtitle: 'Severe Multiple Compression · FCF Contraction · Institutional Re-Pricing',
+    date: 'May 2026',
+    sector: 'Consumer Staples',
+    tags: ['Overvalued', 'Multiple Compression', 'Value Score 14/100', 'Avoid'],
+    summary: "OR trades at 27.78x NTM P/E for +4.9% revenue growth and -1.0% FCF growth. 12M price return -32.0% signals institutional re-pricing. Despite 74.3% gross margin and 18.5% ROIC, the premium leaves zero margin of safety. Value Score 14/100.",
+    pdf_url: '/research/OR_ForwardAlpha.pdf',
+    flag: '🇫🇷',
+  },
 ]
 
 interface Props {
