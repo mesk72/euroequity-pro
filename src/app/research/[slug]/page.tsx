@@ -188,7 +188,6 @@ const NOTES: Note[] = [
     thesis: "L\'Oréal scores Value 14/100 and Growth 28/100. Despite an undisputed operational moat (74.3% gross margin, 18.5% ROIC), paying 27.78x NTM P/E for mid-single-digit growth and contracting FCF is fundamentally dilutive to portfolio alpha. The -32.0% 12-month price return confirms institutional re-pricing is already underway. Our quantitative model rejects the current premium. Avoid until multiples fully correct.",
   },
 
-]
   {
     ticker: 'ABBN', exchange: 'SWX', slug: 'abbn',
     company: 'ABB Ltd', sector: 'Industrials', subsector: 'Industrials / Electrification & Automation',
@@ -211,6 +210,7 @@ const NOTES: Note[] = [
     highlights: ['<strong>Valuation Disconnect:</strong> 0.98x P/BV and 8.40x NTM P/E — buying a global banking powerhouse below tangible assets.','<strong>EPS Acceleration:</strong> Forward 2-Year EPS CAGR of +21.5% — far above European banking peers.','<strong>Profitability Leap:</strong> Net Income scaling from £6,209M to £7,114M (+14.6% YoY).','<strong>Dividend Surge:</strong> DPS projected +75.7% YoY from £0.09 to £0.15, supported by EBIT margins expanding to 42.2%.'],
     thesis: 'Barclays scores Value 77/100 and Growth 62/100 — firmly in the Top 20% of our 3,700+ European equity universe. Trading at 0.98x P/BV and 8.40x NTM P/E, the market heavily discounts a structurally more profitable business. ROE expanding from 8.29% to 10.70% is the primary catalyst for re-rating. With +21.5% Forward EPS CAGR and +75.7% DPS growth, BARC is a high-conviction compounder.',
   },
+]
 
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
