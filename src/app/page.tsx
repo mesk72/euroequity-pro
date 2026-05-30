@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { FileText, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   LayoutDashboard, Search, Briefcase, Globe, Info,
@@ -1426,6 +1426,7 @@ export default function App() {
 
   const nav = [
     { id: 'about'      as Page, label: 'About',         icon: <Info size={16} />, bold: true },
+    { id: 'research'   as Page, label: '📄 Research',    icon: <FileText size={16} />, bold: true },
     { id: 'dashboard'  as Page, label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
     { id: 'screener'   as Page, label: 'All Europe',    icon: <Globe size={16} /> },
     { id: 'eurozone'   as Page, label: 'Eurozone',      icon: <Globe size={16} /> },
@@ -1452,7 +1453,6 @@ export default function App() {
     { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
     { id: 'AIM'        as Page, label: '🇬🇧 UK (AIM)',    icon: <Globe size={16} /> },
     { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
-    { id: 'research'   as Page, label: '📄 Research',    icon: <Globe size={16} /> },
     { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
   ]
 
