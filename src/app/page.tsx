@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
-  FileText, LayoutDashboard, Search, Briefcase, Globe, Info,
+  LayoutDashboard, Search, Briefcase, Globe, Info,
   LogIn, LogOut, User, Menu, X, RefreshCw,
   ChevronUp, ChevronDown, TrendingUp, TrendingDown
 } from 'lucide-react'
@@ -12,7 +12,6 @@ import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/consta
 import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
-import ResearchPage from '@/components/research/ResearchPage'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
@@ -95,7 +94,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'research' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -208,6 +207,7 @@ const COLUMNS: ColDef[] = [
   { key: 'company',     label: 'Company',   width: 180 },
   { key: 'sector',      label: 'Sector',    width: 130 },
   { key: 'price',       label: 'Price',     width: 75  },
+  { key: 'change1d',    label: '1D %',      width: 65  },
   { key: 'mktCap',      label: 'MktCap €B', width: 80  },
   { key: 'peTrail',     label: 'P/E Tr.',   width: 65  },
   { key: 'peFwd',       label: 'P/E Fwd',   width: 65  },
@@ -275,9 +275,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
     return sortAsc ? av - bv : bv - av
   }).slice(0, maxRows)
 
-  const NO_SORT = new Set(['peTrail','peFwd','epsGrowth','revGrowth'])
   const toggle = (key: SortKey) => {
-    if (NO_SORT.has(key)) return
     if (sortKey === key) setSortAsc(a => !a)
     else { setSortKey(key); setSortAsc(false) }
   }
@@ -313,7 +311,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                 <span className="font-mono font-600 text-sm text-text">
                   {s.price != null ? s.price.toFixed(2) : '-'}
                 </span>
-                <span className="font-mono text-xs font-600 text-muted hidden ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
+                <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
                   {s.change1d != null ? fpd(s.change1d/100) : '-'}
                 </span>
               </div>
@@ -368,7 +366,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
-                  cursor: ['peTrail','peFwd','epsGrowth','revGrowth'].includes(c.key) ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
@@ -510,6 +507,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 
   const metrics: [string, string, string][] = [
     ['Price',        fv(stock.price, 2),       ''],
+    ['1D %',         fp(stock.change1d),        clr(stock.change1d)],
     ['Mkt Cap B',    fv(stock.mktCap, 1),       ''],
     ['P/E Trailing', fv(stock.peTrail, 1),      ''],
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
@@ -530,7 +528,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
         <div>
           <div className="font-700 text-base text-text">
             {stock.flag} {stock.ticker}
-            <span className="ml-2 font-mono text-sm text-muted">span>
+            <span className={`ml-2 font-mono text-sm ${clr(stock.change1d)}`}>{fp(stock.change1d)}</span>
           </div>
           <div className="text-xs text-muted">{stock.company} · {stock.exchange}</div>
           {stock.sector && (
@@ -626,14 +624,12 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   const [valMin,      setValMin]      = useState(initValMin)
   const [growMin,     setGrowMin]     = useState(initGrowMin)
   const [combinedMin, setCombinedMin] = useState(initCombinedMin)
-  const [showFilters, setShowFilters] = useState(false)
   const [peMax,    setPeMax]    = useState(0)
   const [pbMax,    setPbMax]    = useState(0)
   const [mom12Min, setMom12Min] = useState(0)
 
   useEffect(() => {
     // Carica nomi portafogli
-    if (typeof window === 'undefined') return
     const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
     const names = Object.keys(stored)
     if (names.length > 0) setPortfolioNames(names)
@@ -659,9 +655,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       const m12AdjVals = data.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null).filter((v:any) => v != null) as number[]
 
       // Calcola euroVal e euroGrow per ogni titolo
-      const NO_RANK_EX = new Set(['AT','VI','LS','IR','NGM'])
       const euroScores = data.map((s:any) => {
-        if (NO_RANK_EX.has(s.exchange)) return null
         const eyt = ey(s.peTrail); const eyf = ey(s.peFwd)
         const pet = eyt != null ? (s.peTrail > 200 ? 1 : pctRk(eyTVals, eyt)) : null
         const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pctRk(eyFVals, eyf)) : null
@@ -683,7 +677,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       const validCombined = euroScores.filter((v:any) => v != null) as number[]
       data.forEach((s: any, i: number) => {
         const c = euroScores[i]
-        if (c == null || NO_RANK_EX.has(s.exchange)) { s.combinedRank = null; return }
+        if (c == null) { s.combinedRank = null; return }
         s.combinedRank = Math.round(validCombined.filter(v => v < c).length / validCombined.length * 100)
       })
 
@@ -713,9 +707,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (valMin > 0 && (s.valueScore  || 0)             < valMin) return false
     if (growMin> 0 && (s.growthScore || 0)             < growMin) return false
     if (combinedMin > 0 && (s.combinedRank || 0)       < combinedMin) return false
-    // Escludi mercati senza rank dai Best screens
-    if ((valMin > 0 || growMin > 0 || combinedMin > 0) &&
-        ['AT','VI','LS','IR','NGM'].includes(s.exchange)) return false
     return true
   })
 
@@ -751,73 +742,46 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Preset screens */}
       <div className="flex gap-2 flex-wrap">
-        <button onClick={() => { setValMin(80); setGrowMin(30); setCombinedMin(0) }}
+        <button onClick={() => { setValMin(80); setGrowMin(30) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          ⭐ Best Value V≥80 G≥30
+          Best Value V80+ G30+
         </button>
-        <button onClick={() => { setValMin(0); setGrowMin(80); setCombinedMin(0) }}
+        <button onClick={() => { setValMin(70); setGrowMin(70) }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          🚀 Best Growth G≥80
+          Best Ideas V70+ G70+
         </button>
-        <button onClick={() => { setValMin(0); setGrowMin(0); setCombinedMin(80) }}
-          className="px-3 py-1 rounded text-xs font-600 border border-border text-orange hover:bg-orange/10">
-          🏆 Best Combined ≥80
-        </button>
-        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setMom12Min(0); setCombinedMin(0); setSearch(''); setSector('All') }}
+        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setMom12Min(0); setSearch(''); setSector('All') }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
           Reset
         </button>
       </div>
 
-      {/* Filters toggle button */}
-      {(() => {
-        const activeCount = [peMax>0, mom12Min>0, valMin>0, growMin>0, combinedMin>0, search.length>0, sector!=='All'].filter(Boolean).length
-        return (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowFilters((f: boolean) => !f)}
-              className="flex items-center gap-2 px-3 py-2 rounded text-xs font-600 border transition-colors"
-              style={{ borderColor: activeCount > 0 ? 'var(--orange)' : 'var(--border)', color: activeCount > 0 ? 'var(--orange)' : 'var(--text3)' }}>
-              <span>⚙ Filters</span>
-              {activeCount > 0 && (
-                <span style={{ background: 'var(--orange)', color: '#000', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 800 }}>
-                  {activeCount}
-                </span>
-              )}
-              <span style={{ fontSize: 10 }}>{showFilters ? "▲" : "▼"}</span>
-            </button>
-            <span className="text-muted text-xs">{filtered.length} results</span>
+      {/* Filters */}
+      <div className="bg-surface border border-border rounded p-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Valuation</div>
+            <input type="number" placeholder="P/E Fwd max" value={peMax || ''} onChange={e => setPeMax(+e.target.value || 0)} className="input-field" />
+            <input type="number" placeholder="P/B max" value={pbMax || ''} onChange={e => setPbMax(+e.target.value || 0)} className="input-field" />
           </div>
-        )
-      })()}
-
-      {showFilters && (
-        <div className="bg-surface border border-border rounded p-3">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-            <div className="space-y-1.5">
-              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Valuation</div>
-              <input type="number" placeholder="P/E Fwd max" value={peMax || ''} onChange={e => setPeMax(+e.target.value || 0)} className="input-field" />
-            </div>
-            <div className="space-y-1.5">
-              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Momentum</div>
-              <input type="number" placeholder="Mom 12M % min" value={mom12Min || ''} onChange={e => setMom12Min(+e.target.value || 0)} className="input-field" />
-            </div>
-            <div className="space-y-1.5">
-              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
-              <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
-              <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
-              <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
-            </div>
-            <div className="space-y-1.5">
-              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
-              <input type="text" placeholder="Ticker / name" value={search} onChange={e => setSearch(e.target.value)} className="input-field" />
-              <select value={sector} onChange={e => setSector(e.target.value)} className="input-field">
-                {sectors.map(s => <option key={s}>{s}</option>)}
-              </select>
-            </div>
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Momentum</div>
+            <input type="number" placeholder="Mom 12M % min" value={mom12Min || ''} onChange={e => setMom12Min(+e.target.value || 0)} className="input-field" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
+            <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" />
+            <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
+            <input type="text" placeholder="Ticker / name" value={search} onChange={e => setSearch(e.target.value)} className="input-field" />
+            <select value={sector} onChange={e => setSector(e.target.value)} className="input-field">
+              {sectors.map(s => <option key={s}>{s}</option>)}
+            </select>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Status */}
       <div className="text-xs text-muted">
@@ -914,7 +878,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
 
   return (
     <div className="space-y-4 p-3">
-      <div className="section-hdr">Sector Heatmap — All Europe</div>
+      <div className="section-hdr">Sector Heatmap - All Europe</div>
 
       {loading ? (
         <div className="text-center py-12 text-muted">
@@ -929,7 +893,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
 
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
             <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
-              Sector Aggregates - All Europe ({stocksEur.length} stocks)
+              Sector Aggregates - All Europe ({stocks.length} stocks)
             </div>
             <div className="overflow-x-auto">
               <table className="data-table w-full">
@@ -937,7 +901,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                   <th>Sector</th>
                   <th>Stocks</th>
                   <th>Mkt Cap €B</th>
-                  
+                  <th>1D %</th>
                   <th>EPS Gr %</th>
                   <th>Rev Gr %</th>
                   <th>Mom 12M %</th>
@@ -954,6 +918,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       </td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fp(s.change1d)}</td>
                       <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m)}</td>
@@ -978,192 +943,294 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   onSelectStock?: (s: Stock) => void
   onGoScreener?: (filter: string) => void
 }) {
+  const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
-  const [country,   setCountry]   = useState('ITA')
-
-  const COUNTRY_EXCHANGES: Record<string, string[]> = {
-    'ITA': ['MIL'], 'DEU': ['XETRA'], 'FRA': ['PA'], 'GBR': ['LSE','AIM'],
-    'SWE': ['OM'],  'NOR': ['OB'],    'CHE': ['SWX'], 'NLD': ['AS'],
-    'BEL': ['BR'],  'FIN': ['HE'],    'ESP': ['MC'],  'DNK': ['CPSE'],
-  }
-  const COUNTRY_LABELS: Record<string, string> = {
-    'ITA':'🇮🇹 Italy','DEU':'🇩🇪 Germany','FRA':'🇫🇷 France','GBR':'🇬🇧 UK',
-    'SWE':'🇸🇪 Sweden','NOR':'🇳🇴 Norway','CHE':'🇨🇭 Switzerland','NLD':'🇳🇱 Netherlands',
-    'BEL':'🇧🇪 Belgium','FIN':'🇫🇮 Finland','ESP':'🇪🇸 Spain','DNK':'🇩🇰 Denmark',
-  }
+  const [search,    setSearch]    = useState('')
+  const [searchRes, setSearchRes] = useState<any[]>([])
+  const [usdToEur,  setUsdToEur]  = useState(0.8615)
+  const searchTimer = useRef<any>(null)
 
   useEffect(() => {
+    // Aggiorna indici ogni 60 secondi
+    const loadIndices = () => apiIndices().then(setIndices)
+    loadIndices()
+    const timer = setInterval(loadIndices, 60000)
+
+    // Carica tasso USD/EUR
+    fetch('/api/fx').then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.usdToEur) setUsdToEur(d.usdToEur) })
+      .catch(() => {})
+
     setLoading(true)
+    // Carica da tutti gli exchange - EMU + ex-EMU
     apiExchange('ALL').then(stocks => {
       setAllStocks(stocks)
       setLoading(false)
     })
+
+    return () => clearInterval(timer)
   }, [])
 
-  // Calcola combined rank su tutti i titoli rankabili
-  const rankable = allStocks.filter(s => s.valueScore != null && s.growthScore != null)
-  const allCombined = rankable.map(s => ((s.valueScore || 0) + (s.growthScore || 0)) / 2)
-  const validCombined = allCombined.filter(v => !isNaN(v))
-  const NO_RANK_EX = new Set(['AT','VI','LS','IR','NGM'])
+  useEffect(() => {
+    clearTimeout(searchTimer.current)
+    if (search.length < 2) { setSearchRes([]); return }
+    searchTimer.current = setTimeout(async () => {
+      if (USE_DB) {
+        try {
+          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`)
+          if (r.ok) {
+            const d = await r.json()
+            setSearchRes(d.stocks || [])
+            return
+          }
+        } catch {}
+      }
+      const q = search.toLowerCase()
+      const results = computeScores([...DEMO_STOCKS])
+        .filter((s: any) => s.ticker.toLowerCase().includes(q) || (s.company||'').toLowerCase().includes(q))
+        .slice(0, 10)
+      setSearchRes(results)
+    }, 200)
+  }, [search])
 
-  allStocks.forEach((s: any) => {
-    if (NO_RANK_EX.has(s.exchange)) { s.combinedRank = null; return }
-    const c = ((s.valueScore || 0) + (s.growthScore || 0)) / 2
-    if (isNaN(c) || s.valueScore == null || s.growthScore == null) { s.combinedRank = null; return }
-    s.combinedRank = Math.round(validCombined.filter(v => v < c).length / validCombined.length * 100)
-  })
 
-  // Top per paese selezionato — Best Rank >= 80
-  const exchanges = COUNTRY_EXCHANGES[country] || []
-  const topCountry = allStocks
-    .filter(s => exchanges.includes(s.exchange) && (s as any).combinedRank != null && (s as any).combinedRank >= 80)
-    .sort((a, b) => ((b as any).combinedRank || 0) - ((a as any).combinedRank || 0))
-    .slice(0, 30)
-
-  // Heatmap su mom1w
-  const u600 = allStocks
-    .filter(s => s.mktCapEur != null)
-    .sort((a, b) => (b.mktCapEur || 0) - (a.mktCapEur || 0))
+  // Top 600 Europe per market cap
+  const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null}))
+    .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
     .slice(0, 600)
 
-  // Top 10 Mom 12M
-  const top12m = allStocks
-    .filter(s => s.mom12m != null && !NO_RANK_EX.has(s.exchange))
-    .sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0))
-    .slice(0, 10)
+  const valid   = u200.filter((s:any) => s.change1d != null)
+  const allGainers = [...valid].filter((s:any) => (s.change1d || 0) > 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
+  const allLosers  = [...valid].filter((s:any) => (s.change1d || 0) < 0).sort((a, b) => (a.change1d || 0) - (b.change1d || 0))
+  const gainers = allGainers.slice(0, 10)
+  const losers  = allLosers.slice(0, 10)
+  const ewReturn = valid.length > 0
+    ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length
+    : null
 
-  const fp = (v: number | null | undefined, pct = true) => {
-    if (v == null || isNaN(v)) return '—'
-    const n = pct ? v * 100 : v
-    return (n >= 0 ? '+' : '') + n.toFixed(1) + (pct ? '%' : '')
-  }
-  const clrStyle = (v: number | null | undefined) => ({
-    color: v == null ? 'var(--text3)' : v >= 0 ? 'var(--green)' : 'var(--red)'
-  })
+  // EPS Growth top/bottom 10 su tutto l'universo
+  const allWithEpsGrowth = u200.filter(s => s.epsGrowth != null)
+  const topEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (b.epsGrowth || 0) - (a.epsGrowth || 0)).slice(0, 10).slice(0, 10)
+  const botEpsGrowth = [...allWithEpsGrowth].sort((a, b) => (a.epsGrowth || 0) - (b.epsGrowth || 0)).slice(0, 10).slice(0, 10)
+
+  // Price Momentum 12M top/bottom 10
+  const allWithMom12 = u200.filter(s => s.mom12m != null)
+  const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
+  const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
+
+  // KPI V+G >= 80 - entrambi i rank >= 70 (titoli con buon value E buon growth)
+  const highVG = u200.filter((s:any) =>
+    s.valueScore != null && s.growthScore != null &&
+    (s.valueScore + s.growthScore) / 2 >= 80
+  ).length
 
   return (
     <div className="space-y-6 fade-in">
 
-      {/* Last Update Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, #0f1923 0%, #1e3a5f 100%)',
-        border: '1px solid rgba(249,115,22,0.3)', borderRadius: 8,
-        padding: '12px 20px', textAlign: 'center'
-      }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
-          Last Quantitative Update
+      {/* Search */}
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search ticker or company…"
+          className="input-field pl-9 text-sm"
+        />
+        {searchRes.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
+            {searchRes.map((r: any) => (
+              <div key={`${r.ticker}.${r.exchange}`}
+                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}`}
+                className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
+                <span style={{ fontSize:15 }}>{r.flag || ''}</span>
+                <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
+                <span className="text-sub flex-1 truncate">{r.company}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', fontSize:11, color:'var(--text3)' }}>{r.price?.toFixed(2)||'-'}</span>
+                <span className="badge badge-delay text-[9px]">{r.exchange}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Indices - aggiornati automaticamente ogni 60s */}
+      <div>
+        <div className="section-hdr flex items-center gap-2">
+          📈 Index Performance
+          <span className="text-[9px] text-muted font-normal">· auto-refresh 60s · delayed 15-20 min</span>
         </div>
-        <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff' }}>May 22, 2026</div>
-        <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-          3,637 European equities · Value & Growth Scores recalculated weekly
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+          {INDICES.map((idx) => {
+            const d = indices.find((x: any) => x.ticker === idx.ticker)
+            return (
+              <IndexCard
+                key={idx.ticker}
+                name={idx.name}
+                close={d?.close ?? null}
+                changeP={d?.changeP ?? null}
+                loading={indices.length === 0}
+              />
+            )
+          })}
         </div>
       </div>
 
-      {/* Heatmap */}
-      <SectorHeatmap stocks={u600} onSectorClick={onSectorClick} useWeekly={true} />
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Total Stocks',              value: loading ? '…' : allStocks.length.toLocaleString() },
+          { label: 'EW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
+          { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
+        ].map(({ label, value }) => (
+          <div key={label} className="metric-card">
+            <div className="metric-label">{label}</div>
+            <div className="metric-value">{value}</div>
+          </div>
+        ))}
+      </div>
 
-      {/* Top Ranked by Country */}
-      <div>
-        <div className="section-hdr flex items-center gap-2 mb-3">
-          ⭐ Top Ranked — Best Combined ≥ 80
-        </div>
-
-        {/* Country tabs */}
-        <div className="flex gap-1.5 overflow-x-auto pb-1 flex-nowrap mb-3">
-          {Object.entries(COUNTRY_LABELS).map(([code, label]) => (
-            <button key={code}
-              onClick={() => setCountry(code)}
-              className={`px-3 py-1.5 rounded text-xs font-600 whitespace-nowrap border transition-colors ${
-                country === code ? 'border-orange-400 text-orange-400 bg-orange-400/10' : 'border-border text-muted hover:text-text'
-              }`}>
-              {label}
-            </button>
+      {/* Gainers / Losers today - top 200 market cap */}
+      {!loading && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[
+            { title: '🟢 Top 10 Gainers Today', list: gainers, color: 'text-[#22d48a]', field: 'change1d' },
+            { title: '🔴 Top 10 Losers Today',  list: losers,  color: 'text-[#e84560]',   field: 'change1d' },
+          ].map(({ title, list, color, field }) => (
+            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
+              <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
+                {title} - Top 600 Europe by Mkt Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
+              </div>
+              <table className="data-table">
+                <thead><tr>
+                  <th>Ticker</th><th style={{maxWidth:100}}>Company</th><th>Price</th><th>1D %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      className="cursor-pointer">
+                      <td className="font-700 text-text">{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px]">{s.company}</td>
+                      <td className="font-mono">{fv(s.price, 2)}</td>
+                      <td className="font-mono font-600 whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ))}
         </div>
+      )}
 
-        {loading ? (
-          <div className="text-muted text-xs p-4">Loading...</div>
-        ) : topCountry.length === 0 ? (
-          <div className="text-muted text-xs p-4">No stocks with Best Rank ≥ 80 for this country.</div>
-        ) : (
-          <div className="overflow-x-auto rounded border border-border">
-            <table className="data-table w-full" style={{ minWidth: 520 }}>
-              <thead><tr>
-                <th style={{ position: 'sticky', left: 0, background: 'var(--surface)', zIndex: 2, minWidth: 90 }}>Ticker</th>
-                <th>Company</th>
-                <th style={{ width: 70 }}>Value</th>
-                <th style={{ width: 70 }}>Growth</th>
-                <th style={{ width: 80 }}>Best Rank</th>
-                <th style={{ width: 90 }}>Mom 12M</th>
-              </tr></thead>
-              <tbody>
-                {topCountry.map((s: any) => (
-                  <tr key={s.ticker + s.exchange}
-                    onClick={() => onSelectStock?.(s)}
-                    className="cursor-pointer">
-                    <td style={{ position: 'sticky', left: 0, background: 'var(--surface)', zIndex: 1 }}
-                      className="font-700 text-[12px] text-orange-400 whitespace-nowrap">
-                      {s.flag} {s.ticker}
-                    </td>
-                    <td className="text-sub text-[11px]" style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {(s.company || '').length > 22 ? (s.company || '').slice(0, 22) + '…' : s.company}
-                    </td>
-                    <td className="text-center"><ScoreBar value={s.valueScore} label="V" /></td>
-                    <td className="text-center"><ScoreBar value={s.growthScore} label="G" /></td>
-                    <td className="font-mono font-700 text-center" style={{ color: 'var(--orange)' }}>
-                      {(s as any).combinedRank}
-                    </td>
-                    <td className="font-mono text-right text-[12px]" style={clrStyle(s.mom12m)}>
-                      {fp(s.mom12m)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {/* Top 10 EPS Growth */}
+      {!loading && topEpsGrowth.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[
+            { title: '📈 Top 10 EPS Growth (Top 600 Europe)', list: topEpsGrowth, color: 'var(--green)' },
+            { title: '📉 Bottom 10 EPS Growth (Top 600 Europe)', list: botEpsGrowth, color: 'var(--red)' },
+          ].map(({ title, list, color }) => (
+            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
+              <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
+                style={{ color }}>
+                {title}
+              </div>
+              <table className="data-table">
+                <thead><tr>
+                  <th>Ticker</th><th>Company</th><th>Sector</th><th>EPS Gr %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      className="cursor-pointer">
+                      <td>
+                        <span className="font-700" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</span>
+                      </td>
+                      <td className="text-sub text-[11px]">{s.company}</td>
+                      <td>
+                        <span className="text-[10px] font-600" style={{ color: getSectorColor(s.sector) }}>
+                          {s.sector || '-'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="font-mono font-600" style={{ color: (s.epsGrowth||0) >= 0 ? '#22d48a' : '#e84560' }}>
+                          {fp(s.epsGrowth)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* Top 10 Mom 12M */}
-      <div>
-        <div className="section-hdr mb-3">📈 Top 10 Momentum 12M — All Europe</div>
-        {loading ? <div className="text-muted text-xs p-4">Loading...</div> : (
-          <div className="overflow-x-auto rounded border border-border">
-            <table className="data-table w-full" style={{ minWidth: 400 }}>
-              <thead><tr>
-                <th style={{ position: 'sticky', left: 0, background: 'var(--surface)', zIndex: 2 }}>Ticker</th>
-                <th>Company</th>
-                <th style={{ width: 90 }}>Mom 12M</th>
-              </tr></thead>
-              <tbody>
-                {top12m.map((s: any) => (
-                  <tr key={s.ticker + s.exchange}
-                    onClick={() => onSelectStock?.(s)}
-                    className="cursor-pointer">
-                    <td style={{ position: 'sticky', left: 0, background: 'var(--surface)', zIndex: 1 }}
-                      className="font-700 text-[12px] whitespace-nowrap">
-                      {s.flag} {s.ticker}
-                    </td>
-                    <td className="text-sub text-[11px]" style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {(s.company || '').length > 22 ? (s.company || '').slice(0, 22) + '…' : s.company}
-                    </td>
-                    <td className="font-mono font-700 text-right" style={clrStyle(s.mom12m)}>
-                      {fp(s.mom12m)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {/* Top 10 Price Momentum 12M */}
+      {!loading && topMom12.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[
+            { title: '🚀 Top 10 Price Mom 12M (Top 600 Europe)', list: topMom12, color: 'var(--green)' },
+            { title: '💣 Bottom 10 Price Mom 12M (Top 600 Europe)', list: botMom12, color: 'var(--red)' },
+          ].map(({ title, list, color }) => (
+            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
+              <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
+                style={{ color }}>
+                {title}
+              </div>
+              <table className="data-table">
+                <thead><tr>
+                  <th>Ticker</th><th>Company</th><th>Sector</th><th>Mom 12M %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      className="cursor-pointer">
+                      <td>
+                        <span className="font-700" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</span>
+                      </td>
+                      <td className="text-sub text-[11px]">{s.company}</td>
+                      <td>
+                        <span className="text-[10px] font-600" style={{ color: getSectorColor(s.sector) }}>
+                          {s.sector || '-'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="font-mono font-700" style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
+                          {fp(s.mom12m)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
 
+      {/* Heatmap settoriale */}
+      {!loading && u200.length > 0 && (
+        <div className="bg-surface border border-border rounded-lg p-4">
+          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · Top 600 Europe</div>
+          <SectorHeatmap stocks={u200} onSectorClick={onSectorClick} />
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-12 text-muted">
+          <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-gold" />
+          <p className="text-sm">Loading market data…</p>
+        </div>
+      )}
     </div>
   )
 }
 
-
+// - LOGIN GATE -
 function LoginGate({ onLogin, title }: { onLogin: () => void, title: string }) {
   return (
     <div className="p-8 space-y-4 fade-in">
@@ -1182,7 +1249,7 @@ function LoginGate({ onLogin, title }: { onLogin: () => void, title: string }) {
           Register for Free
         </button>
         <div style={{ fontSize:11, color:'var(--text4)', marginTop:12 }}>
-          Free access during Beta · No credit card required
+          14-day free trial · No credit card required
         </div>
       </div>
     </div>
@@ -1228,7 +1295,7 @@ function Legal() {
             ['7. Clausole Vessatorie (Art. 1341–1342 c.c.)',
              'In accordance with Italian civil law, the following clauses are explicitly brought to your attention and require specific acceptance: (a) limitation of liability (clause 4); (b) exclusive jurisdiction of the Court of Verona (clause 8). By creating an account you confirm you have read and specifically accepted these clauses.'],
             ['8. Governing Law & Jurisdiction',
-             `These Terms are governed by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona, without prejudice to mandatory consumer protection rights in the user's country of residence. Pursuant to Art. 14 of Regulation (EU) No 524/2013, users may also resolve disputes through the European Commission ODR platform: https://ec.europa.eu/consumers/odr/`],
+             `These Terms are governed by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona, without prejudice to mandatory consumer protection rights in the user's country of residence.`],
           ] as [string,string][]).map(([title, body]) => (
             <div key={title} className="bg-surface border border-border rounded-lg p-4">
               <h3 className="font-700 text-text text-sm mb-2">{title}</h3>
@@ -1242,7 +1309,7 @@ function Legal() {
         <div className="space-y-4">
           {([
             ['1. Data Controller',
-             'Data Controller: Andrea Meschini, Verona (VR), Italy. Contact: andrea@forwardalpha.pro. For GDPR-related requests, contact the Data Controller directly by email.'],
+             'Data Controller: Andrea Meschini, Verona, Italy. Contact: andrea@forwardalpha.pro.'],
             ['2. Data We Collect',
              'We collect: full name, email address, country of residence, hashed password (via Supabase Auth). We also collect usage data (screens visited, filters applied) solely to improve the service. We do not collect payment data directly — this is handled by Stripe if and when subscriptions are activated.'],
             ['3. Legal Basis for Processing',
@@ -1347,7 +1414,6 @@ export default function App() {
 
   const nav = [
     { id: 'about'      as Page, label: 'About',         icon: <Info size={16} />, bold: true },
-    { id: 'research'   as Page, label: '📄 Research',    icon: <FileText size={16} />, bold: true },
     { id: 'dashboard'  as Page, label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
     { id: 'screener'   as Page, label: 'All Europe',    icon: <Globe size={16} /> },
     { id: 'eurozone'   as Page, label: 'Eurozone',      icon: <Globe size={16} /> },
@@ -1355,26 +1421,21 @@ export default function App() {
     { id: 'bestvalue'  as Page, label: 'Best Value',    icon: <TrendingUp size={16} /> },
     { id: 'bestgrowth' as Page, label: 'Best Growth',   icon: <TrendingUp size={16} /> },
     { id: 'sectors'    as Page, label: 'Sectors',       icon: <Globe size={16} /> },
-    { id: 'VI'         as Page, label: '🇦🇹 Austria',     icon: <Globe size={16} /> },
-    { id: 'BR'         as Page, label: '🇧🇪 Belgium',     icon: <Globe size={16} /> },
-    { id: 'CPSE'       as Page, label: '🇩🇰 Denmark',     icon: <Globe size={16} /> },
-    { id: 'HE'         as Page, label: '🇫🇮 Finland',     icon: <Globe size={16} /> },
-    { id: 'PA'         as Page, label: '🇫🇷 France',      icon: <Globe size={16} /> },
-    { id: 'XETRA'      as Page, label: '🇩🇪 Germany',     icon: <Globe size={16} /> },
-    { id: 'AT'         as Page, label: '🇬🇷 Greece',      icon: <Globe size={16} /> },
-    { id: 'IR'         as Page, label: '🇮🇪 Ireland',     icon: <Globe size={16} /> },
-    { id: 'MIL'        as Page, label: '🇮🇹 Italy',       icon: <Globe size={16} /> },
-    { id: 'AS'         as Page, label: '🇳🇱 Netherlands', icon: <Globe size={16} /> },
-    { id: 'OB'         as Page, label: '🇳🇴 Norway',      icon: <Globe size={16} /> },
-    { id: 'LS'         as Page, label: '🇵🇹 Portugal',    icon: <Globe size={16} /> },
-    { id: 'MC'         as Page, label: '🇪🇸 Spain',       icon: <Globe size={16} /> },
-    { id: 'SWX'        as Page, label: '🇨🇭 Switzerland', icon: <Globe size={16} /> },
-    { id: 'OM'         as Page, label: '🇸🇪 Sweden (OM)', icon: <Globe size={16} /> },
-    { id: 'NGM'        as Page, label: '🇸🇪 Sweden (NGM)',icon: <Globe size={16} /> },
-    { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
-    { id: 'AIM'        as Page, label: '🇬🇧 UK (AIM)',    icon: <Globe size={16} /> },
+    { id: 'MIL'        as Page, label: 'Italy',         icon: <Globe size={16} /> },
+    { id: 'PA'         as Page, label: 'France',       icon: <Globe size={16} /> },
+    { id: 'XETRA'      as Page, label: 'Germany',      icon: <Globe size={16} /> },
+    { id: 'LSE'        as Page, label: 'UK (LSE)',      icon: <Globe size={16} /> },
+    { id: 'OM'         as Page, label: 'Sweden',       icon: <Globe size={16} /> },
+    { id: 'OB'         as Page, label: 'Norway',       icon: <Globe size={16} /> },
+    { id: 'SWX'        as Page, label: 'Switzerland',  icon: <Globe size={16} /> },
+    { id: 'MC'         as Page, label: 'Spain',        icon: <Globe size={16} /> },
+    { id: 'AS'         as Page, label: 'Netherlands',  icon: <Globe size={16} /> },
+    { id: 'HE'         as Page, label: 'Finland',      icon: <Globe size={16} /> },
+    { id: 'BR'         as Page, label: 'Belgium',      icon: <Globe size={16} /> },
+    { id: 'CPSE'       as Page, label: 'Denmark',      icon: <Globe size={16} /> },
+    { id: 'AT'         as Page, label: 'Greece',       icon: <Globe size={16} /> },
     { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
-    { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
+    { id: 'legal'     as Page, label: 'Legal',      icon: <Globe size={16} /> },
   ]
 
   const externalNav: {href:string,label:string}[] = []
@@ -1402,11 +1463,9 @@ export default function App() {
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
           {nav.map(item => (
             <button key={item.id}
-              onClick={() => { if (item.id === 'research') { window.location.href = '/research'; } else { setPage(item.id); setSidebar(false) } }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors text-left ${
-                item.bold ? 'font-700' : 'font-500'
-              } ${
-                page === item.id ? 'bg-gold/15 text-gold' : item.bold ? 'text-orange-400 hover:text-orange-300 hover:bg-white/5' : 'text-muted hover:text-text hover:bg-white/5'
+              onClick={() => { setPage(item.id); setSidebar(false) }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-500 transition-colors text-left ${
+                page === item.id ? 'bg-gold/15 text-gold' : 'text-muted hover:text-text hover:bg-white/5'
               }`}>
               {item.icon}{item.label}
             </button>
@@ -1444,7 +1503,7 @@ export default function App() {
         </div>
 
         <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
-          <span className="text-green font-700">● DATA</span> · EODHD<br />
+          <span className="text-green font-700">● DATA</span> · TIKR / EODHD<br />
           ⚠️ Prices: 15-20 min delay<br />
           Fundamentals: daily
         </div>
@@ -1478,7 +1537,7 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
-          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} />}
+          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={page} initExchange={page === 'screener' ? 'EZ' : page} initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'bestvalue'  && (user
             ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value" />
@@ -1498,7 +1557,6 @@ export default function App() {
             <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
           </div>
         )}
-          {page === 'research' && <ResearchPage />}
         {page === 'portfolio' && (
             user ? (
               <div className="p-8 space-y-4 fade-in">
