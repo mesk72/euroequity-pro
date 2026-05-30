@@ -52,6 +52,8 @@ const SECTORS = [
       { ticker: 'RIO', slug: 'rio', flag: '🇬🇧', company: 'Rio Tinto Group', tagline: 'The Institutional Quality Blueprint', value: 46, growth: 74 },
       { ticker: 'MT', slug: 'mt', flag: '🇱🇺', company: 'ArcelorMittal S.A.', tagline: 'Growth Momentum & Asymmetric Risk-Reward', value: 71, growth: 81 },
       { ticker: 'VOW3', slug: 'vow3', flag: '🇩🇪', company: 'Volkswagen AG', tagline: 'The Ultimate Value Paradox', value: 96, growth: 43 },
+      { ticker: 'RMS', slug: 'rms', flag: '🇫🇷', company: 'Hermès International', tagline: 'The Anti-Hype Thesis — Valuation Absurdity', value: 4, growth: 23 },
+      { ticker: 'MC', slug: 'mc', flag: '🇫🇷', company: 'LVMH Moët Hennessy Louis Vuitton', tagline: 'The Anti-Hype Thesis — Quantitative Red Flag', value: 8, growth: 36 },
     ],
   },
 ]
