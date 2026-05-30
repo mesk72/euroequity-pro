@@ -277,11 +277,8 @@ export default function StockPage() {
     )
   }
 
-  const chg = stock.change1d || 0
-
   const metrics = [
     { label:'Price',       val: fv(stock.price, 2),    color: 'var(--text)' },
-    { label:'1D Change',     val: fp(chg, 2),             color: clr(chg) },
     { label:'Mkt Cap €B',  val: stock.mktCap ? fv(stock.mktCap / 1000 * 0.92, 1) : '—', color: 'var(--text)' },
     { label:'P/E Trailing',  val: fv(stock.peTrail, 1),  color: 'var(--text)' },
     { label:'P/E Forward',   val: fv(stock.peFwd, 1),    color: 'var(--text)' },
