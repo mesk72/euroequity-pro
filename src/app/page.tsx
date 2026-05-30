@@ -628,6 +628,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   const [valMin,      setValMin]      = useState(initValMin)
   const [growMin,     setGrowMin]     = useState(initGrowMin)
   const [combinedMin, setCombinedMin] = useState(initCombinedMin)
+  const [showFilters, setShowFilters] = useState(false)
   const [peMax,    setPeMax]    = useState(0)
   const [pbMax,    setPbMax]    = useState(0)
   const [mom12Min, setMom12Min] = useState(0)
@@ -770,33 +771,55 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="bg-surface border border-border rounded p-3">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-          <div className="space-y-1.5">
-            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Valuation</div>
-            <input type="number" placeholder="P/E Fwd max" value={peMax || ''} onChange={e => setPeMax(+e.target.value || 0)} className="input-field" />
+      {/* Filters toggle button */}
+      {(() => {
+        const activeCount = [peMax>0, mom12Min>0, valMin>0, growMin>0, combinedMin>0, search.length>0, sector!=='All'].filter(Boolean).length
+        return (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFilters((f: boolean) => !f)}
+              className="flex items-center gap-2 px-3 py-2 rounded text-xs font-600 border transition-colors"
+              style={{ borderColor: activeCount > 0 ? 'var(--orange)' : 'var(--border)', color: activeCount > 0 ? 'var(--orange)' : 'var(--text3)' }}>
+              <span>⚙ Filters</span>
+              {activeCount > 0 && (
+                <span style={{ background: 'var(--orange)', color: '#000', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 800 }}>
+                  {activeCount}
+                </span>
+              )}
+              <span style={{ fontSize: 10 }}>{showFilters ? "▲" : "▼"}</span>
+            </button>
+            <span className="text-muted text-xs">{sorted.length} results</span>
+          </div>
+        )
+      })()}
 
-          </div>
-          <div className="space-y-1.5">
-            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Momentum</div>
-            <input type="number" placeholder="Mom 12M % min" value={mom12Min || ''} onChange={e => setMom12Min(+e.target.value || 0)} className="input-field" />
-          </div>
-          <div className="space-y-1.5">
-            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
-            <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" />
-            <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" />
-            <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
-          </div>
-          <div className="space-y-1.5">
-            <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
-            <input type="text" placeholder="Ticker / name" value={search} onChange={e => setSearch(e.target.value)} className="input-field" />
-            <select value={sector} onChange={e => setSector(e.target.value)} className="input-field">
-              {sectors.map(s => <option key={s}>{s}</option>)}
-            </select>
+      {showFilters && (
+        <div className="bg-surface border border-border rounded p-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <div className="space-y-1.5">
+              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Valuation</div>
+              <input type="number" placeholder="P/E Fwd max" value={peMax || ''} onChange={e => setPeMax(+e.target.value || 0)} className="input-field" />
+            </div>
+            <div className="space-y-1.5">
+              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Momentum</div>
+              <input type="number" placeholder="Mom 12M % min" value={mom12Min || ''} onChange={e => setMom12Min(+e.target.value || 0)} className="input-field" />
+            </div>
+            <div className="space-y-1.5">
+              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
+              <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+              <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+              <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+            </div>
+            <div className="space-y-1.5">
+              <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
+              <input type="text" placeholder="Ticker / name" value={search} onChange={e => setSearch(e.target.value)} className="input-field" />
+              <select value={sector} onChange={e => setSector(e.target.value)} className="input-field">
+                {sectors.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Status */}
       <div className="text-xs text-muted">
