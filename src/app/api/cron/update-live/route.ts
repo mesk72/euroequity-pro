@@ -10,11 +10,6 @@ import { createClient } from '@supabase/supabase-js'
 const LEEWAY_BASE = 'https://api.leeway.tech/api/v1/public'
 const LEEWAY_KEY  = process.env.LEEWAY_KEY || ''
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!  // service_role per poter scrivere
-)
-
 const EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
 
 async function fetchLiveQuotes(exchange: string) {
@@ -30,6 +25,11 @@ export async function GET(req: NextRequest) {
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   let total = 0
 
