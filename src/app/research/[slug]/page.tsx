@@ -178,7 +178,6 @@ const NOTES: Note[] = [
   },
 ]
 
-const NOTES
 
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
