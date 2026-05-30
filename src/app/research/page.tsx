@@ -61,6 +61,13 @@ const MONTHS = [
           { ticker: 'MC',   slug: 'mc',   flag: '🇫🇷', company: 'LVMH Moët Hennessy Louis Vuitton', tagline: 'The Anti-Hype Thesis — Quantitative Red Flag',   value: 8,  growth: 36 },
         ],
       },
+      {
+        name: 'Consumer Staples',
+        color: '#0891b2',
+        notes: [
+          { ticker: 'OR', slug: 'or', flag: '🇫🇷', company: "L'Oréal S.A.", tagline: 'High Quality, Deflating Premium', value: 14, growth: 28 },
+        ],
+      },
     ],
   },
 ]
