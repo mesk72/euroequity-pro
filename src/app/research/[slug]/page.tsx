@@ -169,7 +169,7 @@ const NOTES: Note[] = [
     ticker: 'MC', exchange: 'PA', slug: 'mc',
     company: 'LVMH Moët Hennessy Louis Vuitton', sector: 'Consumer Discretionary', subsector: 'Consumer Discretionary / Luxury Goods',
     flag: '🇫🇷', country: 'France', value_score: 8, growth_score: 36, universe: 'Excluded — Red Flag',
-    pdf: '/research/MC_ForwardAlpha.pdf',
+    pdf: '/research/MC_ForwardAlpha_v2.pdf',
     tagline: 'The Premium Illusion — Why Our Model Flags LVMH as a Quantitative Red Flag',
     subtitle: 'The era of effortless luxury compounding has transitioned into structural stagnation.',
     kpis: [['Value Score','8/100','Extreme fundamental overvaluation'],['Growth Score','36/100','Structural stagnation'],['NTM P/E','20.51x','Premium for flatline growth'],['2026E Revenue Growth','+0.2%','Dead flat YoY'],['EBITDA Growth','(4.2%)','Margin compression'],['Interest Expense','+102.1%','Debt servicing explosion']],
