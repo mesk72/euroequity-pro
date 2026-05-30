@@ -154,8 +154,31 @@ const NOTES: Note[] = [
     kpis: [['Value Score','96/100','Top 5% European Universe'],['Growth Score','43/100','Restructuring-driven growth'],['NTM P/E','4.34x','Extreme discount to earnings'],['Price / Book','0.26x','74% discount to book value'],['Fwd 2-Yr EPS CAGR','+36.8%','Operational leverage play'],['Dividend Yield','6.8%','+13.5% DPS growth 2026E']],
     highlights: ['<strong>Operational Leverage:</strong> EBIT margins projected to nearly double from 2.8% to 4.9% in 2026.','<strong>Earnings Inflection:</strong> Normalised Net Income forecast to surge +51.2% YoY in FY2026.','<strong>High Yield to Wait:</strong> 6.8% Dividend Yield with +13.5% DPS growth.','<strong>Structural Risks:</strong> €205.5B LTM Net Debt, fierce global EV competition.'],
     thesis: 'Volkswagen holds Value Score 96/100 — top 5% of our European equity universe. At 4.34x NTM P/E and 0.26x P/BV, the market prices in extreme scepticism. The bull case: if EBIT margins double and net income surges +51.2%, the re-rating potential is massive.',
+  },  {
+    ticker: 'RMS', exchange: 'PA', slug: 'rms',
+    company: 'Hermès International', sector: 'Consumer Discretionary', subsector: 'Consumer Discretionary / Luxury Goods',
+    flag: '🇫🇷', country: 'France', value_score: 4, growth_score: 23, universe: 'Excluded — Overvalued',
+    pdf: '/research/RMS_ForwardAlpha.pdf',
+    tagline: 'The Anti-Hype Thesis — The Valuation Absurdity',
+    subtitle: 'Brand exclusivity does not rewrite the laws of mathematics. A quantitative case against the luxury premium.',
+    kpis: [['Value Score','4/100','Extreme overvaluation'],['Growth Score','23/100','Stagnating fundamentals'],['NTM P/E','35.23x','Software-like premium'],['LTM P/BV','9.09x','Zero margin of safety'],['2026E EPS YoY','+3.6%','Severe growth slowdown'],['2026E CF/Share','(2.8%)',  'Cash flow contraction']],
+    highlights: ['<strong>Valuation Absurdity:</strong> 35.23x NTM P/E for a physical goods manufacturer with +3.6% EPS growth — paying tech multiples for bond-like returns.','<strong>Single-Digit Stagnation:</strong> Revenue +5.1% YoY, Forward 2-Year EBITDA CAGR of just 5.6% — no justification for a premium multiple.','<strong>Cash Flow Contraction:</strong> Cash Flow per Share projected to contract -2.8% YoY in 2026 — the ultimate red flag.','<strong>Momentum Exhaustion:</strong> 12-month price return of -0.6% proves the market is unwilling to sustain these multiples.'],
+    thesis: 'Hermès scores Value 4/100 and Growth 23/100 — placing it at the very bottom of our European universe. At 35.23x NTM P/E and 9.09x P/BV, the market prices RMS as a hyper-growth software company. Consensus projects +3.6% EPS growth and -2.8% CF/Share contraction for 2026. Until the price compresses to match its single-digit growth reality, Hermès is firmly excluded from our Alpha Universe.',
+  },
+  {
+    ticker: 'MC', exchange: 'PA', slug: 'mc',
+    company: 'LVMH Moët Hennessy Louis Vuitton', sector: 'Consumer Discretionary', subsector: 'Consumer Discretionary / Luxury Goods',
+    flag: '🇫🇷', country: 'France', value_score: 8, growth_score: 36, universe: 'Excluded — Red Flag',
+    pdf: '/research/MC_ForwardAlpha.pdf',
+    tagline: 'The Anti-Hype Thesis — A Quantitative Red Flag in Luxury',
+    subtitle: 'A brilliant brand portfolio does not automatically translate into efficient capital allocation.',
+    kpis: [['Value Score','8/100','Extreme fundamental overvaluation'],['Growth Score','36/100','Inefficient capital allocation'],['12M Momentum','-3.1%','Institutional distribution phase'],['NTM P/E','20.51x','Unjustified premium multiple'],['Fwd FCF YoY','(97.5%)', 'Severe cash burn trajectory'],['3-Yr EPS CAGR','(8.0%)','Historical bottom-line contraction']],
+    highlights: ['<strong>Momentum Breakdown:</strong> -3.1% 12-month price return — institutional capital distributing, not accumulating.','<strong>Growth Illusion:</strong> Forward 2-Year Revenue CAGR of 22.6% vs historical 3-year EPS CAGR of -8.0% — narrative vs reality.','<strong>FCF Collapse:</strong> CapEx projected to surge +91.6% YoY, causing FCF to plummet -97.5% and FCF margins to collapse from 21.7% to 0.4%.','<strong>Unjustified Premium:</strong> 20.51x NTM P/E for negative momentum, contracting EPS history and imminent FCF destruction.'],
+    thesis: 'LVMH scores Value 8/100 and Growth 36/100 — sitting at the absolute bottom of our European equity universe. Despite the iconic brand portfolio, our quantitative models detect severe structural inefficiencies: -8.0% historical 3-year EPS CAGR, FCF projected to collapse -97.5% YoY, and 12-month negative momentum. MC is a marketing masterpiece but a quantitative red flag. Firmly excluded from our Top 20% Alpha Universe.',
   },
 ]
+
+const NOTES
 
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
@@ -177,6 +200,28 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
+function JsonLd({ note }: { note: Note }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    'headline': `${note.company} (${note.ticker}) — ${note.tagline}`,
+    'description': note.thesis.slice(0, 200),
+    'author': { '@type': 'Organization', 'name': 'ForwardAlpha', 'url': 'https://forwardalpha.pro' },
+    'publisher': { '@type': 'Organization', 'name': 'ForwardAlpha', 'url': 'https://forwardalpha.pro' },
+    'datePublished': '2026-05-01',
+    'dateModified': '2026-05-29',
+    'url': `https://forwardalpha.pro/research/${note.slug}`,
+    'about': {
+      '@type': 'Corporation',
+      'name': note.company,
+      'tickerSymbol': note.ticker,
+      'exchange': note.exchange,
+    },
+    'keywords': `${note.ticker}, ${note.company}, ${note.sector}, quantitative research, European equities, ForwardAlpha`,
+  }
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+}
+
 export default function ResearchNotePage({ params }: { params: { slug: string } }) {
   const note = NOTES.find(n => n.slug === params.slug)
   if (!note) notFound()
@@ -185,6 +230,8 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
   const growthColor = note.growth_score >= 70 ? '#22c55e' : note.growth_score >= 50 ? '#f59e0b' : '#94a3b8'
 
   return (
+    <>
+    <JsonLd note={note} />
     <div style={{ minHeight: '100vh', background: 'var(--bg, #0d1117)', color: 'var(--text, #e2e8f0)', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px' }}>
 
@@ -271,6 +318,32 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
           </p>
         </div>
 
+        {/* Related Notes — Internal Linking */}
+        {(() => {
+          const related = NOTES.filter(n => n.slug !== note.slug && (n.sector === note.sector || n.slug === 'bnp' || n.slug === 'inga')).slice(0, 3)
+          if (related.length === 0) return null
+          return (
+            <div style={{ marginBottom: 28 }}>
+              <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: 12 }}>
+                Related Research
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+                {related.map(r => (
+                  <Link key={r.slug} href={`/research/${r.slug}`} style={{ textDecoration: 'none' }}>
+                    <div style={{ background: '#0f1923', border: '1px solid #334155', borderRadius: 6, padding: '12px 14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                        <span>{r.flag}</span>
+                        <span style={{ fontWeight: 700, color: '#f97316', fontSize: 13 }}>{r.ticker}</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: '#cbd5e1', lineHeight: 1.3 }}>{r.tagline.slice(0, 60)}...</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Disclaimer */}
         <div style={{ borderTop: '1px solid #1e293b', paddingTop: 16 }}>
           <p style={{ fontSize: 10, color: '#94a3b8', lineHeight: 1.5, margin: 0 }}>
@@ -284,5 +357,6 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
 
       </div>
     </div>
+    </>
   )
 }
