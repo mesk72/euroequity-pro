@@ -15,9 +15,10 @@ interface SectorData {
 interface Props {
   stocks:          Stock[]
   onSectorClick:   (sector: string) => void
+  useWeekly?:      boolean
 }
 
-function computeSectors(stocks: Stock[]): SectorData[] {
+function computeSectors(stocks: Stock[], useWeekly = false): SectorData[] {
   const map = new Map<string, Stock[]>()
   for (const s of stocks) {
     const sec = s.sector || 'Other'
@@ -27,10 +28,11 @@ function computeSectors(stocks: Stock[]): SectorData[] {
 
   const result: SectorData[] = []
   for (const [sector, ss] of Array.from(map.entries())) {
-    const valid = ss.filter(s => s.mktCap && s.change1d != null)
+    const field = useWeekly ? 'mom1w' : 'change1d'
+    const valid = ss.filter(s => s.mktCap && (s as any)[field] != null)
     const totalMkt = valid.reduce((a, s) => a + (s.mktCap || 0), 0)
     const mcwReturn = totalMkt > 0
-      ? valid.reduce((a, s) => a + (s.change1d || 0) * (s.mktCap || 0), 0) / totalMkt
+      ? valid.reduce((a, s) => a + ((s as any)[field] || 0) * (s.mktCap || 0), 0) / totalMkt
       : 0
     result.push({ sector, count: ss.length, mcwReturn, totalMktCap: totalMkt, stocks: ss })
   }
@@ -53,8 +55,8 @@ function getTextColor(ret: number): string {
   return Math.abs(ret) > 0.5 ? '#ffffff' : '#1f2937'
 }
 
-export default function SectorHeatmap({ stocks, onSectorClick }: Props) {
-  const sectors = computeSectors(stocks)
+export default function SectorHeatmap({ stocks, onSectorClick, useWeekly = false }: Props) {
+  const sectors = computeSectors(stocks, useWeekly)
   const maxMkt  = Math.max(...sectors.map(s => s.totalMktCap), 1)
 
   return (
