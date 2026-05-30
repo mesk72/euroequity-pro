@@ -176,17 +176,6 @@ const NOTES: Note[] = [
     highlights: ['<strong>Flatlined Top Line:</strong> 2026E Revenue at €80,940M — dead flat +0.2% YoY after 2025 contraction. Zero growth narrative.','<strong>Frozen Earnings:</strong> GAAP EPS growth stalled at +0.2% (€21.90) — failing to recover from the -13.0% drop in 2025.','<strong>Margin Compression:</strong> EBITDA contracting -4.2%, margins falling from 31.9% to 30.5%. ROE deteriorating 16.12% → 15.43%.','<strong>Interest Expense Shock:</strong> Debt servicing costs projected to explode +102.1% from -€401M to -€810M — capital efficiency decay accelerating.'],
     thesis: 'LVMH scores Value 8/100 and Growth 36/100 — bottom tier of our European universe. The era of effortless luxury compounding is over: revenue flat at +0.2%, EBITDA -4.2%, ROE deteriorating, interest expense doubling to €810M, CF/Share -11.6% and DPS frozen. Paying 20.51x NTM P/E for structural stagnation and zero margin of safety. Stripping away the luxury hype, the numbers do not lie.',
   },
-  {
-    ticker: 'OR', exchange: 'PA', slug: 'or',
-    company: "L\'Oréal S.A.", sector: 'Consumer Staples', subsector: 'Consumer Staples / Beauty & Personal Care',
-    flag: '🇫🇷', country: 'France', value_score: 14, growth_score: 28, universe: 'Excluded — Overvalued',
-    pdf: '/research/OR_ForwardAlpha.pdf',
-    tagline: "High Quality, Deflating Premium",
-    subtitle: "L\'Oréal represents a textbook example of a high-quality compounder hit by severe multiple compression.",
-    kpis: [['Value Score','14/100','Low — extreme overvaluation'],['Growth Score','28/100','Stagnating fundamentals'],['NTM P/E','27.78x','Premium for mid-single-digit growth'],['2026E Rev Growth','+4.9%','Mature growth reality'],['2026E FCF Growth','(1.0%)','Contracting cash flow'],['12M Price Return','(32.0%)','Institutional re-pricing']],
-    highlights: ['<strong>Valuation Trap:</strong> 27.78x NTM P/E for +4.9% revenue growth — paying growth premium for a mature compounder.','<strong>FCF Contraction:</strong> Free Cash Flow projected to decline -1.0% in 2026 — the quality moat is not translating to cash generation.','<strong>Institutional Exit:</strong> -32.0% 12-month price return signals institutional capital actively re-pricing the stock.','<strong>Operational Moat Intact but Irrelevant at This Price:</strong> 74.3% gross margin and 18.5% ROIC are undisputed — but the entry price destroys the alpha.'],
-    thesis: "L\'Oréal scores Value 14/100 and Growth 28/100. Despite an undisputed operational moat (74.3% gross margin, 18.5% ROIC), paying 27.78x NTM P/E for mid-single-digit growth and contracting FCF is fundamentally dilutive to portfolio alpha. The -32.0% 12-month price return confirms institutional re-pricing is already underway. Our quantitative model rejects the current premium. Avoid until multiples fully correct.",
-  },
 
   {
     ticker: 'ABBN', exchange: 'SWX', slug: 'abbn',
