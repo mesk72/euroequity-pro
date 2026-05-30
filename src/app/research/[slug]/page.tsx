@@ -176,7 +176,6 @@ const NOTES: Note[] = [
     highlights: ['<strong>Momentum Breakdown:</strong> -3.1% 12-month price return — institutional capital distributing, not accumulating.','<strong>Growth Illusion:</strong> Forward 2-Year Revenue CAGR of 22.6% vs historical 3-year EPS CAGR of -8.0% — narrative vs reality.','<strong>FCF Collapse:</strong> CapEx projected to surge +91.6% YoY, causing FCF to plummet -97.5% and FCF margins to collapse from 21.7% to 0.4%.','<strong>Unjustified Premium:</strong> 20.51x NTM P/E for negative momentum, contracting EPS history and imminent FCF destruction.'],
     thesis: 'LVMH scores Value 8/100 and Growth 36/100 — sitting at the absolute bottom of our European equity universe. Despite the iconic brand portfolio, our quantitative models detect severe structural inefficiencies: -8.0% historical 3-year EPS CAGR, FCF projected to collapse -97.5% YoY, and 12-month negative momentum. MC is a marketing masterpiece but a quantitative red flag. Firmly excluded from our Top 20% Alpha Universe.',
   },
-]
   {
     ticker: 'OR', exchange: 'PA', slug: 'or',
     company: "L\'Oréal S.A.", sector: 'Consumer Staples', subsector: 'Consumer Staples / Beauty & Personal Care',
@@ -189,6 +188,7 @@ const NOTES: Note[] = [
     thesis: "L\'Oréal scores Value 14/100 and Growth 28/100. Despite an undisputed operational moat (74.3% gross margin, 18.5% ROIC), paying 27.78x NTM P/E for mid-single-digit growth and contracting FCF is fundamentally dilutive to portfolio alpha. The -32.0% 12-month price return confirms institutional re-pricing is already underway. Our quantitative model rejects the current premium. Avoid until multiples fully correct.",
   },
 
+]
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
 }
