@@ -24,6 +24,7 @@ const MONTHS = [
           { ticker: 'BNP',  slug: 'bnp',  flag: '🇫🇷', company: 'BNP Paribas S.A.',             tagline: 'Deep Value & Resilient Income Engine',              value: 79, growth: 64 },
           { ticker: 'INGA', slug: 'inga', flag: '🇳🇱', company: 'ING Groep N.V.',                tagline: 'A Rare Blueprint for Financial Sector GARP',        value: 75, growth: 60 },
           { ticker: 'UBSG', slug: 'ubsg', flag: '🇨🇭', company: 'UBS Group AG',                  tagline: 'Operational Leverage at Scale',                     value: 69, growth: 65 },
+          { ticker: 'BARC', slug: 'barc', flag: '🇬🇧', company: 'Barclays PLC',                tagline: 'Re-Accelerating Capital Machine',                        value: 77, growth: 62 },
         ],
       },
       {
@@ -51,6 +52,7 @@ const MONTHS = [
           { ticker: 'RIO',  slug: 'rio',  flag: '🇬🇧', company: 'Rio Tinto Group',               tagline: 'The Institutional Quality Blueprint',               value: 46, growth: 74 },
           { ticker: 'MT',   slug: 'mt',   flag: '🇱🇺', company: 'ArcelorMittal S.A.',             tagline: 'Growth Momentum & Asymmetric Risk-Reward',          value: 71, growth: 81 },
           { ticker: 'VOW3', slug: 'vow3', flag: '🇩🇪', company: 'Volkswagen AG',                  tagline: 'The Ultimate Value Paradox',                        value: 96, growth: 43 },
+          { ticker: 'ABBN', slug: 'abbn', flag: '🇨🇭', company: 'ABB Ltd',                     tagline: 'Industrial Megatrends Unleashed — Quality Growth',       value: 17, growth: 82 },
         ],
       },
       {
