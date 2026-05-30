@@ -1482,8 +1482,10 @@ export default function App() {
           {nav.map(item => (
             <button key={item.id}
               onClick={() => { if (item.id === 'research') { window.location.href = '/research'; } else { setPage(item.id); setSidebar(false) } }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-500 transition-colors text-left ${
-                page === item.id ? 'bg-gold/15 text-gold' : 'text-muted hover:text-text hover:bg-white/5'
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors text-left ${
+                item.bold ? 'font-700' : 'font-500'
+              } ${
+                page === item.id ? 'bg-gold/15 text-gold' : item.bold ? 'text-orange-400 hover:text-orange-300 hover:bg-white/5' : 'text-muted hover:text-text hover:bg-white/5'
               }`}>
               {item.icon}{item.label}
             </button>
