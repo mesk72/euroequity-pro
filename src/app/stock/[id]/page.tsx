@@ -352,10 +352,7 @@ export default function StockPage() {
                ['CPSE'].includes(stock.exchange) ? 'kr' :
                '€'}{fv(stock.price, 2)}
               </span>
-              <span style={{ fontSize:20, fontFamily:'IBM Plex Mono', fontWeight:700,
-                color: chg >= 0 ? 'var(--green)' : 'var(--red)' }}>
-                {fp(chg, 2)}
-              </span>
+
             </div>
             <div style={{ fontSize:14, color:'var(--text3)', marginTop:4 }}>
               {stock.company}
