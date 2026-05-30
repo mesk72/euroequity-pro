@@ -50,8 +50,6 @@ const MONTHS = [
         color: '#16a34a',
         notes: [
           { ticker: 'RIO',  slug: 'rio',  flag: '🇬🇧', company: 'Rio Tinto Group',               tagline: 'The Institutional Quality Blueprint',               value: 46, growth: 74 },
-          { ticker: 'MT',   slug: 'mt',   flag: '🇱🇺', company: 'ArcelorMittal S.A.',             tagline: 'Growth Momentum & Asymmetric Risk-Reward',          value: 71, growth: 81 },
-          { ticker: 'VOW3', slug: 'vow3', flag: '🇩🇪', company: 'Volkswagen AG',                  tagline: 'The Ultimate Value Paradox',                        value: 96, growth: 43 },
           { ticker: 'ABBN', slug: 'abbn', flag: '🇨🇭', company: 'ABB Ltd',                     tagline: 'Industrial Megatrends Unleashed — Quality Growth',       value: 17, growth: 82 },
         ],
       },
@@ -59,8 +57,14 @@ const MONTHS = [
         name: 'Consumer Discretionary & Luxury',
         color: '#c026d3',
         notes: [
-          { ticker: 'RMS',  slug: 'rms',  flag: '🇫🇷', company: 'Hermès International',           tagline: 'The Anti-Hype Thesis — Valuation Absurdity',        value: 4,  growth: 23 },
           { ticker: 'MC',   slug: 'mc',   flag: '🇫🇷', company: 'LVMH Moët Hennessy Louis Vuitton', tagline: 'The Anti-Hype Thesis — Quantitative Red Flag',   value: 8,  growth: 36 },
+        ],
+      },
+      {
+        name: 'Consumer Discretionary & Automotive',
+        color: '#b45309',
+        notes: [
+          { ticker: 'VOW3', slug: 'vow3', flag: '🇩🇪', company: 'Volkswagen AG', tagline: 'The Ultimate Value Paradox', value: 96, growth: 43 },
         ],
       },
     ],
