@@ -1,9 +1,9 @@
 'use client'
 
-import { FileText, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
-  LayoutDashboard, Search, Briefcase, Globe, Info,
+  FileText, LayoutDashboard, Search, Briefcase, Globe, Info,
   LogIn, LogOut, User, Menu, X, RefreshCw,
   ChevronUp, ChevronDown, TrendingUp, TrendingDown
 } from 'lucide-react'
