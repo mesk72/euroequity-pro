@@ -788,7 +788,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
               )}
               <span style={{ fontSize: 10 }}>{showFilters ? "▲" : "▼"}</span>
             </button>
-            <span className="text-muted text-xs">{sorted.length} results</span>
+            <span className="text-muted text-xs">{filtered.length} results</span>
           </div>
         )
       })()}
