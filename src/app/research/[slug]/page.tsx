@@ -177,7 +177,17 @@ const NOTES: Note[] = [
     thesis: 'LVMH scores Value 8/100 and Growth 36/100 — sitting at the absolute bottom of our European equity universe. Despite the iconic brand portfolio, our quantitative models detect severe structural inefficiencies: -8.0% historical 3-year EPS CAGR, FCF projected to collapse -97.5% YoY, and 12-month negative momentum. MC is a marketing masterpiece but a quantitative red flag. Firmly excluded from our Top 20% Alpha Universe.',
   },
 ]
-
+  {
+    ticker: 'OR', exchange: 'PA', slug: 'or',
+    company: "L\'Oréal S.A.", sector: 'Consumer Staples', subsector: 'Consumer Staples / Beauty & Personal Care',
+    flag: '🇫🇷', country: 'France', value_score: 14, growth_score: 28, universe: 'Excluded — Overvalued',
+    pdf: '/research/OR_ForwardAlpha.pdf',
+    tagline: "High Quality, Deflating Premium",
+    subtitle: "L\'Oréal represents a textbook example of a high-quality compounder hit by severe multiple compression.",
+    kpis: [['Value Score','14/100','Low — extreme overvaluation'],['Growth Score','28/100','Stagnating fundamentals'],['NTM P/E','27.78x','Premium for mid-single-digit growth'],['2026E Rev Growth','+4.9%','Mature growth reality'],['2026E FCF Growth','(1.0%)','Contracting cash flow'],['12M Price Return','(32.0%)','Institutional re-pricing']],
+    highlights: ['<strong>Valuation Trap:</strong> 27.78x NTM P/E for +4.9% revenue growth — paying growth premium for a mature compounder.','<strong>FCF Contraction:</strong> Free Cash Flow projected to decline -1.0% in 2026 — the quality moat is not translating to cash generation.','<strong>Institutional Exit:</strong> -32.0% 12-month price return signals institutional capital actively re-pricing the stock.','<strong>Operational Moat Intact but Irrelevant at This Price:</strong> 74.3% gross margin and 18.5% ROIC are undisputed — but the entry price destroys the alpha.'],
+    thesis: "L\'Oréal scores Value 14/100 and Growth 28/100. Despite an undisputed operational moat (74.3% gross margin, 18.5% ROIC), paying 27.78x NTM P/E for mid-single-digit growth and contracting FCF is fundamentally dilutive to portfolio alpha. The -32.0% 12-month price return confirms institutional re-pricing is already underway. Our quantitative model rejects the current premium. Avoid until multiples fully correct.",
+  },
 
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
