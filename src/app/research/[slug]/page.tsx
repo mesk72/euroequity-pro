@@ -329,7 +329,7 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
 
         {/* Related Notes — Internal Linking */}
         {(() => {
-          const related = NOTES.filter(n => n.slug !== note.slug && (n.sector === note.sector || n.slug === 'bnp' || n.slug === 'inga')).slice(0, 3)
+          const related = NOTES.filter(n => n.slug !== note.slug && n.sector === note.sector).slice(0, 3)
           if (related.length === 0) return null
           return (
             <div style={{ marginBottom: 28 }}>
