@@ -240,7 +240,7 @@ export default function StockPage() {
   useEffect(() => {
     if (!ticker || !exchangeCode) return
     setLoading(true)
-    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}`)
+    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store' })
       .then(r => r.ok ? r.json() : { history: [] })
       .then(d => { setHistory(d.history || []); setLoading(false) })
       .catch(() => setLoading(false))
@@ -282,15 +282,15 @@ export default function StockPage() {
   const metrics = [
     { label:'Price',       val: fv(stock.price, 2),    color: 'var(--text)' },
     { label:'1D Change',     val: fp(chg, 2),             color: clr(chg) },
-    { label:'Mkt Cap B',   val: fv(stock.mktCap, 1),   color: 'var(--text)' },
+    { label:'Mkt Cap €B',  val: stock.mktCap ? fv(stock.mktCap / 1000 * 0.92, 1) : '—', color: 'var(--text)' },
     { label:'P/E Trailing',  val: fv(stock.peTrail, 1),  color: 'var(--text)' },
     { label:'P/E Forward',   val: fv(stock.peFwd, 1),    color: 'var(--text)' },
-    { label:'EPS Growth %',  val: fpPct(stock.epsGrowth, 1), color: clr(stock.epsGrowth) },
-    { label:'Rev Growth %',  val: fpPct(stock.revGrowth, 1), color: clr(stock.revGrowth) },
-    { label:'Mom 1 Week',    val: fp(stock.mom1w, 1),    color: clr(stock.mom1w) },
-    { label:'Mom 1 Month',   val: fp(stock.mom1m, 1),    color: clr(stock.mom1m) },
-    { label:'Mom 6 Months',  val: fp(stock.mom6m, 1),    color: clr(stock.mom6m) },
-    { label:'Mom 12 Months', val: fp(stock.mom12m, 1),   color: clr(stock.mom12m) },
+    { label:'EPS Growth %',  val: stock.epsGrowth != null ? fp(stock.epsGrowth * 100, 1) : '—', color: clr(stock.epsGrowth) },
+    { label:'Rev Growth %',  val: stock.revGrowth != null ? fp(stock.revGrowth * 100, 1) : '—', color: clr(stock.revGrowth) },
+    { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
+    { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
+    { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
+    { label:'Mom 12 Months', val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—', color: clr(stock.mom12m) },
   ]
 
   return (
