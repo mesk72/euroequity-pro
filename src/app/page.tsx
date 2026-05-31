@@ -1610,7 +1610,12 @@ export default function App() {
           </div>
         )}
           {page === 'research' && <ResearchPage />}
-        {page === 'portfolio' && (
+        {page === 'myscreen' && (
+            user
+              ? <MyScreen userId={user.id} onSelectStock={setDetailStock} />
+              : <LoginGate onLogin={() => setShowAuth(true)} title="My Screen" />
+          )}
+          {page === 'portfolio' && (
             user ? (
               <div className="p-8 space-y-4 fade-in">
                 <div className="section-hdr">💼 Portfolio</div>
