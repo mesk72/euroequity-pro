@@ -179,7 +179,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                 <span className="text-[9px] font-600" style={{ color: getSectorColor(s.sector) }}>{s.sector || '-'}</span>
               </div>
               <div className="flex gap-2 text-[10px] font-mono">
-                <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${s.mktCap.toFixed(1)}B` : '-'}</span></span>
+                <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${(s.mktCap / 1000 * 0.92).toFixed(1)}B` : '-'}</span></span>
                 <span className="text-[#444]">|</span>
                 <span className="text-muted">P/E: <span className="text-sub">{fv(s.peTrail, 1)}</span></span>
                 <span className="text-[#444]">|</span>
@@ -245,7 +245,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.change1d)}>
                     {s.change1d != null ? fpd(s.change1d / 100) : '-'}
                   </td>
-                  <td className="font-mono text-right text-[12px]">{s.mktCapEur != null ? fv(s.mktCapEur, 1) : s.mktCap != null ? fv(s.mktCap * 0.000001 * 0.92, 1) : '-'}</td>
+                  <td className="font-mono text-right text-[12px]">{s.mktCapEur != null ? fv(s.mktCapEur, 1) : s.mktCap != null ? fv(s.mktCap / 1000 * 0.92, 1) : '-'}</td>
                   <td className="font-mono text-right text-[12px]">{fv(s.peTrail, 1)}</td>
                   <td className="font-mono text-right text-[12px]">{fv(s.peFwd, 1)}</td>
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.epsGrowth)}>{fpd(s.epsGrowth)}</td>
