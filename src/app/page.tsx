@@ -313,9 +313,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                 <span className="font-mono font-600 text-sm text-text">
                   {s.price != null ? s.price.toFixed(2) : '-'}
                 </span>
-                <span className="font-mono text-xs font-600 text-muted hidden ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
-
-                </span>
               </div>
             </div>
             <div className="flex items-center justify-between mb-1">
