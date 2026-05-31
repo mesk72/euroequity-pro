@@ -1466,6 +1466,7 @@ export default function App() {
     { id: 'bestvalue'  as Page, label: 'Best Value',    icon: <TrendingUp size={16} /> },
     { id: 'bestgrowth' as Page, label: 'Best Growth',   icon: <TrendingUp size={16} /> },
     { id: 'sectors'    as Page, label: 'Sectors',       icon: <Globe size={16} /> },
+    { id: 'myscreen'   as Page, label: '⭐ My Screen',   icon: <Star size={16} /> },
     { id: 'VI'         as Page, label: '🇦🇹 Austria',     icon: <Globe size={16} /> },
     { id: 'BR'         as Page, label: '🇧🇪 Belgium',     icon: <Globe size={16} /> },
     { id: 'CPSE'       as Page, label: '🇩🇰 Denmark',     icon: <Globe size={16} /> },
