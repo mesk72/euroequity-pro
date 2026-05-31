@@ -1,3 +1,20 @@
+
+
+Vai ai contenuti
+Utilizzo di Gmail con gli screen reader
+Attiva notifiche desktop per Gmail.
+   OK  No, grazie
+1 di 8.180
+(nessun oggetto)
+Posta in arrivo
+
+Andrea Meschini <andreameschini19@gmail.com>
+Allegati
+03:27 (0 minuti fa)
+a me
+
+ Un allegato
+  •  Scansionato da Gmail
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -494,7 +511,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
   const [history,   setHistory]   = useState<any[]>([])
   const [loadingChart, setLoadingChart] = useState(true)
   const [qty,  setQty]  = useState('')
-  const [px,   setPx]   = useState(stock.price?.toFixed(2) || '')
+  const [px,   setPx]   = useState((stock as any).price?.toFixed(2) || '')
   const [pf,   setPf]   = useState(portfolioNames[0] || 'Portfolio 1')
 
   useEffect(() => {
@@ -505,20 +522,21 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     })
   }, [stock.ticker, stock.exchange, chartDays])
 
+  const s = stock as any
   const metrics: [string, string, string][] = [
-    ['Price',        fv(stock.price, 2),       ''],
-    ['Mkt Cap B',    fv(stock.mktCap, 1),       ''],
-    ['P/E Trailing', fv(stock.peTrail, 1),      ''],
-    ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
-    ['P/B',          fv(stock.pb, 2),           ''],
-    ['EPS Gr %',     fpd(stock.epsGrowth),      clr(stock.epsGrowth)],
-    ['Rev Gr %',     fpd(stock.revGrowth),      clr(stock.revGrowth)],
-    ['Mom 1W %',     fpd(stock.mom1w),          clr(stock.mom1w)],
-    ['Mom 1M %',     fpd(stock.mom1m),          clr(stock.mom1m)],
-    ['Mom 6M %',     fpd(stock.mom6m),          clr(stock.mom6m)],
-    ['Mom 12M %',    fpd(stock.mom12m),         clr(stock.mom12m)],
-    ['Sector',       stock.sector || '-',       ''],
-    ['Country',      stock.country || '-',      ''],
+    ['Price',        fv(s.price, 2),       ''],
+    ['Mkt Cap B',    fv(s.mktCap, 1),      ''],
+    ['P/E Trailing', fv(s.peTrail, 1),     ''],
+    ['P/E Fwd',      fv(s.peFwd, 1),       ''],
+    ['P/B',          fv(s.pb, 2),          ''],
+    ['EPS Gr %',     fpd(s.epsGrowth),     clr(s.epsGrowth)],
+    ['Rev Gr %',     fpd(s.revGrowth),     clr(s.revGrowth)],
+    ['Mom 1W %',     fpd(s.mom1w),         clr(s.mom1w)],
+    ['Mom 1M %',     fpd(s.mom1m),         clr(s.mom1m)],
+    ['Mom 6M %',     fpd(s.mom6m),         clr(s.mom6m)],
+    ['Mom 12M %',    fpd(s.mom12m),        clr(s.mom12m)],
+    ['Sector',       s.sector || '-',      ''],
+    ['Country',      s.country || '-',     ''],
   ]
 
   return (
@@ -527,7 +545,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
         <div>
           <div className="font-700 text-base text-text">
             {stock.flag} {stock.ticker}
-            <span className="ml-2 font-mono text-sm text-muted">span>
+            <span className="ml-2 font-mono text-sm text-muted"></span>
           </div>
           <div className="text-xs text-muted">{stock.company} · {stock.exchange}</div>
           {stock.sector && (
@@ -1575,3 +1593,5 @@ export default function App() {
     </div>
   )
 }
+page_tsx_final.txt
+Visualizzazione di page_tsx_final.txt.
