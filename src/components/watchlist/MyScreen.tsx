@@ -138,6 +138,23 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
     </div>
   )
 
+  // Calcola medie equally weighted
+  const avg = (field: keyof WatchStock) => {
+    const vals = stocks
+      .map(s => s[field] as number | null | undefined)
+      .filter(v => v != null && !isNaN(v as number)) as number[]
+    if (vals.length === 0) return null
+    return vals.reduce((a, b) => a + b, 0) / vals.length
+  }
+
+  const avgMktCap = (() => {
+    const vals = stocks
+      .map(s => s.mktCapEur ?? (s.mktCap != null ? s.mktCap / 1000 * 0.92 : null))
+      .filter(v => v != null) as number[]
+    if (vals.length === 0) return null
+    return vals.reduce((a, b) => a + b, 0) / vals.length
+  })()
+
   return (
     <div className="space-y-4 fade-in">
       <div className="section-hdr flex items-center gap-2">
@@ -262,6 +279,36 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   </td>
                 </tr>
               ))}
+              {/* Average row */}
+              {stocks.length > 1 && (
+                <tr style={{ borderTop: '2px solid rgba(249,115,22,0.3)', background: 'rgba(249,115,22,0.04)' }}>
+                  <td style={{ position: 'sticky', left: 0, background: '#120f0a', zIndex: 1, boxShadow: '2px 0 4px rgba(0,0,0,0.3)' }}>
+                    <span className="font-700 text-[11px] text-orange-400">∅ Average</span>
+                    <span className="text-[9px] text-muted ml-1">{stocks.length} stocks</span>
+                  </td>
+                  <td></td>
+                  <td></td>
+                  <td className="font-mono text-right text-[12px] font-700"></td>
+                  <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('change1d'))}>
+                    {avg('change1d') != null ? fpd((avg('change1d') as number) / 100) : '-'}
+                  </td>
+                  <td className="font-mono text-right text-[12px] font-700">
+                    {avgMktCap != null ? fv(avgMktCap, 1) : '-'}
+                  </td>
+                  <td className="font-mono text-right text-[12px] font-700">{avg('peTrail') != null ? fv(avg('peTrail'), 1) : '-'}</td>
+                  <td className="font-mono text-right text-[12px] font-700">{avg('peFwd') != null ? fv(avg('peFwd'), 1) : '-'}</td>
+                  <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('epsGrowth'))}>{fpd(avg('epsGrowth'))}</td>
+                  <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('revGrowth'))}>{fpd(avg('revGrowth'))}</td>
+                  <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('mom1w'))}>{fpd(avg('mom1w'))}</td>
+                  <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('mom1m'))}>{fpd(avg('mom1m'))}</td>
+                  <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('mom6m'))}>{fpd(avg('mom6m'))}</td>
+                  <td className="font-mono text-right font-700 text-[12px]" style={clrStyle(avg('mom12m'))}>{fpd(avg('mom12m'))}</td>
+                  <td className="font-mono text-center text-[12px] font-700" style={{ color: '#3b82f6' }}>{avg('valueScore') != null ? fv(avg('valueScore'), 1) : '-'}</td>
+                  <td className="font-mono text-center text-[12px] font-700" style={{ color: '#22c55e' }}>{avg('growthScore') != null ? fv(avg('growthScore'), 1) : '-'}</td>
+                  <td className="font-mono text-center font-700 text-[12px]" style={{ color: 'var(--orange)' }}>{avg('combined_rank') != null ? fv(avg('combined_rank'), 1) : '-'}</td>
+                  <td></td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
