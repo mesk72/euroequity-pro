@@ -40,7 +40,6 @@ const MONTHS = [
         color: '#16a34a',
         notes: [
           { ticker: 'RIO',  slug: 'rio',  flag: '🇬🇧', company: 'Rio Tinto Group',               tagline: 'The Institutional Quality Blueprint',               value: 46, growth: 74 },
-          { ticker: 'ABBN', slug: 'abbn', flag: '🇨🇭', company: 'ABB Ltd',                     tagline: 'Industrial Megatrends Unleashed — Quality Growth',       value: 17, growth: 82 },
         ],
       },
       {
