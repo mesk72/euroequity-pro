@@ -55,6 +55,7 @@ export default function WatchlistButton({ stock, userId }: Props) {
         ticker: stock.ticker,
         exchange: stock.exchange,
         company: stock.company,
+        combined_rank: (stock as any).combinedRank ?? null,
       })
       setInList(true)
       toast.success(`${stock.ticker} added to My Screen`)
