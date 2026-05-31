@@ -1024,12 +1024,43 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
 
   // KPI V+G >= 80 - entrambi i rank >= 70 (titoli con buon value E buon growth)
-  // Best Combined: titoli con V>=60 G>=60 e media >= 80 (proxy per combinedRank>=80)
-  const highVG = u200.filter((s:any) =>
-    s.valueScore != null && s.growthScore != null &&
-    s.valueScore >= 60 && s.growthScore >= 60 &&
-    (s.valueScore + s.growthScore) / 2 >= 80
-  ).length
+  // Best Combined: calcolo identico al Best Ideas screen (combinedRank >= 80 su All Europe)
+  const ey_d = (pe: number | null) => (pe && pe !== 0 && Math.abs(pe) <= 200) ? 1/pe : null
+  const pRk  = (vals: number[], v: number) => vals.length ? Math.round(vals.filter(x => x < v).length / vals.length * 100) : null
+
+  const eyTV  = allStocks.map((s:any) => ey_d(s.peTrail)).filter((v:any) => v != null) as number[]
+  const eyFV  = allStocks.map((s:any) => ey_d(s.peFwd)).filter((v:any) => v != null) as number[]
+  const pbV   = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0 && v < 50) as number[]
+  const egV   = allStocks.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
+  const rgV   = allStocks.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
+  const m6AV  = allStocks.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
+  const m12AV = allStocks.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null).filter((v:any) => v != null) as number[]
+
+  const calcEuroScore = (s: any) => {
+    const eyt = ey_d(s.peTrail); const eyf = ey_d(s.peFwd)
+    const pet = eyt != null ? (s.peTrail > 200 ? 1 : pRk(eyTV, eyt)) : null
+    const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pRk(eyFV, eyf)) : null
+    const pb  = s.pb != null && s.pb > 0 && s.pb < 50 ? (100 - pRk(pbV, s.pb)!) : null
+    const vc  = [pet,pef,pb].filter((v:any) => v != null) as number[]
+    const eV  = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
+    const m6a = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
+    const m12a= s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null
+    const eg  = s.epsGrowth != null ? pRk(egV,  s.epsGrowth) : null
+    const rg  = s.revGrowth != null ? pRk(rgV,  s.revGrowth) : null
+    const m6r = m6a  != null ? pRk(m6AV,  m6a)  : null
+    const m12r= m12a != null ? pRk(m12AV, m12a) : null
+    const gc  = [eg,rg,m6r,m12r].filter((v:any) => v != null) as number[]
+    const eG  = gc.length >= 2 ? gc.reduce((a:number,b:number)=>a+b,0)/gc.length : null
+    return eV != null && eG != null ? (eV + eG) / 2 : null
+  }
+
+  const allScores = u200.map(calcEuroScore).filter((v:any) => v != null) as number[]
+  const highVG = u200.filter((s:any) => {
+    const c = calcEuroScore(s)
+    if (c == null) return false
+    const rank = Math.round(allScores.filter(v => v < c).length / allScores.length * 100)
+    return rank >= 80
+  }).length
 
   return (
     <div className="space-y-6 fade-in">
