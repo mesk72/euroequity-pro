@@ -40,6 +40,7 @@ interface WatchStock {
   price?: number | null
   change1d?: number | null
   mktCap?: number | null
+  mktCapEur?: number | null
   peTrail?: number | null
   peFwd?: number | null
   epsGrowth?: number | null
@@ -51,6 +52,7 @@ interface WatchStock {
   valueScore?: number | null
   growthScore?: number | null
   combinedRank?: number | null
+  combined_rank?: number | null
 }
 
 interface Props {
@@ -192,7 +194,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                 <span className="text-[#444]">|</span>
                 <span className="text-muted">Grw: <span style={{ color: '#22c55e' }}>{fn(s.growthScore)}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">Best: <span style={{ color: 'var(--orange)' }}>{fn(s.combinedRank)}</span></span>
+                <span className="text-muted">Best: <span style={{ color: 'var(--orange)' }}>{fn(s.combined_rank ?? s.combinedRank)}</span></span>
               </div>
             </div>
           ))}
@@ -243,7 +245,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.change1d)}>
                     {s.change1d != null ? fpd(s.change1d / 100) : '-'}
                   </td>
-                  <td className="font-mono text-right text-[12px]">{s.mktCap != null ? fv(s.mktCap, 1) : '-'}</td>
+                  <td className="font-mono text-right text-[12px]">{s.mktCapEur != null ? fv(s.mktCapEur, 1) : s.mktCap != null ? fv(s.mktCap * 0.000001 * 0.92, 1) : '-'}</td>
                   <td className="font-mono text-right text-[12px]">{fv(s.peTrail, 1)}</td>
                   <td className="font-mono text-right text-[12px]">{fv(s.peFwd, 1)}</td>
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.epsGrowth)}>{fpd(s.epsGrowth)}</td>
@@ -254,7 +256,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   <td className="font-mono text-right font-700 text-[12px]" style={clrStyle(s.mom12m)}>{fpd(s.mom12m)}</td>
                   <td className="font-mono text-center text-[12px]" style={{ color: '#3b82f6' }}>{fn(s.valueScore)}</td>
                   <td className="font-mono text-center text-[12px]" style={{ color: '#22c55e' }}>{fn(s.growthScore)}</td>
-                  <td className="font-mono text-center font-700 text-[12px]" style={{ color: 'var(--orange)' }}>{fn(s.combinedRank)}</td>
+                  <td className="font-mono text-center font-700 text-[12px]" style={{ color: 'var(--orange)' }}>{fn(s.combined_rank ?? s.combinedRank)}</td>
                   <td onClick={(e) => remove(e, s.id)} className="cursor-pointer text-muted hover:text-red-400 transition-colors text-center">
                     <Trash2 size={13} />
                   </td>
