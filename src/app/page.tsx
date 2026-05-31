@@ -614,11 +614,12 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 }
 
 // - SCREENER -
-function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, initValMin = 0, initGrowMin = 0, initCombinedMin = 0, showAll = false }: {
+function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, userId = null, initValMin = 0, initGrowMin = 0, initCombinedMin = 0, showAll = false }: {
   initExchange?: string
   initSector?:   string
   initEpsMom?:   string
   onSelectStock?: (s: Stock) => void
+  userId?: string | null
   initValMin?: number
   initGrowMin?: number
   initCombinedMin?: number
@@ -836,7 +837,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Table */}
       <div className="bg-surface border border-border rounded overflow-hidden">
-        <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={showAll ? 9999 : 100} />
+        <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={showAll ? 9999 : 100} userId={userId} />
       </div>
     </div>
   )
@@ -1588,20 +1589,20 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
-          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} />}
+          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'bestvalue'  && (user
-            ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={80} initGrowMin={30} showAll={true} />
+            ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value" />
           )}
           {page === 'bestideas'  && (user
-            ? <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
+            ? <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas" />
           )}
           {page === 'bestgrowth' && (user
-            ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} initValMin={0} initGrowMin={80} showAll={true} />
+            ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
           )}
-          {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
+          {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'about'     && (
           <div className="flex-1 overflow-y-auto">
