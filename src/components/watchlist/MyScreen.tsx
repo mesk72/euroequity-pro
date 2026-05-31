@@ -60,7 +60,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
     if (!data || data.length === 0) { setStocks([]); setLoading(false); return }
 
     // Carica dati live per ogni titolo
-    const exchanges = [...new Set(data.map((s: any) => s.exchange))]
+    const exchanges = data.map((s: any) => s.exchange).filter((ex: string, i: number, arr: string[]) => arr.indexOf(ex) === i)
     const liveMap: Record<string, any> = {}
 
     await Promise.all(exchanges.map(async (ex) => {
