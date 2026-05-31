@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   FileText, LayoutDashboard, Search, Briefcase, Globe, Info,
   LogIn, LogOut, User, Menu, X, RefreshCw,
-  ChevronUp, ChevronDown, TrendingUp, TrendingDown
+  ChevronUp, ChevronDown, TrendingUp, TrendingDown, Star
 } from 'lucide-react'
 import { supabase, createProfile, ensureDefaultPortfolios } from '@/lib/supabase'
 import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/constants'
