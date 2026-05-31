@@ -16,6 +16,8 @@ import ResearchPage from '@/components/research/ResearchPage'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
+import WatchlistButton from '@/components/watchlist/WatchlistButton'
+import MyScreen from '@/components/watchlist/MyScreen'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
 
@@ -95,7 +97,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'research' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'AIM' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'AT' | 'CPSE' | 'NGM' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -223,6 +225,7 @@ const COLUMNS: ColDef[] = [
   { key: 'valueScore',  label: 'Value',     width: 55  },
   { key: 'growthScore', label: 'Growth',    width: 60  },
 ]
+// WatchlistButton viene aggiunto nella riga
 
 function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: React.CSSProperties; sectorColor?: string; flag?: string } {
   const v = s[key] as number | null
@@ -249,11 +252,12 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
   }
 }
 
-function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
+function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }: {
   stocks: Stock[]
   onSelect: (s: Stock) => void
   loading?: boolean
   maxRows?: number
+  userId?: string | null
 }) {
   const [sortKey, setSortKey] = useState<SortKey>('mktCap')
   const [sortAsc, setSortAsc] = useState(false)
@@ -309,6 +313,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
               <div className="flex items-center gap-2">
                 <span className="font-700 text-sm text-orange">{s.flag} {s.ticker}</span>
                 <span className="text-[9px] text-muted">{s.exchange}</span>
+                <WatchlistButton stock={s} userId={userId || null} />
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-mono font-600 text-sm text-text">
@@ -423,6 +428,9 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100 }: {
                   </td>
                 )
               })}
+              <td style={{ width: 28 }} onClick={(e) => e.stopPropagation()}>
+                <WatchlistButton stock={s} userId={userId} />
+              </td>
             </tr>
           ))}
         </tbody>
