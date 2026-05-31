@@ -100,18 +100,6 @@ const NOTES: Note[] = [
     highlights: ['<strong>Operational Leverage:</strong> EBIT margins projected to nearly double from 2.8% to 4.9% in 2026.','<strong>Earnings Inflection:</strong> Normalised Net Income forecast to surge +51.2% YoY in FY2026.','<strong>High Yield to Wait:</strong> 6.8% Dividend Yield with +13.5% DPS growth.','<strong>Structural Risks:</strong> €205.5B LTM Net Debt, fierce global EV competition.'],
     thesis: 'Volkswagen holds Value Score 96/100 — top 5% of our European equity universe. At 4.34x NTM P/E and 0.26x P/BV, the market prices in extreme scepticism. The bull case: if EBIT margins double and net income surges +51.2%, the re-rating potential is massive.',
   },
-
-  {
-    ticker: 'ABBN', exchange: 'SWX', slug: 'abbn',
-    company: 'ABB Ltd', sector: 'Industrials', subsector: 'Industrials / Electrification & Automation',
-    flag: '🇨🇭', country: 'Switzerland', value_score: 17, growth_score: 82, universe: 'Top Growth',
-    pdf: '/research/ABBN_ForwardAlpha.pdf',
-    tagline: 'Industrial Megatrends Unleashed — The Quality Growth Profile',
-    subtitle: 'ABB targets structural momentum where execution justifies a premium — Growth Rank 82/100.',
-    kpis: [['Value Score','17/100','Quality premium valuation'],['Growth Score','82/100','Top Growth — Top 20%'],['Revenue Growth 2026E','+12.8%','CHF 37.5B'],['Net Income Growth','+26.5%','YoY to CHF 6.0B'],['LTM ROE','33.6%','Expanding to 34.5%'],['Net Debt/EBITDA','0.44x','Moving to net cash']],
-    highlights: ['<strong>Top-Line Velocity:</strong> Revenues projected to surge +12.8% YoY to CHF 37,481M by late 2026.','<strong>Profitability Inflection:</strong> Normalised Net Income jumping +26.5% YoY to CHF 6,022M.','<strong>Elite Capital Returns:</strong> LTM ROE of 33.6% expanding to 34.5%, alongside ROIC of 24.5%.','<strong>Fortress Balance Sheet:</strong> Net Debt/EBITDA at 0.44x moving to net cash (-CHF 3,900M).'],
-    thesis: 'ABB Ltd scores Growth 82/100 — top 20% of our entire European coverage universe. With Value Score 17/100, it trades at an institutional quality premium backed by exploding demand for electrification, smart motion and automation. Revenue +12.8%, Net Income +26.5%, ROE 33.6%, ROIC 24.5% and a Forward 2-Year EPS CAGR of 14.4%. The definitive structural growth compounder for the modern industrial era.',
-  },
   {
     ticker: 'BARC', exchange: 'LSE', slug: 'barc',
     company: 'Barclays PLC', sector: 'Financials', subsector: 'Financials / Banking',
