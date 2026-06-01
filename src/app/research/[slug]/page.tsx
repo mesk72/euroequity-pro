@@ -112,6 +112,98 @@ const NOTES: Note[] = [
     thesis: 'Barclays scores Value 77/100 and Growth 62/100 — firmly in the Top 20% of our 3,700+ European equity universe. Trading at 0.98x P/BV and 8.40x NTM P/E, the market heavily discounts a structurally more profitable business. ROE expanding from 8.29% to 10.70% is the primary catalyst for re-rating. With +21.5% Forward EPS CAGR and +75.7% DPS growth, BARC is a high-conviction compounder.',
   },
 ]
+  {
+    ticker: 'PRY', exchange: 'MIL', slug: 'pry',
+    company: 'Prysmian S.p.A.', sector: 'Industrials', subsector: 'Industrials / Cables',
+    flag: '🇮🇹', country: 'Italy', value_score: 17, growth_score: 85, universe: 'Top Growth',
+    pdf: '/research/PRY_ForwardAlpha.pdf',
+    tagline: 'The Electrification Compounder — Best-in-Class Growth & Capital Efficiency',
+    subtitle: 'Prysmian is the critical infrastructure backbone of the global energy transition and grid electrification.',
+    kpis: [
+      ['Value Score',        '17/100',   'Priced for perfection'],
+      ['Growth Score',       '85/100',   'Top-tier growth profile'],
+      ['NTM P/E',            '29.77x',   'Premium multiple'],
+      ['Fwd 2-Yr EPS CAGR',  '+38.8%',   'Hyper-scaling earnings'],
+      ['LTM ROIC',           '15.4%',    'Elite capital efficiency'],
+      ['Net Debt/EBITDA 26E', '0.91x',   'Rapid deleveraging'],
+    ],
+    highlights: [
+      '<strong>Top-Line Momentum:</strong> 2026E revenue growth +10.2% YoY with Forward 2-Year EPS CAGR of +38.8%.',
+      '<strong>Earnings Inflection:</strong> 2026E Normalized EPS projected to surge +59.2% YoY.',
+      '<strong>Elite Quality:</strong> LTM ROIC 15.4% and ROE 22.7% — exceptional for a heavy-capex industrial.',
+      '<strong>Price Momentum:</strong> +157.7% price return over the trailing 12-month period.',
+    ],
+    thesis: "Prysmian scores Growth 85/100 — the critical infrastructure backbone of the global energy transition. At 29.77x NTM P/E with LTM ROIC 15.4% and ROE 22.7%, it is expensive but exceptional. The Forward 2-Year EPS CAGR of 38.8% and a +157.7% 12M return confirm a business dominating a multi-decade mega-trend. Net Debt/EBITDA compressing to 0.91x by 2026E. It is an expensive stock, but an exceptional business.",
+  },
+  {
+    ticker: 'ABBN', exchange: 'SWX', slug: 'abbn',
+    company: 'ABB Ltd', sector: 'Industrials', subsector: 'Industrials / Electrical Equipment',
+    flag: '🇨🇭', country: 'Switzerland', value_score: 17, growth_score: 82, universe: 'Top Growth',
+    pdf: '/research/ABBN_ForwardAlpha.pdf',
+    tagline: 'The Ultimate Industrial Growth Engine — Electrification & Automation Megatrends',
+    subtitle: 'ABB has evolved into a premier industrial compounder capturing structural tailwinds across renewable power, grid modernization, and smart factory applications.',
+    kpis: [
+      ['Value Score',       '17/100',  'Priced for perfection'],
+      ['Growth Score',      '82/100',  'Top-tier momentum & growth'],
+      ['NTM P/E',           '32.35x',  'Premium multiple'],
+      ['Fwd 2-Yr EPS CAGR', '+14.4%',  'Robust compounding'],
+      ['LTM ROE',           '33.6%',   'Stellar capital returns'],
+      ['Net Debt/EBITDA',   '0.44x',   'Fortress balance sheet'],
+    ],
+    highlights: [
+      '<strong>Growth Acceleration:</strong> Historic 3-yr Revenue CAGR 4.1% accelerating to Fwd 2-Yr CAGR +10.5%, with 2026E at +12.8% YoY.',
+      '<strong>Operating Leverage:</strong> 2026E EBITDA +19.5% YoY, margins expanding to 21.9%. Normalized EPS +20.8% YoY.',
+      '<strong>Elite Quality:</strong> LTM ROE 33.6% expanding to 34.5%, LTM ROIC 24.5% — best-in-class for electrical equipment.',
+      '<strong>Price Momentum:</strong> +79.7% 12M return, trading near 52-week high of CHF 85.38.',
+    ],
+    thesis: "ABB Ltd scores Growth 82/100 — a quintessential modern industrial compounder. The transition from asset-heavy legacy manufacturer to high-margin leader in Electrification and Automation has permanently re-rated the stock. At 32.35x NTM P/E with LTM ROIC 24.5%, ROE 33.6% and Fwd 2-Yr EPS CAGR of 14.4%, the premium is justified. Net Debt/EBITDA of just 0.44x leaves ample room for R&D and acquisitions. A fundamentally sound anchor for growth portfolios.",
+  },
+  {
+    ticker: 'SHEL', exchange: 'LSE', slug: 'shel',
+    company: 'Shell plc', sector: 'Energy', subsector: 'Energy / Oil, Gas & Consumable Fuels',
+    flag: '🇬🇧', country: 'United Kingdom', value_score: 66, growth_score: 71, universe: 'Top 20%',
+    pdf: '/research/SHEL_ForwardAlpha.pdf',
+    tagline: 'The Best GARP Play in European Energy — Value & Growth Blend',
+    subtitle: 'Shell offers a rare double-threat of deep value and exceptional forward momentum in the top 20% of our European Universe.',
+    kpis: [
+      ['Value Score',        '66/100',  'Deeply discounted'],
+      ['Growth Score',       '71/100',  'Exceptional forward momentum'],
+      ['NTM P/E',            '7.93x',   'Single-digit despite tech-like EPS growth'],
+      ['2026E EPS Growth',   '+72.9%',  'YoY Normalized EPS explosion'],
+      ['Fwd 2-Yr EPS CAGR',  '+23.8%',  'Massive earnings acceleration'],
+      ['Net Debt/EBITDA 26E','0.58x',   'Rapid deleveraging'],
+    ],
+    highlights: [
+      '<strong>Growth Engine:</strong> 2026E Revenue +25.0% YoY, Normalized EPS +72.9% YoY, Fwd 2-Yr EPS CAGR +23.8%.',
+      '<strong>Capital Efficiency:</strong> LTM ROIC 11.7%, ROE expanding to 16.78% by 2026E.',
+      '<strong>Cash Generation:</strong> 2026E FCF Margin 9.5%, FCF growing +22.0% YoY.',
+      '<strong>Valuation Asymmetry:</strong> NTM P/E 7.93x and P/BV 1.36x — plus 3.7% dividend yield at 44.8% payout.',
+    ],
+    thesis: "Shell scores Value 66/100 and Growth 71/100 — firmly in the top 20% of our European Universe. At 7.93x NTM P/E, the stock is delivering tech-like forward EPS growth (+72.9% YoY) at single-digit earnings multiples. LTM ROIC 11.7%, FCF margin 9.5%, and Net Debt/EBITDA compressing to 0.58x. A structurally sound GARP core holding positioned to win in both legacy energy cycles and the low-carbon transition.",
+  },
+  {
+    ticker: 'MC', exchange: 'PA', slug: 'mc',
+    company: 'LVMH Moët Hennessy Louis Vuitton', sector: 'Consumer Discretionary', subsector: 'Consumer Discretionary / Luxury Goods',
+    flag: '🇫🇷', country: 'France', value_score: 36, growth_score: 28, universe: 'Watchlist — Growth Trap',
+    pdf: '/research/MC_ForwardAlpha.pdf',
+    tagline: 'Growth Disconnection Alert — Premium Multiples Face Severe Fundamentals Deceleration',
+    subtitle: 'LVMH presents a classic quantitative trap where trailing quality metrics mask a severe forward growth deceleration.',
+    kpis: [
+      ['Value Score',        '36/100',  'Still demanding a premium multiple'],
+      ['Growth Score',       '28/100',  'Stalling operational fundamentals'],
+      ['NTM P/E',            '20.51x',  'Premium for flat growth'],
+      ['2026E Revenue Gr.',  '+0.2%',   'Near-dead top line'],
+      ['Fwd 2-Yr EPS CAGR',  '+8.4%',   'Subdued earnings trajectory'],
+      ['2026E EBITDA Gr.',   '(4.2%)',  'Margin compression'],
+    ],
+    highlights: [
+      '<strong>Top-Line Stagnation:</strong> 2025 Revenue -4.6% YoY, 2026E +0.2% YoY. Fwd 2-Yr Revenue CAGR just 2.6%.',
+      '<strong>Earnings Trap:</strong> Last 3-Yr EPS CAGR -8.0%. 2026E Normalized EPS only +1.6% YoY.',
+      '<strong>Valuation Danger:</strong> 20.51x NTM P/E for 2.6% revenue growth — PEG well above 2.0x.',
+      '<strong>Momentum Breakdown:</strong> -1.7% 12M price return, trading near 52-week low of €436.55.',
+    ],
+    thesis: "LVMH scores Value 36/100 and Growth 28/100. The low Growth Rank is not a technical anomaly — it is the direct mathematical result of Revenue Growth +0.2% and EPS Growth +1.6% in 2026E. At 20.51x NTM P/E, the stock demands a premium that single-digit forward growth cannot support. Quality metrics remain elite (Gross Margin 66.5%, FCF Margin 15.1%) but act as shock absorbers, not growth engines. A high-priced value trap until multiples de-rate further.",
+  },
 
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
@@ -293,3 +385,4 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
     </>
   )
 }
+    
