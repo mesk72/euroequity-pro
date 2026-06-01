@@ -111,7 +111,7 @@ const NOTES: Note[] = [
     highlights: ['<strong>Valuation Disconnect:</strong> 0.98x P/BV and 8.40x NTM P/E — buying a global banking powerhouse below tangible assets.','<strong>EPS Acceleration:</strong> Forward 2-Year EPS CAGR of +21.5% — far above European banking peers.','<strong>Profitability Leap:</strong> Net Income scaling from £6,209M to £7,114M (+14.6% YoY).','<strong>Dividend Surge:</strong> DPS projected +75.7% YoY from £0.09 to £0.15, supported by EBIT margins expanding to 42.2%.'],
     thesis: 'Barclays scores Value 77/100 and Growth 62/100 — firmly in the Top 20% of our 3,700+ European equity universe. Trading at 0.98x P/BV and 8.40x NTM P/E, the market heavily discounts a structurally more profitable business. ROE expanding from 8.29% to 10.70% is the primary catalyst for re-rating. With +21.5% Forward EPS CAGR and +75.7% DPS growth, BARC is a high-conviction compounder.',
   },
-]
+,
   {
     ticker: 'PRY', exchange: 'MIL', slug: 'pry',
     company: 'Prysmian S.p.A.', sector: 'Industrials', subsector: 'Industrials / Cables',
@@ -203,7 +203,8 @@ const NOTES: Note[] = [
       '<strong>Momentum Breakdown:</strong> -1.7% 12M price return, trading near 52-week low of €436.55.',
     ],
     thesis: "LVMH scores Value 36/100 and Growth 28/100. The low Growth Rank is not a technical anomaly — it is the direct mathematical result of Revenue Growth +0.2% and EPS Growth +1.6% in 2026E. At 20.51x NTM P/E, the stock demands a premium that single-digit forward growth cannot support. Quality metrics remain elite (Gross Margin 66.5%, FCF Margin 15.1%) but act as shock absorbers, not growth engines. A high-priced value trap until multiples de-rate further.",
-  },
+  }
+]
 
 export async function generateStaticParams() {
   return NOTES.map(note => ({ slug: note.slug }))
@@ -385,4 +386,3 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
     </>
   )
 }
-    
