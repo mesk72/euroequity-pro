@@ -22,7 +22,7 @@ interface Note {
   thesis: string
 }
 
-const NOTES: any[] = [
+const NOTES: Note[] = [
   {
     ticker: 'ASML', exchange: 'AS', slug: 'asml',
     company: 'ASML Holding N.V.', sector: 'Information Technology', subsector: 'Technology / Semiconductors',
@@ -43,7 +43,7 @@ const NOTES: any[] = [
     subtitle: 'BNP Paribas presents a classic case of an institutional-grade value compounder trading at a massive disconnect from its fundamental strength.',
     kpis: [['Value Score','79/100','Strong discount across multiples'],['Growth Score','64/100','Stable capital compounding'],['NTM P/E','7.80x','Deeply compressed multiple'],['Price / Book','0.78x','22% discount to book value'],['Dividend Yield','6.6%','+14.4% DPS growth 2026E'],['Fwd 2-Yr EPS CAGR','+7.6%','Resilient earnings growth']],
     highlights: ['<strong>Valuation Gap:</strong> Trading at 7.80x NTM P/E and 0.78x P/BV — massive margin of safety.','<strong>Growing Cash Machine:</strong> Net Income scaling from €12,225M to €13,283M by next fiscal cycle.','<strong>Operational Efficiency:</strong> ROE structurally expanding from 9.6% toward 10.77%.','<strong>Income Engine:</strong> 6.6% dividend yield with +14.4% YoY DPS growth.'],
-    thesis: 'BNP Paribas ranks in the Top 20% of our European Universe with Value Score 79/100. Trading at 7.80x NTM P/E and 0.78x P/BV, investors buy one of Europe\'s largest systemically important banks at a 22% discount to book value.',
+    thesis: "BNP Paribas ranks in the Top 20% of our European Universe with Value Score 79/100. Trading at 7.80x NTM P/E and 0.78x P/BV, investors buy one of Europe's largest systemically important banks at a 22% discount to book value.",
   },
   {
     ticker: 'IFX', exchange: 'XETRA', slug: 'ifx',
@@ -54,7 +54,7 @@ const NOTES: any[] = [
     subtitle: 'Retail screeners flag trailing multi-digit P/Es as value traps, but institutional alpha thrives in cyclical inflections.',
     kpis: [['Value Score','21/100','Cyclical trough trailing metrics'],['Growth Score','86/100','Top Growth — sharp earnings reversal'],['LTM P/E','93.58x','Trailing trough — rearview mirror'],['NTM P/E','35.03x','Steep forward compression'],['Fwd 2-Yr EPS CAGR','+36.0%','+47pp swing from historical lows'],['Net Debt/EBITDA','1.00x','Deleveraging from 1.38x']],
     highlights: ['<strong>Front-Loaded Inflection:</strong> +66.9% YoY GAAP EPS surge from FY2025 to FY2026.','<strong>Secular Mega-Trends:</strong> Dominance in Silicon Carbide (SiC) chips and booming EV content requirements.','<strong>Quality Deleveraging:</strong> Balance sheet optimisation during intensive capacity ramp.','<strong>Multiple Compression:</strong> LTM P/E of 93.58x compresses to 35.03x NTM.'],
-    thesis: 'Infineon registers Growth Score 86/100 — Top Growth backed by violent earnings reversal. The LTM P/E of 93.58x masks a forward story where EPS surges +66.9% YoY and NTM P/E compresses to 35.03x. Global leader in SiC power semiconductors for EV and industrial applications.',
+    thesis: 'Infineon registers Growth 86/100 — Top Growth backed by violent earnings reversal. The LTM P/E of 93.58x masks a forward story where EPS surges +66.9% YoY and NTM P/E compresses to 35.03x. Global leader in SiC power semiconductors for EV and industrial applications.',
   },
   {
     ticker: 'INGA', exchange: 'AS', slug: 'inga',
@@ -109,9 +109,8 @@ const NOTES: any[] = [
     subtitle: 'Value 77/100 combined with Growth 62/100 — a powerful mix of valuation discount and earnings acceleration.',
     kpis: [['Value Score','77/100','Top 20% European Universe'],['Growth Score','62/100','Structural earnings acceleration'],['LTM P/BV','0.98x','Below tangible book value'],['NTM P/E','8.40x','Deeply discounted'],['Fwd 2-Yr EPS CAGR','+21.5%','High-octane growth'],['DPS Growth 2026E','+75.7%','Massive payout expansion']],
     highlights: ['<strong>Valuation Disconnect:</strong> 0.98x P/BV and 8.40x NTM P/E — buying a global banking powerhouse below tangible assets.','<strong>EPS Acceleration:</strong> Forward 2-Year EPS CAGR of +21.5% — far above European banking peers.','<strong>Profitability Leap:</strong> Net Income scaling from £6,209M to £7,114M (+14.6% YoY).','<strong>Dividend Surge:</strong> DPS projected +75.7% YoY from £0.09 to £0.15, supported by EBIT margins expanding to 42.2%.'],
-    thesis: 'Barclays scores Value 77/100 and Growth 62/100 — firmly in the Top 20% of our 3,700+ European equity universe. Trading at 0.98x P/BV and 8.40x NTM P/E, the market heavily discounts a structurally more profitable business. ROE expanding from 8.29% to 10.70% is the primary catalyst for re-rating. With +21.5% Forward EPS CAGR and +75.7% DPS growth, BARC is a high-conviction compounder.',
+    thesis: "Barclays scores Value 77/100 and Growth 62/100 — firmly in the Top 20% of our 3,700+ European equity universe. Trading at 0.98x P/BV and 8.40x NTM P/E, the market heavily discounts a structurally more profitable business. ROE expanding from 8.29% to 10.70% is the primary catalyst for re-rating.",
   },
-,
   {
     ticker: 'PRY', exchange: 'MIL', slug: 'pry',
     company: 'Prysmian S.p.A.', sector: 'Industrials', subsector: 'Industrials / Cables',
@@ -119,21 +118,9 @@ const NOTES: any[] = [
     pdf: '/research/PRY_ForwardAlpha.pdf',
     tagline: 'The Electrification Compounder — Best-in-Class Growth & Capital Efficiency',
     subtitle: 'Prysmian is the critical infrastructure backbone of the global energy transition and grid electrification.',
-    kpis: [
-      ['Value Score',        '17/100',   'Priced for perfection'],
-      ['Growth Score',       '85/100',   'Top-tier growth profile'],
-      ['NTM P/E',            '29.77x',   'Premium multiple'],
-      ['Fwd 2-Yr EPS CAGR',  '+38.8%',   'Hyper-scaling earnings'],
-      ['LTM ROIC',           '15.4%',    'Elite capital efficiency'],
-      ['Net Debt/EBITDA 26E', '0.91x',   'Rapid deleveraging'],
-    ],
-    highlights: [
-      '<strong>Top-Line Momentum:</strong> 2026E revenue growth +10.2% YoY with Forward 2-Year EPS CAGR of +38.8%.',
-      '<strong>Earnings Inflection:</strong> 2026E Normalized EPS projected to surge +59.2% YoY.',
-      '<strong>Elite Quality:</strong> LTM ROIC 15.4% and ROE 22.7% — exceptional for a heavy-capex industrial.',
-      '<strong>Price Momentum:</strong> +157.7% price return over the trailing 12-month period.',
-    ],
-    thesis: "Prysmian scores Growth 85/100 — the critical infrastructure backbone of the global energy transition. At 29.77x NTM P/E with LTM ROIC 15.4% and ROE 22.7%, it is expensive but exceptional. The Forward 2-Year EPS CAGR of 38.8% and a +157.7% 12M return confirm a business dominating a multi-decade mega-trend. Net Debt/EBITDA compressing to 0.91x by 2026E. It is an expensive stock, but an exceptional business.",
+    kpis: [['Value Score','17/100','Priced for perfection'],['Growth Score','85/100','Top-tier growth profile'],['NTM P/E','29.77x','Premium multiple'],['Fwd 2-Yr EPS CAGR','+38.8%','Hyper-scaling earnings'],['LTM ROIC','15.4%','Elite capital efficiency'],['Net Debt/EBITDA 26E','0.91x','Rapid deleveraging']],
+    highlights: ['<strong>Top-Line Momentum:</strong> 2026E revenue growth +10.2% YoY with Forward 2-Year EPS CAGR of +38.8%.','<strong>Earnings Inflection:</strong> 2026E Normalized EPS projected to surge +59.2% YoY.','<strong>Elite Quality:</strong> LTM ROIC 15.4% and ROE 22.7% — exceptional for a heavy-capex industrial.','<strong>Price Momentum:</strong> +157.7% price return over the trailing 12-month period.'],
+    thesis: "Prysmian scores Growth 85/100 — the critical infrastructure backbone of the global energy transition. At 29.77x NTM P/E with LTM ROIC 15.4% and ROE 22.7%, it is expensive but exceptional. The Forward 2-Year EPS CAGR of 38.8% and a +157.7% 12M return confirm a business dominating a multi-decade mega-trend.",
   },
   {
     ticker: 'ABBN', exchange: 'SWX', slug: 'abbn',
@@ -142,21 +129,9 @@ const NOTES: any[] = [
     pdf: '/research/ABBN_ForwardAlpha.pdf',
     tagline: 'The Ultimate Industrial Growth Engine — Electrification & Automation Megatrends',
     subtitle: 'ABB has evolved into a premier industrial compounder capturing structural tailwinds across renewable power, grid modernization, and smart factory applications.',
-    kpis: [
-      ['Value Score',       '17/100',  'Priced for perfection'],
-      ['Growth Score',      '82/100',  'Top-tier momentum & growth'],
-      ['NTM P/E',           '32.35x',  'Premium multiple'],
-      ['Fwd 2-Yr EPS CAGR', '+14.4%',  'Robust compounding'],
-      ['LTM ROE',           '33.6%',   'Stellar capital returns'],
-      ['Net Debt/EBITDA',   '0.44x',   'Fortress balance sheet'],
-    ],
-    highlights: [
-      '<strong>Growth Acceleration:</strong> Historic 3-yr Revenue CAGR 4.1% accelerating to Fwd 2-Yr CAGR +10.5%, with 2026E at +12.8% YoY.',
-      '<strong>Operating Leverage:</strong> 2026E EBITDA +19.5% YoY, margins expanding to 21.9%. Normalized EPS +20.8% YoY.',
-      '<strong>Elite Quality:</strong> LTM ROE 33.6% expanding to 34.5%, LTM ROIC 24.5% — best-in-class for electrical equipment.',
-      '<strong>Price Momentum:</strong> +79.7% 12M return, trading near 52-week high of CHF 85.38.',
-    ],
-    thesis: "ABB Ltd scores Growth 82/100 — a quintessential modern industrial compounder. The transition from asset-heavy legacy manufacturer to high-margin leader in Electrification and Automation has permanently re-rated the stock. At 32.35x NTM P/E with LTM ROIC 24.5%, ROE 33.6% and Fwd 2-Yr EPS CAGR of 14.4%, the premium is justified. Net Debt/EBITDA of just 0.44x leaves ample room for R&D and acquisitions. A fundamentally sound anchor for growth portfolios.",
+    kpis: [['Value Score','17/100','Priced for perfection'],['Growth Score','82/100','Top-tier momentum & growth'],['NTM P/E','32.35x','Premium multiple'],['Fwd 2-Yr EPS CAGR','+14.4%','Robust compounding'],['LTM ROE','33.6%','Stellar capital returns'],['Net Debt/EBITDA','0.44x','Fortress balance sheet']],
+    highlights: ['<strong>Growth Acceleration:</strong> Historic 3-yr Revenue CAGR 4.1% accelerating to Fwd 2-Yr CAGR +10.5%, with 2026E at +12.8% YoY.','<strong>Operating Leverage:</strong> 2026E EBITDA +19.5% YoY, margins expanding to 21.9%. Normalized EPS +20.8% YoY.','<strong>Elite Quality:</strong> LTM ROE 33.6% expanding to 34.5%, LTM ROIC 24.5% — best-in-class for electrical equipment.','<strong>Price Momentum:</strong> +79.7% 12M return, trading near 52-week high of CHF 85.38.'],
+    thesis: 'ABB Ltd scores Growth 82/100 — a quintessential modern industrial compounder. The transition from asset-heavy legacy manufacturer to high-margin leader in Electrification and Automation has permanently re-rated the stock. At 32.35x NTM P/E with LTM ROIC 24.5%, ROE 33.6% and Fwd 2-Yr EPS CAGR of 14.4%, the premium is justified.',
   },
   {
     ticker: 'SHEL', exchange: 'LSE', slug: 'shel',
@@ -165,21 +140,9 @@ const NOTES: any[] = [
     pdf: '/research/SHEL_ForwardAlpha.pdf',
     tagline: 'The Best GARP Play in European Energy — Value & Growth Blend',
     subtitle: 'Shell offers a rare double-threat of deep value and exceptional forward momentum in the top 20% of our European Universe.',
-    kpis: [
-      ['Value Score',        '66/100',  'Deeply discounted'],
-      ['Growth Score',       '71/100',  'Exceptional forward momentum'],
-      ['NTM P/E',            '7.93x',   'Single-digit despite tech-like EPS growth'],
-      ['2026E EPS Growth',   '+72.9%',  'YoY Normalized EPS explosion'],
-      ['Fwd 2-Yr EPS CAGR',  '+23.8%',  'Massive earnings acceleration'],
-      ['Net Debt/EBITDA 26E','0.58x',   'Rapid deleveraging'],
-    ],
-    highlights: [
-      '<strong>Growth Engine:</strong> 2026E Revenue +25.0% YoY, Normalized EPS +72.9% YoY, Fwd 2-Yr EPS CAGR +23.8%.',
-      '<strong>Capital Efficiency:</strong> LTM ROIC 11.7%, ROE expanding to 16.78% by 2026E.',
-      '<strong>Cash Generation:</strong> 2026E FCF Margin 9.5%, FCF growing +22.0% YoY.',
-      '<strong>Valuation Asymmetry:</strong> NTM P/E 7.93x and P/BV 1.36x — plus 3.7% dividend yield at 44.8% payout.',
-    ],
-    thesis: "Shell scores Value 66/100 and Growth 71/100 — firmly in the top 20% of our European Universe. At 7.93x NTM P/E, the stock is delivering tech-like forward EPS growth (+72.9% YoY) at single-digit earnings multiples. LTM ROIC 11.7%, FCF margin 9.5%, and Net Debt/EBITDA compressing to 0.58x. A structurally sound GARP core holding positioned to win in both legacy energy cycles and the low-carbon transition.",
+    kpis: [['Value Score','66/100','Deeply discounted'],['Growth Score','71/100','Exceptional forward momentum'],['NTM P/E','7.93x','Single-digit despite tech-like EPS growth'],['2026E EPS Growth','+72.9%','YoY Normalized EPS explosion'],['Fwd 2-Yr EPS CAGR','+23.8%','Massive earnings acceleration'],['Net Debt/EBITDA 26E','0.58x','Rapid deleveraging']],
+    highlights: ['<strong>Growth Engine:</strong> 2026E Revenue +25.0% YoY, Normalized EPS +72.9% YoY, Fwd 2-Yr EPS CAGR +23.8%.','<strong>Capital Efficiency:</strong> LTM ROIC 11.7%, ROE expanding to 16.78% by 2026E.','<strong>Cash Generation:</strong> 2026E FCF Margin 9.5%, FCF growing +22.0% YoY.','<strong>Valuation Asymmetry:</strong> NTM P/E 7.93x and P/BV 1.36x — plus 3.7% dividend yield at 44.8% payout.'],
+    thesis: 'Shell scores Value 66/100 and Growth 71/100 — firmly in the top 20% of our European Universe. At 7.93x NTM P/E, the stock is delivering tech-like forward EPS growth (+72.9% YoY) at single-digit earnings multiples. LTM ROIC 11.7%, FCF margin 9.5%, and Net Debt/EBITDA compressing to 0.58x.',
   },
   {
     ticker: 'MC', exchange: 'PA', slug: 'mc',
@@ -188,22 +151,10 @@ const NOTES: any[] = [
     pdf: '/research/MC_ForwardAlpha.pdf',
     tagline: 'Growth Disconnection Alert — Premium Multiples Face Severe Fundamentals Deceleration',
     subtitle: 'LVMH presents a classic quantitative trap where trailing quality metrics mask a severe forward growth deceleration.',
-    kpis: [
-      ['Value Score',        '36/100',  'Still demanding a premium multiple'],
-      ['Growth Score',       '28/100',  'Stalling operational fundamentals'],
-      ['NTM P/E',            '20.51x',  'Premium for flat growth'],
-      ['2026E Revenue Gr.',  '+0.2%',   'Near-dead top line'],
-      ['Fwd 2-Yr EPS CAGR',  '+8.4%',   'Subdued earnings trajectory'],
-      ['2026E EBITDA Gr.',   '(4.2%)',  'Margin compression'],
-    ],
-    highlights: [
-      '<strong>Top-Line Stagnation:</strong> 2025 Revenue -4.6% YoY, 2026E +0.2% YoY. Fwd 2-Yr Revenue CAGR just 2.6%.',
-      '<strong>Earnings Trap:</strong> Last 3-Yr EPS CAGR -8.0%. 2026E Normalized EPS only +1.6% YoY.',
-      '<strong>Valuation Danger:</strong> 20.51x NTM P/E for 2.6% revenue growth — PEG well above 2.0x.',
-      '<strong>Momentum Breakdown:</strong> -1.7% 12M price return, trading near 52-week low of €436.55.',
-    ],
-    thesis: "LVMH scores Value 36/100 and Growth 28/100. The low Growth Rank is not a technical anomaly — it is the direct mathematical result of Revenue Growth +0.2% and EPS Growth +1.6% in 2026E. At 20.51x NTM P/E, the stock demands a premium that single-digit forward growth cannot support. Quality metrics remain elite (Gross Margin 66.5%, FCF Margin 15.1%) but act as shock absorbers, not growth engines. A high-priced value trap until multiples de-rate further.",
-  }
+    kpis: [['Value Score','36/100','Still demanding a premium multiple'],['Growth Score','28/100','Stalling operational fundamentals'],['NTM P/E','20.51x','Premium for flat growth'],['2026E Revenue Gr.','+0.2%','Near-dead top line'],['Fwd 2-Yr EPS CAGR','+8.4%','Subdued earnings trajectory'],['2026E EBITDA Gr.','(4.2%)','Margin compression']],
+    highlights: ['<strong>Top-Line Stagnation:</strong> 2025 Revenue -4.6% YoY, 2026E +0.2% YoY. Fwd 2-Yr Revenue CAGR just 2.6%.','<strong>Earnings Trap:</strong> Last 3-Yr EPS CAGR -8.0%. 2026E Normalized EPS only +1.6% YoY.','<strong>Valuation Danger:</strong> 20.51x NTM P/E for 2.6% revenue growth — PEG well above 2.0x.','<strong>Momentum Breakdown:</strong> -1.7% 12M price return, trading near 52-week low of €436.55.'],
+    thesis: 'LVMH scores Value 36/100 and Growth 28/100. The low Growth Rank is not a technical anomaly — it is the direct mathematical result of Revenue Growth +0.2% and EPS Growth +1.6% in 2026E. At 20.51x NTM P/E, the stock demands a premium that single-digit forward growth cannot support. A high-priced value trap until multiples de-rate further.',
+  },
 ]
 
 export async function generateStaticParams() {
@@ -234,15 +185,9 @@ function JsonLd({ note }: { note: Note }) {
     'description': note.thesis.slice(0, 200),
     'author': { '@type': 'Organization', 'name': 'ForwardAlpha', 'url': 'https://forwardalpha.pro' },
     'publisher': { '@type': 'Organization', 'name': 'ForwardAlpha', 'url': 'https://forwardalpha.pro' },
-    'datePublished': '2026-05-01',
-    'dateModified': '2026-05-29',
+    'datePublished': '2026-06-01',
     'url': `https://forwardalpha.pro/research/${note.slug}`,
-    'about': {
-      '@type': 'Corporation',
-      'name': note.company,
-      'tickerSymbol': note.ticker,
-      'exchange': note.exchange,
-    },
+    'about': { '@type': 'Corporation', 'name': note.company, 'tickerSymbol': note.ticker },
     'keywords': `${note.ticker}, ${note.company}, ${note.sector}, quantitative research, European equities, ForwardAlpha`,
   }
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
@@ -261,31 +206,28 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
     <div style={{ minHeight: '100vh', background: 'var(--bg, #0d1117)', color: 'var(--text, #e2e8f0)', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px' }}>
 
-        {/* Back */}
         <Link href="/research" style={{ color: '#f97316', fontSize: 13, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 24 }}>
           ← Back to Research
         </Link>
 
-        {/* Header */}
         <div style={{ borderBottom: '2px solid #f97316', paddingBottom: 16, marginBottom: 24 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#f97316', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
-            ForwardAlpha Quantitative Research · May 2026
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#f97316', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+            ForwardAlpha Quantitative Research · June 2026
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
             <span style={{ fontSize: 28 }}>{note.flag}</span>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 28, fontWeight: 800, color: '#f97316' }}>{note.ticker}</span>
-                <span style={{ fontSize: 12, padding: '2px 8px', border: '1px solid #334155', borderRadius: 4, color: '#cbd5e1' }}>{note.exchange}</span>
+                <span style={{ fontSize: 12, padding: '2px 8px', border: '1px solid #334155', borderRadius: 4, color: '#64748b' }}>{note.exchange}</span>
               </div>
-              <div style={{ fontSize: 14, color: '#e2e8f0' }}>{note.company}</div>
+              <div style={{ fontSize: 14, color: '#94a3b8' }}>{note.company}</div>
             </div>
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: '8px 0 4px', lineHeight: 1.3 }}>{note.tagline}</h1>
-          <p style={{ fontSize: 13, color: '#cbd5e1', margin: 0 }}>{note.subsector}</p>
+          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>{note.subsector}</p>
         </div>
 
-        {/* Scores */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
           {[
             { label: 'Value Score', value: note.value_score + '/100', color: valueColor, bg: '#eff6ff' },
@@ -293,13 +235,12 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
             { label: 'Universe', value: note.universe, color: '#f97316', bg: '#fff7ed' },
           ].map(s => (
             <div key={s.label} style={{ background: s.bg, borderRadius: 8, padding: '14px 12px', textAlign: 'center', border: `1px solid ${s.color}33` }}>
-              <div style={{ fontSize: 10, color: '#e2e8f0', marginBottom: 4 }}>{s.label}</div>
+              <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 4 }}>{s.label}</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
             </div>
           ))}
         </div>
 
-        {/* KPIs */}
         <div style={{ marginBottom: 28 }}>
           <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', marginBottom: 12 }}>Key Quantitative Metrics</h2>
           <div style={{ border: '1px solid #334155', borderRadius: 8, overflow: 'hidden' }}>
@@ -313,11 +254,10 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
           </div>
         </div>
 
-        {/* Highlights */}
         <div style={{ marginBottom: 28 }}>
           <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', marginBottom: 12 }}>Investment Highlights</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {note.highlights.map((h, i) => (
+            {note.highlights.map((h: string, i: number) => (
               <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                 <span style={{ color: '#f97316', fontSize: 16, marginTop: 1, flexShrink: 0 }}>→</span>
                 <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: '#f1f5f9' }} dangerouslySetInnerHTML={{ __html: h }} />
@@ -326,33 +266,29 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
           </div>
         </div>
 
-        {/* Thesis */}
         <div style={{ background: '#0f1923', border: '1px solid #f9731633', borderRadius: 8, padding: '20px 24px', marginBottom: 28 }}>
           <h2 style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#f97316', marginBottom: 10 }}>ForwardAlpha Investment Thesis</h2>
-          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: '#f1f5f9' }}>{note.thesis}</p>
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: '#cbd5e1' }}>{note.thesis}</p>
         </div>
 
-        {/* Download */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <a href={note.pdf} target="_blank" rel="noopener noreferrer"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#f97316', color: '#000', padding: '14px 32px', borderRadius: 8, fontWeight: 800, fontSize: 14, textDecoration: 'none' }}>
             ↓ Download Full {note.ticker} Quantitative Research Report — PDF
           </a>
-          <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 8 }}>
-            Free access during Beta · No credit card required ·{' '}
+          <p style={{ fontSize: 11, color: '#475569', marginTop: 8 }}>
+            Free access during Beta ·{' '}
             <Link href="/" style={{ color: '#f97316', textDecoration: 'none' }}>Access the full ForwardAlpha screener →</Link>
           </p>
         </div>
 
-        {/* Related Notes — Internal Linking */}
+        {/* Related Research */}
         {(() => {
           const related = NOTES.filter(n => n.slug !== note.slug && n.sector === note.sector).slice(0, 3)
           if (related.length === 0) return null
           return (
             <div style={{ marginBottom: 28 }}>
-              <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: 12 }}>
-                Related Research
-              </h2>
+              <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', marginBottom: 12 }}>Related Research</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
                 {related.map(r => (
                   <Link key={r.slug} href={`/research/${r.slug}`} style={{ textDecoration: 'none' }}>
@@ -370,14 +306,11 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
           )
         })()}
 
-        {/* Disclaimer */}
         <div style={{ borderTop: '1px solid #1e293b', paddingTop: 16 }}>
-          <p style={{ fontSize: 10, color: '#94a3b8', lineHeight: 1.5, margin: 0 }}>
+          <p style={{ fontSize: 10, color: '#475569', lineHeight: 1.5, margin: 0 }}>
             <strong>DISCLAIMER — NOT INVESTMENT ADVICE.</strong> This document is produced by ForwardAlpha (forwardalpha.pro) for informational and educational purposes only.
-            It does not constitute investment advice, a solicitation, or a recommendation to buy, sell or hold any financial instrument.
-            ForwardAlpha is not a registered investment adviser. All data and projections are sourced from third-party providers and believed to be reliable but not guaranteed.
-            Past performance is not indicative of future results. Always consult a qualified financial adviser.
-            © 2026 ForwardAlpha · andrea@forwardalpha.pro
+            It does not constitute investment advice. ForwardAlpha is not a registered investment adviser. Past performance is not indicative of future results.
+            Always consult a qualified financial adviser. © 2026 ForwardAlpha · andrea@forwardalpha.pro
           </p>
         </div>
 
