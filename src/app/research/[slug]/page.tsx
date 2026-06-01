@@ -22,7 +22,7 @@ interface Note {
   thesis: string
 }
 
-const NOTES: Note[] = [
+const NOTES: any[] = [
   {
     ticker: 'ASML', exchange: 'AS', slug: 'asml',
     company: 'ASML Holding N.V.', sector: 'Information Technology', subsector: 'Technology / Semiconductors',
