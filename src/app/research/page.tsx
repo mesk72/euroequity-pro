@@ -51,6 +51,33 @@ const MONTHS = [
       },
     ],
   },
+  {
+    month: 'June 2026',
+    sectors: [
+      {
+        name: 'Industrials',
+        color: '#8b5cf6',
+        notes: [
+          { ticker: 'PRY',  slug: 'pry',  flag: '🇮🇹', company: 'Prysmian S.p.A.',  tagline: 'The Electrification Compounder', value: 17, growth: 85 },
+          { ticker: 'ABBN', slug: 'abbn', flag: '🇨🇭', company: 'ABB Ltd',           tagline: 'The Ultimate Industrial Growth Engine', value: 17, growth: 82 },
+        ],
+      },
+      {
+        name: 'Energy',
+        color: '#ef4444',
+        notes: [
+          { ticker: 'SHEL', slug: 'shel', flag: '🇬🇧', company: 'Shell plc', tagline: 'The Best GARP Play in European Energy', value: 66, growth: 71 },
+        ],
+      },
+      {
+        name: 'Consumer Discretionary & Luxury',
+        color: '#c026d3',
+        notes: [
+          { ticker: 'MC', slug: 'mc', flag: '🇫🇷', company: 'LVMH Moët Hennessy Louis Vuitton', tagline: 'Growth Disconnection Alert — Growth Trap', value: 36, growth: 28 },
+        ],
+      },
+    ],
+  },
 ]
 
 export default function ResearchHubPage() {
