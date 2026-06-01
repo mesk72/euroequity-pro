@@ -303,7 +303,7 @@ export default function ResearchNotePage({ params }: { params: { slug: string } 
         <div style={{ marginBottom: 28 }}>
           <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', marginBottom: 12 }}>Key Quantitative Metrics</h2>
           <div style={{ border: '1px solid #334155', borderRadius: 8, overflow: 'hidden' }}>
-            {note.kpis.map(([label, value, insight], i) => (
+            {note.kpis.map(([label, value, insight]: [string, string, string], i: number) => (
               <div key={label} style={{ display: 'grid', gridTemplateColumns: '160px 100px 1fr', gap: 0, borderBottom: i < note.kpis.length - 1 ? '1px solid #334155' : 'none', background: i % 2 === 0 ? '#111827' : '#0f172a' }}>
                 <div style={{ padding: '10px 14px', fontSize: 12, color: '#e2e8f0', fontWeight: 600 }}>{label}</div>
                 <div style={{ padding: '10px 14px', fontSize: 13, fontWeight: 800, color: '#ffffff' }}>{value}</div>
