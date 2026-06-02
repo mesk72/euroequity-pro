@@ -20,12 +20,6 @@ async function fetchLiveQuotes(exchange: string) {
 }
 
 export async function GET(req: NextRequest) {
-  // Verifica secret per sicurezza
-  const auth = req.headers.get('authorization')
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
