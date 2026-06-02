@@ -1153,10 +1153,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
             Last Quantitative Update
           </div>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-            May 22, 2026
+            June 2, 2026
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            3,637 European equities · Value & Growth Scores recalculated
+            3,636 European equities · Value & Growth Scores recalculated
           </div>
         </div>
 
