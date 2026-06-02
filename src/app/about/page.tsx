@@ -2,32 +2,23 @@ export default function AboutPage() {
   const sections = [
     {
       title: 'Our Philosophy',
-      content: `ForwardAlpha was built on a simple but powerful conviction: European equity markets are systematically underanalyzed, and the tools available to serious investors have not kept pace with the opportunity.
+      content: `ForwardAlpha was built on a simple but powerful conviction: European equity markets are underserved by modern financial technology.
 
-While most financial platforms focus on US markets, Europe offers over 3,700 listed companies across 18 exchanges — from the Eurozone blue chips to Nordic growth companies and UK mid-caps — with valuation levels that have historically been more attractive than their American counterparts.
+While most financial platforms focus on US markets, Europe offers over 3,700 listed companies across 16 exchanges — a rich universe of opportunities that remains largely inaccessible to independent investors without institutional-grade tools.
 
-We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`
+We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`,
     },
     {
-      title: 'The Best Score',
-      content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to the entire European universe.
+      title: 'Who We Are',
+      content: `ForwardAlpha was founded by Andrea Meschini, a professional investor with over 15 years of experience in European equity research and portfolio management.
 
-It is calculated as the simple average of the Value Score and Growth Score, then re-ranked from 1 to 100 across all European stocks regardless of country.
+Andrea began his career at Gestiveneto SGR, one of Italy's established asset management firms, before moving to JPMorgan Asset Management in London, where he worked as a European equity analyst covering multiple sectors.
 
-A Best Score of 90 means the stock ranks in the top 10% of all European equities on our combined Value and Growth metrics — it is both attractively valued and showing strong growth momentum relative to the full European universe.
+He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as a portfolio manager running long-only European equity mandates, followed by five years as Head of Equity Research, overseeing a team of analysts covering the Italian and broader European equity universe.
 
-The Best Score is our primary screening tool for identifying European equity opportunities that combine both value and growth characteristics.`,
-    },
-    {title: 'Who We Are',
-      content: `ForwardAlpha was founded by Andrea Meschini, a professional investor with over 15 years of institutional experience in European equity and alternative investment management.
+Prior to founding ForwardAlpha, Andrea served as Senior Hedge Fund Analyst at Integrated Alternative Investments, focusing on manager selection and due diligence across European long/short equity strategies.
 
-Andrea began his career at Gestiveneto SGR, one of Italy's established asset management firms, before joining J.P. Morgan where he spent four years as Investment Analyst, Assistant Portfolio Manager and Junior Portfolio Manager, developing deep expertise in quantitative equity analysis and portfolio construction.
-
-He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as Investment Analyst covering Funds of Hedge Funds, and five years as Portfolio Manager running a dedicated Eurozone equity mandate for a pension fund, applying both fundamental and quantitative approaches to stock selection.
-
-Prior to founding ForwardAlpha, Andrea served as Senior Hedge Fund Analyst at Integrated Alternative Investments in London, where he focused on institutional-grade due diligence across alternative strategies.
-
-This background informs every aspect of ForwardAlpha's methodology — from the way we construct our scoring models to the emphasis on data quality and intellectual honesty about what the numbers can and cannot tell us.`
+This background informs every aspect of ForwardAlpha's methodology — from the way we construct our scoring models to the metrics we prioritise and the rigour we apply to data quality.`,
     },
     {
       title: 'The Value Score',
@@ -53,69 +44,39 @@ Growth investing seeks companies that are expanding faster than the market expec
 
 Our Growth Score combines four rank components, each calculated relative to all stocks listed on the same exchange:
 
-• EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months. Calculated as EPS NTM divided by EPS LTM. Companies with negative trailing EPS receive a neutral rank of 50.
+• EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months, calculated as EPS NTM divided by EPS LTM using the absolute value of the denominator. This means turnaround companies with negative trailing EPS are included in the ranking.
 • Revenue Growth Rank — ranks stocks by top-line growth momentum using a time-weighted blend of fiscal year estimates. Revenue growth validates earnings growth and signals genuine business expansion. Companies with negative trailing revenue receive a neutral rank of 50.
-• Price Momentum Rank (6M) — ranks stocks by medium-term price momentum, measuring the 6-month return excluding the most recent week to reduce short-term noise.
-• Price Momentum Rank (12M) — ranks stocks by long-term price momentum, measuring the 12-month return excluding the most recent month.
+• Price Momentum — we rank stocks based on medium and long-term price momentum, using 6-month and 12-month return windows. Short-term noise is reduced by excluding the most recent period from each window. Markets tend to anticipate future growth; stocks that have outperformed over these horizons often continue to do so.
 
 The four components are averaged and re-ranked to produce the final Growth Score. All ranks are calculated within the stock's country universe.
 
-A Growth Score of 70 means the stock has stronger growth characteristics than 70% of its European peers.`,
+A Growth Score of 70 means the stock has stronger growth characteristics than 70% of its peers.`,
+    },
+    {
+      title: 'The Best Score',
+      content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to the entire European universe.
+
+It is calculated as the simple average of the Value Score and Growth Score, then re-ranked from 1 to 100 across all European stocks regardless of country.
+
+A Best Score of 80 or above places a stock in the top 20% of all European equities — combining both attractive valuation and strong growth momentum. These are ForwardAlpha's Best Ideas: stocks where value and growth reinforce each other.
+
+The Best Score is our primary screening tool for identifying European equity opportunities.`,
     },
     {
       title: 'How to Use ForwardAlpha',
-      content: `Best Ideas — Value Score >= 70 and Growth Score >= 70
-The sweet spot. Companies that are reasonably priced and growing faster than their peers. These are rare, and historically the most rewarding investments.
+      content: `ForwardAlpha is designed for investors who want a rigorous, data-driven starting point for European equity research.
 
-Best Value — Value Score >= 80 and Growth Score >= 30
-Deep value opportunities. Companies trading at significant discounts to peers with at least some growth. Classic value investing territory.
+Key parameters to focus on:
 
-Best Growth — Growth Score >= 80
-High-growth companies regardless of valuation. Suitable for investors willing to pay a premium for exceptional growth.
+• Best Score ≥ 80 — the top 20% of European equities combining Value and Growth. Our primary Best Ideas filter.
+• Value Score — use to identify attractively valued stocks within a sector or country.
+• Growth Score — use to identify companies with strong earnings, revenue and price momentum.
+• Momentum 6M and 12M — medium and long-term price performance indicators.
 
-Practical tips:
-• Start with Best Ideas — the intersection of value and growth is where the best risk-adjusted returns are historically found.
-• Use country filters — different European markets have different characteristics. Italian and Spanish financials often score high on value; Nordic technology companies often lead on growth.
-• Check the sector — a P/E of 15x means very different things for a utility versus a software company.
-• Look at the full picture — a high Value Score with negative EPS growth may signal a value trap. A high Growth Score with an extreme P/E may not leave a margin of safety.`
-    },
-    {
-      title: 'Key Parameters',
-      content: null,
-      table: [
-        ['P/E Forward', 'Price divided by next 12 months estimated earnings. Our primary valuation metric.'],
-        ['P/E Trailing', 'Price divided by last 12 months actual earnings.'],
-        ['P/B', 'Price-to-book ratio. Net asset value anchor, key for financials.'],
-        ['EPS Growth %', 'Expected earnings per share growth, next 12 months vs trailing.'],
-        ['Rev Growth %', 'Expected revenue growth, next 12 months.'],
-        ['Mom 1M / 6M / 12M', 'Total return price performance over 1, 6 and 12 months in local currency.'],
-        ['Value Score', 'Composite ranking on valuation metrics (1-100). Higher = cheaper vs peers.'],
-        ['Growth Score', 'Composite ranking on growth and momentum metrics (1-100). Higher = faster growing.'],
-      ]
-    },
-    {
-      title: 'Data & Methodology',
-      content: `Universe: 3,700+ stocks across 18 European exchanges including Borsa Italiana, Xetra, Euronext Paris, London Stock Exchange, Nasdaq Stockholm, Oslo Bors, SIX Swiss Exchange, Copenhagen, Helsinki and others.
-
-Fundamentals: Sourced from institutional-grade data providers. Updated weekly every Friday after market close.
-
-Prices: End-of-day prices in local currency. Updated daily after market close.
-
-Scores: Value Score and Growth Score recalculated daily after market close using the latest prices and weekly fundamentals.
-
-Currency: All market caps displayed in EUR billions. Prices shown in local currency.
-
-Beta version: ForwardAlpha is currently in beta. Fundamental data is updated as of May 22, 2026. We are working to bring you daily updates. If you find this tool useful, register your interest at andrea@forwardalpha.pro`
-    },
-    {
-      title: 'Disclaimer',
-      content: `ForwardAlpha is a screening and research tool, not a registered investment advisor. All data and scores are provided for informational and educational purposes only and do not constitute investment advice or a recommendation to buy, sell or hold any security.
-
-Investing in financial markets involves risk, including the possible loss of principal. Past performance is not indicative of future results. Always conduct your own due diligence and consider seeking advice from a qualified financial professional before making investment decisions.
-
-ForwardAlpha makes no representation as to the accuracy, completeness or timeliness of the data presented.`
+All data is updated weekly. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates. Last updated: 1 June 2026.`,
     },
   ]
+
 
   return (
     <div style={{ background:'#0a0e1a', minHeight:'100vh', color:'#e2e8f0', fontFamily:'IBM Plex Sans, sans-serif', padding:'40px 24px' }}>
