@@ -212,18 +212,14 @@ const COLUMNS: ColDef[] = [
   { key: 'price',       label: 'Price',     width: 75  },
   { key: 'change1d',    label: '1D %',      width: 65  },
   { key: 'mktCap',      label: 'MktCap €B', width: 80  },
-  { key: 'peTrail',     label: 'P/E Tr.',   width: 65  },
-  { key: 'peFwd',       label: 'P/E Fwd',   width: 65  },
-
-  { key: 'epsGrowth',   label: 'EPS Gr%',   width: 72  },
-  { key: 'revGrowth',   label: 'Rev Gr%',   width: 72  },
+  { key: 'pb',          label: 'P/B',       width: 60  },
+  { key: 'valueScore',  label: 'Val Rank',  width: 65  },
+  { key: 'growthScore', label: 'Grw Rank',  width: 65  },
   { key: 'mom1w',       label: '1W %',      width: 65  },
   { key: 'mom1m',       label: '1M %',      width: 65  },
   { key: 'mom6m',       label: '6M %',      width: 65  },
   { key: 'mom12m',      label: '12M %',     width: 72  },
   { key: 'combinedRank',label: 'Best',      width: 55  },
-  { key: 'valueScore',  label: 'Value',     width: 55  },
-  { key: 'growthScore', label: 'Growth',    width: 60  },
 ]
 // WatchlistButton viene aggiunto nella riga
 
@@ -237,6 +233,7 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'price':       return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-text'  : 'text-muted' }
     case 'change1d':    return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mktCap':      return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
+    case 'pb':          return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peTrail':     return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'epsGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
@@ -280,7 +277,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
     return sortAsc ? av - bv : bv - av
   }).slice(0, maxRows)
 
-  const NO_SORT = new Set(['peTrail','peFwd','epsGrowth','revGrowth'])
+  const NO_SORT = new Set(['pb'])
   const toggle = (key: SortKey) => {
     if (NO_SORT.has(key)) return
     if (sortKey === key) setSortAsc(a => !a)
@@ -331,16 +328,16 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
               <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${s.mktCap.toFixed(1)}B` : '-'}</span></span>
               <span className="text-[#444]">|</span>
-              <span className="text-muted">P/E: <span className="text-sub">{s.peTrail != null ? s.peTrail.toFixed(1) : '-'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">Fwd: <span className="text-sub">{s.peFwd != null ? s.peFwd.toFixed(1) : '-'}</span></span>
-              <span className="text-[#444]">|</span>
               <span className="text-muted">P/B: <span className="text-sub">{s.pb != null ? s.pb.toFixed(2) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{s.valueScore != null ? Math.round(s.valueScore) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{s.growthScore != null ? Math.round(s.growthScore) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{s.combinedRank != null ? Math.round(s.combinedRank) : '-'}</span></span>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-              <span className="text-muted">EPS: <span style={{color: s.epsGrowth != null ? (s.epsGrowth >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.epsGrowth != null ? `${(s.epsGrowth*100).toFixed(1)}%` : '-'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">Rev: <span style={{color: s.revGrowth != null ? (s.revGrowth >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.revGrowth != null ? `${(s.revGrowth*100).toFixed(1)}%` : '-'}</span></span>
+              <span className="text-muted">1W: <span style={{color: s.mom1w != null ? (s.mom1w >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom1w != null ? `${(s.mom1w*100).toFixed(1)}%` : '-'}</span></span>
               <span className="text-[#444]">|</span>
               <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom1m != null ? `${(s.mom1m*100).toFixed(1)}%` : '-'}</span></span>
               <span className="text-[#444]">|</span>
@@ -374,7 +371,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
-                  cursor: ['peTrail','peFwd','epsGrowth','revGrowth'].includes(c.key) ? 'default' : 'pointer',
+                  cursor: ['pb'].includes(c.key) ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
