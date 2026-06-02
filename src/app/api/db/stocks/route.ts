@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ stocks: [{
         ticker: s.ticker, exchange: s.exchange, isin: s.isin,
         company: s.company, sector: s.sector, country: s.country, flag: s.flag,
-        price: l.price ?? null, change1d: l.change_1d ?? (f.change1d != null ? f.change1d * 100 : null),
+        price: l.price ?? null, change1d: l.change_1d ?? null,
         volume: l.volume ?? null, mktCap: f.mkt_cap ?? null,
         peTrail: f.pe_trailing ?? null, peFwd: f.pe_forward ?? null,
         pb: f.pb ?? null, evEbitda: f.ev_ebitda ?? null,
@@ -136,7 +136,7 @@ export async function GET(req: NextRequest) {
         country: s.country,
         flag: s.flag,
         price: live.price ?? null,
-        change1d: live.change_1d ?? (fund.change1d != null ? fund.change1d * 100 : null),
+        change1d: live.change_1d ?? null,
         volume: live.volume ?? null,
         mktCap: fund.mkt_cap ?? null,
         peTrail: fund.pe_trailing ?? null,
