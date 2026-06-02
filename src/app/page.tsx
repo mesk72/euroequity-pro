@@ -212,13 +212,17 @@ const COLUMNS: ColDef[] = [
   { key: 'price',       label: 'Price',     width: 75  },
   { key: 'change1d',    label: '1D %',      width: 65  },
   { key: 'mktCap',      label: 'MktCap €B', width: 80  },
-  { key: 'pb',          label: 'P/B',       width: 60  },
-  { key: 'valueScore',  label: 'Val Rank',  width: 65  },
-  { key: 'growthScore', label: 'Grw Rank',  width: 65  },
+  { key: 'rankPeLtm',   label: 'PE LTM Rk', width: 70  },
+  { key: 'rankPeNtm',   label: 'PE NTM Rk', width: 70  },
+  { key: 'rankPb',      label: 'PB Rank',   width: 65  },
+  { key: 'rankEpsGr',   label: 'EPS Rk',    width: 60  },
+  { key: 'rankRevGr',   label: 'Rev Rk',    width: 60  },
   { key: 'mom1w',       label: '1W %',      width: 65  },
   { key: 'mom1m',       label: '1M %',      width: 65  },
   { key: 'mom6m',       label: '6M %',      width: 65  },
   { key: 'mom12m',      label: '12M %',     width: 72  },
+  { key: 'valueScore',  label: 'Value',     width: 55  },
+  { key: 'growthScore', label: 'Growth',    width: 60  },
   { key: 'combinedRank',label: 'Best',      width: 55  },
 ]
 // WatchlistButton viene aggiunto nella riga
@@ -233,7 +237,6 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'price':       return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-text'  : 'text-muted' }
     case 'change1d':    return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mktCap':      return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
-    case 'pb':          return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peTrail':     return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'epsGrowth':   return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
@@ -242,6 +245,11 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'mom1m':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mom6m':       return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mom12m':      return { val: v != null ? fpd(v)    : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'rankPeLtm':   return { val: v != null ? fn(v) : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400') : 'text-muted' }
+    case 'rankPeNtm':   return { val: v != null ? fn(v) : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400') : 'text-muted' }
+    case 'rankPb':      return { val: v != null ? fn(v) : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400') : 'text-muted' }
+    case 'rankEpsGr':   return { val: v != null ? fn(v) : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400') : 'text-muted' }
+    case 'rankRevGr':   return { val: v != null ? fn(v) : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400') : 'text-muted' }
     case 'combinedRank': return { val: v != null ? fn(v) : '-', cls: v != null ? (v >= 80 ? 'text-green font-700' : v >= 60 ? 'text-yellow-400' : 'text-muted') : 'text-muted' }
     case 'valueScore':  return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
     case 'growthScore': return { val: v != null ? fn(v)     : '-', cls: v != null ? (v >= 70 ? 'text-green font-700' : v <= 30 ? 'text-[#e84560]' : 'text-yellow-400 font-600') : 'text-muted' }
@@ -277,7 +285,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
     return sortAsc ? av - bv : bv - av
   }).slice(0, maxRows)
 
-  const NO_SORT = new Set(['pb'])
+  const NO_SORT = new Set(['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'])
   const toggle = (key: SortKey) => {
     if (NO_SORT.has(key)) return
     if (sortKey === key) setSortAsc(a => !a)
@@ -326,22 +334,26 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
               <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-              <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${s.mktCap.toFixed(1)}B` : '-'}</span></span>
+              <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${(s as any).mktCap.toFixed(1)}B` : '-'}</span></span>
               <span className="text-[#444]">|</span>
-              <span className="text-muted">P/B: <span className="text-sub">{s.pb != null ? s.pb.toFixed(2) : '-'}</span></span>
+              <span className="text-muted">PEv: <span style={{color:'#3b82f6'}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : '-'}</span></span>
               <span className="text-[#444]">|</span>
+              <span className="text-muted">PEf: <span style={{color:'#3b82f6'}}>{(s as any).rankPeNtm != null ? Math.round((s as any).rankPeNtm) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">PB: <span style={{color:'#3b82f6'}}>{(s as any).rankPb != null ? Math.round((s as any).rankPb) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">EPS: <span style={{color:'#22c55e'}}>{(s as any).rankEpsGr != null ? Math.round((s as any).rankEpsGr) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
               <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{s.valueScore != null ? Math.round(s.valueScore) : '-'}</span></span>
               <span className="text-[#444]">|</span>
               <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{s.growthScore != null ? Math.round(s.growthScore) : '-'}</span></span>
               <span className="text-[#444]">|</span>
               <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{s.combinedRank != null ? Math.round(s.combinedRank) : '-'}</span></span>
-            </div>
-            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-              <span className="text-muted">1W: <span style={{color: s.mom1w != null ? (s.mom1w >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom1w != null ? `${(s.mom1w*100).toFixed(1)}%` : '-'}</span></span>
               <span className="text-[#444]">|</span>
               <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom1m != null ? `${(s.mom1m*100).toFixed(1)}%` : '-'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">6M: <span style={{color: s.mom6m != null ? (s.mom6m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom6m != null ? `${(s.mom6m*100).toFixed(1)}%` : '-'}</span></span>
               <span className="text-[#444]">|</span>
               <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-'}</span></span>
             </div>
@@ -371,7 +383,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
-                  cursor: ['pb'].includes(c.key) ? 'default' : 'pointer',
+                  cursor: ['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'].includes(c.key) ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
