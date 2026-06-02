@@ -280,7 +280,7 @@ export default function StockPage() {
   const s = stock as any
   const metrics = [
     { label:'Price',         val: fv(stock.price, 2),    color: 'var(--text)' },
-    { label:'1D Change %', val: stock.change1d != null ? fp((stock.change1d as number) * 100, 2) : '—', color: (stock.change1d ?? 0) >= 0 ? 'var(--green)' : 'var(--red)' },
+    { label:'1D Change %', val: stock.change1d != null ? fp(stock.change1d, 2) : '—', color: (stock.change1d ?? 0) >= 0 ? 'var(--green)' : 'var(--red)' },
     { label:'Mkt Cap €B',    val: stock.mktCap ? fv(stock.mktCap, 1) : '—', color: 'var(--text)' },
     { label:'PE LTM Rank',   val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm <= 30 ? '#e84560' : '#f59e0b' },
     { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b' },
