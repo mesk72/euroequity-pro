@@ -1314,7 +1314,7 @@ function Legal() {
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
-      <div className="text-xs text-muted">Last updated: May 2026 · Beta version</div>
+      <div className="text-xs text-muted">Last updated: 1 June 2026 · Beta version</div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
         {(['terms','privacy','cookie'] as const).map(t => (
