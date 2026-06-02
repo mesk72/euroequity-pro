@@ -81,10 +81,10 @@ export async function GET(req: NextRequest) {
         epsGrowth: fund.eps_growth ?? null,
         revGrowth: fund.rev_growth ?? null,
         epsMom30d: null,
-        mom1w: null,
-        mom1m: null,
-        mom6m: null,
-        mom12m: null,
+        mom1w: fund.mom1w ?? null,
+        mom1m: fund.mom1m ?? null,
+        mom6m: fund.mom6m ?? null,
+        mom12m: fund.mom12m ?? null,
         valueScore: fund.value_score ?? null,
         growthScore: fund.growth_score ?? null,
         combinedRank: fund.combined_rank ?? null,
@@ -93,10 +93,6 @@ export async function GET(req: NextRequest) {
         rankPb: fund.rank_pb ?? null,
         rankEpsGr: fund.rank_eps_gr ?? null,
         rankRevGr: fund.rank_rev_gr ?? null,
-        mom1w: fund.mom1w ?? null,
-        mom1m: fund.mom1m ?? null,
-        mom6m: fund.mom6m ?? null,
-        mom12m: fund.mom12m ?? null,
       }
     })
 
