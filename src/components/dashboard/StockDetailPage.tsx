@@ -156,12 +156,12 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
     ['Mkt Cap €B',   fv(stock.mktCap, 2),      ''],
     ['PE LTM Rank',  fn((stock as any).rankPeLtm),  scoreClr((stock as any).rankPeLtm)],
     ['PE NTM Rank',  fn((stock as any).rankPeNtm),  scoreClr((stock as any).rankPeNtm)],
+    ['PB Rank',      fn((stock as any).rankPb),      scoreClr((stock as any).rankPb)],
   ]
 
   const rightMetrics: [string, string, string][] = [
     ['EPS Gr Rank',    fn((stock as any).rankEpsGr),  scoreClr((stock as any).rankEpsGr)],
     ['Rev Gr Rank',    fn((stock as any).rankRevGr),  scoreClr((stock as any).rankRevGr)],
-    ['PB Rank',        fn((stock as any).rankPb),      scoreClr((stock as any).rankPb)],
     ['Mom 1 Week %',   fpPct(stock.mom1w),      clr(stock.mom1w)],
     ['Mom 1 Month %',  fpPct(stock.mom1m),      clr(stock.mom1m)],
     ['Mom 6 Months %', fpPct(stock.mom6m),      clr(stock.mom6m)],
