@@ -9,7 +9,6 @@ While most financial platforms focus on US markets, Europe offers over 3,700 lis
 We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`
     },
     {
-      {
       title: 'The Best Score',
       content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to the entire European universe.
 
