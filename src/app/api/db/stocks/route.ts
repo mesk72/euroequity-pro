@@ -110,11 +110,58 @@ export async function GET(req: NextRequest) {
 
     if (!stocksData.length) return NextResponse.json({ stocks: [] })
 
-    // Query prezzi live e fondamentali con paginazione
+    // Query fondamentali con paginazione
     const [liveData, fundData] = await Promise.all([
       fetchAll('prices_live', 'ticker,exchange,price,change_1d,volume,updated_at', exList),
       fetchAll('fundamentals', 'ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m', exList),
     ])
+
+    // Calcola price e change1d dalle ultime 2 date in price_history
+    // Usa Supabase per ottenere max date per ogni ticker
+    const priceMap: Record<string, {price: number, change1d: number | null}> = {}
+    
+    // Legge ultimi 2 prezzi per ogni ticker dall'ultima data disponibile
+    const maxDateResult = await supabase
+      .from('price_history')
+      .select('date')
+      .order('date', { ascending: false })
+      .limit(1)
+    
+    const maxDate = maxDateResult.data?.[0]?.date
+    
+    if (maxDate) {
+      // Ottiene secondo ultimo giorno
+      const prevDateResult = await supabase
+        .from('price_history')
+        .select('date')
+        .lt('date', maxDate)
+        .order('date', { ascending: false })
+        .limit(1)
+      
+      const prevDate = prevDateResult.data?.[0]?.date
+      
+      if (prevDate) {
+        // Legge prezzi per entrambe le date
+        const [lastPrices, prevPrices] = await Promise.all([
+          supabase.from('price_history').select('ticker,exchange,close').eq('date', maxDate).in('exchange', exList),
+          supabase.from('price_history').select('ticker,exchange,close').eq('date', prevDate).in('exchange', exList),
+        ])
+        
+        const prevMap: Record<string, number> = {}
+        for (const p of (prevPrices.data || [])) {
+          prevMap[`${p.ticker}.${p.exchange}`] = p.close
+        }
+        
+        for (const p of (lastPrices.data || [])) {
+          const key = `${p.ticker}.${p.exchange}`
+          const prev = prevMap[key]
+          priceMap[key] = {
+            price: p.close,
+            change1d: prev && prev > 0 ? ((p.close / prev - 1) * 100) : null
+          }
+        }
+      }
+    }
 
     // Mappe per accesso rapido
     const liveMap: Record<string, any> = {}
