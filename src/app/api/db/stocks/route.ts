@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
   const search = req.nextUrl.searchParams.get('search') || ''
+  const ticker = req.nextUrl.searchParams.get('ticker') || ''
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
 
   try {
@@ -51,9 +52,52 @@ export async function GET(req: NextRequest) {
       exList = ALL_RANKED
     }
 
-    // Query stocks con search
+    // Query stocks con search o ticker singolo
     let stocksData: any[] = []
-    if (search) {
+    if (ticker && exchange) {
+      const { data } = await supabase
+        .from('stocks')
+        .select('ticker,exchange,isin,company,sector,country,flag')
+        .eq('ticker', ticker)
+        .eq('exchange', exchange)
+        .limit(1)
+      stocksData = data || []
+      if (stocksData.length === 0) return NextResponse.json({ stocks: [] })
+      // Per ticker singolo legge fondamentali direttamente
+      const { data: fund } = await supabase
+        .from('fundamentals')
+        .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,change1d')
+        .eq('ticker', ticker)
+        .eq('exchange', exchange)
+        .limit(1)
+      const { data: live } = await supabase
+        .from('prices_live')
+        .select('ticker,exchange,price,change_1d,volume,updated_at')
+        .eq('ticker', ticker)
+        .eq('exchange', exchange)
+        .limit(1)
+      const f = fund?.[0] || {}
+      const l = live?.[0] || {}
+      const s = stocksData[0]
+      return NextResponse.json({ stocks: [{
+        ticker: s.ticker, exchange: s.exchange, isin: s.isin,
+        company: s.company, sector: s.sector, country: s.country, flag: s.flag,
+        price: l.price ?? null, change1d: l.change_1d ?? (f.change1d != null ? f.change1d * 100 : null),
+        volume: l.volume ?? null, mktCap: f.mkt_cap ?? null,
+        peTrail: f.pe_trailing ?? null, peFwd: f.pe_forward ?? null,
+        pb: f.pb ?? null, evEbitda: f.ev_ebitda ?? null,
+        roe: f.roe ?? null, divYield: f.div_yield ?? null,
+        beta: f.beta ?? null, epsGrowth: f.eps_growth ?? null,
+        revGrowth: f.rev_growth ?? null, epsMom30d: null,
+        mom1w: f.mom1w ?? null, mom1m: f.mom1m ?? null,
+        mom6m: f.mom6m ?? null, mom12m: f.mom12m ?? null,
+        valueScore: f.value_score ?? null, growthScore: f.growth_score ?? null,
+        combinedRank: f.combined_rank ?? null,
+        rankPeLtm: f.rank_pe_ltm ?? null, rankPeNtm: f.rank_pe_ntm ?? null,
+        rankPb: f.rank_pb ?? null, rankEpsGr: f.rank_eps_gr ?? null,
+        rankRevGr: f.rank_rev_gr ?? null,
+      }], source: 'supabase' })
+    } else if (search) {
       const { data } = await supabase
         .from('stocks')
         .select('ticker,exchange,isin,company,sector,country,flag')
@@ -92,7 +136,7 @@ export async function GET(req: NextRequest) {
         country: s.country,
         flag: s.flag,
         price: live.price ?? null,
-        change1d: live.change_1d ?? fund.change1d ?? null,
+        change1d: live.change_1d ?? (fund.change1d != null ? fund.change1d * 100 : null),
         volume: live.volume ?? null,
         mktCap: fund.mkt_cap ?? null,
         peTrail: fund.pe_trailing ?? null,
