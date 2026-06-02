@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
       // Per ticker singolo legge fondamentali direttamente
       const { data: fund } = await supabase
         .from('fundamentals')
-        .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,change1d')
+        .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m')
         .eq('ticker', ticker)
         .eq('exchange', exchange)
         .limit(1)
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ stocks: [{
         ticker: s.ticker, exchange: s.exchange, isin: s.isin,
         company: s.company, sector: s.sector, country: s.country, flag: s.flag,
-        price: l.price ?? null, change1d: l.change_1d != null ? l.change_1d / 100 : null,
+        price: l.price ?? null, change1d: l.change_1d ?? null,
         volume: l.volume ?? null, mktCap: f.mkt_cap ?? null,
         peTrail: f.pe_trailing ?? null, peFwd: f.pe_forward ?? null,
         pb: f.pb ?? null, evEbitda: f.ev_ebitda ?? null,
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
     // Query prezzi live e fondamentali con paginazione
     const [liveData, fundData] = await Promise.all([
       fetchAll('prices_live', 'ticker,exchange,price,change_1d,volume,updated_at', exList),
-      fetchAll('fundamentals', 'ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,change1d', exList),
+      fetchAll('fundamentals', 'ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m', exList),
     ])
 
     // Mappe per accesso rapido
@@ -136,7 +136,7 @@ export async function GET(req: NextRequest) {
         country: s.country,
         flag: s.flag,
         price: live.price ?? null,
-        change1d: live.change_1d != null ? live.change_1d / 100 : null,
+        change1d: live.change_1d ?? null,
         volume: live.volume ?? null,
         mktCap: fund.mkt_cap ?? null,
         peTrail: fund.pe_trailing ?? null,
