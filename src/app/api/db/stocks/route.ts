@@ -76,8 +76,8 @@ export async function GET(req: NextRequest) {
         .eq('ticker', ticker)
         .eq('exchange', exchange)
         .limit(1)
-      const f = fund?.[0] || {}
-      const l = live?.[0] || {}
+      const f: any = fund?.[0] || {}
+      const l: any = live?.[0] || {}
       const s = stocksData[0]
       return NextResponse.json({ stocks: [{
         ticker: s.ticker, exchange: s.exchange, isin: s.isin,
