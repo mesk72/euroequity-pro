@@ -49,7 +49,7 @@ function PriceChart({ history, days }: { history: any[]; days: number }) {
       close: parseFloat(d.adjusted_close || d.close || '0'),
     }))
     .filter(d => !isNaN(d.close) && d.close > 0)
-    .slice(-days)
+    .slice(-(days + 1))
 
   if (data.length < 5) return (
     <div style={{ height:280, display:'flex', alignItems:'center', justifyContent:'center',
@@ -372,6 +372,7 @@ export default function StockPage() {
             {[
               { label:'Value Score', val: stock.valueScore },
               { label:'Growth Score', val: stock.growthScore },
+              { label:'Best', val: stock.combinedRank },
             ].map(({ label, val }) => (
               <div key={label} style={{ textAlign:'center',
                 background: scoreBg(val), border:`1px solid ${scoreClr(val)}40`,
