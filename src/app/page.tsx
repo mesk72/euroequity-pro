@@ -744,7 +744,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   return (
     <div className="space-y-3 p-3">
       {/* Exchange tabs */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 flex-nowrap">
+      <div className="flex gap-1.5 flex-wrap pb-1">
         <button onClick={() => setExchange('EZ')}
           className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === 'EZ' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
           All Europe
