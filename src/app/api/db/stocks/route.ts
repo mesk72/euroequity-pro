@@ -11,6 +11,25 @@ const supabase = createClient(
 const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT','LSE','AIM','SWX','OM','OB','CPSE','NGM']
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
 
+// Legge tutti i record con paginazione (bypassa limite 1000 Supabase)
+async function fetchAll(table: string, select: string, exchangeList: string[]) {
+  const PAGE = 1000
+  let all: any[] = []
+  let from = 0
+  while (true) {
+    const { data, error } = await supabase
+      .from(table)
+      .select(select)
+      .in('exchange', exchangeList)
+      .range(from, from + PAGE - 1)
+    if (error || !data || data.length === 0) break
+    all = all.concat(data)
+    if (data.length < PAGE) break
+    from += PAGE
+  }
+  return all
+}
+
 export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
@@ -18,62 +37,47 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
 
   try {
-    // Determina lista exchange da usare
+    // Determina lista exchange
     let exList: string[] = []
     if (search) {
       exList = ALL_RANKED
-    } else if (exchange && exchange !== 'EZ' && exchange !== 'ALL') {
-      exList = [exchange]
     } else if (exchange === 'EMU') {
       exList = EMU_EXCHANGES
+    } else if (exchange && exchange !== 'EZ' && exchange !== 'ALL') {
+      exList = [exchange]
     } else if (exchanges) {
       exList = exchanges.split(',')
     } else {
       exList = ALL_RANKED
     }
 
-    // Query stocks
-    let stocksQ = supabase
-      .from('stocks')
-      .select('ticker,exchange,isin,company,sector,country,flag')
-      .in('exchange', exList)
-      .limit(5000)
-
+    // Query stocks con search
+    let stocksData: any[] = []
     if (search) {
-      stocksQ = supabase
+      const { data } = await supabase
         .from('stocks')
         .select('ticker,exchange,isin,company,sector,country,flag')
         .or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
         .limit(limit > 0 ? limit : 20)
+      stocksData = data || []
+    } else {
+      stocksData = await fetchAll('stocks', 'ticker,exchange,isin,company,sector,country,flag', exList)
     }
 
-    const { data: stocksData, error: stocksErr } = await stocksQ
-    if (stocksErr) return NextResponse.json({ error: stocksErr.message }, { status: 500 })
-    if (!stocksData?.length) return NextResponse.json({ stocks: [] })
+    if (!stocksData.length) return NextResponse.json({ stocks: [] })
 
-    // Query prezzi live
-    const { data: liveData } = await supabase
-      .from('prices_live')
-      .select('ticker,exchange,price,change_1d,volume,updated_at')
-      .in('exchange', exList)
-      .limit(5000)
-
-    // Query fondamentali
-    const { data: fundData } = await supabase
-      .from('fundamentals')
-      .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,change1d')
-      .in('exchange', exList)
-      .limit(5000)
+    // Query prezzi live e fondamentali con paginazione
+    const [liveData, fundData] = await Promise.all([
+      fetchAll('prices_live', 'ticker,exchange,price,change_1d,volume,updated_at', exList),
+      fetchAll('fundamentals', 'ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,change1d', exList),
+    ])
 
     // Mappe per accesso rapido
     const liveMap: Record<string, any> = {}
-    for (const l of (liveData || [])) {
-      liveMap[`${l.ticker}.${l.exchange}`] = l
-    }
+    for (const l of liveData) liveMap[`${l.ticker}.${l.exchange}`] = l
+
     const fundMap: Record<string, any> = {}
-    for (const f of (fundData || [])) {
-      fundMap[`${f.ticker}.${f.exchange}`] = f
-    }
+    for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
     const stocks = stocksData.map(s => {
       const key = `${s.ticker}.${s.exchange}`
