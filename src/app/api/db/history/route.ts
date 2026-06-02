@@ -18,12 +18,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const fromDate = new Date(Date.now() - (days + 50) * 86400000)
+    // Legge da price_history — unica fonte dati storici
+    const fromDate = new Date(Date.now() - (days + 100) * 86400000)
       .toISOString().slice(0, 10)
 
     const { data, error } = await supabase
-      .from('prices_eod')
-      .select('date,open,high,low,close,adj_close,volume')
+      .from('price_history')
+      .select('date,close')
       .eq('ticker', ticker)
       .eq('exchange', exchange)
       .gte('date', fromDate)
@@ -33,32 +34,36 @@ export async function GET(req: NextRequest) {
 
     const history = (data || []).map((d: any) => ({
       date: d.date,
-      open: d.open,
-      high: d.high,
-      low: d.low,
+      open: d.close,
+      high: d.close,
+      low: d.close,
       close: d.close,
-      adjusted_close: d.adj_close || d.close,
-      volume: d.volume,
+      adjusted_close: d.close,
+      volume: null,
     }))
 
-    const closes = history.map((d: any) => d.adjusted_close).filter(Boolean) as number[]
+    const closes = history.map((d: any) => d.close).filter(Boolean) as number[]
     const n = closes.length
     const last = closes[n - 1]
 
-    const getMom = (offset: number): number | null => {
-      const idx = Math.max(0, n - offset)
-      return closes[idx] ? (last / closes[idx] - 1) * 100 : null
+    // Momentum calcolati con gli stessi offset del daily_load
+    // ret(lag) = prices[-1] / prices[-(lag+1)] - 1
+    const getMom = (lag: number): number | null => {
+      if (n <= lag) return null
+      const p = closes[n - 1 - lag] // stesso di prices.iloc[-(lag+1)]
+      return p && p > 0 ? (last / p - 1) * 100 : null
     }
 
     const momentum = {
-      mom1w: getMom(5),
-      mom1m: getMom(21),
-      mom6m: getMom(126),
-      mom12m: getMom(252),
+      mom1w: getMom(5), // 5 giorni borsa
+      mom1m: getMom(21), // 21 giorni borsa
+      mom6m: getMom(131), // 131 giorni borsa
+      mom12m: getMom(252), // 252 giorni borsa
     }
 
     return NextResponse.json({ history, momentum })
-  } catch {
+
+  } catch (e) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
   }
 }
