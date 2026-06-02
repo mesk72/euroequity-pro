@@ -62,7 +62,7 @@ export interface Stock {
   flag:         string
   exchange:     string
   price:        number | null
-  change1d:     number | null
+  change1d:     number | null  // percentuale es. 1.54 = +1.54%
   volume:       number | null
   mktCap:       number | null  // billions EUR
   peTrail:      number | null
