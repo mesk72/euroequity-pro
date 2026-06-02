@@ -154,13 +154,14 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
     ['Price',   (stock.exchange === 'SWX' ? 'CHF ' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp ' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK ' : stock.exchange === 'OB' ? 'NOK ' : stock.exchange === 'CPSE' ? 'DKK ' : 'EUR ') + fv(stock.price, 2), ''],
     ['1D Change %',  fp(chg, 2),               chg >= 0 ? 'var(--green)' : 'var(--red)'],
     ['Mkt Cap €B',   fv(stock.mktCap, 2),      ''],
-    ['P/E Trailing', fv(stock.peTrail, 1),     ''],
-    ['P/E Forward',  fv(stock.peFwd, 1),       ''],
+    ['PE LTM Rank',  fn((stock as any).rankPeLtm),  scoreClr((stock as any).rankPeLtm)],
+    ['PE NTM Rank',  fn((stock as any).rankPeNtm),  scoreClr((stock as any).rankPeNtm)],
   ]
 
   const rightMetrics: [string, string, string][] = [
-    ['EPS Growth %',   fpPct(stock.epsGrowth),  clr(stock.epsGrowth)],
-    ['Rev Growth %',   fpPct(stock.revGrowth),  clr(stock.revGrowth)],
+    ['EPS Gr Rank',    fn((stock as any).rankEpsGr),  scoreClr((stock as any).rankEpsGr)],
+    ['Rev Gr Rank',    fn((stock as any).rankRevGr),  scoreClr((stock as any).rankRevGr)],
+    ['PB Rank',        fn((stock as any).rankPb),      scoreClr((stock as any).rankPb)],
     ['Mom 1 Week %',   fpPct(stock.mom1w),      clr(stock.mom1w)],
     ['Mom 1 Month %',  fpPct(stock.mom1m),      clr(stock.mom1m)],
     ['Mom 6 Months %', fpPct(stock.mom6m),      clr(stock.mom6m)],
