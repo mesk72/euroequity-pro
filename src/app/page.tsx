@@ -714,7 +714,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   const usdToEur = 0.8615
   const stocksWithEurCap = stocks.map(s => ({
     ...s,
-    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null
+    mktCap: s.mktCap ?? null
   }))
 
   const filtered = stocksWithEurCap.filter(s => {
@@ -882,7 +882,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
 
   const stocksEur = stocks.map(s => ({
     ...s,
-    mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null
+    mktCap: s.mktCap ?? null
   }))
 
   // Aggrega per settore
@@ -1050,7 +1050,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
 
   // Top 600 Europe per market cap
-  const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap != null ? parseFloat((s.mktCap * usdToEur / 1e3).toFixed(2)) : null}))
+  const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null}))
     .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
     .slice(0, 600)
 
