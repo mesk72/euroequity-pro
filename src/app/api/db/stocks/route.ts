@@ -20,14 +20,15 @@ export async function GET(req: NextRequest) {
     // Legge stocks con prezzi live e fondamentali in una sola query
     let stocksQ = supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag')
     if (search) {
-      stocksQ = stocksQ.or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
+      stocksQ = stocksQ.or(`ticker.ilike.%${search}%,company.ilike.%${search}%`).limit(limit > 0 ? limit : 20)
     } else if (exchange && exchange !== 'EZ' && exchange !== 'ALL') {
-      stocksQ = stocksQ.eq('exchange', exchange)
+      stocksQ = stocksQ.eq('exchange', exchange).limit(5000)
     } else if (exchanges) {
       const exList = exchanges.split(',')
-      stocksQ = stocksQ.in('exchange', exList)
+      stocksQ = stocksQ.in('exchange', exList).limit(5000)
+    } else {
+      stocksQ = stocksQ.limit(5000)
     }
-    if (limit > 0) stocksQ = stocksQ.limit(limit)
     const { data: stocksData, error: stocksErr } = await stocksQ
 
     if (stocksErr) return NextResponse.json({ error: stocksErr.message }, { status: 500 })
@@ -43,6 +44,7 @@ export async function GET(req: NextRequest) {
         ? [exchange]
         : ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
       )
+      .limit(5000)
 
     // Legge fondamentali
     const { data: fundData } = await supabase
@@ -52,6 +54,7 @@ export async function GET(req: NextRequest) {
         ? [exchange]
         : ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
       )
+      .limit(5000)
 
     // Mappa per accesso rapido
     const liveMap: Record<string, any> = {}
