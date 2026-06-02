@@ -18,21 +18,25 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Legge da price_history — unica fonte dati storici
-    const fromDate = new Date(Date.now() - (days + 100) * 86400000)
-      .toISOString().slice(0, 10)
-
+    // Legge tutti i dati storici da price_history senza filtro data
+    // poi slice lato client
     const { data, error } = await supabase
       .from('price_history')
       .select('date,close')
       .eq('ticker', ticker)
       .eq('exchange', exchange)
-      .gte('date', fromDate)
       .order('date', { ascending: true })
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
 
-    const history = (data || []).map((d: any) => ({
+    if (!data || data.length === 0) {
+      return NextResponse.json({ history: [], momentum: { mom1w: null, mom1m: null, mom6m: null, mom12m: null } })
+    }
+
+    // Costruisce history nel formato atteso dal grafico
+    const history = data.map((d: any) => ({
       date: d.date,
       open: d.close,
       high: d.close,
@@ -42,23 +46,22 @@ export async function GET(req: NextRequest) {
       volume: null,
     }))
 
-    const closes = history.map((d: any) => d.close).filter(Boolean) as number[]
+    // Calcola momentum con stessi offset del daily_load
+    const closes = data.map((d: any) => d.close) as number[]
     const n = closes.length
     const last = closes[n - 1]
 
-    // Momentum calcolati con gli stessi offset del daily_load
-    // ret(lag) = prices[-1] / prices[-(lag+1)] - 1
     const getMom = (lag: number): number | null => {
       if (n <= lag) return null
-      const p = closes[n - 1 - lag] // stesso di prices.iloc[-(lag+1)]
+      const p = closes[n - 1 - lag]
       return p && p > 0 ? (last / p - 1) * 100 : null
     }
 
     const momentum = {
-      mom1w: getMom(5), // 5 giorni borsa
-      mom1m: getMom(21), // 21 giorni borsa
-      mom6m: getMom(131), // 131 giorni borsa
-      mom12m: getMom(252), // 252 giorni borsa
+      mom1w: getMom(5),
+      mom1m: getMom(21),
+      mom6m: getMom(131),
+      mom12m: getMom(252),
     }
 
     return NextResponse.json({ history, momentum })
