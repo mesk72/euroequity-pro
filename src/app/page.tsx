@@ -235,7 +235,7 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'country':     return { val: s.country  || '-',   cls: 'text-[10px] text-muted' }
     case 'sector':      return { val: s.sector  || '-',   cls: 'text-[10px]', sectorColor: getSectorColor(s.sector) }
     case 'price':       return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-text'  : 'text-muted' }
-    case 'change1d':    return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'change1d':    return { val: v != null ? fp((v as number) * 100)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mktCap':      return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peTrail':     return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
@@ -325,7 +325,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                   {s.price != null ? s.price.toFixed(2) : '-'}
                 </span>
                 <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
-                  {s.change1d != null ? fpd(s.change1d/100) : '-'}
+                  {s.change1d != null ? fpd(s.change1d) : '-'}
                 </span>
               </div>
             </div>
@@ -526,7 +526,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 
   const metrics: [string, string, string][] = [
     ['Price',        fv(stock.price, 2),       ''],
-    ['1D %',         fp(stock.change1d),        clr(stock.change1d)],
+    ['1D %',         fp((stock.change1d as number) * 100),        clr(stock.change1d)],
     ['Mkt Cap B',    fv(stock.mktCap, 1),       ''],
     ['P/E Trailing', fv(stock.peTrail, 1),      ''],
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
@@ -547,7 +547,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
         <div>
           <div className="font-700 text-base text-text">
             {stock.flag} {stock.ticker}
-            <span className={`ml-2 font-mono text-sm ${clr(stock.change1d)}`}>{fp(stock.change1d)}</span>
+            <span className={`ml-2 font-mono text-sm ${clr(stock.change1d)}`}>{fp((stock.change1d as number) * 100)}</span>
           </div>
           <div className="text-xs text-muted">{stock.company} · {stock.exchange}</div>
           {stock.sector && (
@@ -972,7 +972,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       </td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clr(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fp((s.change1d as number) * 100)}</td>
                       <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m)}</td>
@@ -1153,10 +1153,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
             Last Quantitative Update
           </div>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-            June 1, 2026
+            May 22, 2026
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            3,636 European equities · Value & Growth Scores recalculated
+            3,637 European equities · Value & Growth Scores recalculated
           </div>
         </div>
 
@@ -1217,7 +1217,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp((s.change1d as number) * 100)}</td>
                     </tr>
                   ))}
                 </tbody>
