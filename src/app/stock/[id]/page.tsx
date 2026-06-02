@@ -277,13 +277,15 @@ export default function StockPage() {
     )
   }
 
+  const s = stock as any
   const metrics = [
-    { label:'Price',       val: fv(stock.price, 2),    color: 'var(--text)' },
-    { label:'Mkt Cap €B',  val: stock.mktCap ? fv(stock.mktCap / 1000 * 0.92, 1) : '—', color: 'var(--text)' },
-    { label:'P/E Trailing',  val: fv(stock.peTrail, 1),  color: 'var(--text)' },
-    { label:'P/E Forward',   val: fv(stock.peFwd, 1),    color: 'var(--text)' },
-    { label:'EPS Growth %',  val: stock.epsGrowth != null ? fp(stock.epsGrowth * 100, 1) : '—', color: clr(stock.epsGrowth) },
-    { label:'Rev Growth %',  val: stock.revGrowth != null ? fp(stock.revGrowth * 100, 1) : '—', color: clr(stock.revGrowth) },
+    { label:'Price',         val: fv(stock.price, 2),    color: 'var(--text)' },
+    { label:'Mkt Cap €B',    val: stock.mktCap ? fv(stock.mktCap / 1000 * 0.92, 1) : '—', color: 'var(--text)' },
+    { label:'PE LTM Rank',   val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'PB Rank',       val: s.rankPb    != null ? String(Math.round(s.rankPb))    : '—', color: s.rankPb    >= 70 ? 'var(--green)' : s.rankPb    <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'EPS Gr Rank',   val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b' },
     { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
     { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
     { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
