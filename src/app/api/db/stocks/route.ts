@@ -12,13 +12,22 @@ const supabase = createClient(
 
 export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
+  const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
+  const search = req.nextUrl.searchParams.get('search') || ''
+  const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
 
   try {
     // Legge stocks con prezzi live e fondamentali in una sola query
     let stocksQ = supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag')
-    if (exchange && exchange !== 'EZ') {
+    if (search) {
+      stocksQ = stocksQ.or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
+    } else if (exchange && exchange !== 'EZ' && exchange !== 'ALL') {
       stocksQ = stocksQ.eq('exchange', exchange)
+    } else if (exchanges) {
+      const exList = exchanges.split(',')
+      stocksQ = stocksQ.in('exchange', exList)
     }
+    if (limit > 0) stocksQ = stocksQ.limit(limit)
     const { data: stocksData, error: stocksErr } = await stocksQ
 
     if (stocksErr) return NextResponse.json({ error: stocksErr.message }, { status: 500 })
@@ -38,7 +47,7 @@ export async function GET(req: NextRequest) {
     // Legge fondamentali
     const { data: fundData } = await supabase
       .from('fundamentals')
-      .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,epsMom30d:eps_current,value_score,growth_score')
+      .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m')
       .in('exchange', exchange && exchange !== 'EZ'
         ? [exchange]
         : ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
