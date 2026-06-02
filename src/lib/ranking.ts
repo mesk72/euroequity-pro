@@ -83,6 +83,11 @@ export interface Stock {
   valueScore:   number | null
   growthScore:  number | null
   combinedRank?: number | null
+  rankPeLtm?:   number | null
+  rankPeNtm?:   number | null
+  rankPb?:      number | null
+  rankEpsGr?:   number | null
+  rankRevGr?:   number | null
 }
 
 export function computeScores(stocks: Stock[]): Stock[] {
