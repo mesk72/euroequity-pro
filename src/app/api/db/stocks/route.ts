@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// Cache 60s condivisa — se 1000 utenti richiedono MIL nello stesso minuto,
-// Supabase riceve UNA sola query e tutti ricevono la risposta dalla cache
 export const revalidate = 60
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
+
+const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT','LSE','AIM','SWX','OM','OB','CPSE','NGM']
+const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
 
 export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
@@ -17,46 +18,54 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
 
   try {
-    // Legge stocks con prezzi live e fondamentali in una sola query
-    let stocksQ = supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag')
+    // Determina lista exchange da usare
+    let exList: string[] = []
     if (search) {
-      stocksQ = stocksQ.or(`ticker.ilike.%${search}%,company.ilike.%${search}%`).limit(limit > 0 ? limit : 20)
+      exList = ALL_RANKED
     } else if (exchange && exchange !== 'EZ' && exchange !== 'ALL') {
-      stocksQ = stocksQ.eq('exchange', exchange).limit(5000)
+      exList = [exchange]
+    } else if (exchange === 'EMU') {
+      exList = EMU_EXCHANGES
     } else if (exchanges) {
-      const exList = exchanges.split(',')
-      stocksQ = stocksQ.in('exchange', exList).limit(5000)
+      exList = exchanges.split(',')
     } else {
-      stocksQ = stocksQ.limit(5000)
+      exList = ALL_RANKED
     }
-    const { data: stocksData, error: stocksErr } = await stocksQ
 
+    // Query stocks
+    let stocksQ = supabase
+      .from('stocks')
+      .select('ticker,exchange,isin,company,sector,country,flag')
+      .in('exchange', exList)
+      .limit(5000)
+
+    if (search) {
+      stocksQ = supabase
+        .from('stocks')
+        .select('ticker,exchange,isin,company,sector,country,flag')
+        .or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
+        .limit(limit > 0 ? limit : 20)
+    }
+
+    const { data: stocksData, error: stocksErr } = await stocksQ
     if (stocksErr) return NextResponse.json({ error: stocksErr.message }, { status: 500 })
     if (!stocksData?.length) return NextResponse.json({ stocks: [] })
 
-    const tickers = stocksData.map(s => `${s.ticker}.${s.exchange}`)
-
-    // Legge prezzi live
+    // Query prezzi live
     const { data: liveData } = await supabase
       .from('prices_live')
       .select('ticker,exchange,price,change_1d,volume,updated_at')
-      .in('exchange', exchange && exchange !== 'EZ'
-        ? [exchange]
-        : ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
-      )
+      .in('exchange', exList)
       .limit(5000)
 
-    // Legge fondamentali
+    // Query fondamentali
     const { data: fundData } = await supabase
       .from('fundamentals')
-      .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m')
-      .in('exchange', exchange && exchange !== 'EZ'
-        ? [exchange]
-        : ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
-      )
+      .select('ticker,exchange,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,change1d')
+      .in('exchange', exList)
       .limit(5000)
 
-    // Mappa per accesso rapido
+    // Mappe per accesso rapido
     const liveMap: Record<string, any> = {}
     for (const l of (liveData || [])) {
       liveMap[`${l.ticker}.${l.exchange}`] = l
@@ -66,7 +75,6 @@ export async function GET(req: NextRequest) {
       fundMap[`${f.ticker}.${f.exchange}`] = f
     }
 
-    // Normalizza formato
     const stocks = stocksData.map(s => {
       const key = `${s.ticker}.${s.exchange}`
       const live = liveMap[key] || {}
@@ -80,7 +88,7 @@ export async function GET(req: NextRequest) {
         country: s.country,
         flag: s.flag,
         price: live.price ?? null,
-        change1d: live.change_1d ?? null,
+        change1d: live.change_1d ?? fund.change1d ?? null,
         volume: live.volume ?? null,
         mktCap: fund.mkt_cap ?? null,
         peTrail: fund.pe_trailing ?? null,
@@ -109,7 +117,7 @@ export async function GET(req: NextRequest) {
     })
 
     return NextResponse.json({ stocks, source: 'supabase' })
-  } catch {
+  } catch (e) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
   }
 }
