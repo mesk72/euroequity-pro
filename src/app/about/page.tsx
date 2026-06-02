@@ -9,7 +9,17 @@ While most financial platforms focus on US markets, Europe offers over 3,700 lis
 We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`
     },
     {
-      title: 'Who We Are',
+      {
+      title: 'The Best Score',
+      content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to the entire European universe.
+
+It is calculated as the simple average of the Value Score and Growth Score, then re-ranked from 1 to 100 across all European stocks regardless of country.
+
+A Best Score of 90 means the stock ranks in the top 10% of all European equities on our combined Value and Growth metrics — it is both attractively valued and showing strong growth momentum relative to the full European universe.
+
+The Best Score is our primary screening tool for identifying European equity opportunities that combine both value and growth characteristics.`,
+    },
+    {title: 'Who We Are',
       content: `ForwardAlpha was founded by Andrea Meschini, a professional investor with over 15 years of institutional experience in European equity and alternative investment management.
 
 Andrea began his career at Gestiveneto SGR, one of Italy's established asset management firms, before joining J.P. Morgan where he spent four years as Investment Analyst, Assistant Portfolio Manager and Junior Portfolio Manager, developing deep expertise in quantitative equity analysis and portfolio construction.
@@ -26,28 +36,32 @@ This background informs every aspect of ForwardAlpha's methodology — from the 
 
 Inspired by the principles of Benjamin Graham and Warren Buffett, value investing rests on a fundamental truth: markets are often irrational in the short term. Great companies get temporarily mispriced. Patient investors who identify these opportunities and buy at a discount to fair value are rewarded over time.
 
-Our Value Score evaluates each stock across three dimensions:
+Our Value Score combines three rank components, each calculated relative to all stocks listed on the same exchange:
 
-• Earnings yield — how much a company earns relative to its price, both on a trailing and forward basis. A stock trading at 8x earnings offers a higher earnings yield than one at 30x, all else equal.
-• Book value — how much a company is worth relative to its net assets. Particularly relevant for financial companies, banks, and insurers where tangible book value is a key anchor.
-• Relative ranking — we don't use absolute thresholds. A stock is scored relative to all other stocks in our European universe. This ensures the framework adapts to different market conditions and sector dynamics.
+• PE LTM Rank — ranks stocks by trailing earnings yield (1/PE). A high rank means the stock earns more relative to its price than its peers. Negative earnings are excluded.
+• PE NTM Rank — ranks stocks by forward earnings yield based on next-twelve-month consensus estimates. Forward-looking and more predictive than trailing earnings.
+• PB Rank — ranks stocks by Price/Book ratio. Lower P/B means more assets per dollar of market value. Negative book value stocks receive rank 0.
 
-A Value Score of 80 means the stock is cheaper than 80% of its peers on our combined valuation metrics.`
+Each component is ranked from 1 to 100 within the stock's country. The three ranks are averaged and re-ranked to produce the final Value Score. A minimum of two components must be available; otherwise the stock receives a neutral score of 50.
+
+A Value Score of 80 means the stock is cheaper than 80% of its peers on our combined valuation metrics.`,
     },
     {
       title: 'The Growth Score',
-      content: `The Growth Score measures a company's growth momentum across earnings, revenue, and price.
+      content: `The Growth Score measures a company's growth momentum across earnings, revenue, and price — the three pillars of fundamental momentum investing.
 
-Growth investing seeks companies that are expanding faster than the market expects. The most durable returns come from businesses that can compound earnings at above-average rates for extended periods.
+Growth investing seeks companies that are expanding faster than the market expects. The most durable returns come from businesses where earnings, revenues, and market recognition are all moving in the same direction.
 
-Our Growth Score evaluates each stock across four dimensions:
+Our Growth Score combines four rank components, each calculated relative to all stocks listed on the same exchange:
 
-• EPS Growth — the expected growth in earnings per share over the next 12 months. Forward-looking earnings growth is the most direct measure of a company's future trajectory.
-• Revenue Growth — top-line growth validates earnings growth. Earnings that grow without revenue growth are fragile and often unsustainable.
-• Price Momentum 6M — markets tend to anticipate future growth. Stocks that have outperformed over the past six months often continue to do so, a pattern well-documented in academic research.
-• Price Momentum 12M — longer-term price momentum further confirms the direction of business fundamentals.
+• EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months. Calculated as EPS NTM divided by EPS LTM. Companies with negative trailing EPS receive a neutral rank of 50.
+• Revenue Growth Rank — ranks stocks by top-line growth momentum using a time-weighted blend of fiscal year estimates. Revenue growth validates earnings growth and signals genuine business expansion. Companies with negative trailing revenue receive a neutral rank of 50.
+• Price Momentum Rank (6M) — ranks stocks by medium-term price momentum, measuring the 6-month return excluding the most recent week to reduce short-term noise.
+• Price Momentum Rank (12M) — ranks stocks by long-term price momentum, measuring the 12-month return excluding the most recent month.
 
-A Growth Score of 70 means the stock has stronger growth characteristics than 70% of its European peers.`
+The four components are averaged and re-ranked to produce the final Growth Score. All ranks are calculated within the stock's country universe.
+
+A Growth Score of 70 means the stock has stronger growth characteristics than 70% of its European peers.`,
     },
     {
       title: 'How to Use ForwardAlpha',
