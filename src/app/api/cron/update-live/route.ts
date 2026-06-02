@@ -3,74 +3,91 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// Questo endpoint viene chiamato da Vercel Cron ogni 5 minuti
-// Configura in vercel.json:
-// "crons": [{ "path": "/api/cron/update-live", "schedule": "*/5 8-18 * * 1-5" }]
+// Chiamato da Vercel Cron ogni giorno alle 18:30 IT (lun-ven)
+// vercel.json: { "path": "/api/cron/update-live", "schedule": "30 16 * * 1-5" }
 
-const LEEWAY_BASE = 'https://api.leeway.tech/api/v1/public'
-const LEEWAY_KEY  = process.env.LEEWAY_KEY || ''
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
-const EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
+const EXCHANGE_SUFFIX: Record<string, string> = {
+  'MIL':'.MI','XETRA':'.DE','PA':'.PA','LSE':'.L',
+  'AS':'.AS','SWX':'.SW','OM':'.ST','OB':'.OL',
+  'BR':'.BR','HE':'.HE','MC':'.MC','CPSE':'.CO',
+  'AT':'.AT','VI':'.VI','LS':'.LS','IR':'.IR',
+}
 
-async function fetchLiveQuotes(exchange: string) {
-  const url = `${LEEWAY_BASE}/livequotes/${exchange}?apitoken=${LEEWAY_KEY}`
-  const r = await fetch(url, { cache: 'no-store' })
-  if (!r.ok) return []
-  return r.json()
+async function fetchYahooQuote(yahooTicker: string): Promise<{price: number, change1d: number} | null> {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooTicker)}?interval=1d&range=2d`
+    const r = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      cache: 'no-store'
+    })
+    if (!r.ok) return null
+    const data = await r.json()
+    const meta = data?.chart?.result?.[0]?.meta
+    if (!meta?.regularMarketPrice) return null
+    const price = meta.regularMarketPrice
+    const prev = meta.chartPreviousClose || meta.previousClose
+    const change1d = prev && prev !== 0 ? (price / prev - 1) : null
+    return { price, change1d }
+  } catch {
+    return null
+  }
 }
 
 export async function GET(req: NextRequest) {
-  // Verifica secret per sicurezza
   const auth = req.headers.get('authorization')
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  // Legge tutti i ticker dal DB
+  const { data: stocks } = await supabaseAdmin
+    .from('stocks')
+    .select('ticker,exchange')
+    .in('exchange', Object.keys(EXCHANGE_SUFFIX))
 
-  let total = 0
+  if (!stocks?.length) return NextResponse.json({ error: 'No stocks' })
 
-  for (const exchange of EXCHANGES) {
-    try {
-      const quotes = await fetchLiveQuotes(exchange)
-      if (!Array.isArray(quotes) || !quotes.length) continue
+  let ok = 0
+  let errors = 0
+  const rows: any[] = []
 
-      const rows = quotes.map((q: any) => {
-        const ticker    = q.ticker || q.code || q.symbol || ''
-        const price     = parseFloat(q.close || q.price || q.last || '0') || null
-        const prev      = parseFloat(q.previousClose || q.prev_close || '0') || null
-        const change1d  = price && prev && prev !== 0
-          ? ((price / prev) - 1) * 100
-          : parseFloat(q.changePercent || q.change_p || '0') || null
-        const changeAbs = price && prev ? price - prev : null
+  for (const s of stocks) {
+    const suffix = EXCHANGE_SUFFIX[s.exchange] || ''
+    let yticker = s.ticker + suffix
 
-        return {
-          ticker,
-          exchange,
-          price,
-          change_1d:  change1d,
-          change_abs: changeAbs,
-          volume:     parseInt(q.volume || '0') || null,
-          updated_at: new Date().toISOString(),
-        }
-      }).filter((r: any) => r.ticker && r.price)
+    // Fix ticker nordici
+    if (['.ST','.CO','.OL','.HE'].includes(suffix) && yticker.includes(' '))
+      yticker = yticker.replace(' ', '-')
+    if (suffix === '.L' && s.ticker.endsWith('.'))
+      yticker = s.ticker.slice(0,-1) + suffix
 
-      if (rows.length) {
-        await supabase
-          .from('prices_live')
-          .upsert(rows, { onConflict: 'ticker,exchange' })
-        total += rows.length
-      }
-    } catch (err) {
-      console.error(`Error updating ${exchange}:`, err)
+    const q = await fetchYahooQuote(yticker)
+    if (!q) { errors++; continue }
+
+    rows.push({
+      ticker: s.ticker,
+      exchange: s.exchange,
+      price: q.price,
+      change_1d: q.change1d,
+      updated_at: new Date().toISOString(),
+    })
+    ok++
+
+    // Batch upsert ogni 100
+    if (rows.length >= 100) {
+      await supabaseAdmin.from('prices_live').upsert(rows.splice(0,100), { onConflict: 'ticker,exchange' })
     }
   }
 
-  return NextResponse.json({
-    updated: total,
-    timestamp: new Date().toISOString(),
-  })
+  // Upload rimanenti
+  if (rows.length > 0) {
+    await supabaseAdmin.from('prices_live').upsert(rows, { onConflict: 'ticker,exchange' })
+  }
+
+  return NextResponse.json({ ok, errors, timestamp: new Date().toISOString() })
 }
