@@ -75,7 +75,7 @@ Key parameters to focus on:
 
 All data is updated weekly. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates. Last updated: 1 June 2026.
 
-Coverage note: Value Score, Growth Score and Best Score are available for exchanges with at least 100 listed stocks: London (LSE + AIM), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (AT) and Copenhagen (CPSE). For smaller markets — Vienna (VI), Lisbon (LS), Dublin (IR) and Stockholm NGM — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated due to insufficient sample size.`,
+Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE + AIM), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (AT) and Copenhagen (CPSE). For smaller markets — Vienna (VI), Lisbon (LS), Dublin (IR) and Stockholm NGM — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated.`,
     },
   ]
 
