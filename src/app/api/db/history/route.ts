@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     const lastDate = new Date(dates[dates.length - 1])
     const lastPrice = closes[closes.length - 1]
 
-    function getPrice(targetDate: Date): number | null {
+    const getPrice = (targetDate: Date): number | null => {
       // Prende il prezzo del giorno di borsa precedente alla data target
       const target = targetDate.toISOString().slice(0, 10)
       for (let i = dates.length - 1; i >= 0; i--) {
@@ -66,13 +66,13 @@ export async function GET(req: NextRequest) {
       return null
     }
 
-    function addMonths(d: Date, months: number): Date {
+    const addMonths = (d: Date, months: number): Date => {
       const result = new Date(d)
       result.setMonth(result.getMonth() + months)
       return result
     }
 
-    function addDays(d: Date, days: number): Date {
+    const addDays = (d: Date, days: number): Date => {
       const result = new Date(d)
       result.setDate(result.getDate() + days)
       return result
