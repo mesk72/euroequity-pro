@@ -153,10 +153,10 @@ async function apiHistory(ticker: string, exchange: string, days: number) {
     : `/api/history?ticker=${ticker}&exchange=${exchange}&days=${days}`
   try {
     const r = await fetch(endpoint)
-    if (!r.ok) return []
+    if (!r.ok) return { history: [] as any[], momentum: null }
     const d = await r.json()
-    return { history: d.history || [], momentum: d.momentum || null }
-  } catch { return { history: [], momentum: null } }
+    return { history: (d.history || []) as any[], momentum: d.momentum || null }
+  } catch { return { history: [] as any[], momentum: null } }
 }
 
 async function apiIndices() {
@@ -475,12 +475,11 @@ function PriceChart({ history, momentum, chartDays }: { history: any[]; momentum
 
   const isUp  = prices[prices.length - 1] >= prices[0]
   const color = isUp ? '#22d48a' : '#e84560'
-  // Usa momentum dal route db/history (date di calendario) invece di prices[0]
   const getMomForDays = () => {
     if (!momentum) return null
-    if (chartDays <= 10)   return momentum.mom1w
-    if (chartDays <= 40)   return momentum.mom1m
-    if (chartDays <= 200)  return momentum.mom6m
+    if (chartDays <= 10)  return momentum.mom1w
+    if (chartDays <= 40)  return momentum.mom1m
+    if (chartDays <= 200) return momentum.mom6m
     return momentum.mom12m
   }
   const momVal = getMomForDays()
