@@ -153,10 +153,10 @@ async function apiHistory(ticker: string, exchange: string, days: number) {
     : `/api/history?ticker=${ticker}&exchange=${exchange}&days=${days}`
   try {
     const r = await fetch(endpoint)
-    if (!r.ok) return { history: [] as any[], momentum: null }
+    if (!r.ok) return []
     const d = await r.json()
-    return { history: (d.history || []) as any[], momentum: d.momentum || null }
-  } catch { return { history: [] as any[], momentum: null } }
+    return d.history || []
+  } catch { return [] }
 }
 
 async function apiIndices() {
@@ -451,7 +451,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   )
 }
 
-function PriceChart({ history, momentum, chartDays }: { history: any[]; momentum: any; chartDays: number }) {
+function PriceChart({ history }: { history: any[] }) {
   const prices = history
     .map((d: any) => parseFloat(d.adjusted_close || d.close || '0'))
     .filter(v => !isNaN(v) && v > 0)
@@ -475,15 +475,7 @@ function PriceChart({ history, momentum, chartDays }: { history: any[]; momentum
 
   const isUp  = prices[prices.length - 1] >= prices[0]
   const color = isUp ? '#22d48a' : '#e84560'
-  const getMomForDays = () => {
-    if (!momentum) return null
-    if (chartDays <= 10)  return momentum.mom1w
-    if (chartDays <= 40)  return momentum.mom1m
-    if (chartDays <= 200) return momentum.mom6m
-    return momentum.mom12m
-  }
-  const momVal = getMomForDays()
-  const perf   = momVal != null ? (momVal).toFixed(1) : ((prices[prices.length - 1] / prices[0] - 1) * 100).toFixed(1)
+  const perf  = ((prices[prices.length - 1] / prices[0] - 1) * 100).toFixed(1)
 
   return (
     <div className="relative">
@@ -519,7 +511,6 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 }) {
   const [chartDays, setChartDays] = useState(365)
   const [history,   setHistory]   = useState<any[]>([])
-  const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoadingChart] = useState(true)
   const [qty,  setQty]  = useState('')
   const [px,   setPx]   = useState(stock.price?.toFixed(2) || '')
@@ -527,9 +518,8 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 
   useEffect(() => {
     setLoadingChart(true)
-    apiHistory(stock.ticker, stock.exchange, chartDays).then(result => {
-      setHistory(result.history)
-      setMomentum(result.momentum)
+    apiHistory(stock.ticker, stock.exchange, chartDays).then(h => {
+      setHistory(h)
       setLoadingChart(false)
     })
   }, [stock.ticker, stock.exchange, chartDays])
@@ -602,7 +592,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
         <div className="bg-bg border border-border rounded-lg overflow-hidden">
           {loadingChart
             ? <div className="h-48 flex items-center justify-center"><RefreshCw size={16} className="animate-spin text-gold" /></div>
-            : <PriceChart history={history} momentum={momentum} chartDays={chartDays} />
+            : <PriceChart history={history} />
           }
         </div>
       </div>
