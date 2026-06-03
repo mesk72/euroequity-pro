@@ -6,6 +6,7 @@ const NOTES: Record<string, any> = {
     ticker: 'SHEL',
     exchange: 'LSE',
     company: 'Shell plc',
+    bestScore: 96,
     title: 'Value 75 & Growth 92: The Rare GARP Engine Hidden in Big Oil',
     summary: 'Shell triggers a rare dual signal: Growth Score 92 and Value Score 75. NTM P/E of 7.9x with +30% 12M price return and projected EPS growth of 24% per year.',
     valueScore: 75,
@@ -33,6 +34,7 @@ Trading at a dirt-cheap NTM P/E of just ~7.9x, the market has not priced in this
     ticker: 'ABBN',
     exchange: 'SWX',
     company: 'ABB Ltd',
+    bestScore: 56,
     title: 'Growth Score 97/100: Why the Market is Paying a Premium for ABB',
     summary: 'ABB scores 97/100 on Growth with +80% 12M return. EPS growth ~14% annually, ROIC 25%, Net Debt/EBITDA below 0.5x. Trading at 32x NTM P/E.',
     valueScore: 6,
@@ -118,18 +120,18 @@ export default function ResearchNotePage({ params }: Props) {
         <div style={{ display:'flex', gap:16, marginBottom:32 }}>
           <div style={{ background:'#111827', border:'1px solid #1e293b', borderRadius:8,
             padding:'16px 24px', textAlign:'center', flex:1 }}>
-            <div style={{ fontSize:28, fontWeight:800, color:'#22c55e' }}>{note.valueScore}</div>
+            <div style={{ fontSize:28, fontWeight:800, color:'#22c55e', fontFamily:'IBM Plex Mono' }}>{note.valueScore}</div>
             <div style={{ fontSize:11, color:'#64748b', marginTop:4 }}>Value Score</div>
           </div>
           <div style={{ background:'#111827', border:'1px solid #1e293b', borderRadius:8,
             padding:'16px 24px', textAlign:'center', flex:1 }}>
-            <div style={{ fontSize:28, fontWeight:800, color:'#f97316' }}>{note.growthScore}</div>
+            <div style={{ fontSize:28, fontWeight:800, color:'#f97316', fontFamily:'IBM Plex Mono' }}>{note.growthScore}</div>
             <div style={{ fontSize:11, color:'#64748b', marginTop:4 }}>Growth Score</div>
           </div>
           <div style={{ background:'#111827', border:'1px solid #1e293b', borderRadius:8,
             padding:'16px 24px', textAlign:'center', flex:1 }}>
-            <div style={{ fontSize:14, fontWeight:700, color:'#e2e8f0' }}>
-              {Math.round((note.valueScore + note.growthScore) / 2)}
+            <div style={{ fontSize:28, fontWeight:800, color:'#3b82f6', fontFamily:'IBM Plex Mono' }}>
+              {note.bestScore || Math.round((note.valueScore + note.growthScore) / 2)}
             </div>
             <div style={{ fontSize:11, color:'#64748b', marginTop:4 }}>Best Score</div>
           </div>
