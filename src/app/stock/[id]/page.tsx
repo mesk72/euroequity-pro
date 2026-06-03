@@ -4,12 +4,30 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { computeScores } from '@/lib/ranking'
-import { STOCK_LINKS } from '@/lib/stockLinks'
 import { DEMO_STOCKS } from '@/lib/demoData'
 
-// Recupera link ufficiali dalla mappa
-function getLinks(ticker: string, exchange: string) {
-  return STOCK_LINKS[`${ticker}.${exchange}`] || null
+// Costruisce link borsa dinamicamente da ISIN e exchange
+const MIC: Record<string, string> = {
+  PA:'XPAR', AS:'XAMS', BR:'XBRU', LS:'XLIS', MIL:'XMIL', IR:'XDUB', OB:'XOSL'
+}
+
+function getBorseUrl(ticker: string, exchange: string, isin: string | null): string | null {
+  if (['PA','AS','BR','LS','MIL','IR'].includes(exchange) && isin)
+    return `https://live.euronext.com/en/product/equities/${isin}-${MIC[exchange]}`
+  if (exchange === 'OB' && isin)
+    return `https://live.euronext.com/nb/product/equities/${isin}-XOSL`
+  if (exchange === 'XETRA' && isin)
+    return `https://www.boerse-frankfurt.de/equity/${isin}`
+  if (exchange === 'MC' && isin)
+    return `https://www.bolsamadrid.es/esp/aspx/Empresas/FichaValor.aspx?ISIN=${isin}`
+  if (['LSE','AIM'].includes(exchange))
+    return `https://www.londonstockexchange.com/stock/${ticker}/company-page`
+  if (['OM','HE','CPSE','NGM'].includes(exchange))
+    return `https://www.nasdaq.com/european-market-activity/shares/${ticker.toLowerCase()}`
+  if (exchange === 'SWX')
+    return `https://www.six-group.com/en/market-data/shares/share-explorer.html?`
+  return null
+}
 }
 
 function fp(v?: number | null, d = 2): string {
@@ -500,10 +518,10 @@ export default function StockPage() {
 
         {/* Official links */}
         {(() => {
-          const links = getLinks(ticker, exchangeCode)
-          if (!links) return null
+          const borseUrl = getBorseUrl(ticker, exchangeCode, stock.isin || null)
+          const companyUrl = stock.website || null
+          if (!borseUrl && !companyUrl) return null
           return (
-            <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
               justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
               <div>
@@ -511,21 +529,25 @@ export default function StockPage() {
                   letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)',
                   marginBottom:6 }}>Official Links</div>
                 <div style={{ fontSize:12, color:'var(--text3)', fontFamily:'IBM Plex Mono' }}>
-                  ISIN: {links.isin}
+                  ISIN: {stock.isin || "N/A"}
                 </div>
               </div>
               <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                <a href={links.borseUrl} target="_blank" rel="noopener noreferrer"
+                {borseUrl && (
+                <a href={borseUrl || "#"} target="_blank" rel="noopener noreferrer"
                   style={{ background:'var(--surface2)', color:'var(--text2)',
                     fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                     fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
+                )}
                     textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
                   📊 Official Listing ↗
                 </a>
-                <a href={links.companyUrl} target="_blank" rel="noopener noreferrer"
+                {companyUrl && (
+                <a href={companyUrl || "#"} target="_blank" rel="noopener noreferrer"
                   style={{ background:'var(--orange)', color:'#fff',
                     fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                     fontSize:12, padding:'7px 14px', borderRadius:3,
+                )}
                     textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
                   🌐 Company Website ↗
                 </a>
