@@ -28,6 +28,7 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null): str
     return `https://www.six-group.com/en/market-data/shares/share-explorer.html?`
   return null
 }
+}
 
 function fp(v?: number | null, d = 2): string {
   if (v == null || isNaN(v as number)) return '-'
@@ -113,10 +114,10 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   // Performance calcolata sul periodo selezionato (prezzi adjusted close)
   const perfFromMom = (() => {
     if (!momentum) return null
-    if (days <= 10)  return momentum.mom1w  != null ? (momentum.mom1w  ).toFixed(2) : null
-    if (days <= 40)  return momentum.mom1m  != null ? (momentum.mom1m  ).toFixed(2) : null
-    if (days <= 200) return momentum.mom6m  != null ? (momentum.mom6m  ).toFixed(2) : null
-    return momentum.mom12m != null ? (momentum.mom12m ).toFixed(2) : null
+    if (days <= 10)  return momentum.mom1w  != null ? momentum.mom1w.toFixed(2)  : null
+    if (days <= 40)  return momentum.mom1m  != null ? momentum.mom1m.toFixed(2)  : null
+    if (days <= 200) return momentum.mom6m  != null ? momentum.mom6m.toFixed(2)  : null
+    return momentum.mom12m != null ? momentum.mom12m.toFixed(2) : null
   })()
   const perf = perfFromMom ?? ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
 
@@ -517,7 +518,7 @@ export default function StockPage() {
 
         {/* Official links */}
         {(() => {
-          const borseUrl = getBorseUrl(ticker, exchangeCode, stock.isin || null)
+          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null)
           const companyUrl = (stock as any).website || null
           if (!borseUrl && !companyUrl) return null
             <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
@@ -538,7 +539,7 @@ export default function StockPage() {
                       fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                       fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
                       textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                    \U0001f4ca Official Listing ↗
+                    📊 Official Listing ↗
                   </a>
                 )}
                 {companyUrl && (
