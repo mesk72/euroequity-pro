@@ -42,7 +42,7 @@ function scoreClr(v?: number | null): string {
 }
 
 // ── PRICE CHART WITH MOVING AVERAGES ──────────────────────────────
-function PriceChart({ history, days }: { history: any[]; days: number }) {
+function PriceChart({ history, days, momentum }: { history: any[]; days: number; momentum: any }) {
   const data = history
     .map((d: any) => ({
       date:  d.date || d.Date || '',
@@ -94,7 +94,15 @@ function PriceChart({ history, days }: { history: any[]; days: number }) {
   const isUp = closes[closes.length - 1] >= closes[0]
   const c = isUp ? 'var(--green)' : 'var(--red)'
   // Performance calcolata sul periodo selezionato (prezzi adjusted close)
-  const perf = ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
+  const getMomForDays = () => {
+    if (!momentum) return null
+    if (days <= 10)  return momentum.mom1w != null ? momentum.mom1w * 100 : null
+    if (days <= 40)  return momentum.mom1m != null ? momentum.mom1m * 100 : null
+    if (days <= 200) return momentum.mom6m != null ? momentum.mom6m * 100 : null
+    return momentum.mom12m != null ? momentum.mom12m * 100 : null
+  }
+  const momVal = getMomForDays()
+  const perf = momVal != null ? momVal.toFixed(2) : ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
 
   // Y axis labels
   const yLabels = [0, 0.25, 0.5, 0.75, 1].map(r => ({
@@ -231,6 +239,7 @@ export default function StockPage() {
 
   const [chartDays, setChartDays]   = useState(252)
   const [history,   setHistory]     = useState<any[]>([])
+  const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoading]  = useState(true)
   const [qty,   setQty]   = useState('')
   const [px,    setPx]    = useState(stock?.price?.toFixed(2) || '')
@@ -242,8 +251,8 @@ export default function StockPage() {
     setLoading(true)
     fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store' })
       .then(r => r.ok ? r.json() : { history: [] })
-      .then(d => { setHistory(d.history || []); setLoading(false) })
-      .catch(() => setLoading(false))
+      .then(r => r.ok ? r.json() : { history: [], momentum: null })
+      .then(d => { setHistory(d.history || []); setMomentum(d.momentum || null); setLoading(false) })
   }, [ticker, exchangeCode, chartDays])
 
   function handleAdd() {
@@ -418,7 +427,7 @@ export default function StockPage() {
               Loading chart…
             </div>
           ) : (
-            <PriceChart history={history} days={chartDays} />
+            <PriceChart history={history} days={chartDays} momentum={momentum} />
 
           )}
           <div style={{ display:'flex', gap:16, marginTop:8, fontSize:10,
