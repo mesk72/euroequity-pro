@@ -96,10 +96,10 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   // Performance calcolata sul periodo selezionato (prezzi adjusted close)
   const perfFromMom = (() => {
     if (!momentum) return null
-    if (days <= 10)  return momentum.mom1w  != null ? (momentum.mom1w  * 100).toFixed(2) : null
-    if (days <= 40)  return momentum.mom1m  != null ? (momentum.mom1m  * 100).toFixed(2) : null
-    if (days <= 200) return momentum.mom6m  != null ? (momentum.mom6m  * 100).toFixed(2) : null
-    return momentum.mom12m != null ? (momentum.mom12m * 100).toFixed(2) : null
+    if (days <= 10)  return momentum.mom1w  != null ? (momentum.mom1w  ).toFixed(2) : null
+    if (days <= 40)  return momentum.mom1m  != null ? (momentum.mom1m  ).toFixed(2) : null
+    if (days <= 200) return momentum.mom6m  != null ? (momentum.mom6m  ).toFixed(2) : null
+    return momentum.mom12m != null ? (momentum.mom12m ).toFixed(2) : null
   })()
   const perf = perfFromMom ?? ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
 
