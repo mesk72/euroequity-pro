@@ -36,7 +36,7 @@ export default function ResearchHubPage() {
         </div>
 
         {/* Months */}
-        {MONTHS.map(monthGroup => (
+        {MONTHS.map((monthGroup: any) => (
           <div key={monthGroup.month} style={{ marginBottom: 48 }}>
             {/* Month divider */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
@@ -53,7 +53,7 @@ export default function ResearchHubPage() {
                   {sector.name}
                 </h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
-                  {sector.notes.map(note => (
+                  {sector.notes.map((note: any) => (
                     <Link key={note.slug} href={`/research/${note.slug}`} style={{ textDecoration: 'none' }}>
                       <div style={{ background: '#0f1923', border: '1px solid #1e293b', borderRadius: 8, padding: '14px 16px', cursor: 'pointer' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
