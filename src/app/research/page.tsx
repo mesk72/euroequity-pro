@@ -13,72 +13,7 @@ export const metadata: Metadata = {
   },
 }
 
-const MONTHS = [
-  {
-    month: 'May 2026',
-    sectors: [
-      {
-        name: 'Financials & Banking',
-        color: '#3b82f6',
-        notes: [
-          { ticker: 'BNP',  slug: 'bnp',  flag: '🇫🇷', company: 'BNP Paribas S.A.',             tagline: 'Deep Value & Resilient Income Engine',              value: 79, growth: 64 },
-          { ticker: 'INGA', slug: 'inga', flag: '🇳🇱', company: 'ING Groep N.V.',                tagline: 'A Rare Blueprint for Financial Sector GARP',        value: 75, growth: 60 },
-          { ticker: 'UBSG', slug: 'ubsg', flag: '🇨🇭', company: 'UBS Group AG',                  tagline: 'Operational Leverage at Scale',                     value: 69, growth: 65 },
-          { ticker: 'BARC', slug: 'barc', flag: '🇬🇧', company: 'Barclays PLC',                tagline: 'Re-Accelerating Capital Machine',                        value: 77, growth: 62 },
-        ],
-      },
-      {
-        name: 'Technology & Semiconductors',
-        color: '#8b5cf6',
-        notes: [
-          { ticker: 'ASML', slug: 'asml', flag: '🇳🇱', company: 'ASML Holding N.V.',             tagline: 'The Quantitative Growth Engine — EUV Monopoly',     value: 19, growth: 86 },
-          { ticker: 'IFX',  slug: 'ifx',  flag: '🇩🇪', company: 'Infineon Technologies AG',      tagline: 'Violent Multiple Compression in Tech',              value: 21, growth: 86 },
-        ],
-      },
-      {
-        name: 'Basic Materials & Industrials',
-        color: '#16a34a',
-        notes: [
-          { ticker: 'RIO',  slug: 'rio',  flag: '🇬🇧', company: 'Rio Tinto Group',               tagline: 'The Institutional Quality Blueprint',               value: 46, growth: 74 },
-        ],
-      },
-      {
-        name: 'Consumer Discretionary & Automotive',
-        color: '#b45309',
-        notes: [
-          { ticker: 'VOW3', slug: 'vow3', flag: '🇩🇪', company: 'Volkswagen AG', tagline: 'The Ultimate Value Paradox', value: 96, growth: 43 },
-        ],
-      },
-    ],
-  },
-  {
-    month: 'June 2026',
-    sectors: [
-      {
-        name: 'Industrials',
-        color: '#8b5cf6',
-        notes: [
-          { ticker: 'PRY',  slug: 'pry',  flag: '🇮🇹', company: 'Prysmian S.p.A.',  tagline: 'The Electrification Compounder', value: 17, growth: 85 },
-          { ticker: 'ABBN', slug: 'abbn', flag: '🇨🇭', company: 'ABB Ltd',           tagline: 'The Ultimate Industrial Growth Engine', value: 17, growth: 82 },
-        ],
-      },
-      {
-        name: 'Energy',
-        color: '#ef4444',
-        notes: [
-          { ticker: 'SHEL', slug: 'shel', flag: '🇬🇧', company: 'Shell plc', tagline: 'The Best GARP Play in European Energy', value: 66, growth: 71 },
-        ],
-      },
-      {
-        name: 'Consumer Discretionary & Luxury',
-        color: '#c026d3',
-        notes: [
-          { ticker: 'MC', slug: 'mc', flag: '🇫🇷', company: 'LVMH Moët Hennessy Louis Vuitton', tagline: 'Growth Disconnection Alert — Growth Trap', value: 36, growth: 28 },
-        ],
-      },
-    ],
-  },
-]
+const MONTHS: any[] = []
 
 export default function ResearchHubPage() {
   return (
