@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-const SLUGS = ['asml','barc','bnp','ifx','inga','rio','ubsg','vow3']
+const SLUGS: string[] = []
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://forwardalpha.pro'
