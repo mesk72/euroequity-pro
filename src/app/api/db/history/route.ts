@@ -17,11 +17,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Legge con paginazione per bypassare limite 1000 Supabase
+    // Legge tutta la serie storica con paginazione
     let all: any[] = []
     let from = 0
-    const PAGE = 1000
-
     while (true) {
       const { data, error } = await supabase
         .from('price_history')
@@ -29,19 +27,17 @@ export async function GET(req: NextRequest) {
         .eq('ticker', ticker)
         .eq('exchange', exchange)
         .order('date', { ascending: true })
-        .range(from, from + PAGE - 1)
-
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-      if (!data || data.length === 0) break
+        .range(from, from + 999)
+      if (error || !data || data.length === 0) break
       all = all.concat(data)
-      if (data.length < PAGE) break
-      from += PAGE
+      if (data.length < 1000) break
+      from += 1000
     }
 
     if (all.length === 0) {
-      return NextResponse.json({ 
-        history: [], 
-        momentum: { mom1w: null, mom1m: null, mom6m: null, mom12m: null } 
+      return NextResponse.json({
+        history: [],
+        momentum: { mom1w: null, mom1m: null, mom6m: null, mom12m: null }
       })
     }
 
@@ -55,21 +51,45 @@ export async function GET(req: NextRequest) {
       volume: null,
     }))
 
+    // Calcola momentum con date di calendario — stessa logica del daily_load
+    const dates = all.map((d: any) => d.date) as string[]
     const closes = all.map((d: any) => d.close) as number[]
-    const n = closes.length
-    const last = closes[n - 1]
+    const lastDate = new Date(dates[dates.length - 1])
+    const lastPrice = closes[closes.length - 1]
 
-    const getMom = (lag: number): number | null => {
-      if (n <= lag) return null
-      const p = closes[n - 1 - lag]
-      return p && p > 0 ? (last / p - 1) * 100 : null
+    function getPrice(targetDate: Date): number | null {
+      // Prende il prezzo del giorno di borsa precedente alla data target
+      const target = targetDate.toISOString().slice(0, 10)
+      for (let i = dates.length - 1; i >= 0; i--) {
+        if (dates[i] <= target) return closes[i]
+      }
+      return null
     }
 
+    function addMonths(d: Date, months: number): Date {
+      const result = new Date(d)
+      result.setMonth(result.getMonth() + months)
+      return result
+    }
+
+    function addDays(d: Date, days: number): Date {
+      const result = new Date(d)
+      result.setDate(result.getDate() + days)
+      return result
+    }
+
+    const p1w = getPrice(addDays(lastDate, -7))
+    const p1m = getPrice(addMonths(lastDate, -1))
+    const p6m = getPrice(addMonths(lastDate, -6))
+    const p12m = getPrice(addMonths(lastDate, -12))
+
+    const mom = (p: number | null) => p && p > 0 ? (lastPrice / p - 1) * 100 : null
+
     const momentum = {
-      mom1w: getMom(5),
-      mom1m: getMom(21),
-      mom6m: getMom(131),
-      mom12m: getMom(252),
+      mom1w: mom(p1w),
+      mom1m: mom(p1m),
+      mom6m: mom(p6m),
+      mom12m: mom(p12m),
     }
 
     return NextResponse.json({ history, momentum })
