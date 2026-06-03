@@ -153,10 +153,10 @@ async function apiHistory(ticker: string, exchange: string, days: number) {
     : `/api/history?ticker=${ticker}&exchange=${exchange}&days=${days}`
   try {
     const r = await fetch(endpoint)
-    if (!r.ok) return { history: [] as any[], momentum: null }
+    if (!r.ok) return []
     const d = await r.json()
-    return { history: (d.history || []) as any[], momentum: d.momentum || null }
-  } catch { return { history: [] as any[], momentum: null } }
+    return { history: d.history || [], momentum: d.momentum || null }
+  } catch { return { history: [], momentum: null } }
 }
 
 async function apiIndices() {
