@@ -13,7 +13,49 @@ export const metadata: Metadata = {
   },
 }
 
-const MONTHS: any[] = []
+const MONTHS: any[] = [
+  {
+    month: 'June 2026',
+    sectors: [
+      {
+        name: 'Energy',
+        color: '#f97316',
+        notes: [
+          {
+            slug: 'SHEL-LSE',
+            ticker: 'SHEL',
+            exchange: 'LSE',
+            company: 'Shell plc',
+            title: 'Value 75 & Growth 92: The Rare GARP Engine Hidden in Big Oil',
+            summary: 'Shell triggers a rare dual signal: Growth Score 92 and Value Score 75. NTM P/E of 7.9x with +30% 12M price return and projected EPS growth of 24% per year.',
+            valueScore: 75,
+            growthScore: 92,
+            pdfFile: 'SHEL_ForwardAlpha_Analysis.pdf',
+            date: '2026-06-03',
+          }
+        ]
+      },
+      {
+        name: 'Industrials',
+        color: '#3b82f6',
+        notes: [
+          {
+            slug: 'ABBN-SWX',
+            ticker: 'ABBN',
+            exchange: 'SWX',
+            company: 'ABB Ltd',
+            title: 'Growth Score 97/100: Why the Market is Paying a Premium for ABB',
+            summary: 'ABB scores 97/100 on Growth with +80% 12M return. EPS growth ~14% annually, ROIC 25%, Net Debt/EBITDA below 0.5x. Trading at 32x NTM P/E.',
+            valueScore: 6,
+            growthScore: 97,
+            pdfFile: 'ABBN_ForwardAlpha_Analysis.pdf',
+            date: '2026-06-03',
+          }
+        ]
+      }
+    ]
+  }
+]
 
 export default function ResearchHubPage() {
   return (
