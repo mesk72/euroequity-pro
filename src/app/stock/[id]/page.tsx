@@ -520,6 +520,7 @@ export default function StockPage() {
           const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null)
           const companyUrl = (stock as any).website || null
           if (!borseUrl && !companyUrl) return null
+          return (
             <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
               justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
