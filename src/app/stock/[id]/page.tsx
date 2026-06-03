@@ -518,9 +518,9 @@ export default function StockPage() {
         {/* Official links */}
         {(() => {
           const borseUrl = getBorseUrl(ticker, exchangeCode, stock.isin || null)
-          const companyUrl = stock.website || null
+          const companyUrl = (stock as any).website || null
           if (!borseUrl && !companyUrl) return null
-          return (
+            <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
               justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
               <div>
@@ -528,17 +528,17 @@ export default function StockPage() {
                   letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)',
                   marginBottom:6 }}>Official Links</div>
                 <div style={{ fontSize:12, color:'var(--text3)', fontFamily:'IBM Plex Mono' }}>
-                  ISIN: {stock.isin || "N/A"}
+                  ISIN: {(stock as any).isin || "N/A"}
                 </div>
               </div>
-                <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
                 {borseUrl && (
                   <a href={borseUrl} target="_blank" rel="noopener noreferrer"
                     style={{ background:'var(--surface2)', color:'var(--text2)',
                       fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                       fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
                       textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                    📊 Official Listing ↗
+                    \U0001f4ca Official Listing ↗
                   </a>
                 )}
                 {companyUrl && (
