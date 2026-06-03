@@ -28,7 +28,6 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null): str
     return `https://www.six-group.com/en/market-data/shares/share-explorer.html?`
   return null
 }
-}
 
 function fp(v?: number | null, d = 2): string {
   if (v == null || isNaN(v as number)) return '-'
