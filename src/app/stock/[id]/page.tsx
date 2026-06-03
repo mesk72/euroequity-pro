@@ -28,7 +28,6 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null): str
     return `https://www.six-group.com/en/market-data/shares/share-explorer.html?`
   return null
 }
-}
 
 function fp(v?: number | null, d = 2): string {
   if (v == null || isNaN(v as number)) return '-'
@@ -532,25 +531,25 @@ export default function StockPage() {
                   ISIN: {stock.isin || "N/A"}
                 </div>
               </div>
-              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
                 {borseUrl && (
-                <a href={borseUrl || "#"} target="_blank" rel="noopener noreferrer"
-                  style={{ background:'var(--surface2)', color:'var(--text2)',
-                    fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                    fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
+                  <a href={borseUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ background:'var(--surface2)', color:'var(--text2)',
+                      fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                      fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
+                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+                    📊 Official Listing ↗
+                  </a>
                 )}
-                    textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                  📊 Official Listing ↗
-                </a>
                 {companyUrl && (
-                <a href={companyUrl || "#"} target="_blank" rel="noopener noreferrer"
-                  style={{ background:'var(--orange)', color:'#fff',
-                    fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                    fontSize:12, padding:'7px 14px', borderRadius:3,
+                  <a href={companyUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ background:'var(--orange)', color:'#fff',
+                      fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                      fontSize:12, padding:'7px 14px', borderRadius:3,
+                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+                    🌐 Company Website ↗
+                  </a>
                 )}
-                    textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                  🌐 Company Website ↗
-                </a>
               </div>
             </div>
           )
