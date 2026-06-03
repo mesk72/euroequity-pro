@@ -46,7 +46,7 @@ export default function ResearchHubPage() {
               </div>
               <div style={{ height: 1, flex: 1, background: '#1e293b' }} />
             </div>
-            {monthGroup.sectors.map(sector => (
+            {monthGroup.sectors.map((sector: any) => (
               <div key={sector.name} style={{ marginBottom: 28 }}>
                 <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: sector.color, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ display: 'inline-block', width: 3, height: 14, background: sector.color, borderRadius: 2 }} />
