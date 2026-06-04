@@ -52,7 +52,7 @@ const NOTES: ResearchNote[] = [
     ticker: 'ASML',
     exchange: 'AS',
     company: 'ASML Holding N.V.',
-    title: 'Growth Score 98/100: Decoding ASML's Monopoly Power',
+    title: "Growth Score 98/100: Decoding ASML's Monopoly Power",
     subtitle: 'Value 2 · Growth 98 · Best 51 · EPS +29% · ROE 50%+',
     date: 'June 2026',
     sector: 'Information Technology',
