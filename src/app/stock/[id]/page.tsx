@@ -5,29 +5,17 @@ import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { computeScores } from '@/lib/ranking'
 import { RESEARCH_INDEX } from '@/lib/researchIndex'
-import { RESEARCH_INDEX } from '@/lib/researchIndex'
 import { DEMO_STOCKS } from '@/lib/demoData'
 
-// Costruisce link borsa dinamicamente da ISIN e exchange
-const MIC: Record<string, string> = {
-  PA:'XPAR', AS:'XAMS', BR:'XBRU', LS:'XLIS', MIL:'XMIL', IR:'XDUB', OB:'XOSL'
-}
+const MIC: Record<string, string> = { PA:'XPAR', AS:'XAMS', BR:'XBRU', LS:'XLIS', MIL:'XMIL', IR:'XDUB', OB:'XOSL' }
 
 function getBorseUrl(ticker: string, exchange: string, isin: string | null): string | null {
-  if (['PA','AS','BR','LS','MIL','IR'].includes(exchange) && isin)
-    return `https://live.euronext.com/en/product/equities/${isin}-${MIC[exchange]}`
-  if (exchange === 'OB' && isin)
-    return `https://live.euronext.com/nb/product/equities/${isin}-XOSL`
-  if (exchange === 'XETRA' && isin)
-    return `https://www.boerse-frankfurt.de/equity/${isin}`
-  if (exchange === 'MC' && isin)
-    return `https://www.bolsamadrid.es/esp/aspx/Empresas/FichaValor.aspx?ISIN=${isin}`
-  if (['LSE','AIM'].includes(exchange))
-    return `https://www.londonstockexchange.com/stock/${ticker}/company-page`
-  if (['OM','HE','CPSE','NGM'].includes(exchange))
-    return `https://www.nasdaq.com/european-market-activity/shares/${ticker.toLowerCase()}`
-  if (exchange === 'SWX')
-    return `https://www.six-group.com/en/market-data/shares/share-explorer.html?`
+  if (['PA','AS','BR','LS','MIL','IR'].includes(exchange) && isin) return `https://live.euronext.com/en/product/equities/${isin}-${MIC[exchange]}`
+  if (exchange === 'OB' && isin) return `https://live.euronext.com/nb/product/equities/${isin}-XOSL`
+  if (exchange === 'XETRA' && isin) return `https://www.boerse-frankfurt.de/equity/${isin}`
+  if (exchange === 'MC' && isin) return `https://www.bolsamadrid.es/esp/aspx/Empresas/FichaValor.aspx?ISIN=${isin}`
+  if (['LSE','AIM'].includes(exchange)) return `https://www.londonstockexchange.com/stock/${ticker}/company-page`
+  if (['OM','HE','CPSE','NGM'].includes(exchange)) return `https://www.nasdaq.com/european-market-activity/shares/${ticker.toLowerCase()}`
   return null
 }
 
@@ -113,14 +101,8 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   const isUp = closes[closes.length - 1] >= closes[0]
   const c = isUp ? 'var(--green)' : 'var(--red)'
   // Performance calcolata sul periodo selezionato (prezzi adjusted close)
-  const perfFromMom = (() => {
-    if (!momentum) return null
-    if (days <= 10)  return momentum.mom1w  != null ? momentum.mom1w.toFixed(2)  : null
-    if (days <= 40)  return momentum.mom1m  != null ? momentum.mom1m.toFixed(2)  : null
-    if (days <= 200) return momentum.mom6m  != null ? momentum.mom6m.toFixed(2)  : null
-    return momentum.mom12m != null ? momentum.mom12m.toFixed(2) : null
-  })()
-  const perf = perfFromMom ?? ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
+  const _fb = ((closes[closes.length-1]/closes[0]-1)*100).toFixed(2)
+  const perf = momentum ? (days<=10 ? (momentum.mom1w??_fb) : days<=40 ? (momentum.mom1m??_fb) : days<=200 ? (momentum.mom6m??_fb) : (momentum.mom12m??_fb)) : _fb
 
   // Y axis labels
   const yLabels = [0, 0.25, 0.5, 0.75, 1].map(r => ({
@@ -257,7 +239,6 @@ export default function StockPage() {
 
   const [chartDays, setChartDays]   = useState(252)
   const [history,   setHistory]     = useState<any[]>([])
-  const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoading]  = useState(true)
   const [qty,   setQty]   = useState('')
   const [px,    setPx]    = useState(stock?.price?.toFixed(2) || '')
@@ -293,6 +274,7 @@ export default function StockPage() {
     return (
       <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
         fontFamily:'IBM Plex Sans, sans-serif', padding:40 }}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
         <button onClick={() => router.back()}
           style={{ display:'flex', alignItems:'center', gap:8, color:'var(--orange)',
             background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
@@ -307,11 +289,11 @@ export default function StockPage() {
   const metrics = [
     { label:'Price',         val: fv(stock.price, 2),    color: 'var(--text)' },
     { label:'Mkt Cap €B',    val: stock.mktCap ? fv(stock.mktCap, 1) : '—', color: 'var(--text)' },
-    { label:'PE LTM Rank',   val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'PB Rank',       val: s.rankPb    != null ? String(Math.round(s.rankPb))    : '—', color: s.rankPb    >= 70 ? 'var(--green)' : s.rankPb    >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'EPS Gr Rank',   val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: 'var(--text)' },
+    { label:'PE LTM Rank',   val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'PB Rank',       val: s.rankPb    != null ? String(Math.round(s.rankPb))    : '—', color: s.rankPb    >= 70 ? 'var(--green)' : s.rankPb    <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'EPS Gr Rank',   val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b' },
     { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
     { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
     { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
@@ -321,6 +303,28 @@ export default function StockPage() {
   return (
     <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
       fontFamily:'IBM Plex Sans, sans-serif', fontSize:13 }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap');
+        :root {
+          --bg:#0a0e1a; --bg2:#0d1221; --surface:#111827; --surface2:#161d2e;
+          --border:#1e2d45; --border2:#243550; --orange:#f97316; --green:#22c55e;
+          --red:#ef4444; --gold:#eab308; --text:#ffffff; --text2:#e2e8f0;
+          --text3:#cbd5e1; --text4:#94a3b8;
+        }
+        body { background:var(--bg); margin:0; }
+        .input-field {
+          background:var(--bg2); border:1px solid var(--border); border-radius:3px;
+          padding:5px 8px; font-size:13px; color:var(--text);
+          font-family:'IBM Plex Sans',sans-serif; outline:none; width:100%;
+        }
+        .input-field:focus { border-color:var(--orange); }
+        .btn-primary {
+          background:var(--orange); color:#fff; font-family:'IBM Plex Sans Condensed',sans-serif;
+          font-weight:700; font-size:13px; padding:7px 18px; border-radius:3px;
+          border:none; cursor:pointer;
+        }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
+      `}</style>
 
       {/* Top nav */}
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
@@ -513,33 +517,10 @@ export default function StockPage() {
                 </div>
               </div>
               <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                {borseUrl && (
-                  <a href={borseUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ background:'var(--surface2)', color:'var(--text2)',
-                      fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                      fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
-                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                    📊 Official Listing ↗
-                  </a>
-                )}
-                {companyUrl && (
-                  <a href={companyUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ background:'var(--orange)', color:'#fff',
-                      fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                      fontSize:12, padding:'7px 14px', borderRadius:3,
-                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                    🌐 Company Website ↗
-                  </a>
-                )}
-                {researchSlug && (
-                  <a href={`/research/${researchSlug}`}
-                    style={{ background:'#f97316', color:'#fff',
-                      fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                      fontSize:12, padding:'7px 14px', borderRadius:3,
-                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                    📋 Read Analysis ↗
-                  </a>
-                )}
+                {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
+                {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
+                {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
+              </div>
             </div>
           )
         })()}
