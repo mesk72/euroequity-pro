@@ -286,9 +286,10 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   }).slice(0, maxRows)
 
   const NO_SORT = new Set(['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'])
+  const LOCKED_GUEST = new Set(['valueScore','growthScore','combinedRank'])
   const toggle = (key: SortKey) => {
-    if (!userId) return
     if (NO_SORT.has(key)) return
+    if (!userId && LOCKED_GUEST.has(key)) return
     if (sortKey === key) setSortAsc(a => !a)
     else { setSortKey(key); setSortAsc(false) }
   }
@@ -382,7 +383,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
-                  cursor: !userId ? 'default' : ['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'].includes(c.key) ? 'default' : 'pointer',
+                  cursor: (NO_SORT.has(c.key) || (!userId && LOCKED_GUEST.has(c.key))) ? 'default' : 'pointer' ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
@@ -393,7 +394,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                 }}
               >
                 <span className="flex items-center gap-1">
-                  {c.label}{!userId && ci > 0 ? ' 🔒' : ''}
+                  {c.label}{!userId && LOCKED_GUEST.has(c.key) ? ' 🔒' : ''}
                   {userId && sortKey === c.key
                     ? (sortAsc ? <ChevronUp size={10} className="text-gold" /> : <ChevronDown size={10} className="text-gold" />)
                     : null
