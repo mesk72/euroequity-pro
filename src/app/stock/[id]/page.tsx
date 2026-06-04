@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { computeScores } from '@/lib/ranking'
+import { RESEARCH_INDEX } from '@/lib/researchIndex'
 import { DEMO_STOCKS } from '@/lib/demoData'
 
 // Costruisce link borsa dinamicamente da ISIN e exchange
@@ -517,9 +518,10 @@ export default function StockPage() {
 
         {/* Official links */}
         {(() => {
+          const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
           const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null)
           const companyUrl = (stock as any).website || null
-          if (!borseUrl && !companyUrl) return null
+          if (!borseUrl && !companyUrl && !researchSlug) return null
           return (
             <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
@@ -551,7 +553,15 @@ export default function StockPage() {
                     🌐 Company Website ↗
                   </a>
                 )}
-              </div>
+                {researchSlug && (
+                  <a href={`/research/${researchSlug}`}
+                    style={{ background:'#f97316', color:'#fff',
+                      fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                      fontSize:12, padding:'7px 14px', borderRadius:3,
+                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+                    📋 Read Analysis ↗
+                  </a>
+                )}
             </div>
           )
         })()}
