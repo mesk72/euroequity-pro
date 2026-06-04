@@ -26,8 +26,7 @@ function getBorseUrl(
   if (['LSE','AIM'].includes(exchange))
     return `https://www.londonstockexchange.com/stock/${ticker}/company-page`
   if (['OM','HE','CPSE','NGM'].includes(exchange))
-    return `https://www.nasdaq.com/european-market-activity/shares/`
-      + `${ticker.toLowerCase()}`
+    return `https://www.nasdaq.com/european-market-activity/shares/${ticker.toLowerCase()}`
   if (exchange === 'SWX')
     return `https://www.six-group.com/en/market-data/shares/share-explorer.html?`
   return null
@@ -130,8 +129,8 @@ function PriceChart(
     if (days <= 200) return momentum.mom6m  != null ? momentum.mom6m.toFixed(2)  : null
     return momentum.mom12m != null ? momentum.mom12m.toFixed(2) : null
   })()
-  const perf = perfFromMom ??
-    ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
+  const fallbackPerf = ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
+  const perf = perfFromMom ?? fallbackPerf
 
   // Y axis labels
   const yLabels = [0, 0.25, 0.5, 0.75, 1].map(r => ({
