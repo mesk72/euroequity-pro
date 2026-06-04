@@ -102,7 +102,13 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   const c = isUp ? 'var(--green)' : 'var(--red)'
   // Performance calcolata sul periodo selezionato (prezzi adjusted close)
   const _fb = ((closes[closes.length-1]/closes[0]-1)*100).toFixed(2)
-  const perf = momentum ? (days<=10 ? (momentum.mom1w??_fb) : days<=40 ? (momentum.mom1m??_fb) : days<=200 ? (momentum.mom6m??_fb) : (momentum.mom12m??_fb)) : _fb
+  const _pct = (v: number | null) => v != null ? (v * 100).toFixed(2) : null
+  const perf = momentum
+    ? (days <= 10  ? (_pct(momentum.mom1w)  ?? _fb)
+    : days <= 40   ? (_pct(momentum.mom1m)  ?? _fb)
+    : days <= 200  ? (_pct(momentum.mom6m)  ?? _fb)
+    :                (_pct(momentum.mom12m) ?? _fb))
+    : _fb
 
   // Y axis labels
   const yLabels = [0, 0.25, 0.5, 0.75, 1].map(r => ({
@@ -128,7 +134,7 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
         color: isUp ? 'var(--green)' : 'var(--red)',
         background:'var(--bg2)', padding:'2px 10px', borderRadius:2,
         border:`1px solid ${isUp ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
-        {isUp ? '▲' : '▼'} {isUp ? '+' : ''}{perf}%
+        {isUp ? '▲' : '▼'} {parseFloat(perf) > 0 ? '+' : ''}{perf}%
       </div>
 
       {/* Legend */}
