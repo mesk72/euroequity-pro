@@ -107,7 +107,9 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
     ? (days <= 10  ? (_pct(momentum.mom1w)  ?? _fb)
     : days <= 40   ? (_pct(momentum.mom1m)  ?? _fb)
     : days <= 200  ? (_pct(momentum.mom6m)  ?? _fb)
-    :                (_pct(momentum.mom12m) ?? _fb))
+    : days <= 400  ? (_pct(momentum.mom12m) ?? _fb)
+    : days <= 1000 ? (_pct(momentum.mom3y)  ?? _fb)
+    :                (_pct(momentum.mom5y)  ?? _fb))
     : _fb
 
   // Y axis labels
