@@ -785,7 +785,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           className="px-3 py-1 rounded text-xs font-600 border border-border text-orange hover:bg-orange/10">
           🏆 Best Combined ≥80
         </button>
-        <button onClick={() => { setValMin(0); setGrowMin(0); setPeMax(0); setPbMax(0); setMom12Min(0); setCombinedMin(0); setSearch(''); setSector('All') }}
+        <button onClick={() => { setValMin(0); setGrowMin(0); setMom6Min(0); setPbMax(0); setMom12Min(0); setCombinedMin(0); setSearch(''); setSector('All') }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
           Reset
         </button>
