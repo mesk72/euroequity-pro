@@ -138,7 +138,8 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   const lastMa200 = ma200.filter(v => v != null).pop()
 
   return (
-    <div style={{ position:'relative', background:'var(--bg2)', borderRadius:3, padding:'12px 0 4px' }}>
+    <div style={{ position:'relative', background:'var(--bg2)',
+      borderRadius:3, padding:'12px 0 4px' }}>
       {/* Performance badge */}
       <div style={{ position:'absolute', top:12, right:16,
         fontFamily:'IBM Plex Mono', fontSize:15, fontWeight:700,
@@ -266,9 +267,15 @@ export default function StockPage() {
   useEffect(() => {
     if (!ticker || !exchangeCode) return
     setLoading(true)
-    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store' })
+    fetch(
+      `/api/db/history?ticker=${ticker}&exchange=${exchangeCode}`
+      + `&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`
       .then(r => r.ok ? r.json() : { history: [] })
-      .then(d => { setHistory(d.history || []); setMomentum(d.momentum || null); setLoading(false) })
+      .then(d => {
+        setHistory(d.history || [])
+        setMomentum(d.momentum || null)
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [ticker, exchangeCode, chartDays])
 
@@ -292,7 +299,6 @@ export default function StockPage() {
     return (
       <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
         fontFamily:'IBM Plex Sans, sans-serif', padding:40 }}>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
         <button onClick={() => router.back()}
           style={{ display:'flex', alignItems:'center', gap:8, color:'var(--orange)',
             background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
@@ -306,43 +312,41 @@ export default function StockPage() {
   const s = stock as any
   const metrics = [
     { label:'Price',         val: fv(stock.price, 2),    color: 'var(--text)' },
-    { label:'Mkt Cap €B',    val: stock.mktCap ? fv(stock.mktCap, 1) : '—', color: 'var(--text)' },
-    { label:'PE LTM Rank',   val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'PB Rank',       val: s.rankPb    != null ? String(Math.round(s.rankPb))    : '—', color: s.rankPb    >= 70 ? 'var(--green)' : s.rankPb    >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'EPS Gr Rank',   val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: 'var(--text)' },
-    { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
-    { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
-    { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
-    { label:'Mom 12 Months', val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—', color: clr(stock.mom12m) },
+    { label:'PE LTM Rank',
+      val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—',
+      color: s.rankPeLtm >= 70
+        ? 'var(--green)' : s.rankPeLtm >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'PE NTM Rank',
+      val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—',
+      color: s.rankPeNtm >= 70
+        ? 'var(--green)' : s.rankPeNtm >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'PB Rank',
+      val: s.rankPb != null ? String(Math.round(s.rankPb)) : '—',
+      color: s.rankPb >= 70 ? 'var(--green)' : s.rankPb >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'EPS Gr Rank',
+      val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—',
+      color: s.rankEpsGr >= 70
+        ? 'var(--green)' : s.rankEpsGr >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'Rev Gr Rank',
+      val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—',
+      color: 'var(--text)' },
+    { label:'Mom 1W',
+      val: stock.mom1w != null ? fp(stock.mom1w * 100, 1) : '—',
+      color: clr(stock.mom1w) },
+    { label:'Mom 1M',
+      val: stock.mom1m != null ? fp(stock.mom1m * 100, 1) : '—',
+      color: clr(stock.mom1m) },
+    { label:'Mom 6M',
+      val: stock.mom6m != null ? fp(stock.mom6m * 100, 1) : '—',
+      color: clr(stock.mom6m) },
+    { label:'Mom 12M',
+      val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—',
+      color: clr(stock.mom12m) },
   ]
 
   return (
     <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
       fontFamily:'IBM Plex Sans, sans-serif', fontSize:13 }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap');
-        :root {
-          --bg:#0a0e1a; --bg2:#0d1221; --surface:#111827; --surface2:#161d2e;
-          --border:#1e2d45; --border2:#243550; --orange:#f97316; --green:#22c55e;
-          --red:#ef4444; --gold:#eab308; --text:#ffffff; --text2:#e2e8f0;
-          --text3:#cbd5e1; --text4:#94a3b8;
-        }
-        body { background:var(--bg); margin:0; }
-        .input-field {
-          background:var(--bg2); border:1px solid var(--border); border-radius:3px;
-          padding:5px 8px; font-size:13px; color:var(--text);
-          font-family:'IBM Plex Sans',sans-serif; outline:none; width:100%;
-        }
-        .input-field:focus { border-color:var(--orange); }
-        .btn-primary {
-          background:var(--orange); color:#fff; font-family:'IBM Plex Sans Condensed',sans-serif;
-          font-weight:700; font-size:13px; padding:7px 18px; border-radius:3px;
-          border:none; cursor:pointer;
-        }
-        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
-      `}</style>
 
       {/* Top nav */}
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
@@ -456,7 +460,8 @@ export default function StockPage() {
         </div>
 
         {/* Metrics grid */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
+        <div style={{ display:'grid',
+          gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
           {metrics.map(({ label, val, color }) => (
             <div key={label} style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:3, padding:'8px 12px' }}>
@@ -539,7 +544,8 @@ export default function StockPage() {
                   <a href={borseUrl} target="_blank" rel="noopener noreferrer"
                     style={{ background:'var(--surface2)', color:'var(--text2)',
                       fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                      fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
+                      fontSize:12, padding:'7px 14px', borderRadius:3,
+                      border:'1px solid var(--border)',
                       textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
                     📊 Official Listing ↗
                   </a>
