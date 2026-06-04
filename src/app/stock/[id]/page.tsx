@@ -270,13 +270,13 @@ export default function StockPage() {
     fetch(
       `/api/db/history?ticker=${ticker}&exchange=${exchangeCode}`
       + `&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`
+    )
       .then(r => r.ok ? r.json() : { history: [] })
       .then(d => {
         setHistory(d.history || [])
         setMomentum(d.momentum || null)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
   }, [ticker, exchangeCode, chartDays])
 
   function handleAdd() {
