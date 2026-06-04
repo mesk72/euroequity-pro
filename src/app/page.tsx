@@ -289,7 +289,10 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   const LOCKED_GUEST = new Set(['valueScore','growthScore','combinedRank'])
   const toggle = (key: SortKey) => {
     if (NO_SORT.has(key)) return
-    if (!userId && LOCKED_GUEST.has(key)) return
+    if (!userId && LOCKED_GUEST.has(key)) {
+      alert('Register for free to sort by Value, Growth and Best Score.')
+      return
+    }
     if (sortKey === key) setSortAsc(a => !a)
     else { setSortKey(key); setSortAsc(false) }
   }
