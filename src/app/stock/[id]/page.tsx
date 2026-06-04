@@ -312,6 +312,21 @@ export default function StockPage() {
   const s = stock as any
   const metrics = [
     { label:'Price',         val: fv(stock.price, 2),    color: 'var(--text)' },
+    { label:'Mkt Cap B',
+      val: stock.mktCap ? fv(stock.mktCap, 1) : '—',
+      color: 'var(--text)' },
+    { label:'Value Rank',
+      val: s.valueScore != null ? String(Math.round(s.valueScore)) : '—',
+      color: s.valueScore >= 70
+        ? 'var(--green)' : s.valueScore >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'Growth Rank',
+      val: s.growthScore != null ? String(Math.round(s.growthScore)) : '—',
+      color: s.growthScore >= 70
+        ? 'var(--green)' : s.growthScore >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'Best Rank',
+      val: s.combinedRank != null ? String(Math.round(s.combinedRank)) : '—',
+      color: s.combinedRank >= 70
+        ? 'var(--green)' : s.combinedRank >= 40 ? 'var(--text)' : 'var(--red)' },
     { label:'PE LTM Rank',
       val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—',
       color: s.rankPeLtm >= 70
