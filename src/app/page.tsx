@@ -287,6 +287,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
 
   const NO_SORT = new Set(['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'])
   const toggle = (key: SortKey) => {
+    if (!userId) return
     if (NO_SORT.has(key)) return
     if (sortKey === key) setSortAsc(a => !a)
     else { setSortKey(key); setSortAsc(false) }
@@ -381,7 +382,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
-                  cursor: ['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'].includes(c.key) ? 'default' : 'pointer',
+                  cursor: !userId ? 'default' : ['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'].includes(c.key) ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
@@ -392,8 +393,8 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                 }}
               >
                 <span className="flex items-center gap-1">
-                  {c.label}
-                  {sortKey === c.key
+                  {c.label}{!userId && ci > 0 ? ' 🔒' : ''}
+                  {userId && sortKey === c.key
                     ? (sortAsc ? <ChevronUp size={10} className="text-gold" /> : <ChevronDown size={10} className="text-gold" />)
                     : null
                   }
@@ -538,7 +539,6 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['Mom 6M %',     fpd(stock.mom6m),          clr(stock.mom6m)],
     ['Mom 12M %',    fpd(stock.mom12m),         clr(stock.mom12m)],
     ['Sector',       stock.sector || '-',       ''],
-    ['Country',      stock.country || '-',      ''],
   ]
 
   return (
