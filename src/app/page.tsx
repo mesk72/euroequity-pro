@@ -383,7 +383,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
-                  cursor: (NO_SORT.has(c.key) || (!userId && LOCKED_GUEST.has(c.key))) ? 'default' : 'pointer' ? 'default' : 'pointer',
+                  cursor: (NO_SORT.has(c.key) || (!userId && LOCKED_GUEST.has(c.key))) ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
