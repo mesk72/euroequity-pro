@@ -649,7 +649,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   const [growMin,     setGrowMin]     = useState(initGrowMin)
   const [combinedMin, setCombinedMin] = useState(initCombinedMin)
   const [showFilters, setShowFilters] = useState(false)
-  const [peMax,    setPeMax]    = useState(0)
+  const [mom6Min,  setMom6Min]  = useState(0)
   const [pbMax,    setPbMax]    = useState(0)
   const [mom12Min, setMom12Min] = useState(0)
 
@@ -729,7 +729,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (sector !== 'All' && s.sector !== sector) return false
     if (initEpsMom === 'epsMomPos' && (s.epsMom30d == null || s.epsMom30d <= 0)) return false
     if (initEpsMom === 'epsMomNeg' && (s.epsMom30d == null || s.epsMom30d >= 0)) return false
-    if (peMax  > 0 && s.peFwd    != null && s.peFwd    > peMax)  return false
+    if (mom6Min > 0 && (s.mom6m || 0) < mom6Min) return false
     if (pbMax  > 0 && s.pb       != null && s.pb       > pbMax)  return false
     if (mom12Min>0 && (s.mom12m  || 0)                 < mom12Min) return false
     if (valMin > 0 && (s.valueScore  || 0)             < valMin) return false
@@ -793,7 +793,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Filters toggle button */}
       {(() => {
-        const activeCount = [peMax>0, mom12Min>0, valMin>0, growMin>0, combinedMin>0, search.length>0, sector!=='All'].filter(Boolean).length
+        const activeCount = [mom6Min>0, mom12Min>0, valMin>0, growMin>0, combinedMin>0, search.length>0, sector!=='All'].filter(Boolean).length
         return (
           <div className="flex items-center gap-2">
             <button
@@ -818,7 +818,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
             <div className="space-y-1.5">
               <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Valuation</div>
-              <input type="number" placeholder="P/E Fwd max" value={peMax || ''} onChange={e => setPeMax(+e.target.value || 0)} className="input-field" />
+              <input type="number" placeholder="Mom 6M % min" value={mom6Min || ''} onChange={e => setMom6Min(+e.target.value || 0)} className="input-field" min={-100} max={1000} />
             </div>
             <div className="space-y-1.5">
               <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Momentum</div>
