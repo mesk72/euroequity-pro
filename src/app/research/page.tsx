@@ -74,7 +74,7 @@ const MONTHS: any[] = [
           {
             slug: 'ASML-AS',
             ticker: 'ASML', exchange: 'AS', company: 'ASML Holding N.V.',
-            title: 'Growth Score 98/100: Decoding ASML's Monopoly Power',
+            title: "Growth Score 98/100: Decoding ASML's Monopoly Power",
             summary: 'Growth 98, Value 2, Best 51. Revenue +20% YoY, EPS +29%, ROE 50%+.',
             valueScore: 2, growthScore: 98, bestScore: 51,
             pdfFile: 'ASML_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
