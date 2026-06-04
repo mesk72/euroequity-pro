@@ -102,7 +102,7 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   const c = isUp ? 'var(--green)' : 'var(--red)'
   // Performance calcolata sul periodo selezionato (prezzi adjusted close)
   const _fb = ((closes[closes.length-1]/closes[0]-1)*100).toFixed(2)
-  const _pct = (v: number | null) => v != null ? (v * 100).toFixed(2) : null
+  const _pct = (v: number | null) => v != null ? Number(v).toFixed(2) : null
   const perf = momentum
     ? (days <= 10  ? (_pct(momentum.mom1w)  ?? _fb)
     : days <= 40   ? (_pct(momentum.mom1m)  ?? _fb)
