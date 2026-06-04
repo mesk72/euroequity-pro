@@ -239,6 +239,7 @@ export default function StockPage() {
 
   const [chartDays, setChartDays]   = useState(252)
   const [history,   setHistory]     = useState<any[]>([])
+  const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoading]  = useState(true)
   const [qty,   setQty]   = useState('')
   const [px,    setPx]    = useState(stock?.price?.toFixed(2) || '')
