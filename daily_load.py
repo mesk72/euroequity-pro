@@ -505,5 +505,124 @@ def calc_ranks_for_group(group):
         key=(d["ticker"],d["exchange"])
         m6=d.get("mom6m"); m12=d.get("mom12m")
         m1w=mom1w_map.get(key); m1m=mom1m_map.get(key)
-        if m6 is not None and m1w is not None: mom6_adj
+ if m6 is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
+        if m12 is not None and m1m is not None: mom12_adj_g.append(m12 - m1m)
 
+    results = []
+    for d in group:
+        key = (d["ticker"], d["exchange"])
+        pe_t = d.get("pe_trailing")
+        pe_f = d.get("pe_forward")
+        pb_v = d.get("pb")
+        eps_g = d.get("eps_growth")
+        rev_g = d.get("rev_growth")
+        m6 = d.get("mom6m")
+        m12 = d.get("mom12m")
+        m1w = mom1w_map.get(key)
+        m1m = mom1m_map.get(key)
+
+        ey_t = ey(pe_t)
+        if ey_t is not None:
+            r_eyt = pct_rank(ey_trail_g, ey_t)
+        elif pe_t is not None and pe_t < 0:
+            r_eyt = 1
+        else:
+            r_eyt = None
+
+        ey_f = ey(pe_f)
+        if ey_f is not None:
+            r_eyf = pct_rank(ey_fwd_g, ey_f)
+        elif pe_f is not None and pe_f < 0:
+            r_eyf = 1
+        else:
+            r_eyf = None
+
+        r_pb = pct_rank([1/x for x in pb_g if x > 0], 1/pb_v if pb_v and pb_v > 0 else None) if pb_v and pb_v > 0 else None
+
+        val_inputs = [x for x in [r_eyt, r_eyf, r_pb] if x is not None]
+        value_score = int(round(sum(val_inputs)/len(val_inputs))) if val_inputs else None
+
+        r_epsg = pct_rank(eps_g_vals, eps_g) if eps_g is not None else None
+        r_revg = pct_rank(rev_g_vals, rev_g) if rev_g is not None else None
+        mom6_adj = (m6 - m1w) if m6 is not None and m1w is not None else None
+        mom12_adj = (m12 - m1m) if m12 is not None and m1m is not None else None
+        r_m6 = pct_rank(mom6_adj_g, mom6_adj) if mom6_adj is not None else None
+        r_m12 = pct_rank(mom12_adj_g, mom12_adj) if mom12_adj is not None else None
+
+        gr_inputs = [x for x in [r_epsg, r_revg, r_m6, r_m12] if x is not None]
+        growth_score = int(round(sum(gr_inputs)/len(gr_inputs))) if gr_inputs else None
+
+        r_pe_ltm = pct_rank(ey_trail_g, ey_t) if ey_t is not None else (1 if pe_t is not None and pe_t < 0 else None)
+        r_pe_ntm = pct_rank(ey_fwd_g, ey_f) if ey_f is not None else (1 if pe_f is not None and pe_f < 0 else None)
+        r_pb_ind = pct_rank([1/x for x in pb_g if x > 0], 1/pb_v if pb_v and pb_v > 0 else None) if pb_v and pb_v > 0 else None
+        r_eps_gr = pct_rank(eps_g_vals, eps_g) if eps_g is not None else None
+        r_rev_gr = pct_rank(rev_g_vals, rev_g) if rev_g is not None else None
+
+        results.append({
+            "ticker": d["ticker"], "exchange": d["exchange"],
+            "value_score": value_score,
+            "growth_score": growth_score,
+            "rank_pe_ltm": r_pe_ltm,
+            "rank_pe_ntm": r_pe_ntm,
+            "rank_pb": r_pb_ind,
+            "rank_eps_gr": r_eps_gr,
+            "rank_rev_gr": r_rev_gr,
+        })
+    return results
+
+rank_updates = []
+for country, exchanges in RANK_GROUPS.items():
+    group = [d for d in all_data if d["exchange"] in exchanges]
+    if not group: continue
+    rank_updates.extend(calc_ranks_for_group(group))
+
+ranked_exchanges = set(ex for exs in RANK_GROUPS.values() for ex in exs)
+unranked = [d for d in all_data if d["exchange"] not in ranked_exchanges and d["exchange"] not in NO_RANK]
+if unranked:
+    rank_updates.extend(calc_ranks_for_group(unranked))
+
+ok = 0
+for i in range(0, len(rank_updates), 100):
+    r = requests.post(SUPABASE_URL+"/rest/v1/fundamentals",
+        headers=headers_up, json=rank_updates[i:i+100])
+    if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
+print(f" Rank aggiornati: {ok}/{len(rank_updates)}")
+
+all_scores = []
+offset = 0
+while True:
+    r = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
+        params={"select":"ticker,exchange,value_score,growth_score",
+                "offset":offset,"limit":1000})
+    data = r.json()
+    if not data: break
+    all_scores.extend(data)
+    offset += 1000
+    if len(data) < 1000: break
+
+val_arr = [d["value_score"] for d in all_scores if d["value_score"] is not None]
+grw_arr = [d["growth_score"] for d in all_scores if d["growth_score"] is not None]
+
+combined_updates = []
+for d in all_scores:
+    vs = d.get("value_score")
+    gs = d.get("growth_score")
+    if vs is None and gs is None: continue
+    inputs = [x for x in [vs, gs] if x is not None]
+    avg = sum(inputs) / len(inputs)
+    combined = pct_rank(val_arr + grw_arr, avg)
+    combined_updates.append({
+        "ticker": d["ticker"], "exchange": d["exchange"],
+        "combined_rank": combined
+    })
+
+ok = 0
+for i in range(0, len(combined_updates), 100):
+    r = requests.post(SUPABASE_URL+"/rest/v1/fundamentals",
+        headers=headers_up, json=combined_updates[i:i+100])
+    if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
+print(f" Combined rank aggiornati: {ok}/{len(combined_updates)}")
+
+print("\n" + "="*60)
+print("DAILY LOAD COMPLETATO")
+print("="*60)
