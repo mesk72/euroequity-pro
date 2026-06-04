@@ -144,16 +144,14 @@ export default function ResearchHubPage() {
                           <Link href={`/stock/${note.ticker}-${note.exchange}`}
                             style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#94a3b8',
                               background: '#1e293b', padding: '4px 6px', borderRadius: 3,
-                              textDecoration: 'none', textAlign: 'center', border: '1px solid #334155' }}
-                            onClick={(e: any) => e.stopPropagation()}>
+                              textDecoration: 'none', textAlign: 'center', border: '1px solid #334155' }}>
                             📊 Chart
                           </Link>
                           {note.pdfFile && (
                             <a href={`/research/${note.pdfFile}`} target="_blank" rel="noopener noreferrer"
                               style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#f97316',
                                 background: '#1e293b', padding: '4px 6px', borderRadius: 3,
-                                textDecoration: 'none', textAlign: 'center', border: '1px solid #f97316' }}
-                              onClick={(e: any) => e.stopPropagation()}>
+                                textDecoration: 'none', textAlign: 'center', border: '1px solid #f97316' }}>
                               📄 PDF
                             </a>
                           )}
