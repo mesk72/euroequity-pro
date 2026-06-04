@@ -293,7 +293,6 @@ export default function StockPage() {
     return (
       <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
         fontFamily:'IBM Plex Sans, sans-serif', padding:40 }}>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
         <button onClick={() => router.back()}
           style={{ display:'flex', alignItems:'center', gap:8, color:'var(--orange)',
             background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
@@ -322,28 +321,6 @@ export default function StockPage() {
   return (
     <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
       fontFamily:'IBM Plex Sans, sans-serif', fontSize:13 }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap');
-        :root {
-          --bg:#0a0e1a; --bg2:#0d1221; --surface:#111827; --surface2:#161d2e;
-          --border:#1e2d45; --border2:#243550; --orange:#f97316; --green:#22c55e;
-          --red:#ef4444; --gold:#eab308; --text:#ffffff; --text2:#e2e8f0;
-          --text3:#cbd5e1; --text4:#94a3b8;
-        }
-        body { background:var(--bg); margin:0; }
-        .input-field {
-          background:var(--bg2); border:1px solid var(--border); border-radius:3px;
-          padding:5px 8px; font-size:13px; color:var(--text);
-          font-family:'IBM Plex Sans',sans-serif; outline:none; width:100%;
-        }
-        .input-field:focus { border-color:var(--orange); }
-        .btn-primary {
-          background:var(--orange); color:#fff; font-family:'IBM Plex Sans Condensed',sans-serif;
-          font-weight:700; font-size:13px; padding:7px 18px; border-radius:3px;
-          border:none; cursor:pointer;
-        }
-        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
-      `}</style>
 
       {/* Top nav */}
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
