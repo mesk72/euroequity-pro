@@ -18,6 +18,85 @@ const MONTHS: any[] = [
     month: 'June 2026',
     sectors: [
       {
+        name: 'Financials',
+        color: '#22c55e',
+        notes: [
+          {
+            slug: 'BNP-PA',
+            ticker: 'BNP', exchange: 'PA', company: 'BNP Paribas S.A.',
+            title: 'Value 90 & Growth 80: The Institutional Mispricing of BNP Paribas',
+            summary: 'Value 90, Growth 80, Best 97. NTM P/E 7.8x, P/B 0.78x, dividend 6.6%.',
+            valueScore: 90, growthScore: 80, bestScore: 97,
+            pdfFile: 'BNP_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+          }
+        ]
+      },
+      {
+        name: 'Energy',
+        color: '#f97316',
+        notes: [
+          {
+            slug: 'SHEL-LSE',
+            ticker: 'SHEL', exchange: 'LSE', company: 'Shell plc',
+            title: 'Value 75 & Growth 92: The Rare GARP Engine Hidden in Big Oil',
+            summary: 'Value 75, Growth 92, Best 96. NTM P/E 7.9x, dividend 3.7%, EPS +24%.',
+            valueScore: 75, growthScore: 92, bestScore: 96,
+            pdfFile: 'SHEL_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+          }
+        ]
+      },
+      {
+        name: 'Industrials',
+        color: '#3b82f6',
+        notes: [
+          {
+            slug: 'ENR-XETRA',
+            ticker: 'ENR', exchange: 'XETRA', company: 'Siemens Energy AG',
+            title: 'Growth Score 98/100: Is Siemens Energy the Ultimate AI Infrastructure Winner?',
+            summary: 'Growth 98, Value 4, Best 53. Net income +160% YoY, FCF margin 16%, net cash.',
+            valueScore: 4, growthScore: 98, bestScore: 53,
+            pdfFile: 'ENR_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+          },
+          {
+            slug: 'ABBN-SWX',
+            ticker: 'ABBN', exchange: 'SWX', company: 'ABB Ltd',
+            title: 'Growth Score 97/100: Why the Market is Paying a Premium for ABB',
+            summary: 'Growth 97, Value 6, Best 56. ROIC 25%, EPS +14%, +80% 12M return.',
+            valueScore: 6, growthScore: 97, bestScore: 56,
+            pdfFile: 'ABBN_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+          }
+        ]
+      },
+      {
+        name: 'Information Technology',
+        color: '#8b5cf6',
+        notes: [
+          {
+            slug: 'ASML-AS',
+            ticker: 'ASML', exchange: 'AS', company: 'ASML Holding N.V.',
+            title: 'Growth Score 98/100: Decoding ASML's Monopoly Power',
+            summary: 'Growth 98, Value 2, Best 51. Revenue +20% YoY, EPS +29%, ROE 50%+.',
+            valueScore: 2, growthScore: 98, bestScore: 51,
+            pdfFile: 'ASML_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+          },
+          {
+            slug: 'IFX-XETRA',
+            ticker: 'IFX', exchange: 'XETRA', company: 'Infineon Technologies AG',
+            title: 'Growth Rank 99: Why IFX is a True Growth Story',
+            summary: 'Growth 99, Value 5, Best 56. EPS +36%, +160% 12M return, SiC leader.',
+            valueScore: 5, growthScore: 99, bestScore: 56,
+            pdfFile: 'IFX_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+          }
+        ]
+      }
+    ]
+  }
+]
+ = [
+  {
+    month: 'June 2026',
+    sectors: [
+      {
         name: 'Energy',
         color: '#f97316',
         notes: [
@@ -113,6 +192,25 @@ export default function ResearchHubPage() {
                             <div style={{ fontSize: 8, color: '#86efac' }}>GROWTH</div>
                             <div style={{ fontSize: 13, fontWeight: 800, color: '#22c55e' }}>{note.growth}</div>
                           </div>
+                        </div>
+
+                        <div style={{ display:'flex', gap:6, marginTop:10 }}>
+                          <Link href={`/stock/${note.ticker}-${note.exchange}`}
+                            style={{ flex:1, fontSize:10, fontWeight:700, color:'#94a3b8',
+                              background:'#1e293b', padding:'4px 6px', borderRadius:3,
+                              textDecoration:'none', textAlign:'center', border:'1px solid #334155' }}
+                            onClick={(e: any) => e.stopPropagation()}>
+                            📊 Chart
+                          </Link>
+                          {note.pdfFile && (
+                            <a href={`/research/${note.pdfFile}`} target='_blank' rel='noopener noreferrer'
+                              style={{ flex:1, fontSize:10, fontWeight:700, color:'#f97316',
+                                background:'#1e293b', padding:'4px 6px', borderRadius:3,
+                                textDecoration:'none', textAlign:'center', border:'1px solid #f97316' }}
+                              onClick={(e: any) => e.stopPropagation()}>
+                              📄 PDF
+                            </a>
+                          )}
                         </div>
                       </div>
                     </Link>
