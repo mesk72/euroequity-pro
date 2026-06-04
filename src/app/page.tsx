@@ -826,9 +826,21 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
             </div>
             <div className="space-y-1.5">
               <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
-              <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
-              <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
-              <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+              {userId ? (
+                <>
+                  <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+                  <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+                  <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
+                </>
+              ) : (
+                <div onClick={() => alert('Sign up for free to filter by Value, Growth and Best Score.')}
+                  style={{ cursor:'pointer', background:'var(--surface2)', border:'1px solid var(--border)',
+                    borderRadius:4, padding:'8px 12px', fontSize:12, color:'var(--text3)',
+                    display:'flex', alignItems:'center', gap:6 }}>
+                  🔒 Value / Growth / Best filters
+                  <span style={{ color:'var(--orange)', fontWeight:700, marginLeft:'auto' }}>Sign up free →</span>
+                </div>
+              )}
             </div>
             <div className="space-y-1.5">
               <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Search</div>
