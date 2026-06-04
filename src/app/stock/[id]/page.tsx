@@ -311,7 +311,7 @@ export default function StockPage() {
     { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b' },
     { label:'PB Rank',       val: s.rankPb    != null ? String(Math.round(s.rankPb))    : '—', color: s.rankPb    >= 70 ? 'var(--green)' : s.rankPb    <= 30 ? '#e84560' : '#f59e0b' },
     { label:'EPS Gr Rank',   val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: 'var(--text)' },
     { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
     { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
     { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
