@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     if (all.length === 0) {
       return NextResponse.json({
         history: [],
-        momentum: { mom1w: null, mom1m: null, mom6m: null, mom12m: null }
+        momentum: { mom1w: null, mom1m: null, mom6m: null, mom12m: null, mom3y: null, mom5y: null }
       })
     }
 
@@ -78,18 +78,22 @@ export async function GET(req: NextRequest) {
       return result
     }
 
-    const p1w = getPrice(addDays(lastDate, -7))
-    const p1m = getPrice(addMonths(lastDate, -1))
-    const p6m = getPrice(addMonths(lastDate, -6))
+    const p1w  = getPrice(addDays(lastDate, -7))
+    const p1m  = getPrice(addMonths(lastDate, -1))
+    const p6m  = getPrice(addMonths(lastDate, -6))
     const p12m = getPrice(addMonths(lastDate, -12))
+    const p3y  = getPrice(addMonths(lastDate, -36))
+    const p5y  = getPrice(addMonths(lastDate, -60))
 
     const mom = (p: number | null) => p && p > 0 ? (lastPrice / p - 1) * 100 : null
 
     const momentum = {
-      mom1w: mom(p1w),
-      mom1m: mom(p1m),
-      mom6m: mom(p6m),
+      mom1w:  mom(p1w),
+      mom1m:  mom(p1m),
+      mom6m:  mom(p6m),
       mom12m: mom(p12m),
+      mom3y:  mom(p3y),
+      mom5y:  mom(p5y),
     }
 
     return NextResponse.json({ history, momentum })
