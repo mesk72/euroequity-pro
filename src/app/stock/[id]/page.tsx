@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { computeScores } from '@/lib/ranking'
 import { RESEARCH_INDEX } from '@/lib/researchIndex'
+import { RESEARCH_INDEX } from '@/lib/researchIndex'
 import { DEMO_STOCKS } from '@/lib/demoData'
 
 // Costruisce link borsa dinamicamente da ISIN e exchange
@@ -12,9 +13,7 @@ const MIC: Record<string, string> = {
   PA:'XPAR', AS:'XAMS', BR:'XBRU', LS:'XLIS', MIL:'XMIL', IR:'XDUB', OB:'XOSL'
 }
 
-function getBorseUrl(
-  ticker: string, exchange: string, isin: string | null
-): string | null {
+function getBorseUrl(ticker: string, exchange: string, isin: string | null): string | null {
   if (['PA','AS','BR','LS','MIL','IR'].includes(exchange) && isin)
     return `https://live.euronext.com/en/product/equities/${isin}-${MIC[exchange]}`
   if (exchange === 'OB' && isin)
@@ -62,10 +61,7 @@ function scoreClr(v?: number | null): string {
 }
 
 // ── PRICE CHART WITH MOVING AVERAGES ──────────────────────────────
-function PriceChart(
-  { history, days, momentum }:
-  { history: any[]; days: number; momentum?: any }
-) {
+function PriceChart({ history, days, momentum }: { history: any[]; days: number; momentum?: any }) {
   const data = history
     .map((d: any) => ({
       date:  d.date || d.Date || '',
@@ -75,8 +71,7 @@ function PriceChart(
     .slice(-(days + 1))
 
   if (data.length < 5) return (
-    <div style={{ height:280, display:'flex', alignItems:'center', 
-        justifyContent:'center',
+    <div style={{ height:280, display:'flex', alignItems:'center', justifyContent:'center',
       color:'var(--text3)', fontSize:13 }}>
       No chart data available
     </div>
@@ -109,16 +104,12 @@ function PriceChart(
     values.forEach((v, i) => {
       if (v == null) return
       const x = toX(i), y = toY(v)
-      path += path === ''
-        ? `M${x.toFixed(1)},${y.toFixed(1)}`
-        : ` L${x.toFixed(1)},${y.toFixed(1)}`
+      path += path === '' ? `M${x.toFixed(1)},${y.toFixed(1)}` : ` L${x.toFixed(1)},${y.toFixed(1)}`
     })
     return path
   }
 
-  const pricePoints = closes
-    .map((p, i) => `${toX(i).toFixed(1)},${toY(p).toFixed(1)}`)
-    .join(' ')
+  const pricePoints = closes.map((p, i) => `${toX(i).toFixed(1)},${toY(p).toFixed(1)}`).join(' ')
   const isUp = closes[closes.length - 1] >= closes[0]
   const c = isUp ? 'var(--green)' : 'var(--red)'
   // Performance calcolata sul periodo selezionato (prezzi adjusted close)
@@ -129,8 +120,7 @@ function PriceChart(
     if (days <= 200) return momentum.mom6m  != null ? momentum.mom6m.toFixed(2)  : null
     return momentum.mom12m != null ? momentum.mom12m.toFixed(2) : null
   })()
-  const fallbackPerf = ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
-  const perf = perfFromMom ?? fallbackPerf
+  const perf = perfFromMom ?? ((closes[closes.length - 1] / closes[0] - 1) * 100).toFixed(2)
 
   // Y axis labels
   const yLabels = [0, 0.25, 0.5, 0.75, 1].map(r => ({
@@ -149,8 +139,7 @@ function PriceChart(
   const lastMa200 = ma200.filter(v => v != null).pop()
 
   return (
-    <div style={{ position:'relative', background:'var(--bg2)',
-      borderRadius:3, padding:'12px 0 4px' }}>
+    <div style={{ position:'relative', background:'var(--bg2)', borderRadius:3, padding:'12px 0 4px' }}>
       {/* Performance badge */}
       <div style={{ position:'absolute', top:12, right:16,
         fontFamily:'IBM Plex Mono', fontSize:15, fontWeight:700,
@@ -162,8 +151,7 @@ function PriceChart(
 
       {/* Legend */}
       <div style={{ display:'flex', gap:16, paddingLeft:PX, marginBottom:8 }}>
-        <span style={{ fontSize:10, 
-              fontFamily:'IBM Plex Sans Condensed', color:'var(--text3)' }}>
+        <span style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', color:'var(--text3)' }}>
           Price
         </span>
         {lastMa50 && (
@@ -254,18 +242,14 @@ export default function StockPage() {
         } else {
           // Fallback a demo
           const allStocks = computeScores([...DEMO_STOCKS])
-          const found = allStocks.find(
-            s => s.ticker === ticker && s.exchange === exchangeCode
-          )
+          const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
           setStock(found || null)
         }
         setLoadingStock(false)
       })
       .catch(() => {
         const allStocks = computeScores([...DEMO_STOCKS])
-        const found = allStocks.find(
-          s => s.ticker === ticker && s.exchange === exchangeCode
-        )
+        const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
         setStock(found || null)
         setLoadingStock(false)
       })
@@ -283,16 +267,10 @@ export default function StockPage() {
   useEffect(() => {
     if (!ticker || !exchangeCode) return
     setLoading(true)
-    fetch(
-      `/api/db/history?ticker=${ticker}&exchange=${exchangeCode}`
-      + `&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`
-    )
+    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store' })
       .then(r => r.ok ? r.json() : { history: [] })
-      .then(d => {
-        setHistory(d.history || [])
-        setMomentum(d.momentum || null)
-        setLoading(false)
-      })
+      .then(d => { setHistory(d.history || []); setMomentum(d.momentum || null); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [ticker, exchangeCode, chartDays])
 
   function handleAdd() {
@@ -315,10 +293,10 @@ export default function StockPage() {
     return (
       <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
         fontFamily:'IBM Plex Sans, sans-serif', padding:40 }}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
         <button onClick={() => router.back()}
           style={{ display:'flex', alignItems:'center', gap:8, color:'var(--orange)',
-            background:'none', border:'none', cursor:'pointer',
-             fontSize:14, marginBottom:24 }}>
+            background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
           <ArrowLeft size={16} /> Back
         </button>
         <p style={{ color:'var(--text3)' }}>Stock not found: {ticker}.{exchangeCode}</p>
@@ -329,57 +307,43 @@ export default function StockPage() {
   const s = stock as any
   const metrics = [
     { label:'Price',         val: fv(stock.price, 2),    color: 'var(--text)' },
-    { label:'Mkt Cap B',
-      val: stock.mktCap ? fv(stock.mktCap, 1) : '—',
-      color: 'var(--text)' },
-    { label:'Value Rank',
-      val: s.valueScore != null ? String(Math.round(s.valueScore)) : '—',
-      color: s.valueScore >= 70
-        ? 'var(--green)' : s.valueScore >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'Growth Rank',
-      val: s.growthScore != null ? String(Math.round(s.growthScore)) : '—',
-      color: s.growthScore >= 70
-        ? 'var(--green)' : s.growthScore >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'Best Rank',
-      val: s.combinedRank != null ? String(Math.round(s.combinedRank)) : '—',
-      color: s.combinedRank >= 70
-        ? 'var(--green)' : s.combinedRank >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'PE LTM Rank',
-      val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—',
-      color: s.rankPeLtm >= 70
-        ? 'var(--green)' : s.rankPeLtm >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'PE NTM Rank',
-      val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—',
-      color: s.rankPeNtm >= 70
-        ? 'var(--green)' : s.rankPeNtm >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'PB Rank',
-      val: s.rankPb != null ? String(Math.round(s.rankPb)) : '—',
-      color: s.rankPb >= 70
-        ? 'var(--green)' : s.rankPb >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'EPS Gr Rank',
-      val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—',
-      color: s.rankEpsGr >= 70
-        ? 'var(--green)' : s.rankEpsGr >= 40 ? 'var(--text)' : 'var(--red)' },
-    { label:'Rev Gr Rank',
-      val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—',
-      color: 'var(--text)' },
-    { label:'Mom 1W',
-      val: stock.mom1w != null ? fp(stock.mom1w * 100, 1) : '—',
-      color: clr(stock.mom1w) },
-    { label:'Mom 1M',
-      val: stock.mom1m != null ? fp(stock.mom1m * 100, 1) : '—',
-      color: clr(stock.mom1m) },
-    { label:'Mom 6M',
-      val: stock.mom6m != null ? fp(stock.mom6m * 100, 1) : '—',
-      color: clr(stock.mom6m) },
-    { label:'Mom 12M',
-      val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—',
-      color: clr(stock.mom12m) },
+    { label:'Mkt Cap €B',    val: stock.mktCap ? fv(stock.mktCap, 1) : '—', color: 'var(--text)' },
+    { label:'PE LTM Rank',   val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'PB Rank',       val: s.rankPb    != null ? String(Math.round(s.rankPb))    : '—', color: s.rankPb    >= 70 ? 'var(--green)' : s.rankPb    >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'EPS Gr Rank',   val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr >= 40 ? 'var(--text)' : 'var(--red)' },
+    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: 'var(--text)' },
+    { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
+    { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
+    { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
+    { label:'Mom 12 Months', val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—', color: clr(stock.mom12m) },
   ]
 
   return (
     <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
       fontFamily:'IBM Plex Sans, sans-serif', fontSize:13 }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap');
+        :root {
+          --bg:#0a0e1a; --bg2:#0d1221; --surface:#111827; --surface2:#161d2e;
+          --border:#1e2d45; --border2:#243550; --orange:#f97316; --green:#22c55e;
+          --red:#ef4444; --gold:#eab308; --text:#ffffff; --text2:#e2e8f0;
+          --text3:#cbd5e1; --text4:#94a3b8;
+        }
+        body { background:var(--bg); margin:0; }
+        .input-field {
+          background:var(--bg2); border:1px solid var(--border); border-radius:3px;
+          padding:5px 8px; font-size:13px; color:var(--text);
+          font-family:'IBM Plex Sans',sans-serif; outline:none; width:100%;
+        }
+        .input-field:focus { border-color:var(--orange); }
+        .btn-primary {
+          background:var(--orange); color:#fff; font-family:'IBM Plex Sans Condensed',sans-serif;
+          font-weight:700; font-size:13px; padding:7px 18px; border-radius:3px;
+          border:none; cursor:pointer;
+        }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
+      `}</style>
 
       {/* Top nav */}
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
@@ -400,12 +364,10 @@ export default function StockPage() {
         {/* Stock header */}
         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
           borderLeft:'4px solid var(--orange)', borderRadius:4, padding:'16px 20px',
-          marginBottom:16, display:'flex', alignItems:'center', 
-            justifyContent:'space-between',
+          marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between',
           flexWrap:'wrap', gap:12 }}>
           <div>
-            <div style={{ display:'flex', alignItems:'baseline',
-               gap:12, flexWrap:'wrap' }}>
+            <div style={{ display:'flex', alignItems:'baseline', gap:12, flexWrap:'wrap' }}>
               <span style={{ fontSize:28, fontFamily:'IBM Plex Sans Condensed',
                 fontWeight:700, color:'var(--orange)' }}>
                 {stock.flag} {stock.ticker}
@@ -458,17 +420,14 @@ export default function StockPage() {
         {/* Chart */}
         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
           borderRadius:4, padding:16, marginBottom:16 }}>
-          <div style={{ display:'flex', alignItems:'center', 
-            justifyContent:'space-between',
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
             marginBottom:12, flexWrap:'wrap', gap:8 }}>
-            <div style={{ fontSize:10, 
-              fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+            <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
               letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)' }}>
               Price Chart · MA50 · MA200
             </div>
             <div style={{ display:'flex', gap:4 }}>
-              {([['1Y',252],['3Y',756],['5Y',1260]] as [string,number][])
-                .map(([lbl,d]) => (
+              {([['1Y',252],['3Y',756],['5Y',1260]] as [string,number][]).map(([lbl,d]) => (
                 <button key={lbl} onClick={() => setChartDays(d)}
                   style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                     fontSize:11, padding:'4px 12px', borderRadius:2, cursor:'pointer',
@@ -498,18 +457,14 @@ export default function StockPage() {
         </div>
 
         {/* Metrics grid */}
-        <div style={{ display:'grid',
-          gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
           {metrics.map(({ label, val, color }) => (
-            <div key={label} style={{ background:'var(--surface)', 
-              border:'1px solid var(--border)',
+            <div key={label} style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:3, padding:'8px 12px' }}>
-              <div style={{ fontSize:9, 
-              fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                 letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--text4)',
                 marginBottom:3 }}>{label}</div>
-              <div style={{ 
-              fontFamily:'IBM Plex Mono', fontWeight:600, fontSize:15, color }}>
+              <div style={{ fontFamily:'IBM Plex Mono', fontWeight:600, fontSize:15, color }}>
                 {val}
               </div>
             </div>
@@ -531,8 +486,7 @@ export default function StockPage() {
                 textTransform:'uppercase' }}>Portfolio</div>
               <select value={pf} onChange={e => setPf(e.target.value)}
                 className="input-field" style={{ width:140 }}>
-                {['Portfolio 1','Portfolio 2','Portfolio 3']
-                  .map(p => <option key={p}>{p}</option>)}
+                {['Portfolio 1','Portfolio 2','Portfolio 3'].map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
             <div>
@@ -574,12 +528,10 @@ export default function StockPage() {
               borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
               justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
               <div>
-                <div style={{ fontSize:9, 
-              fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                   letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)',
                   marginBottom:6 }}>Official Links</div>
-                <div style={{ fontSize:12, color:'var(--text3)',
-                  fontFamily:'IBM Plex Mono' }}>
+                <div style={{ fontSize:12, color:'var(--text3)', fontFamily:'IBM Plex Mono' }}>
                   ISIN: {(stock as any).isin || "N/A"}
                 </div>
               </div>
@@ -588,10 +540,8 @@ export default function StockPage() {
                   <a href={borseUrl} target="_blank" rel="noopener noreferrer"
                     style={{ background:'var(--surface2)', color:'var(--text2)',
                       fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                      fontSize:12, padding:'7px 14px', borderRadius:3,
-                      border:'1px solid var(--border)',
-                      textDecoration:'none', display:'inline-flex',
-                        alignItems:'center', gap:6 }}>
+                      fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)',
+                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
                     📊 Official Listing ↗
                   </a>
                 )}
@@ -600,8 +550,7 @@ export default function StockPage() {
                     style={{ background:'var(--orange)', color:'#fff',
                       fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                       fontSize:12, padding:'7px 14px', borderRadius:3,
-                      textDecoration:'none', display:'inline-flex',
-                        alignItems:'center', gap:6 }}>
+                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
                     🌐 Company Website ↗
                   </a>
                 )}
@@ -610,8 +559,7 @@ export default function StockPage() {
                     style={{ background:'#f97316', color:'#fff',
                       fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                       fontSize:12, padding:'7px 14px', borderRadius:3,
-                      textDecoration:'none', display:'inline-flex',
-                        alignItems:'center', gap:6 }}>
+                      textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
                     📋 Read Analysis ↗
                   </a>
                 )}
