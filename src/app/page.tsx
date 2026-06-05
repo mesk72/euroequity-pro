@@ -1650,7 +1650,7 @@ export default function App() {
           {page === 'research' && <ResearchPage />}
         {page === 'myscreen' && (
             user
-              ? <MyScreen userId={user.id} onSelectStock={setDetailStock} />
+              ? <MyScreen userId={user!.id} onSelectStock={setDetailStock} />
               : <LoginGate onLogin={() => setShowAuth(true)} title="My Screen" />
           )}
           {page === 'portfolio' && (
