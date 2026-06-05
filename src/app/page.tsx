@@ -1454,6 +1454,20 @@ function CookieBanner() {
 
 // - ROOT APP -
 export default function App() {
+ // MAINTENANCE MODE
+  return (
+    <div style={{ minHeight:'100vh', background:'#0d1117', color:'#e2e8f0',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      fontFamily:'system-ui, sans-serif', flexDirection:'column', gap:16 }}>
+      <div style={{ fontSize:48 }}>🔧</div>
+      <h1 style={{ fontSize:24, fontWeight:800, color:'#f97316' }}>Under Maintenance</h1>
+      <p style={{ color:'#94a3b8', fontSize:14 }}>
+        ForwardAlpha is currently undergoing scheduled maintenance.
+      </p>
+      <p style={{ color:'#64748b', fontSize:12 }}>We will be back shortly.</p>
+    </div>
+  )
+  // END MAINTENANCE MODE
   const [page,        setPage]        = useState<Page>('dashboard')
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
   const [showAuth,    setShowAuth]    = useState(false)
