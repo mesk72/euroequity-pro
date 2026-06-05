@@ -1577,7 +1577,7 @@ export default function App() {
         <div className="p-3 border-t border-border space-y-2">
           {user ? (
             <>
-              <div className="text-[10px] text-green font-600 truncate">👤 {user.email}</div>
+              <div className="text-[10px] text-green font-600 truncate">👤 {user?.email}</div>
               <button onClick={async () => { await supabase.auth.signOut(); window.location.reload() }}
                 className="flex items-center gap-1.5 text-xs font-600"
                 style={{ color: 'var(--red)' }}>
