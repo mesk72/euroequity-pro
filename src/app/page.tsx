@@ -1665,7 +1665,7 @@ export default function App() {
                   Portfolio tracking with multi-currency support, performance analytics,
                   Value/Growth score overlay and sector breakdown is under development.
                   <div style={{ marginTop:8, fontSize:11, color:'var(--text4)' }}>
-                    Logged in as: <span style={{ color:'var(--green)' }}>{user.email}</span>
+                    Logged in as: <span style={{ color:'var(--green)' }}>{user?.email}</span>
                   </div>
                 </div>
               </div>
