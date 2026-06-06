@@ -73,7 +73,7 @@ Key parameters to focus on:
 • Growth Score — use to identify companies with strong earnings, revenue and price momentum.
 • Momentum 6M and 12M — medium and long-term price performance indicators.
 
-All data is updated weekly. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates. Last updated: 1 June 2026.
+All data is updated weekly. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates. Last updated: 5 June 2026.
 
 Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE + AIM), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (AT) and Copenhagen (CPSE). For smaller markets — Vienna (VI), Lisbon (LS), Dublin (IR) and Stockholm NGM — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated.`,
     },
