@@ -43,11 +43,11 @@ export async function GET(req: NextRequest) {
 
     const history = all.map((d: any) => ({
       date: d.date,
-      open: d.close,
-      high: d.close,
-      low: d.close,
-      close: d.close,
-      adjusted_close: d.close,
+      open: d.adj_close,
+      high: d.adj_close,
+      low: d.adj_close,
+      close: d.adj_close,
+      adjusted_close: d.adj_close,
       volume: null,
     }))
 
