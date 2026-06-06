@@ -1496,7 +1496,7 @@ export default function App() {
     { id: 'HE'         as Page, label: '🇫🇮 Finland',     icon: <Globe size={16} /> },
     { id: 'PA'         as Page, label: '🇫🇷 France',      icon: <Globe size={16} /> },
     { id: 'XETRA'      as Page, label: '🇩🇪 Germany',     icon: <Globe size={16} /> },
-    { id: 'AT'         as Page, label: '🇬🇷 Greece',      icon: <Globe size={16} /> },
+    { id: 'GR'         as Page, label: '🇬🇷 Greece',      icon: <Globe size={16} /> },
     { id: 'IR'         as Page, label: '🇮🇪 Ireland',     icon: <Globe size={16} /> },
     { id: 'MIL'        as Page, label: '🇮🇹 Italy',       icon: <Globe size={16} /> },
     { id: 'AS'         as Page, label: '🇳🇱 Netherlands', icon: <Globe size={16} /> },
