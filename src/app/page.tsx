@@ -109,7 +109,7 @@ async function apiExchange(code: string): Promise<Stock[]> {
   if (USE_DB) {
     try {
       const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,AT'
-      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,AT,LSE,AIM,SWX,OM,NGM,OB,CPSE'
+      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE'
       const url = code === 'EZ' || code === 'ALL'
         ? `/api/db/stocks?exchanges=${ALL_EX}`
         : code === 'EMU'
@@ -681,7 +681,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       const m12AdjVals = data.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null).filter((v:any) => v != null) as number[]
 
       // Calcola euroVal e euroGrow per ogni titolo
-      const NO_RANK_EX = new Set(['AT','VI','LS','IR','NGM'])
+      const NO_RANK_EX = new Set(['GR','VI','LS','IR'])
       const euroScores = data.map((s:any) => {
         if (NO_RANK_EX.has(s.exchange)) return null
         const eyt = ey(s.peTrail); const eyf = ey(s.peFwd)
@@ -737,7 +737,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (combinedMin > 0 && (s.combinedRank || 0)       < combinedMin) return false
     // Escludi mercati senza rank dai Best screens
     if ((valMin > 0 || growMin > 0 || combinedMin > 0) &&
-        ['AT','VI','LS','IR','NGM'].includes(s.exchange)) return false
+        ['GR','VI','LS','IR'].includes(s.exchange)) return false
     return true
   })
 
@@ -1172,7 +1172,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
             June 2, 2026
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            3,636 European equities · Value & Growth Scores recalculated
+            2,117 European equities · Value & Growth Scores recalculated
           </div>
         </div>
 
@@ -1199,7 +1199,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total Stocks',              value: loading ? '…' : allStocks.length.toLocaleString() },
+          { label: 'Total Stocks',              value: loading ? '…' : '2,117', // allStocks.length.toLocaleString() },
           { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
@@ -1525,9 +1525,7 @@ export default function App() {
     { id: 'MC'         as Page, label: '🇪🇸 Spain',       icon: <Globe size={16} /> },
     { id: 'SWX'        as Page, label: '🇨🇭 Switzerland', icon: <Globe size={16} /> },
     { id: 'OM'         as Page, label: '🇸🇪 Sweden (OM)', icon: <Globe size={16} /> },
-    { id: 'NGM'        as Page, label: '🇸🇪 Sweden (NGM)',icon: <Globe size={16} /> },
     { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
-    { id: 'AIM'        as Page, label: '🇬🇧 UK (AIM)',    icon: <Globe size={16} /> },
     { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
     { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
   ]
@@ -1633,7 +1631,7 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
-          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'AIM' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'AT' || page === 'CPSE' || page === 'NGM' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
+          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'GR' || page === 'CPSE' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'bestvalue'  && (user
             ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value" />
