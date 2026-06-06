@@ -701,12 +701,9 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
         return euroVal != null && euroGrow != null ? (euroVal + euroGrow) / 2 : null
       })
 
-      // Calcola percentile combined su All Europe
-      const validCombined = euroScores.filter((v:any) => v != null) as number[]
-      data.forEach((s: any, i: number) => {
-        const c = euroScores[i]
-        if (c == null || NO_RANK_EX.has(s.exchange)) { s.combinedRank = null; return }
-        s.combinedRank = Math.round(validCombined.filter(v => v < c).length / validCombined.length * 100)
+      // Usa combinedRank dal DB — azzera solo per NO_RANK_EX
+      data.forEach((s: any) => {
+        if (NO_RANK_EX.has(s.exchange)) { s.combinedRank = null }
       })
 
       setStocks(data)
