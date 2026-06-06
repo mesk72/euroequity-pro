@@ -4,7 +4,7 @@ export default function AboutPage() {
       title: 'Our Philosophy',
       content: `ForwardAlpha was built on a simple but powerful conviction: European equity markets are underserved by modern financial technology.
 
-While most financial platforms focus on US markets, Europe offers over 3,700 listed companies across 16 exchanges — a rich universe of opportunities that remains largely inaccessible to independent investors without institutional-grade tools.
+While most financial platforms focus on US markets, Europe offers over 2,100 listed companies across 16 exchanges — a rich universe of opportunities that remains largely inaccessible to independent investors without institutional-grade tools.
 
 We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`,
     },
@@ -75,7 +75,7 @@ Key parameters to focus on:
 
 All data is updated weekly. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates. Last updated: 5 June 2026.
 
-Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE + AIM), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (AT) and Copenhagen (CPSE). For smaller markets — Vienna (VI), Lisbon (LS), Dublin (IR) and Stockholm NGM — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated.`,
+Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (GR) and Copenhagen (CPSE). For smaller markets — Vienna (VI), Lisbon (LS) and Dublin (IR) — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated.`,
     },
   ]
 
