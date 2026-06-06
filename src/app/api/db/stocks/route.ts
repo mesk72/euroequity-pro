@@ -32,29 +32,41 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
   return all
 }
 
-function applyUniverseFilter(mapped: any[]) {
-  // Step 1: filtro 500M per mercati principali
-  const filtered = mapped.filter(s =>
-    NO_FILTER.has(s.exchange) ||
-    TOP_100_EX.has(s.exchange) ||
-    (FILTER_500M.has(s.exchange) && s.mktCap != null && s.mktCap >= 500)
-  )
+// Filtro universo su dati grezzi (mkt_cap in milioni USD)
+function applyUniverseFilter(fundData: any[], stocksData: any[]) {
+  const fundMap: Record<string, any> = {}
+  for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
+
+  // Step 1: filtro 500M sui dati grezzi
+  const filtered = stocksData.filter(s => {
+    const f = fundMap[`${s.ticker}.${s.exchange}`] || {}
+    const mktCap = f.mkt_cap ?? null
+    if (NO_FILTER.has(s.exchange)) return true
+    if (TOP_100_EX.has(s.exchange)) return true
+    if (FILTER_500M.has(s.exchange)) return mktCap != null && mktCap >= 500
+    return true
+  })
+
   // Step 2: top 100 per exchange nei mercati minori
   const top100Map: Record<string, any[]> = {}
   filtered.forEach(s => {
     if (TOP_100_EX.has(s.exchange)) {
       if (!top100Map[s.exchange]) top100Map[s.exchange] = []
-      top100Map[s.exchange].push(s)
+      const f = fundMap[`${s.ticker}.${s.exchange}`] || {}
+      top100Map[s.exchange].push({ ...s, _mktCap: f.mkt_cap ?? 0 })
     }
   })
   Object.keys(top100Map).forEach(ex => {
-    top100Map[ex].sort((a,b) => (b.mktCap||0)-(a.mktCap||0))
+    top100Map[ex].sort((a,b) => b._mktCap - a._mktCap)
     top100Map[ex] = top100Map[ex].slice(0,100)
   })
   const top100Set = new Set(Object.values(top100Map).flat().map((s:any) => `${s.ticker}.${s.exchange}`))
-  return filtered.filter(s =>
+
+  const result = filtered.filter(s =>
     !TOP_100_EX.has(s.exchange) || top100Set.has(`${s.ticker}.${s.exchange}`)
   )
+
+  return result.map(s => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
 }
 
 export async function GET(req: NextRequest) {
@@ -113,14 +125,7 @@ export async function GET(req: NextRequest) {
       fetchAll('fundamentals', 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj', exList),
     ])
 
-    const fundMap: Record<string, any> = {}
-    for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
-
-    const mapped = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
-
-    // Applica sempre il filtro universo
-    const stocks = applyUniverseFilter(mapped)
-
+    const stocks = applyUniverseFilter(fundData, stocksData)
     return NextResponse.json({ stocks, source: 'supabase' })
 
   } catch (e) {
@@ -141,7 +146,7 @@ function mapStock(s: any, f: any) {
     price: f.price ?? null,
     change1d: f.change1d ?? null,
     volume: null,
-    mktCap: f.mkt_cap ?? null,
+    mktCap: f.mkt_cap != null ? Math.round(f.mkt_cap / 1000 * 100) / 100 : null,
     peTrail: f.pe_trailing ?? null,
     peFwd: f.pe_forward ?? null,
     pb: f.pb ?? null,
