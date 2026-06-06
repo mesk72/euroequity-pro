@@ -22,8 +22,8 @@ export async function GET(req: NextRequest) {
     let from = 0
     while (true) {
       const { data, error } = await supabase
-        .from('price_history')
-        .select('date,close')
+        .from('prices_eod')
+        .select('date,adj_close')
         .eq('ticker', ticker)
         .eq('exchange', exchange)
         .order('date', { ascending: true })
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
 
     // Calcola momentum con date di calendario — stessa logica del daily_load
     const dates = all.map((d: any) => d.date) as string[]
-    const closes = all.map((d: any) => d.close) as number[]
+    const closes = all.map((d: any) => d.adj_close) as number[]
     const lastDate = new Date(dates[dates.length - 1])
     const lastPrice = closes[closes.length - 1]
 
