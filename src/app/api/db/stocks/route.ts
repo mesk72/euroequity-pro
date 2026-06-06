@@ -37,20 +37,24 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
   const fundMap: Record<string, any> = {}
   for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
-  // Step 1: filtro 500M sui dati grezzi
-  const filtered = stocksData.filter(s => {
-    const f = fundMap[`${s.ticker}.${s.exchange}`] || {}
+  // Step 1: costruisce stockMap per join
+  const stockMap: Record<string, any> = {}
+  for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
+
+  // Filtra su fundData (sorgente corretta per mkt_cap)
+  const filtered = fundData.filter(f => {
+    if (!stockMap[`${f.ticker}.${f.exchange}`]) return false // deve esistere in stocks
     const mktCap = f.mkt_cap ?? null
-    if (NO_FILTER.has(s.exchange)) return true
-    if (TOP_100_EX.has(s.exchange)) return true
-    if (FILTER_500M.has(s.exchange)) return mktCap != null && mktCap >= 500
+    if (NO_FILTER.has(f.exchange)) return true
+    if (TOP_100_EX.has(f.exchange)) return true
+    if (FILTER_500M.has(f.exchange)) return mktCap != null && mktCap >= 500
     return true
-  })
+  }).map(f => stockMap[`${f.ticker}.${f.exchange}`])
 
   // Step 2: top 100 per exchange nei mercati minori
   const top100Map: Record<string, any[]> = {}
   filtered.forEach(s => {
-    if (TOP_100_EX.has(s.exchange)) {
+    if (s && TOP_100_EX.has(s.exchange)) {
       if (!top100Map[s.exchange]) top100Map[s.exchange] = []
       const f = fundMap[`${s.ticker}.${s.exchange}`] || {}
       top100Map[s.exchange].push({ ...s, _mktCap: f.mkt_cap ?? 0 })
