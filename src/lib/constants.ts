@@ -58,8 +58,9 @@ export const INDICES: { name: string; ticker: string; source: 'eodhd' | 'yahoo';
   { name: 'FTSE 100', ticker: '^FTSE', source: 'yahoo', flag: '🇬🇧' },
   { name: 'SMI', ticker: 'SSMI.INDX', source: 'eodhd', flag: '🇨🇭' },
   { name: 'OMX Stockholm', ticker: 'OMXS30.INDX', source: 'eodhd', flag: '🇸🇪' },
-  { name: 'OBX', ticker: 'OBX.OL', source: 'eodhd', flag: '🇳🇴' },
+  { name: 'OBX', ticker: 'OBX.OL', source: 'yahoo', flag: '🇳🇴' },
   { name: 'OMX Copenhagen',ticker: 'OMXC25.INDX', source: 'eodhd', flag: '🇩🇰' },
+  { name: 'ASE', ticker: 'ATG.INDX', source: 'eodhd', flag: '🇬🇷' },
 ]
 
 // ── SECTORS ───────────────────────────────────────────────────────
