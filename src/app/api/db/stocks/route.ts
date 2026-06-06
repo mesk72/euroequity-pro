@@ -8,10 +8,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT','LSE','AIM','SWX','OM','OB','CPSE','NGM']
-const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','AT']
+const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE']
+const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR']
+const FILTER_500M = new Set(['LSE','XETRA','PA','OM','SWX','MIL'])
+const TOP_100_EX  = new Set(['OB','MC','AS','BR','CPSE','HE','GR'])
 
-// Paginazione per bypassare limite 1000 Supabase
 async function fetchAll(table: string, select: string, exchangeList: string[]) {
   const PAGE = 1000
   let all: any[] = []
@@ -30,6 +31,25 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
   return all
 }
 
+function applyUniverseFilter(mapped: any[], exchange: string) {
+  const filtered500 = mapped.filter(s => !FILTER_500M.has(s.exchange) || (s.mktCap != null && s.mktCap >= 500))
+  const top100Map: Record<string, any[]> = {}
+  filtered500.forEach(s => {
+    if (TOP_100_EX.has(s.exchange)) {
+      if (!top100Map[s.exchange]) top100Map[s.exchange] = []
+      top100Map[s.exchange].push(s)
+    }
+  })
+  Object.keys(top100Map).forEach(ex => {
+    top100Map[ex].sort((a,b) => (b.mktCap||0)-(a.mktCap||0))
+    top100Map[ex] = top100Map[ex].slice(0,100)
+  })
+  const top100Tickers = new Set(Object.values(top100Map).flat().map((s:any) => `${s.ticker}.${s.exchange}`))
+  return filtered500.filter(s =>
+    !TOP_100_EX.has(s.exchange) || top100Tickers.has(`${s.ticker}.${s.exchange}`)
+  )
+}
+
 export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
@@ -38,7 +58,6 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
 
   try {
-    // Determina lista exchange
     let exList: string[] = []
     if (search || ticker) {
       exList = ALL_RANKED
@@ -52,11 +71,10 @@ export async function GET(req: NextRequest) {
       exList = ALL_RANKED
     }
 
-    // Ticker singolo — query diretta
     if (ticker && exchange) {
       const [stockRes, fundRes] = await Promise.all([
         supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website').eq('ticker', ticker).eq('exchange', exchange).limit(1),
-        supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m').eq('ticker', ticker).eq('exchange', exchange).limit(1),
+        supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj').eq('ticker', ticker).eq('exchange', exchange).limit(1),
       ])
       const s: any = stockRes.data?.[0] || {}
       const f: any = fundRes.data?.[0] || {}
@@ -64,7 +82,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ stocks: [mapStock(s, f)], source: 'supabase' })
     }
 
-    // Search
     if (search) {
       const { data } = await supabase
         .from('stocks')
@@ -76,7 +93,7 @@ export async function GET(req: NextRequest) {
       const tickers = stocksData.map((s: any) => s.ticker)
       const { data: fundData } = await supabase
         .from('fundamentals')
-        .select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m')
+        .select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj')
         .in('ticker', tickers)
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
@@ -84,16 +101,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ stocks, source: 'supabase' })
     }
 
-    // Lista completa con paginazione
     const [stocksData, fundData] = await Promise.all([
       fetchAll('stocks', 'ticker,exchange,isin,company,sector,country,flag,website', exList),
-      fetchAll('fundamentals', 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m', exList),
+      fetchAll('fundamentals', 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj', exList),
     ])
 
     const fundMap: Record<string, any> = {}
     for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
-    const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+    const mapped = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+
+    const applyFilter = !exchange || exchange === 'ALL' || exchange === 'EMU' || exchanges === ALL_RANKED.join(',')
+    const stocks = applyFilter ? applyUniverseFilter(mapped, exchange) : mapped
+
     return NextResponse.json({ stocks, source: 'supabase' })
 
   } catch (e) {
@@ -137,5 +157,7 @@ function mapStock(s: any, f: any) {
     rankPb: f.rank_pb ?? null,
     rankEpsGr: f.rank_eps_gr ?? null,
     rankRevGr: f.rank_rev_gr ?? null,
+    rankMom6Adj: f.rank_mom6_adj ?? null,
+    rankMom12Adj: f.rank_mom12_adj ?? null,
   }
 }
