@@ -681,7 +681,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       const m12AdjVals = data.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null).filter((v:any) => v != null) as number[]
 
       // Calcola euroVal e euroGrow per ogni titolo
-      const NO_RANK_EX = new Set(['GR','VI','LS','IR'])
+      const NO_RANK_EX = new Set(['VI','LS','IR'])
       const euroScores = data.map((s:any) => {
         if (NO_RANK_EX.has(s.exchange)) return null
         const eyt = ey(s.peTrail); const eyf = ey(s.peFwd)
@@ -1172,7 +1172,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
             June 2, 2026
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            2,117 European equities · Value & Growth Scores recalculated
+            2,111 European equities · Value & Growth Scores recalculated
           </div>
         </div>
 
