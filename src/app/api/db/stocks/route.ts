@@ -11,7 +11,8 @@ const supabase = createClient(
 const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE']
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR']
 const FILTER_500M = new Set(['LSE','XETRA','PA','OM','SWX','MIL'])
-const TOP_100_EX  = new Set(['OB','MC','AS','BR','CPSE','HE','GR'])
+const TOP_100_EX = new Set(['OB','MC','AS','BR','CPSE','HE','GR'])
+const NO_FILTER = new Set(['VI','IR','LS'])
 
 async function fetchAll(table: string, select: string, exchangeList: string[]) {
   const PAGE = 1000
@@ -31,10 +32,16 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
   return all
 }
 
-function applyUniverseFilter(mapped: any[], exchange: string) {
-  const filtered500 = mapped.filter(s => !FILTER_500M.has(s.exchange) || (s.mktCap != null && s.mktCap >= 500))
+function applyUniverseFilter(mapped: any[]) {
+  // Step 1: filtro 500M per mercati principali
+  const filtered = mapped.filter(s =>
+    NO_FILTER.has(s.exchange) ||
+    TOP_100_EX.has(s.exchange) ||
+    (FILTER_500M.has(s.exchange) && s.mktCap != null && s.mktCap >= 500)
+  )
+  // Step 2: top 100 per exchange nei mercati minori
   const top100Map: Record<string, any[]> = {}
-  filtered500.forEach(s => {
+  filtered.forEach(s => {
     if (TOP_100_EX.has(s.exchange)) {
       if (!top100Map[s.exchange]) top100Map[s.exchange] = []
       top100Map[s.exchange].push(s)
@@ -44,9 +51,9 @@ function applyUniverseFilter(mapped: any[], exchange: string) {
     top100Map[ex].sort((a,b) => (b.mktCap||0)-(a.mktCap||0))
     top100Map[ex] = top100Map[ex].slice(0,100)
   })
-  const top100Tickers = new Set(Object.values(top100Map).flat().map((s:any) => `${s.ticker}.${s.exchange}`))
-  return filtered500.filter(s =>
-    !TOP_100_EX.has(s.exchange) || top100Tickers.has(`${s.ticker}.${s.exchange}`)
+  const top100Set = new Set(Object.values(top100Map).flat().map((s:any) => `${s.ticker}.${s.exchange}`))
+  return filtered.filter(s =>
+    !TOP_100_EX.has(s.exchange) || top100Set.has(`${s.ticker}.${s.exchange}`)
   )
 }
 
@@ -111,8 +118,8 @@ export async function GET(req: NextRequest) {
 
     const mapped = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
 
-    const applyFilter = !exchange || exchange === 'ALL' || exchange === 'EMU' || exchanges === ALL_RANKED.join(',')
-    const stocks = applyFilter ? applyUniverseFilter(mapped, exchange) : mapped
+    // Applica sempre il filtro universo
+    const stocks = applyUniverseFilter(mapped)
 
     return NextResponse.json({ stocks, source: 'supabase' })
 
