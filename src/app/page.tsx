@@ -108,7 +108,7 @@ async function apiExchange(code: string): Promise<Stock[]> {
   }
   if (USE_DB) {
     try {
-      const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,AT'
+      const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR'
       const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE'
       const url = code === 'EZ' || code === 'ALL'
         ? `/api/db/stocks?exchanges=${ALL_EX}`
