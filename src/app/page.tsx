@@ -1115,12 +1115,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   }
 
   const allScores = u200.map(calcEuroScore).filter((v:any) => v != null) as number[]
-  const highVG = u200.filter((s:any) => {
-    const c = calcEuroScore(s)
-    if (c == null) return false
-    const rank = Math.round(allScores.filter(v => v < c).length / allScores.length * 100)
-    return rank >= 80
-  }).length
+  const highVG = u200.filter((s:any) => s.combinedRank != null && s.combinedRank >= 80).length
 
   return (
     <div className="space-y-6 fade-in">
