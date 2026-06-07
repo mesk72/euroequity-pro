@@ -233,11 +233,12 @@ export default function ResearchNotePage({ params }: Props) {
 
         {/* PDF Download */}
         {note.pdfFile && (
-          <a href={`/research/${note.pdfFile}`} target="_blank" rel="noopener noreferrer"
+          <a href="/register"
             style={{ display:'inline-flex', alignItems:'center', gap:8,
               background:'#f97316', color:'#fff', fontWeight:700, fontSize:13,
-              padding:'12px 24px', borderRadius:6, textDecoration:'none' }}>
-            📄 Download Full Analysis PDF
+              padding:'12px 24px', borderRadius:6, textDecoration:'none' }}
+            title="Free registration required to download PDF">
+            📄 Download Full Analysis PDF — Free Registration
           </a>
         )}
 
@@ -284,11 +285,12 @@ export default function ResearchNotePage({ params }: Props) {
             📊 View {note.ticker} Chart & Data →
           </Link>
           {note.pdfFile && (
-            <a href={`/research/${note.pdfFile}`} target="_blank" rel="noopener noreferrer"
+            <a href="/register"
               style={{ display:'inline-flex', alignItems:'center', gap:8,
                 background:'#f97316', color:'#fff', fontWeight:700, fontSize:13,
-                padding:'10px 20px', borderRadius:6, textDecoration:'none' }}>
-              📄 Download PDF Analysis
+                padding:'10px 20px', borderRadius:6, textDecoration:'none' }}
+              title="Free registration required to download PDF">
+              📄 Download PDF Analysis — Free Registration
             </a>
           )}
         </div>
