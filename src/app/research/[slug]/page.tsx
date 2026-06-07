@@ -7,7 +7,7 @@ const NOTES: Record<string, any> = {
     title: 'Value 90 & Growth 80: The Institutional Mispricing of BNP Paribas',
     summary: 'BNP scores Value 90 and Growth 80. Trading at 7.8x NTM P/E and 0.78x P/B with 6.6% dividend yield and +14% dividend growth YoY.',
     valueScore: 90, growthScore: 80, bestScore: 97,
-    pdfFile: 'BNP_ForwardAlpha_Analysis.pdf', date: '2026-06-03', sector: 'Financials',
+    pdfFile: 'BNP_ForwardAlpha.pdf', date: '2026-06-03', sector: 'Financials',
     content: `BNP Paribas S.A. (BNP) has been flagged with Value Score 90/100 and Growth Score 80/100 by ForwardAlpha.
 
 The Valuation Disconnect
@@ -30,7 +30,7 @@ Value Rank 90/100 confirms BNP as a top-conviction name for institutional mandat
     title: 'Value 75 & Growth 92: The Rare GARP Engine Hidden in Big Oil',
     summary: 'Shell triggers a rare dual signal: Growth Score 92 and Value Score 75. NTM P/E 7.9x with +30% 12M return and projected EPS growth of 24% per year.',
     valueScore: 75, growthScore: 92, bestScore: 96,
-    pdfFile: 'SHEL_ForwardAlpha_Analysis.pdf', date: '2026-06-03', sector: 'Energy',
+    pdfFile: 'SHEL_ForwardAlpha.pdf', date: '2026-06-03', sector: 'Energy',
     content: `Shell plc (SHEL) has triggered a high-conviction dual signal: Growth Score 92/100 and Value Score 75/100.
 
 The Earnings & Margin Inflection
@@ -51,7 +51,7 @@ NTM P/E of ~7.9x with 3.7% dividend yield. Shell represents a premier GARP oppor
     title: 'Growth Score 98/100: Is Siemens Energy the Ultimate AI Infrastructure Winner?',
     summary: 'Siemens Energy scores Growth 98/100. Net income +160% YoY, FCF margin 16%, EPS growth 93% annually. Net cash position with ROIC 17.8%.',
     valueScore: 4, growthScore: 98, bestScore: 53,
-    pdfFile: 'ENR_ForwardAlpha_Analysis.pdf', date: '2026-06-03', sector: 'Industrials',
+    pdfFile: 'ENR_ForwardAlpha.pdf', date: '2026-06-03', sector: 'Industrials',
     content: `Siemens Energy AG (ENR) has been flagged with an elite Growth Score of 98/100 by ForwardAlpha.
 
 The AI Data Center & Grid Supercycle
@@ -75,7 +75,7 @@ Trading at ~32x NTM P/E, when forward earnings compound at 93% the valuation mul
     title: 'Growth Score 97/100: Why the Market is Paying a Premium for ABB',
     summary: 'ABB scores Growth 97/100 with +80% 12M return. EPS growth ~14% annually, ROIC 25%, Net Debt/EBITDA below 0.5x. Trading at 32x NTM P/E.',
     valueScore: 6, growthScore: 97, bestScore: 56,
-    pdfFile: 'ABBN_ForwardAlpha_Analysis.pdf', date: '2026-06-03', sector: 'Industrials',
+    pdfFile: 'ABBN_ForwardAlpha.pdf', date: '2026-06-03', sector: 'Industrials',
     content: `ABB Ltd (ABBN) has been flagged with an elite Growth Score of 97/100 by ForwardAlpha.
 
 Structural Growth Inflection
@@ -96,7 +96,7 @@ Trading at ~32x NTM P/E. For quality growth mandates this premium is justified b
     title: "Growth Score 98/100: Decoding ASML's Monopoly Power",
     summary: 'ASML scores Growth 98/100. Revenue +20% YoY, EBIT margins above 36%, EPS growth ~29% annually. Net cash and ROE expanding to mid-50s.',
     valueScore: 2, growthScore: 98, bestScore: 51,
-    pdfFile: 'ASML_ForwardAlpha_Analysis.pdf', date: '2026-06-03', sector: 'Information Technology',
+    pdfFile: 'ASML_ForwardAlpha.pdf', date: '2026-06-03', sector: 'Information Technology',
     content: `ASML Holding N.V. (ASML) has been flagged with a near-perfect Growth Score of 98/100 by ForwardAlpha.
 
 High-Velocity Top & Bottom-Line Scaling
@@ -116,7 +116,7 @@ Trading at ~41x NTM P/E. ASML's absolute monopoly in EUV lithography provides a 
     title: 'Growth Rank 99: Why IFX is a True Growth Story',
     summary: 'Infineon scores Growth 99/100. EPS growth ~36% annually, near-term EPS +65%. Trailing multiple compressing 60%+ on forward estimates. +160.1% 12M.',
     valueScore: 5, growthScore: 99, bestScore: 56,
-    pdfFile: 'IFX_ForwardAlpha_Analysis.pdf', date: '2026-06-03', sector: 'Information Technology',
+    pdfFile: 'IFX_ForwardAlpha.pdf', date: '2026-06-03', sector: 'Information Technology',
     content: `Infineon Technologies AG (IFX) has been flagged with Growth Rank 99/100 by ForwardAlpha.
 
 The Earnings Inflection
