@@ -20,7 +20,7 @@ const MONTHS = [
             title: 'Value 90 & Growth 80: The Institutional Mispricing of BNP Paribas',
             summary: 'Value 90, Growth 80, Best 97. NTM P/E 7.8x, P/B 0.78x, dividend 6.6%.',
             valueScore: 90, growthScore: 80, bestScore: 97,
-            pdfFile: 'BNP_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+            pdfFile: 'BNP_ForwardAlpha.pdf', date: '2026-06-03',
           }
         ]
       },
@@ -34,7 +34,7 @@ const MONTHS = [
             title: 'Value 75 & Growth 92: The Rare GARP Engine Hidden in Big Oil',
             summary: 'Value 75, Growth 92, Best 96. NTM P/E 7.9x, dividend 3.7%, EPS +24%.',
             valueScore: 75, growthScore: 92, bestScore: 96,
-            pdfFile: 'SHEL_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+            pdfFile: 'SHEL_ForwardAlpha.pdf', date: '2026-06-03',
           }
         ]
       },
@@ -48,7 +48,7 @@ const MONTHS = [
             title: 'Growth Score 98/100: Is Siemens Energy the Ultimate AI Infrastructure Winner?',
             summary: 'Growth 98, Value 4, Best 53. Net income +160% YoY, FCF margin 16%, net cash.',
             valueScore: 4, growthScore: 98, bestScore: 53,
-            pdfFile: 'ENR_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+            pdfFile: 'ENR_ForwardAlpha.pdf', date: '2026-06-03',
           },
           {
             slug: 'ABBN-SWX',
@@ -56,7 +56,7 @@ const MONTHS = [
             title: 'Growth Score 97/100: Why the Market is Paying a Premium for ABB',
             summary: 'Growth 97, Value 6, Best 56. ROIC 25%, EPS +14%, +80% 12M return.',
             valueScore: 6, growthScore: 97, bestScore: 56,
-            pdfFile: 'ABBN_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+            pdfFile: 'ABBN_ForwardAlpha.pdf', date: '2026-06-03',
           }
         ]
       },
@@ -70,7 +70,7 @@ const MONTHS = [
             title: "Growth Score 98/100: Decoding ASML's Monopoly Power",
             summary: 'Growth 98, Value 2, Best 51. Revenue +20% YoY, EPS +29%, ROE 50%+.',
             valueScore: 2, growthScore: 98, bestScore: 51,
-            pdfFile: 'ASML_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+            pdfFile: 'ASML_ForwardAlpha.pdf', date: '2026-06-03',
           },
           {
             slug: 'IFX-XETRA',
@@ -78,7 +78,7 @@ const MONTHS = [
             title: 'Growth Rank 99: Why IFX is a True Growth Story',
             summary: 'Growth 99, Value 5, Best 56. EPS +36%, +160% 12M return, SiC leader.',
             valueScore: 5, growthScore: 99, bestScore: 56,
-            pdfFile: 'IFX_ForwardAlpha_Analysis.pdf', date: '2026-06-03',
+            pdfFile: 'IFX_ForwardAlpha.pdf', date: '2026-06-03',
           }
         ]
       }
