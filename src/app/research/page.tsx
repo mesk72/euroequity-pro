@@ -148,11 +148,13 @@ export default function ResearchHubPage() {
                             📊 Chart
                           </Link>
                           {note.pdfFile && (
-                            <a href={`/research/${note.pdfFile}`} target="_blank" rel="noopener noreferrer"
+                            <a href="/register" 
                               style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#f97316',
                                 background: '#1e293b', padding: '4px 6px', borderRadius: 3,
-                                textDecoration: 'none', textAlign: 'center', border: '1px solid #f97316' }}>
-                              📄 PDF
+                                textDecoration: 'none', textAlign: 'center', border: '1px solid #f97316',
+                                cursor: 'pointer' }}
+                              title="Free registration required to download PDF">
+                              📄 PDF — Free Registration
                             </a>
                           )}
                         </div>
