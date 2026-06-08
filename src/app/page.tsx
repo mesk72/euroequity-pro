@@ -1164,7 +1164,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
             June 5, 2026
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            2,111 European equities · Value & Growth Scores recalculated
+            2,111 European equities · Value & Growth Scores recalculated · 2,000 US equities added to the research bar — Work in progress
           </div>
         </div>
 
