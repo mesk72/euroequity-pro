@@ -1517,7 +1517,7 @@ export default function App() {
           <div className="font-700 text-lg leading-tight" style={{ fontFamily: 'IBM Plex Sans Condensed' }}>
             FORWARD<span style={{ color: 'var(--orange)' }}>ALPHA</span>
           </div>
-          <div className="text-[9px] text-muted mt-0.5">European Equity Research</div>
+          <div className="text-[9px] text-muted mt-0.5">Global Equity Research</div>
           <div className="flex gap-1 mt-2 flex-wrap">
             <span className="badge badge-beta">🧪 BETA</span>
             <span className="badge badge-live">● LIVE</span>
