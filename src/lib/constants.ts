@@ -21,6 +21,7 @@ export const EXCHANGES_EXEMU: Record<string, { flag: string; label: string; mark
   OB: { flag: '🇳🇴', label: 'Norway', market: 'Oslo Børs', currency: 'NOK' },
   CPSE: { flag: '🇩🇰', label: 'Denmark', market: 'Nasdaq Copenhagen', currency: 'DKK' },
  US: { flag: '🇺🇸', label: 'United States', market: 'NYSE / Nasdaq', currency: 'USD' },
+ US: { flag: '🇺🇸', label: 'United States', market: 'NYSE / Nasdaq', currency: 'USD' },
 }
 
 // Tutti gli exchange
