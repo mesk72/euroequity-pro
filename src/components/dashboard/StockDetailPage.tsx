@@ -151,7 +151,7 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
   const chg = stock.change1d || 0
 
   const leftMetrics: [string, string, string][] = [
-    ['Price',   (stock.exchange === 'SWX' ? 'CHF ' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp ' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK ' : stock.exchange === 'OB' ? 'NOK ' : stock.exchange === 'CPSE' ? 'DKK ' : 'EUR ') + fv(stock.price, 2), ''],
+    ['Price',   (stock.exchange === 'SWX' ? 'CHF ' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp ' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK ' : stock.exchange === 'OB' ? 'NOK ' : stock.exchange === 'CPSE' ? 'DKK ' : stock.exchange === 'US' ? 'USD ' : 'EUR ') + fv(stock.price, 2), ''],
     ['1D Change %',  fp(chg, 2),               chg >= 0 ? 'var(--green)' : 'var(--red)'],
     ['Mkt Cap $B',   fv(stock.mktCap, 2),      ''],
     ['PE LTM Rank',  fn((stock as any).rankPeLtm),  scoreClr((stock as any).rankPeLtm)],
@@ -194,7 +194,7 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
               {stock.flag} {stock.ticker}
             </span>
             <span style={{ fontSize:18, fontFamily:'IBM Plex Mono', fontWeight:700, color:'var(--text)' }}>
-              {stock.exchange === 'SWX' ? 'CHF' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK' : stock.exchange === 'OB' ? 'NOK' : stock.exchange === 'CPSE' ? 'DKK' : '€'} {fv(stock.price, 2)}
+              {stock.exchange === 'SWX' ? 'CHF' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK' : stock.exchange === 'OB' ? 'NOK' : stock.exchange === 'CPSE' ? 'DKK' : stock.exchange === 'US' ? 'USD' : '€'} {fv(stock.price, 2)}
             </span>
             <span style={{ fontSize:16, fontFamily:'IBM Plex Mono', fontWeight:700,
               color: chg >= 0 ? 'var(--green)' : 'var(--red)' }}>
