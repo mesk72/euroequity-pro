@@ -153,7 +153,7 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
   const leftMetrics: [string, string, string][] = [
     ['Price',   (stock.exchange === 'SWX' ? 'CHF ' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp ' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK ' : stock.exchange === 'OB' ? 'NOK ' : stock.exchange === 'CPSE' ? 'DKK ' : 'EUR ') + fv(stock.price, 2), ''],
     ['1D Change %',  fp(chg, 2),               chg >= 0 ? 'var(--green)' : 'var(--red)'],
-    ['Mkt Cap €B',   fv(stock.mktCap, 2),      ''],
+    ['Mkt Cap $B',   fv(stock.mktCap, 2),      ''],
     ['PE LTM Rank',  fn((stock as any).rankPeLtm),  scoreClr((stock as any).rankPeLtm)],
     ['PE NTM Rank',  fn((stock as any).rankPeNtm),  scoreClr((stock as any).rankPeNtm)],
     ['PB Rank',      fn((stock as any).rankPb),      scoreClr((stock as any).rankPb)],
@@ -334,7 +334,7 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
               </div>
               <div>
                 <div style={{ fontSize:10, color:'var(--text3)', marginBottom:4,
-                  fontFamily:'IBM Plex Sans Condensed', fontWeight:700, textTransform:'uppercase' }}>Buy Price €</div>
+                  fontFamily:'IBM Plex Sans Condensed', fontWeight:700, textTransform:'uppercase' }}>Buy Price</div>
                 <input type="number" value={px}
                   onChange={e => setPx(e.target.value)}
                   className="input-field" style={{ width:100 }} />
