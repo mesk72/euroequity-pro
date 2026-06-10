@@ -97,7 +97,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -1475,6 +1475,7 @@ export default function App() {
     { id: 'about'      as Page, label: 'About',         icon: <Info size={16} />, bold: true },
     { id: 'research'   as Page, label: '📄 Research',    icon: <FileText size={16} />, bold: true },
     { id: 'dashboard'  as Page, label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
+ { id: 'northamerica' as Page, label: '🌎 North America', icon: <Globe size={16} /> },
     { id: 'screener'   as Page, label: 'All Europe',    icon: <Globe size={16} /> },
     { id: 'eurozone'   as Page, label: 'Eurozone',      icon: <Globe size={16} /> },
     { id: 'bestideas'  as Page, label: 'Best Ideas',    icon: <TrendingUp size={16} /> },
@@ -1498,6 +1499,7 @@ export default function App() {
     { id: 'SWX'        as Page, label: '🇨🇭 Switzerland', icon: <Globe size={16} /> },
     { id: 'OM'         as Page, label: '🇸🇪 Sweden (OM)', icon: <Globe size={16} /> },
     { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
+ { id: 'usscreen' as Page, label: '🇺🇸 United States', icon: <Globe size={16} /> },
     { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
     { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
   ]
