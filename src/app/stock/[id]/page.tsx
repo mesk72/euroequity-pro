@@ -417,7 +417,7 @@ export default function StockPage() {
               Price Chart · MA50 · MA200
             </div>
             <div style={{ display:'flex', gap:4 }}>
-              {([['1Y',252],['3Y',756],['5Y',1260]] as [string,number][]).map(([lbl,d]) => (
+              {([['1W',7],['1M',30],['6M',182],['1Y',252],['3Y',756],['5Y',1260]] as [string,number][]).map(([lbl,d]) => (
                 <button key={lbl} onClick={() => setChartDays(d)}
                   style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                     fontSize:11, padding:'4px 12px', borderRadius:2, cursor:'pointer',
