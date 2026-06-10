@@ -51,49 +51,21 @@ export async function GET(req: NextRequest) {
       volume: null,
     }))
 
-    // Calcola momentum con date di calendario — stessa logica del daily_load
-    const dates = all.map((d: any) => d.date) as string[]
-    const closes = all.map((d: any) => d.adj_close) as number[]
-    const lastDate = new Date(dates[dates.length - 1])
-    const lastPrice = closes[closes.length - 1]
-
-    const getPrice = (targetDate: Date): number | null => {
-      // Prende il prezzo del giorno di borsa precedente alla data target
-      const target = targetDate.toISOString().slice(0, 10)
-      for (let i = dates.length - 1; i >= 0; i--) {
-        if (dates[i] <= target) return closes[i]
-      }
-      return null
-    }
-
-    const addMonths = (d: Date, months: number): Date => {
-      const result = new Date(d)
-      result.setMonth(result.getMonth() + months)
-      return result
-    }
-
-    const addDays = (d: Date, days: number): Date => {
-      const result = new Date(d)
-      result.setDate(result.getDate() + days)
-      return result
-    }
-
-    const p1w  = getPrice(addDays(lastDate, -7))
-    const p1m  = getPrice(addMonths(lastDate, -1))
-    const p6m  = getPrice(addMonths(lastDate, -6))
-    const p12m = getPrice(addMonths(lastDate, -12))
-    const p3y  = getPrice(addMonths(lastDate, -36))
-    const p5y  = getPrice(addMonths(lastDate, -60))
-
-    const mom = (p: number | null) => p && p > 0 ? (lastPrice / p - 1) * 100 : null
+    // Legge momentum da fundamentals — stessa fonte della tabellina
+    const { data: fund } = await supabase
+      .from('fundamentals')
+      .select('mom1w,mom1m,mom6m,mom12m')
+      .eq('ticker', ticker)
+      .eq('exchange', exchange)
+      .single()
 
     const momentum = {
-      mom1w:  mom(p1w),
-      mom1m:  mom(p1m),
-      mom6m:  mom(p6m),
-      mom12m: mom(p12m),
-      mom3y:  mom(p3y),
-      mom5y:  mom(p5y),
+      mom1w: fund?.mom1w != null ? fund.mom1w * 100 : null,
+      mom1m: fund?.mom1m != null ? fund.mom1m * 100 : null,
+      mom6m: fund?.mom6m != null ? fund.mom6m * 100 : null,
+      mom12m: fund?.mom12m != null ? fund.mom12m * 100 : null,
+      mom3y: null,
+      mom5y: null,
     }
 
     return NextResponse.json({ history, momentum })
