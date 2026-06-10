@@ -211,7 +211,7 @@ const COLUMNS: ColDef[] = [
   { key: 'sector',      label: 'Sector',    width: 130 },
   { key: 'price',       label: 'Price',     width: 75  },
   { key: 'change1d',    label: '1D %',      width: 65  },
-  { key: 'mktCap',      label: 'MktCap €B', width: 80  },
+  { key: 'mktCap',      label: 'MktCap $B', width: 80  },
   { key: 'rankPeLtm',   label: 'PE LTM Rk', width: 70  },
   { key: 'rankPeNtm',   label: 'PE NTM Rk', width: 70  },
   { key: 'rankPb',      label: 'PB Rank',   width: 65  },
@@ -339,7 +339,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
               <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-              <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `${s.mktCap.toFixed(1)}B` : '-'}</span></span>
+              <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? `$${s.mktCap.toFixed(1)}B` : '-'}</span></span>
               <span className="text-[#444]">|</span>
               <span className="text-muted">PEv: <span style={{color:'#3b82f6'}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : '-'}</span></span>
               <span className="text-[#444]">|</span>
@@ -967,7 +967,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                 <thead><tr>
                   <th>Sector</th>
                   <th>Stocks</th>
-                  <th>Mkt Cap €B</th>
+                  <th>Mkt Cap $B</th>
                   <th>1D %</th>
                   <th>EPS Gr %</th>
                   <th>Rev Gr %</th>
