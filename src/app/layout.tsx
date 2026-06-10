@@ -4,13 +4,13 @@ import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
-  title:       'ForwardAlpha — European Equity Research',
-  description: 'ForwardAlpha — Professional European equity screening and research. Real-time data for Borsa Italiana, DAX, CAC 40 and all major European markets.',
-  keywords:    'European stocks, Borsa Italiana, equity screening, fundamental analysis, CFA',
+ title: 'ForwardAlpha — Global Quantitative Equity Research',
+ description: 'ForwardAlpha — Proprietary Value & Growth scoring across 2,100+ European and 2,000+ US equities. Daily refresh. Expanding to Canada, Japan and Asia-Pacific within 3 months.',
+ keywords: 'global stocks, equity screening, quantitative analysis, value investing, growth investing, CFA, European stocks, US stocks, Asia Pacific',
   authors:     [{ name: 'Andrea Meschini' }],
   openGraph: {
     title:       'ForwardAlpha',
-    description: 'Professional European equity research platform',
+ description: 'Professional global equity research platform',
     type:        'website',
   },
 }
