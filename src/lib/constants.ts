@@ -20,6 +20,7 @@ export const EXCHANGES_EXEMU: Record<string, { flag: string; label: string; mark
   OM: { flag: '🇸🇪', label: 'Sweden', market: 'Nasdaq Stockholm', currency: 'SEK' },
   OB: { flag: '🇳🇴', label: 'Norway', market: 'Oslo Børs', currency: 'NOK' },
   CPSE: { flag: '🇩🇰', label: 'Denmark', market: 'Nasdaq Copenhagen', currency: 'DKK' },
+ US: { flag: '🇺🇸', label: 'United States', market: 'NYSE / Nasdaq', currency: 'USD' },
 }
 
 // Tutti gli exchange
@@ -39,7 +40,7 @@ export const EXCHANGE_CURRENCY: Record<string, string> = {
   MIL:'EUR', XETRA:'EUR', PA:'EUR', AS:'EUR', MC:'EUR',
   BR:'EUR', LS:'EUR', VI:'EUR', HE:'EUR', IR:'EUR', GR:'EUR',
   LSE:'GBP', SWX:'CHF', OM:'SEK',
-  OB:'NOK', CPSE:'DKK',
+  OB:'NOK', CPSE:'DKK', US:'USD',
 }
 
 // ── INDICES ───────────────────────────────────────────────────────
