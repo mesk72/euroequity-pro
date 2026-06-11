@@ -1622,8 +1622,8 @@ export default function App() {
             ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
           )}
- {page === 'northamerica' && <Screener key="northamerica" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
- {page === 'usscreen' && <Screener key="usscreen" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
+ {page === 'northamerica' && <Screener key="northamerica" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
+ {page === 'usscreen' && <Screener key="usscreen" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'about'     && (
