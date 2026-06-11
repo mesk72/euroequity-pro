@@ -1,0 +1,23 @@
+name: Daily US Update
+
+on:
+  schedule:
+    - cron: '0 21 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  update-us:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install yfinance requests pandas numpy
+      - name: Run US daily load
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          MARKET: US
+        run: python daily_load.py
