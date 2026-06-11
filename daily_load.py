@@ -11,11 +11,12 @@ import numpy as np
 import json
 import time
 import math
+import os
 from datetime import datetime, timedelta
 
 # ── CONFIGURAZIONE ──────────────────────────────────────────
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
-SERVICE_KEY = input("Inserisci Supabase Service Key: ")
+SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
@@ -600,20 +601,29 @@ while True:
     offset += 1000
     if len(data) < 1000: break
 
-val_arr = [d["value_score"] for d in all_scores if d["value_score"] is not None]
-grw_arr = [d["growth_score"] for d in all_scores if d["growth_score"] is not None]
+# Separa EU e US per combined_rank continentale
+all_scores_eu = [d for d in all_scores if d["exchange"] != "US" 
+                 and d.get("value_score") is not None 
+                 and d.get("growth_score") is not None]
+all_scores_us = [d for d in all_scores if d["exchange"] == "US"
+                 and d.get("value_score") is not None
+                 and d.get("growth_score") is not None]
+
+sum_arr_eu = [d["value_score"] + d["growth_score"] for d in all_scores_eu]
+sum_arr_us = [d["value_score"] + d["growth_score"] for d in all_scores_us]
 
 combined_updates = []
-for d in all_scores:
-    vs = d.get("value_score")
-    gs = d.get("growth_score")
-    if vs is None and gs is None: continue
-    inputs = [x for x in [vs, gs] if x is not None]
-    avg = sum(inputs) / len(inputs)
-    combined = pct_rank(val_arr + grw_arr, avg)
+for d in all_scores_eu:
+    total = d["value_score"] + d["growth_score"]
     combined_updates.append({
         "ticker": d["ticker"], "exchange": d["exchange"],
-        "combined_rank": combined
+        "combined_rank": min(99, pct_rank(sum_arr_eu, total))
+    })
+for d in all_scores_us:
+    total = d["value_score"] + d["growth_score"]
+    combined_updates.append({
+        "ticker": d["ticker"], "exchange": d["exchange"],
+        "combined_rank": min(99, pct_rank(sum_arr_us, total))
     })
 
 ok = 0
