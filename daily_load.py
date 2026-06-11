@@ -174,51 +174,7 @@ for i in range(0,len(mom_updates),100):
         headers=headers_up, json=mom_updates[i:i+100])
 print(f" Momentum ok={ok} fail={fail}")
 
-# ============================================================
-# STEP 2 — NEXT EARNINGS DATE
-# ============================================================
-print("\n[2/5] Download next earnings date...")
-
-ok=fail=no_date=0
-earn_updates=[]
-
-for stock in all_stocks:
-    ticker = stock["ticker"]
-    exchange = stock["exchange"]
-    s = sym(ticker, exchange)
-
-    info = None
-    for attempt in range(3):
-        try:
-            info = yf.Ticker(s).info
-            break
-        except Exception as e:
-            if '500' in str(e) or '429' in str(e):
-                time.sleep(3)
-                continue
-            break
-
-    if info:
-        next_earn = ts(info.get("earningsTimestampStart"))
-        if next_earn and next_earn >= "2026-01-01":
-            earn_updates.append({
-                "ticker":ticker,"exchange":exchange,
-                "next_report":next_earn
-            })
-            ok+=1
-        else:
-            no_date+=1
-    else:
-        fail+=1
-
-    if (ok+no_date+fail) % 200 == 0:
-        print(f" earnings ok={ok} no_date={no_date} fail={fail}")
-    time.sleep(0.3)
-
-for i in range(0,len(earn_updates),100):
-    requests.post(SUPABASE_URL+"/rest/v1/fundamentals",
-        headers=headers_up, json=earn_updates[i:i+100])
-print(f" Earnings ok={ok} no_date={no_date} fail={fail}")
+# Step 2 earnings rimosso — aggiornato manualmente con CSV TIKR
 
 # ============================================================
 # STEP 3 — CAMBI FX
