@@ -12,6 +12,7 @@ import json
 import time
 import math
 import os
+import time as time_module
 from datetime import datetime, timedelta
 
 # ── CONFIGURAZIONE ──────────────────────────────────────────
@@ -55,6 +56,7 @@ def ts(t):
     except: return None
 
 # ── LEGGE UNIVERSO ──────────────────────────────────────────
+start_time = time_module.time()
 print("=" * 60)
 print(f"FORWARDALPHA DAILY LOAD — {TODAY}")
 print("=" * 60)
@@ -76,6 +78,8 @@ print(f"\nUniverso: {len(all_stocks)} titoli")
 # ============================================================
 print("\n[1/5] Download prezzi EOD...")
 
+ok_prices=0
+fail_prices=0
 ok=fail=0
 price_buf=[]
 
@@ -632,6 +636,25 @@ for i in range(0, len(combined_updates), 100):
         headers=headers_up, json=combined_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
 print(f" Combined rank aggiornati: {ok}/{len(combined_updates)}")
+
+
+# ============================================================
+# LOG GIORNALIERO
+# ============================================================
+end_time = time_module.time()
+log_entry = {
+    "run_date": TODAY,
+    "market": os.environ.get("MARKET", "EU"),
+    "prices_updated": ok,
+    "prices_failed": fail,
+    "last_price_date": TODAY,
+    "momentum_updated": len(mom_updates),
+    "rank_updated": ok,
+    "duration_seconds": int(end_time - start_time)
+}
+requests.post(SUPABASE_URL+"/rest/v1/daily_log",
+    headers=headers_up, json=[log_entry])
+print(f"\nLog salvato: {log_entry}")
 
 print("\n" + "="*60)
 print("DAILY LOAD COMPLETATO")
