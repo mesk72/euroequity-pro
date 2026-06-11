@@ -510,7 +510,7 @@ def calc_ranks_for_group(group):
         key=(d["ticker"],d["exchange"])
         m6=d.get("mom6m"); m12=d.get("mom12m")
         m1w=mom1w_map.get(key); m1m=mom1m_map.get(key)
- if m6 is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
+        if m6 is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
         if m12 is not None and m1m is not None: mom12_adj_g.append(m12 - m1m)
 
     results = []
