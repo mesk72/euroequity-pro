@@ -534,6 +534,7 @@ export default function StockPage() {
                 {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
                 {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
                 {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
+                <a href={`https://news.google.com/search?q=${encodeURIComponent((stock as any).company || ticker)}+stock&hl=en&gl=US&ceid=US:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
               </div>
             </div>
           )
