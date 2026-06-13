@@ -183,7 +183,7 @@ all_data = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m","exchange":"not.eq.US","offset":str(offset),"limit":"1000"})
+        params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m","exchange":"not.eq.US","in_universe":"eq.true","offset":str(offset),"limit":"1000"})
     data = r.json()
     if not data: break
     all_data.extend(data); offset += 1000
@@ -193,7 +193,7 @@ mom_data = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,mom1w,mom1m","exchange":"not.eq.US","offset":str(offset),"limit":"1000"})
+        params={"select":"ticker,exchange,mom1w,mom1m","exchange":"not.eq.US","in_universe":"eq.true","offset":str(offset),"limit":"1000"})
     data = r.json()
     if not data: break
     mom_data.extend(data); offset += 1000
