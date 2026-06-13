@@ -129,10 +129,7 @@ export async function GET(req: NextRequest) {
       fetchAll('fundamentals', 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj', exList),
     ])
 
-    // Usa stocks come fonte principale, join con fundamentals
-    const fundMap: Record<string, any> = {}
-    for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
-    const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+    const stocks = applyUniverseFilter(fundData, stocksData)
     return NextResponse.json({ stocks, source: 'supabase' })
 
   } catch (e) {
