@@ -88,20 +88,37 @@ if price_buf:
 print(f" Prezzi: ok={ok} fail={fail}")
 ok_prices = ok; fail_prices = fail
 
+from datetime import datetime as dt, timedelta
+
 print("\n Calcolo momentum...")
 ok = fail = 0; mom_updates = []
 for stock in all_stocks:
     ticker = stock["ticker"]; exchange = stock["exchange"]
     r = requests.get(SUPABASE_URL+"/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"date,adj_close","ticker":"eq."+ticker,"exchange":"eq."+exchange,"date":"lte."+TODAY,"order":"date.desc","limit":"260"})
+        params={"select":"date,adj_close","ticker":"eq."+ticker,"exchange":"eq."+exchange,
+                "date":"lte."+TODAY,"order":"date.desc","limit":"1826"})
     data = r.json()
     if not data: fail+=1; continue
-    closes = [d["adj_close"] for d in data if d["adj_close"]]
-    if not closes: fail+=1; continue
-    last_px = closes[0]
-    def mom(n): return round(last_px/closes[n-1]-1,6) if len(closes)>=n and closes[n-1] else None
-    chg1d = round((closes[0]/closes[1]-1)*100,4) if len(closes)>=2 else None
-    mom_updates.append({"ticker":ticker,"exchange":exchange,"mom1w":mom(5),"mom1m":mom(21),"mom6m":mom(126),"mom12m":mom(252),"change1d":chg1d})
+    data = [d for d in data if d["adj_close"]]
+    if not data: fail+=1; continue
+
+    last_px = data[0]["adj_close"]
+    last_date = dt.strptime(data[0]["date"], "%Y-%m-%d")
+    chg1d = round((data[0]["adj_close"]/data[1]["adj_close"]-1)*100,4) if len(data)>=2 else None
+
+    def mom_cal(days):
+        target = last_date - timedelta(days=days)
+        closest = min(data, key=lambda x: abs((dt.strptime(x["date"],"%Y-%m-%d")-target).days))
+        if closest["adj_close"] and closest["adj_close"] != 0:
+            return round(last_px/closest["adj_close"]-1, 6)
+        return None
+
+    mom_updates.append({
+        "ticker":ticker,"exchange":exchange,
+        "mom1w":mom_cal(7),"mom1m":mom_cal(31),
+        "mom6m":mom_cal(182),"mom12m":mom_cal(365),
+        "change1d":chg1d
+    })
     ok += 1
 for i in range(0,len(mom_updates),100):
     requests.post(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
