@@ -1155,7 +1155,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
-          <span className="text-[9px] text-muted font-normal">· auto-refresh 60s · delayed 15-20 min</span>
+         
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {INDICES.map((idx) => {
