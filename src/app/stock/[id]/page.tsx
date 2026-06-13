@@ -383,6 +383,11 @@ export default function StockPage() {
             <div style={{ fontSize:12, color:'var(--text4)', marginTop:2 }}>
               {stock.exchange} · {stock.sector} · {stock.country}
             </div>
+ {history.length > 0 && (
+ <div style={{ fontSize:11, color:'var(--text4)', marginTop:4 }}>
+ Last price: {history[0]?.date || '-'}
+ </div>
+ )}
           </div>
           {/* Scores */}
           <div style={{ display:'flex', gap:12 }}>
