@@ -949,7 +949,7 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
 
   return (
     <div className="space-y-4 p-3">
-      <div className="section-hdr">Sector Heatmap — All Europe</div>
+      <div className="section-hdr">Sector Heatmap — {exchange === "US" ? "North America" : "All Europe"}</div>
 
       {loading ? (
         <div className="text-center py-12 text-muted">
@@ -964,7 +964,7 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
 
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
             <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
-              Sector Aggregates - All Europe ({stocksEur.length} stocks)
+              Sector Aggregates - {exchange === "US" ? "North America" : "All Europe"} ({stocksEur.length} stocks)
             </div>
             <div className="overflow-x-auto">
               <table className="data-table w-full">
@@ -1066,10 +1066,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   }, [search])
 
 
-  // Top 600 Europe per market cap
+  // Tutti i titoli per market cap
   const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null}))
     .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
-    .slice(0, 600)
+    
 
   const valid   = u200.filter((s:any) => s.change1d != null)
   const allGainers = [...valid].filter((s:any) => (s.change1d || 0) > 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
@@ -1177,9 +1177,9 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : '2,111' },
-          { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
-          { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
-          { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
+          { label: 'MCW 1D Return ({exchange === "US" ? "North America" : "All Europe"})', value: loading ? '…' : fp(ewReturn) },
+          { label: 'V+G Best Combined', value: loading ? '…' : highVG.toString() },
+          { label: 'Gainers/Losers',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
@@ -1197,7 +1197,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
-                {title} - Top 600 Europe by Mkt Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
+                {title} - {exchange === "US" ? "North America" : "All Europe"}
               </div>
               <table className="data-table">
                 <thead><tr>
@@ -1224,8 +1224,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {!loading && topMom12.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
-            { title: '🚀 Top 10 Price Mom 12M (Top 600 Europe)', list: topMom12, color: 'var(--green)' },
-            { title: '💣 Bottom 10 Price Mom 12M (Top 600 Europe)', list: botMom12, color: 'var(--red)' },
+            { title: '🚀 Top 10 Price Mom 12M ({exchange === "US" ? "North America" : "All Europe"})', list: topMom12, color: 'var(--green)' },
+            { title: '💣 Bottom 10 Price Mom 12M ({exchange === "US" ? "North America" : "All Europe"})', list: botMom12, color: 'var(--red)' },
           ].map(({ title, list, color }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
@@ -1259,7 +1259,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {/* Heatmap settoriale */}
       {!loading && u200.length > 0 && (
         <div className="bg-surface border border-border rounded-lg p-4">
-          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · Top 600 Europe</div>
+          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · {exchange === "US" ? "North America" : "All Europe"}</div>
           <SectorHeatmap stocks={u200} onSectorClick={onSectorClick} />
         </div>
       )}
