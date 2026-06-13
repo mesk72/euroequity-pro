@@ -943,7 +943,7 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
-  const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
+ const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
   const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
   const clr = (v: number | null) => ({ color: v == null ? 'var(--muted)' : v >= 0 ? '#22d48a' : '#e84560' })
 
