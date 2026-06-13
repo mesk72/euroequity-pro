@@ -385,7 +385,7 @@ export default function StockPage() {
             </div>
  {history.length > 0 && (
  <div style={{ fontSize:11, color:'var(--text4)', marginTop:4 }}>
- Last price: {history[0]?.date || '-'}
+ Last price: {history[history.length - 1]?.date || '-'}
  </div>
  )}
           </div>
