@@ -1459,7 +1459,7 @@ export default function App() {
   const [scrSector,   setScrSector]   = useState('All')
   const [scrEpsMom,   setScrEpsMom]   = useState<string>('')
   const [detailStock, setDetailStock] = useState<Stock | null>(null)
-
+ const [user, setUser] = useState<any>(null)
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
     const { data: sub } = supabase.auth.onAuthStateChange((_, sess) => {
