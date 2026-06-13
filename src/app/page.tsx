@@ -1259,7 +1259,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {/* Heatmap settoriale */}
       {!loading && u200.length > 0 && (
         <div className="bg-surface border border-border rounded-lg p-4">
-          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · {exchange === "US" ? "North America" : "All Europe"}</div>
+          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · All Europe</div>
           <SectorHeatmap stocks={u200} onSectorClick={onSectorClick} />
         </div>
       )}
