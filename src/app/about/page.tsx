@@ -32,7 +32,7 @@ Our Value Score combines three rank components, each calculated relative to all 
 • PE NTM Rank — ranks stocks by forward earnings yield based on next-twelve-month consensus estimates. Forward-looking and more predictive than trailing earnings.
 • PB Rank — ranks stocks by Price/Book ratio. Lower P/B means more assets per dollar of market value. Negative book value stocks receive rank 0.
 
-Each component is ranked from 1 to 100 within the stock's country. The three ranks are averaged and re-ranked to produce the final Value Score. A minimum of two components must be available; otherwise the stock receives a neutral score of 50.
+Each component is ranked from 1 to 100 within the stock's country. The three ranks are averaged and re-ranked to produce the final Value Score.
 
 A Value Score of 80 means the stock is cheaper than 80% of its peers on our combined valuation metrics.`,
     },
@@ -40,15 +40,14 @@ A Value Score of 80 means the stock is cheaper than 80% of its peers on our comb
       title: 'The Growth Score',
       content: `The Growth Score measures a company's growth momentum across earnings, revenue, and price — the three pillars of fundamental momentum investing.
 
-Growth investing seeks companies that are expanding faster than the market expects. The most durable returns come from businesses where earnings, revenues, and market recognition are all moving in the same direction.
-
 Our Growth Score combines four rank components, each calculated relative to all stocks listed on the same exchange:
 
-• EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months, calculated as EPS NTM divided by EPS LTM using the absolute value of the denominator. This means turnaround companies with negative trailing EPS are included in the ranking.
-• Revenue Growth Rank — ranks stocks by top-line growth momentum using a time-weighted blend of fiscal year estimates. Revenue growth validates earnings growth and signals genuine business expansion. Companies with negative trailing revenue receive a neutral rank of 50.
-• Price Momentum — we rank stocks based on medium and long-term price momentum, using 6-month and 12-month return windows. Short-term noise is reduced by excluding the most recent period from each window. Markets tend to anticipate future growth; stocks that have outperformed over these horizons often continue to do so.
+• EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months.
+• Revenue Growth Rank — ranks stocks by top-line growth momentum using a time-weighted blend of fiscal year estimates.
+• Price Momentum 6M — 6-month return excluding the most recent month to reduce short-term noise.
+• Price Momentum 12M — 12-month return excluding the most recent month.
 
-The four components are averaged and re-ranked to produce the final Growth Score. All ranks are calculated within the stock's country universe.
+The four components are averaged and re-ranked to produce the final Growth Score.
 
 A Growth Score of 70 means the stock has stronger growth characteristics than 70% of its peers.`,
     },
@@ -58,109 +57,81 @@ A Growth Score of 70 means the stock has stronger growth characteristics than 70
 
 It is calculated as the sum of the Value Score and Growth Score, then re-ranked from 1 to 100 within Europe or North America respectively.
 
-A Best Score of 80 or above places a stock in the top 20% of its universe — combining both attractive valuation and strong growth momentum. These are ForwardAlpha's Best Ideas: stocks where value and growth reinforce each other.
-
-The Best Score is our primary screening tool for identifying equity opportunities.`,
+A Best Score of 80 or above places a stock in the top 20% of its universe — combining both attractive valuation and strong growth momentum.`,
     },
     {
       title: 'How to Use ForwardAlpha',
-      content: `ForwardAlpha is designed for investors who want a rigorous, data-driven starting point for equity research.
-
-Key parameters to focus on:
+      content: `Key parameters to focus on:
 
 • Best Score ≥ 80 — the top 20% of equities combining Value and Growth. Our primary Best Ideas filter.
 • Value Score — use to identify attractively valued stocks within a sector or country.
 • Growth Score — use to identify companies with strong earnings, revenue and price momentum.
-• Momentum 1W, 1M, 6M, 12M — short, medium and long-term price performance indicators.
+• Momentum 1W, 1M, 6M, 12M — short, medium and long-term price performance indicators, calculated on calendar days.
 
 Prices are updated automatically every trading day. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates and is updated weekly.
 
 Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (GR), Copenhagen (CPSE), Toronto (TSX — coming soon), Tokyo (JPX — coming soon), Hong Kong (HKEX — coming soon), Seoul (KRX — coming soon), Sydney (ASX — coming soon) and Singapore (SGX — coming soon). We are evaluating whether to add further markets in the future.
 
-For smaller markets — Vienna (VI), Lisbon (LS) and Dublin (IR) — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated.`,
+For smaller markets — Vienna (VI), Lisbon (LS) and Dublin (IR) — individual rank components are available but aggregate scores are not calculated.`,
     },
   ]
 
-
   return (
-    <div style={{ background:'#0a0e1a', minHeight:'100vh', color:'#e2e8f0', fontFamily:'IBM Plex Sans, sans-serif', padding:'40px 24px' }}>
-      <style>{\`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');\`}</style>
-      <div style={{ maxWidth:800, margin:'0 auto' }}>
+    <div style={{ background: '#0a0e1a', minHeight: '100vh', color: '#e2e8f0', fontFamily: 'IBM Plex Sans, sans-serif', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
 
-        {/* Header */}
-        <div style={{ marginBottom:32, borderBottom:'2px solid #f97316', paddingBottom:16 }}>
-          <a href="/" style={{ textDecoration:'none' }}>
-            <div style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:24, color:'#f97316' }}>
-              FORWARD<span style={{ color:'#94a3b8' }}>ALPHA</span>
+        <div style={{ marginBottom: 32, borderBottom: '2px solid #f97316', paddingBottom: 16 }}>
+          <a href="/" style={{ textDecoration: 'none' }}>
+            <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 24, color: '#f97316' }}>
+              FORWARD<span style={{ color: '#94a3b8' }}>ALPHA</span>
             </div>
           </a>
-          <div style={{ fontSize:9, color:'#64748b', marginTop:4, letterSpacing:'0.14em', fontFamily:'IBM Plex Sans Condensed', fontWeight:600 }}>
+          <div style={{ fontSize: 9, color: '#64748b', marginTop: 4, letterSpacing: '0.14em', fontFamily: 'IBM Plex Sans Condensed', fontWeight: 600 }}>
             GLOBAL EQUITY RESEARCH · METHODOLOGY · PHILOSOPHY
           </div>
         </div>
 
-        {/* Title */}
-        <div style={{ marginBottom:32 }}>
-          <h1 style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:28, color:'#e2e8f0', margin:0, marginBottom:8 }}>
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 28, color: '#e2e8f0', margin: 0, marginBottom: 8 }}>
             About ForwardAlpha
           </h1>
-          <p style={{ fontSize:14, color:'#64748b', lineHeight:1.7, margin:0 }}>
+          <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.7, margin: 0 }}>
             A quantitative framework for global equity research, built by an institutional investor for serious investors.
           </p>
         </div>
 
-        {/* Sections */}
-        {sections.map(({ title, content, table }: any) => (
-          <div key={title} style={{ marginBottom:16, background:'#111827', border:'1px solid #1e2d45', borderRadius:6, overflow:'hidden' }}>
-            <div style={{ background:'#161d2e', padding:'12px 20px', borderBottom:'1px solid #1e2d45', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:14, color:'#f97316' }}>
+        {sections.map(({ title, content }: any) => (
+          <div key={title} style={{ marginBottom: 16, background: '#111827', border: '1px solid #1e2d45', borderRadius: 6, overflow: 'hidden' }}>
+            <div style={{ background: '#161d2e', padding: '12px 20px', borderBottom: '1px solid #1e2d45', fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 14, color: '#f97316' }}>
               {title}
             </div>
-            <div style={{ padding:'16px 20px' }}>
-              {content && content.split('\n\n').map((para: string, i: number) => (
-                <p key={i} style={{ fontSize:13, color:'#94a3b8', lineHeight:1.8, margin:0, marginBottom: i < content.split('\n\n').length-1 ? 12 : 0, whiteSpace:'pre-line' }}>
+            <div style={{ padding: '16px 20px' }}>
+              {content.split('\n\n').map((para: string, i: number) => (
+                <p key={i} style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.8, margin: 0, marginBottom: i < content.split('\n\n').length - 1 ? 12 : 0, whiteSpace: 'pre-line' }}>
                   {para}
                 </p>
               ))}
-              {table && (
-                <table style={{ width:'100%', borderCollapse:'collapse' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign:'left', fontSize:10, color:'#64748b', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', paddingBottom:8, borderBottom:'1px solid #1e2d45', width:'35%' }}>Parameter</th>
-                      <th style={{ textAlign:'left', fontSize:10, color:'#64748b', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', paddingBottom:8, borderBottom:'1px solid #1e2d45' }}>Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.map(([param, desc]: [string, string], i: number) => (
-                      <tr key={param} style={{ borderBottom: i < table.length-1 ? '1px solid rgba(30,45,69,0.5)' : 'none' }}>
-                        <td style={{ padding:'8px 0', paddingRight:16, fontSize:12, color:'#f97316', fontFamily:'IBM Plex Sans Condensed', fontWeight:600 }}>{param}</td>
-                        <td style={{ padding:'8px 0', fontSize:12, color:'#64748b', lineHeight:1.6 }}>{desc}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
             </div>
           </div>
         ))}
 
-        {/* Contact CTA */}
-        <div style={{ marginBottom:16, background:'linear-gradient(135deg, #1a1f35, #161d2e)', border:'1px solid #f97316', borderRadius:6, padding:'24px 20px', textAlign:'center' }}>
-          <div style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:16, color:'#f97316', marginBottom:8 }}>
+        <div style={{ marginBottom: 16, background: 'linear-gradient(135deg, #1a1f35, #161d2e)', border: '1px solid #f97316', borderRadius: 6, padding: '24px 20px', textAlign: 'center' }}>
+          <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 16, color: '#f97316', marginBottom: 8 }}>
             Interested in ForwardAlpha?
           </div>
-          <p style={{ fontSize:13, color:'#94a3b8', lineHeight:1.7, margin:0, marginBottom:16 }}>
+          <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.7, margin: 0, marginBottom: 16 }}>
             ForwardAlpha is currently in beta. Register your interest to be notified at launch and receive early access.
           </p>
           <a href="mailto:andrea@forwardalpha.pro"
-            style={{ display:'inline-block', background:'#f97316', color:'#0a0e1a', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:13, padding:'10px 24px', borderRadius:4, textDecoration:'none', letterSpacing:'0.05em' }}>
+            style={{ display: 'inline-block', background: '#f97316', color: '#0a0e1a', fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 13, padding: '10px 24px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.05em' }}>
             CONTACT US
           </a>
         </div>
 
-        {/* Footer */}
-        <div style={{ fontSize:10, color:'#3d5068', textAlign:'center', paddingTop:16, borderTop:'1px solid #1e2d45', marginTop:8 }}>
-          ForwardAlpha · Verona, Italy · © 2026 Andrea Meschini · <a href="/legal" style={{ color:'#f97316' }}>Legal & Privacy</a>
+        <div style={{ fontSize: 10, color: '#3d5068', textAlign: 'center', paddingTop: 16, borderTop: '1px solid #1e2d45', marginTop: 8 }}>
+          ForwardAlpha · Verona, Italy · © 2026 Andrea Meschini · <a href="/legal" style={{ color: '#f97316' }}>Legal &amp; Privacy</a>
         </div>
+
       </div>
     </div>
   )
