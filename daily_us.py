@@ -170,6 +170,11 @@ while True:
     all_data.extend(data); offset += 1000
     if len(data) < 1000: break
 
+# Filtra solo titoli in_universe
+universe_keys = {f"{s['ticker']}.{s['exchange']}" for s in all_stocks}
+all_data = [d for d in all_data if f"{d['ticker']}.{d['exchange']}" in universe_keys]
+print(f" Fondamentali US filtrati: {len(all_data)}")
+
 mom_data = []
 offset = 0
 while True:
