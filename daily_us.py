@@ -108,6 +108,30 @@ for i in range(0,len(mom_updates),100):
 print(f" Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
+
+print("\n Aggiornamento prezzo corrente in stocks...")
+price_updates = []
+for stock in all_stocks:
+    ticker = stock["ticker"]; exchange = stock["exchange"]
+    r = requests.get(SUPABASE_URL+"/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"date,close","ticker":"eq."+ticker,"exchange":"eq."+exchange,
+                "order":"date.desc","limit":"1"})
+    data = r.json()
+    if data:
+        price_updates.append({
+            "ticker": ticker, "exchange": exchange,
+            "price": data[0]["close"],
+            "last_price_date": data[0]["date"]
+        })
+saved_prices = 0
+for d in price_updates:
+    r2 = requests.patch(SUPABASE_URL+"/rest/v1/stocks",
+        headers=headers_up,
+        params={"ticker":f"eq.{d['ticker']}","exchange":f"eq.{d['exchange']}"},
+        json={"price": d["price"], "last_price_date": d["last_price_date"]})
+    if r2.status_code in (200,201,204): saved_prices += 1
+print(f" Prezzi correnti aggiornati: {saved_prices}/{len(price_updates)}")
+
 print("\n[2/3] Ricalcolo rank US...")
 all_data = []
 offset = 0
