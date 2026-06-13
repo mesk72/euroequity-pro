@@ -1177,7 +1177,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : '2,111' },
-          { label: 'MCW 1D Return ({exchange === "US" ? "North America" : "All Europe"})', value: loading ? '…' : fp(ewReturn) },
+          { label: 'MCW 1D Return (All Europe)', value: loading ? '…' : fp(ewReturn) },
           { label: 'V+G Best Combined', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
@@ -1224,8 +1224,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {!loading && topMom12.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
-            { title: '🚀 Top 10 Price Mom 12M ({exchange === "US" ? "North America" : "All Europe"})', list: topMom12, color: 'var(--green)' },
-            { title: '💣 Bottom 10 Price Mom 12M ({exchange === "US" ? "North America" : "All Europe"})', list: botMom12, color: 'var(--red)' },
+            { title: '🚀 Top 10 Price Mom 12M (All Europe)', list: topMom12, color: 'var(--green)' },
+            { title: '💣 Bottom 10 Price Mom 12M (All Europe)', list: botMom12, color: 'var(--red)' },
           ].map(({ title, list, color }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
