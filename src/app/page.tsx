@@ -1067,7 +1067,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
 
   // Tutti i titoli per market cap
-  const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null}))
+ const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null})).sort((a:any,b:any) => (b.mktCap||0)-(a.mktCap||0)).slice(0, 600)
     .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
     
 
