@@ -1451,7 +1451,9 @@ function CookieBanner() {
 // - ROOT APP -
 export default function App() {
   const [page,        setPage]        = useState<Page>('dashboard')
-  const [user,        setUser]        = useState<SupabaseUser | null>(null)
+ const [page, setPage] = useState<Page>('dashboard')
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['dashboard','bestideas','bestvalue','bestgrowth','sectors']))
+  const toggleMenu = (id: string) => setExpandedMenus(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   const [showAuth,    setShowAuth]    = useState(false)
   const [sidebarOpen, setSidebar]     = useState(false)
   const [scrExchange, setScrExchange] = useState('MIL')
