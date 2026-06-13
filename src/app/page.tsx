@@ -1197,7 +1197,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
-                {title} - {exchange === "US" ? "North America" : "All Europe"}
+                {title}
               </div>
               <table className="data-table">
                 <thead><tr>
