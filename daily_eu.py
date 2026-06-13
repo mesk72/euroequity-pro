@@ -101,10 +101,20 @@ print("\n Calcolo momentum...")
 ok = fail = 0; mom_updates = []
 for stock in all_stocks:
     ticker = stock["ticker"]; exchange = stock["exchange"]
-    r = requests.get(SUPABASE_URL+"/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"date,adj_close","ticker":"eq."+ticker,"exchange":"eq."+exchange,
-                "date":"lte."+TODAY,"order":"date.desc","limit":"1826"})
-    data = r.json()
+    # Legge prezzi con paginazione per avere tutta la serie storica
+    data = []
+    offset_p = 0
+    while True:
+        rp = requests.get(SUPABASE_URL+"/rest/v1/prices_eod", headers=headers_r,
+            params={"select":"date,adj_close","ticker":"eq."+ticker,"exchange":"eq."+exchange,
+                    "date":"lte."+TODAY,"order":"date.desc","offset":str(offset_p),"limit":"1000"})
+        chunk = rp.json()
+        if not chunk: break
+        data.extend(chunk)
+        if len(chunk) < 1000: break
+        offset_p += 1000
+        if len(data) >= 1826: break
+    data = data[:1826]
     if not data: fail+=1; continue
     data = [d for d in data if d["adj_close"]]
     if not data: fail+=1; continue
