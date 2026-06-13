@@ -1152,25 +1152,6 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
       {/* Indices - aggiornati automaticamente ogni 60s */}
       <div>
-        {/* Last Update Banner */}
-        <div style={{
-          background: 'linear-gradient(135deg, #0f1923 0%, #1e3a5f 100%)',
-          border: '1px solid rgba(249,115,22,0.3)',
-          borderRadius: 8,
-          padding: '12px 20px',
-          marginBottom: 16,
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
-            Last Quantitative Update
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-            June 5, 2026
-          </div>
-          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            2,111 European equities · Value & Growth Scores recalculated · 2,000 US equities added to the research bar — Work in progress
-          </div>
-        </div>
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
