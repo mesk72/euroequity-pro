@@ -183,17 +183,22 @@ all_data = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m","exchange":"not.eq.US","in_universe":"eq.true","offset":str(offset),"limit":"1000"})
+        params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m","exchange":"not.eq.US","offset":str(offset),"limit":"1000"})
     data = r.json()
     if not data: break
     all_data.extend(data); offset += 1000
     if len(data) < 1000: break
 
+# Filtra solo titoli in_universe
+universe_keys = {f"{s['ticker']}.{s['exchange']}" for s in all_stocks}
+all_data = [d for d in all_data if f"{d['ticker']}.{d['exchange']}" in universe_keys]
+print(f" Fondamentali EU filtrati: {len(all_data)}")
+
 mom_data = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,mom1w,mom1m","exchange":"not.eq.US","in_universe":"eq.true","offset":str(offset),"limit":"1000"})
+        params={"select":"ticker,exchange,mom1w,mom1m","exchange":"not.eq.US","offset":str(offset),"limit":"1000"})
     data = r.json()
     if not data: break
     mom_data.extend(data); offset += 1000
