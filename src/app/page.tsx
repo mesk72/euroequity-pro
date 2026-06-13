@@ -1176,7 +1176,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total Stocks',              value: loading ? '…' : '2,111' },
+          { label: 'Total Stocks', value: loading ? '…' : allStocks.length.toString() },
           { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
