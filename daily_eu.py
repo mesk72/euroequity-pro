@@ -189,10 +189,12 @@ while True:
     all_data.extend(data); offset += 1000
     if len(data) < 1000: break
 
-# Filtra solo titoli in_universe
+# Filtra solo titoli in_universe e dedup
 universe_keys = {f"{s['ticker']}.{s['exchange']}" for s in all_stocks}
 all_data = [d for d in all_data if f"{d['ticker']}.{d['exchange']}" in universe_keys]
-print(f" Fondamentali EU filtrati: {len(all_data)}")
+seen = set()
+all_data = [d for d in all_data if not (f"{d['ticker']}.{d['exchange']}" in seen or seen.add(f"{d['ticker']}.{d['exchange']}"))]
+print(f" Fondamentali EU filtrati e dedup: {len(all_data)}")
 
 mom_data = []
 offset = 0
