@@ -67,37 +67,38 @@ print("\n[1/4] Download prezzi EOD...")
 ok = fail = 0
 price_buf = []
 for stock in all_stocks:
- ticker = stock["ticker"]; exchange = stock["exchange"]; s = sym(ticker, exchange)
- r = requests.get(SUPABASE_URL+"/rest/v1/prices_eod", headers=headers_r,
- params={"select":"date,close","ticker":"eq."+ticker,"exchange":"eq."+exchange,"order":"date.desc","limit":"1"})
- data = r.json()
- last = data[0]["date"] if data else "2021-05-25"
- last_close_db = data[0]["close"] if data else None
- if last >= TODAY: ok += 1; continue
- start = (datetime.strptime(last,"%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
- try:
- df = yf.download(s, start=start, end=TODAY, progress=False, auto_adjust=True)
- if df.empty: raise Exception('empty')
- if hasattr(df.columns,'get_level_values'): df.columns=df.columns.get_level_values(0)
- df = df.reset_index()
- # Controllo split al 35%
- if last_close_db and len(df) > 0:
- first_new = safe_float(df.iloc[0]['Close'])
- if first_new and abs(first_new/last_close_db - 1) > 0.35:
- print(f' SPLIT rilevato {ticker}: DB={last_close_db} Yahoo={first_new:.4f} — riscarico 5 anni')
- requests.delete(SUPABASE_URL+'/rest/v1/prices_eod',
- headers={**headers_r,'Content-Type':'application/json'},
- params={'ticker':'eq.'+ticker,'exchange':'eq.'+exchange})
- df = yf.download(s, start='2021-01-01', end=TODAY, progress=False, auto_adjust=True)
- if df.empty: raise Exception('empty after split')
- if hasattr(df.columns,'get_level_values'): df.columns=df.columns.get_level_values(0)
- df = df.reset_index()
- for _,row in df.iterrows():
- cv = safe_float(row['Close'])
- if cv is None: continue
- price_buf.append({'ticker':ticker,'exchange':exchange,'date':row['Date'].strftime('%Y-%m-%d'),'open':safe_float(row.get('Open',cv)) or cv,'high':safe_float(row.get('High',cv)) or cv,'low':safe_float(row.get('Low',cv)) or cv,'close':cv,'adj_close':cv,'volume':safe_int(row.get('Volume',0))})
- ok += 1
- except: fail += 1
+    ticker = stock["ticker"]; exchange = stock["exchange"]; s = sym(ticker, exchange)
+    r = requests.get(SUPABASE_URL+"/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"date,close","ticker":"eq."+ticker,"exchange":"eq."+exchange,"order":"date.desc","limit":"1"})
+    data = r.json()
+    last = data[0]["date"] if data else "2021-05-25"
+    last_close_db = data[0]["close"] if data else None
+    if last >= TODAY: ok += 1; continue
+    start = (datetime.strptime(last,"%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+    try:
+        df = yf.download(s, start=start, end=TODAY, progress=False, auto_adjust=True)
+        if df.empty: raise Exception("empty")
+        if hasattr(df.columns,"get_level_values"): df.columns=df.columns.get_level_values(0)
+        df = df.reset_index()
+        if last_close_db and len(df) > 0:
+            first_new = safe_float(df.iloc[0]["Close"])
+            if first_new and abs(first_new/last_close_db - 1) > 0.35:
+                print(f" SPLIT rilevato {ticker}: DB={last_close_db} Yahoo={first_new:.4f}")
+                requests.delete(SUPABASE_URL+"/rest/v1/prices_eod",
+                    headers={**headers_r,"Content-Type":"application/json"},
+                    params={"ticker":"eq."+ticker,"exchange":"eq."+exchange})
+                df = yf.download(s, start="2021-01-01", end=TODAY, progress=False, auto_adjust=True)
+                if df.empty: raise Exception("empty after split")
+                if hasattr(df.columns,"get_level_values"): df.columns=df.columns.get_level_values(0)
+                df = df.reset_index()
+        for _,row in df.iterrows():
+            cv = safe_float(row["Close"])
+            if cv is None: continue
+            price_buf.append({"ticker":ticker,"exchange":exchange,"date":row["Date"].strftime("%Y-%m-%d"),"open":safe_float(row.get("Open",cv)) or cv,"high":safe_float(row.get("High",cv)) or cv,"low":safe_float(row.get("Low",cv)) or cv,"close":cv,"adj_close":cv,"volume":safe_int(row.get("Volume",0))})
+        ok += 1
+    except: fail += 1
+    if len(price_buf) >= 500:
+        requests.post(SUPABASE_URL+"/rest/v1/prices_eod", headers=headers_up, json=price_buf)
         price_buf = []
     if (ok+fail) % 200 == 0: print(f" prezzi ok={ok} fail={fail}")
     time.sleep(0.05)
@@ -199,13 +200,6 @@ while True:
     if not data: break
     all_data.extend(data); offset += 1000
     if len(data) < 1000: break
-
-# Filtra solo titoli in_universe e dedup
-universe_keys = {f"{s['ticker']}.{s['exchange']}" for s in all_stocks}
-all_data = [d for d in all_data if f"{d['ticker']}.{d['exchange']}" in universe_keys]
-seen = set()
-all_data = [d for d in all_data if not (f"{d['ticker']}.{d['exchange']}" in seen or seen.add(f"{d['ticker']}.{d['exchange']}"))]
-print(f" Fondamentali EU filtrati e dedup: {len(all_data)}")
 
 mom_data = []
 offset = 0
