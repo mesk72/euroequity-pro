@@ -2,9 +2,9 @@ export default function AboutPage() {
   const sections = [
     {
       title: 'Our Philosophy',
-      content: `ForwardAlpha was built on a simple but powerful conviction: European equity markets are underserved by modern financial technology.
+      content: `ForwardAlpha applies a quantitative methodology used by institutional portfolio managers to analyse global equities.
 
-While most financial platforms focus on US markets, Europe offers over 2,100 listed companies across 16 exchanges — a rich universe of opportunities that remains largely inaccessible to independent investors without institutional-grade tools.
+We currently cover approximately 2,100 stocks across 16 European exchanges and approximately 2,000 stocks in North America. We are building our Asia Pacific universe, which will include approximately 1,000 stocks in Japan, plus Hong Kong, Korea, Australia and Singapore.
 
 We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`,
     },
@@ -54,35 +54,37 @@ A Growth Score of 70 means the stock has stronger growth characteristics than 70
     },
     {
       title: 'The Best Score',
-      content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to the entire European universe.
+      content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to its continental universe.
 
-It is calculated as the simple average of the Value Score and Growth Score, then re-ranked from 1 to 100 across all European stocks regardless of country.
+It is calculated as the sum of the Value Score and Growth Score, then re-ranked from 1 to 100 within Europe or North America respectively.
 
-A Best Score of 80 or above places a stock in the top 20% of all European equities — combining both attractive valuation and strong growth momentum. These are ForwardAlpha's Best Ideas: stocks where value and growth reinforce each other.
+A Best Score of 80 or above places a stock in the top 20% of its universe — combining both attractive valuation and strong growth momentum. These are ForwardAlpha's Best Ideas: stocks where value and growth reinforce each other.
 
-The Best Score is our primary screening tool for identifying European equity opportunities.`,
+The Best Score is our primary screening tool for identifying equity opportunities.`,
     },
     {
       title: 'How to Use ForwardAlpha',
-      content: `ForwardAlpha is designed for investors who want a rigorous, data-driven starting point for European equity research.
+      content: `ForwardAlpha is designed for investors who want a rigorous, data-driven starting point for equity research.
 
 Key parameters to focus on:
 
-• Best Score ≥ 80 — the top 20% of European equities combining Value and Growth. Our primary Best Ideas filter.
+• Best Score ≥ 80 — the top 20% of equities combining Value and Growth. Our primary Best Ideas filter.
 • Value Score — use to identify attractively valued stocks within a sector or country.
 • Growth Score — use to identify companies with strong earnings, revenue and price momentum.
-• Momentum 6M and 12M — medium and long-term price performance indicators.
+• Momentum 1W, 1M, 6M, 12M — short, medium and long-term price performance indicators.
 
-All data is updated weekly. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates. Last updated: 5 June 2026.
+Prices are updated automatically every trading day. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates and is updated weekly.
 
-Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (GR) and Copenhagen (CPSE). For smaller markets — Vienna (VI), Lisbon (LS) and Dublin (IR) — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated.`,
+Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (GR), Copenhagen (CPSE), Toronto (TSX — coming soon), Tokyo (JPX — coming soon), Hong Kong (HKEX — coming soon), Seoul (KRX — coming soon), Sydney (ASX — coming soon) and Singapore (SGX — coming soon). We are evaluating whether to add further markets in the future.
+
+For smaller markets — Vienna (VI), Lisbon (LS) and Dublin (IR) — individual rank components (PE LTM, PE NTM, PB, EPS Growth, Revenue Growth) are available but aggregate scores are not calculated.`,
     },
   ]
 
 
   return (
     <div style={{ background:'#0a0e1a', minHeight:'100vh', color:'#e2e8f0', fontFamily:'IBM Plex Sans, sans-serif', padding:'40px 24px' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
+      <style>{\`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');\`}</style>
       <div style={{ maxWidth:800, margin:'0 auto' }}>
 
         {/* Header */}
@@ -93,7 +95,7 @@ Coverage note: Value Score, Growth Score and Best Score are available for the fo
             </div>
           </a>
           <div style={{ fontSize:9, color:'#64748b', marginTop:4, letterSpacing:'0.14em', fontFamily:'IBM Plex Sans Condensed', fontWeight:600 }}>
-            EUROPEAN EQUITY RESEARCH · METHODOLOGY · PHILOSOPHY
+            GLOBAL EQUITY RESEARCH · METHODOLOGY · PHILOSOPHY
           </div>
         </div>
 
@@ -103,7 +105,7 @@ Coverage note: Value Score, Growth Score and Best Score are available for the fo
             About ForwardAlpha
           </h1>
           <p style={{ fontSize:14, color:'#64748b', lineHeight:1.7, margin:0 }}>
-            A quantitative framework for European equity research, built by an institutional investor for serious investors.
+            A quantitative framework for global equity research, built by an institutional investor for serious investors.
           </p>
         </div>
 
