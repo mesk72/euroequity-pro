@@ -1192,7 +1192,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {!loading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
-            { title: '🟢 Top 10 Gainers Today', list: gainers, color: 'text-[#22d48a]', field: 'change1d' },
+            { title: '🟢 Top 10 Gainers Today (top 600)', list: gainers, color: 'text-[#22d48a]', field: 'change1d' },
             { title: '🔴 Top 10 Losers Today',  list: losers,  color: 'text-[#e84560]',   field: 'change1d' },
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
