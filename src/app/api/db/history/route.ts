@@ -51,45 +51,38 @@ export async function GET(req: NextRequest) {
       volume: null,
     }))
 
-    // Legge momentum 1W/1M/6M/12M da fundamentals — stessa fonte della tabellina
-    const { data: fund } = await supabase
-      .from('fundamentals')
-      .select('mom1w,mom1m,mom6m,mom12m')
-      .eq('ticker', ticker)
-      .eq('exchange', exchange)
-      .single()
-
-    // Calcola 3Y e 5Y dai prezzi storici
+    // Calcola TUTTI i momentum da prices_eod — fonte unica
     const dates = all.map((d: any) => d.date) as string[]
     const closes = all.map((d: any) => d.adj_close) as number[]
     const lastDate = new Date(dates[dates.length - 1])
     const lastPrice = closes[closes.length - 1]
 
-    const getPrice = (targetDate: Date): number | null => {
-      const target = targetDate.toISOString().slice(0, 10)
-      for (let i = dates.length - 1; i >= 0; i--) {
-        if (dates[i] <= target) return closes[i]
+    const getClosestPrice = (targetDate: Date): number | null => {
+      const target = targetDate.getTime()
+      let closest = null
+      let minDiff = Infinity
+      for (let i = 0; i < dates.length; i++) {
+        const diff = Math.abs(new Date(dates[i]).getTime() - target)
+        if (diff < minDiff) { minDiff = diff; closest = closes[i] }
       }
-      return null
+      return closest
     }
 
-    const addMonths = (d: Date, months: number): Date => {
-      const result = new Date(d)
-      result.setMonth(result.getMonth() + months)
-      return result
+    const daysBack = (days: number): Date => {
+      const d = new Date(lastDate)
+      d.setDate(d.getDate() - days)
+      return d
     }
 
-    const p3y = getPrice(addMonths(lastDate, -36))
-    const p5y = getPrice(addMonths(lastDate, -60))
     const mom = (p: number | null) => p && p > 0 ? (lastPrice / p - 1) * 100 : null
 
     const momentum = {
-      mom1w: fund?.mom1w != null ? fund.mom1w * 100 : null,
-      mom1m: fund?.mom1m != null ? fund.mom1m * 100 : null,
-      mom6m: fund?.mom6m != null ? fund.mom6m * 100 : null,
-      mom12m: fund?.mom12m != null ? fund.mom12m * 100 : null,
-      mom3y: mom(p3y),
-      mom5y: mom(p5y),
+      mom1w: mom(getClosestPrice(daysBack(7))),
+      mom1m: mom(getClosestPrice(daysBack(31))),
+      mom6m: mom(getClosestPrice(daysBack(182))),
+      mom12m: mom(getClosestPrice(daysBack(365))),
+      mom3y: mom(getClosestPrice(daysBack(1095))),
+      mom5y: mom(getClosestPrice(daysBack(1826))),
     }
 
     return NextResponse.json({ history, momentum })
