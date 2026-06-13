@@ -19,5 +19,4 @@ jobs:
       - name: Run US daily load
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          MARKET: US
-        run: python daily_load.py
+        run: python daily_us.py
