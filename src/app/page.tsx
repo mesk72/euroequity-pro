@@ -257,14 +257,6 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
   }
 }
 
-function CellRenderer({ val, cls, cellStyle, cellFlag, sectorColor, isLocked }: {
-  val: string; cls: string; cellStyle: any; cellFlag?: string; sectorColor?: string; isLocked: boolean
-}) {
-  if (sectorColor) return <span className="truncate block text-[10px] font-600" style={{ color: sectorColor }}>{val}</span>
-  if (isLocked) return <span className="truncate block text-muted text-center">🔒</span>
-  return <span className={`truncate block ${cls}`} style={cellStyle}>{cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}</span>
-}
-
 function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }: {
   stocks: Stock[]
   onSelect: (s: Stock) => void
@@ -424,7 +416,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
             >
               {COLUMNS.map((c, ci) => {
                 const { val, cls, style: cellStyle, sectorColor, flag: cellFlag } = cellFmt(s, c.key)
-                const isLocked = !userId && LOCKED_GUEST.has(c.key)
                 return (
                   <td key={c.key} style={{
                     maxWidth: c.width,
@@ -436,10 +427,18 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                       boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
                     } : {})
                   }}>
-                    <CellRenderer val={val} cls={cls} cellStyle={cellStyle} cellFlag={cellFlag} sectorColor={sectorColor} isLocked={isLocked} />
-                  </td>
-                )
-              )}
+                    {c.key === 'sector' && sectorColor ? (
+                      <span className="truncate block text-[10px] font-600"
+                        style={{ color: sectorColor }}>
+                        {val}
+                      </span>
+                    ) : (!userId && LOCKED_GUEST.has(c.key)) ? (
+                      <span className="truncate block text-muted text-center">🔒</span>
+                    ) : (
+                      <span className={`truncate block ${cls}`} style={cellStyle}>
+                        {cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}
+                      </span>
+                    )}
                   </td>
                 )
               })}
