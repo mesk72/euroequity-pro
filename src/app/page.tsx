@@ -286,7 +286,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   }).slice(0, maxRows)
 
   const NO_SORT = new Set(['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'])
- const LOCKED_GUEST = new Set(['valueScore','growthScore','combinedRank','mom1w','mom1m','mom6m','mom12m'])
+  const LOCKED_GUEST = new Set(['valueScore','growthScore','combinedRank','mom1w','mom1m','mom6m','mom12m'])
   const toggle = (key: SortKey) => {
     if (NO_SORT.has(key)) return
     if (!userId && LOCKED_GUEST.has(key)) {
