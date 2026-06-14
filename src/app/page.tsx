@@ -991,7 +991,8 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
                   <th>Mom 12M %</th>
                   <th>Value</th>
                   <th>Growth</th>
-                </tr></thead>
+ <th>Growth</th>
+ <th>Best</th>
                 <tbody>
                   {sectors.map(s => (
  <tr key={s.name} onClick={() => onSectorClick(s.name, exchange)} className="cursor-pointer">
@@ -1008,7 +1009,8 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
  <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m != null ? s.mom12m * 100 : null)}</td>
                       <td className="font-mono">{fv(s.valueScore, 0)}</td>
                       <td className="font-mono">{fv(s.growthScore, 0)}</td>
-                    </tr>
+ <td className="font-mono">{fv(s.growthScore, 0)}</td>
+ <td className="font-mono font-700" style={clr((s.combinedRank || 50) - 50)}>{fv(s.combinedRank, 0)}</td>
                   ))}
                 </tbody>
               </table>
