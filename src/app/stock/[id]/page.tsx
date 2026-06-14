@@ -527,7 +527,7 @@ export default function StockPage() {
         {/* Official links */}
         {(() => {
           const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
-          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primary_exchange || undefined)
+          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
           const companyUrl = (stock as any).website || null
           if (!borseUrl && !companyUrl && !researchSlug) return null
           return (
