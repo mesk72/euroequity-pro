@@ -442,7 +442,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                   </td>
                 )
               )}
-              )}
               <td style={{ width: 28 }} onClick={(e) => e.stopPropagation()}>
                 <WatchlistButton stock={s} userId={userId} />
               </td>
