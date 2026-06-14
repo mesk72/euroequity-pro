@@ -1163,10 +1163,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
             Last Quantitative Update
           </div>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-            June 5, 2026
+            June 14, 2026 — 14:41 CET
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            2,111 European equities · Value & Growth Scores recalculated · 2,000 US equities added to the research bar — Work in progress
+            Work in progress
           </div>
         </div>
 
