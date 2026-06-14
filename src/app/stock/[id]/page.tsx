@@ -10,7 +10,7 @@ import { DEMO_STOCKS } from '@/lib/demoData'
 
 const MIC: Record<string, string> = { PA:'XPAR', AS:'XAMS', BR:'XBRU', LS:'XLIS', MIL:'XMIL', IR:'XDUB', OB:'XOSL' }
 
-function getBorseUrl(ticker: string, exchange: string, isin: string | null): string | null {
+function getBorseUrl(ticker: string, exchange: string, isin: string | null, primaryExchange?: string): string | null {
   if (['PA','AS','BR','LS','MIL','IR'].includes(exchange) && isin) return `https://live.euronext.com/en/product/equities/${isin}-${MIC[exchange]}`
   if (exchange === 'OB' && isin) return `https://live.euronext.com/nb/product/equities/${isin}-XOSL`
   if (exchange === 'XETRA' && isin) return `https://www.boerse-frankfurt.de/equity/${isin}`
@@ -518,7 +518,7 @@ export default function StockPage() {
         {/* Official links */}
         {(() => {
           const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
-          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null)
+          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primary_exchange || undefined)
           const companyUrl = (stock as any).website || null
           if (!borseUrl && !companyUrl && !researchSlug) return null
           return (
