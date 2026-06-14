@@ -97,7 +97,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'bestideas_us' | 'bestideas_ap' | 'bestvalue_us' | 'bestvalue_ap' | 'bestgrowth_us' | 'bestgrowth_ap' | 'sectors_us' | 'sectors_ap' | 'dashasiapac' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -415,7 +415,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
               className="cursor-pointer"
             >
               {COLUMNS.map((c, ci) => {
-                const isLocked = !userId && LOCKED_GUEST.has(c.key)
                 const { val, cls, style: cellStyle, sectorColor, flag: cellFlag } = cellFmt(s, c.key)
                 return (
                   <td key={c.key} style={{
@@ -431,10 +430,8 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                     {c.key === 'sector' && sectorColor ? (
                       <span className="truncate block text-[10px] font-600"
                         style={{ color: sectorColor }}>
-                          {val}
+                        {val}
                       </span>
-                    ) : isLocked ? (
-                      <span className="truncate block text-muted text-center">🔒</span>
                     ) : (
                       <span className={`truncate block ${cls}`} style={cellStyle}>
                         {cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}
@@ -442,7 +439,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                     )}
                   </td>
                 )
-              )}
+              })}
               <td style={{ width: 28 }} onClick={(e) => e.stopPropagation()}>
                 <WatchlistButton stock={s} userId={userId} />
               </td>
@@ -749,10 +746,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     <div className="space-y-3 p-3">
       {/* Exchange tabs */}
       <div className="flex gap-1.5 flex-wrap pb-1">
- <button onClick={() => setExchange('US')}
-          className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === 'US' ? 'bg-gold text-bg border-gold' : 'border-border text-text4 hover:border-text4'}`}>
-          🌎 North America
-        </button>
         <button onClick={() => setExchange('EZ')}
           className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === 'EZ' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
           All Europe
@@ -890,15 +883,15 @@ function FlagIcon({ flag }: { flag: string }) {
 }
 
 // - SECTORS -
-function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: string, ex?: string) => void, exchange?: string }) {
+function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void }) {
   const [stocks, setStocks] = useState<Stock[]>([])
   const [loading, setLoading] = useState(true)
   const usdToEur = 0.8615
 
- useEffect(() => {
- setLoading(true)
- apiExchange(exchange).then(data => { setStocks(data); setLoading(false) })
- }, [exchange])
+  useEffect(() => {
+    setLoading(true)
+    apiExchange('EZ').then(data => { setStocks(data); setLoading(false) })
+  }, [])
 
   const stocksEur = stocks.map(s => ({
     ...s,
@@ -908,58 +901,45 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
   // Aggrega per settore
   const sectorMap: Record<string, {
     mktCap: number, count: number,
-    change1d_w: number, change1d_m: number,
-    epsGrowth_w: number, epsGrowth_m: number,
-    revGrowth_w: number, revGrowth_m: number,
-    mom12m_w: number, mom12m_m: number,
-    valueScore_w: number, valueScore_m: number,
-    growthScore_w: number, growthScore_m: number,
-    combinedRank_w: number, combinedRank_m: number,
+    change1d: number[], epsGrowth: number[], revGrowth: number[],
+    mom12m: number[], valueScore: number[], growthScore: number[]
   }> = {}
 
   for (const s of stocksEur) {
     const sec = s.sector || 'Other'
     if (!sectorMap[sec]) sectorMap[sec] = {
       mktCap: 0, count: 0,
-      change1d_w: 0, change1d_m: 0,
-      epsGrowth_w: 0, epsGrowth_m: 0,
-      revGrowth_w: 0, revGrowth_m: 0,
-      mom12m_w: 0, mom12m_m: 0,
-      valueScore_w: 0, valueScore_m: 0,
-      growthScore_w: 0, growthScore_m: 0,
-      combinedRank_w: 0, combinedRank_m: 0,
+      change1d: [], epsGrowth: [], revGrowth: [],
+      mom12m: [], valueScore: [], growthScore: []
     }
     const g = sectorMap[sec]
-    const mc = s.mktCap || 0
     g.count++
-    if (mc) g.mktCap += mc
-    if (s.change1d != null && mc) { g.change1d_w += s.change1d * mc; g.change1d_m += mc }
-    if (s.epsGrowth != null && mc) { g.epsGrowth_w += s.epsGrowth * mc; g.epsGrowth_m += mc }
-    if (s.revGrowth != null && mc) { g.revGrowth_w += s.revGrowth * mc; g.revGrowth_m += mc }
-    if (s.mom12m != null && mc) { g.mom12m_w += s.mom12m * mc; g.mom12m_m += mc }
-    if (s.valueScore != null && mc) { g.valueScore_w += s.valueScore * mc; g.valueScore_m += mc }
-    if (s.growthScore != null && mc) { g.growthScore_w += s.growthScore * mc; g.growthScore_m += mc }
-    if (s.combinedRank != null && mc) { g.combinedRank_w += s.combinedRank * mc; g.combinedRank_m += mc }
+    if (s.mktCap) g.mktCap += s.mktCap
+    if (s.change1d != null) g.change1d.push(s.change1d)
+    if (s.epsGrowth != null) g.epsGrowth.push(s.epsGrowth)
+    if (s.revGrowth != null) g.revGrowth.push(s.revGrowth)
+    if (s.mom12m != null) g.mom12m.push(s.mom12m)
+    if (s.valueScore != null) g.valueScore.push(s.valueScore)
+    if (s.growthScore != null) g.growthScore.push(s.growthScore)
   }
 
-  const mcw = (w: number, m: number): number | null => m > 0 ? w / m : null
+  const avg = (arr: number[]) => arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : null
 
   const sectors = Object.entries(sectorMap)
     .map(([name, g]) => ({
       name,
       count: g.count,
       mktCap: g.mktCap,
-      change1d: mcw(g.change1d_w, g.change1d_m),
-      epsGrowth: mcw(g.epsGrowth_w, g.epsGrowth_m),
-      revGrowth: mcw(g.revGrowth_w, g.revGrowth_m),
-      mom12m: mcw(g.mom12m_w, g.mom12m_m),
-      valueScore: mcw(g.valueScore_w, g.valueScore_m),
-      growthScore: mcw(g.growthScore_w, g.growthScore_m),
-      combinedRank: mcw(g.combinedRank_w, g.combinedRank_m),
+      change1d: avg(g.change1d),
+      epsGrowth: avg(g.epsGrowth),
+      revGrowth: avg(g.revGrowth),
+      mom12m: avg(g.mom12m),
+      valueScore: avg(g.valueScore),
+      growthScore: avg(g.growthScore),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
- const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
+  const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
   const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
   const clr = (v: number | null) => ({ color: v == null ? 'var(--muted)' : v >= 0 ? '#22d48a' : '#e84560' })
 
@@ -994,11 +974,10 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
                   <th>Mom 12M %</th>
                   <th>Value</th>
                   <th>Growth</th>
- <th>Best</th>
                 </tr></thead>
                 <tbody>
                   {sectors.map(s => (
-                    <tr key={s.name} onClick={() => onSectorClick(s.name, exchange)} className="cursor-pointer">
+                    <tr key={s.name} onClick={() => onSectorClick(s.name)} className="cursor-pointer">
                       <td>
                         <span className="text-[11px] font-600" style={{ color: getSectorColor(s.name) }}>
                           {s.name}
@@ -1007,12 +986,11 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clr(s.change1d)}>{fp(s.change1d)}</td>
-                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth != null ? s.epsGrowth * 100 : null)}</td>
-                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth != null ? s.revGrowth * 100 : null)}</td>
-                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m != null ? s.mom12m * 100 : null)}</td>
+                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth)}</td>
+                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth)}</td>
+                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m)}</td>
                       <td className="font-mono">{fv(s.valueScore, 0)}</td>
                       <td className="font-mono">{fv(s.growthScore, 0)}</td>
- <td className="font-mono font-700">{fv(s.combinedRank, 0)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1170,10 +1148,29 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
       {/* Indices - aggiornati automaticamente ogni 60s */}
       <div>
+        {/* Last Update Banner */}
+        <div style={{
+          background: 'linear-gradient(135deg, #0f1923 0%, #1e3a5f 100%)',
+          border: '1px solid rgba(249,115,22,0.3)',
+          borderRadius: 8,
+          padding: '12px 20px',
+          marginBottom: 16,
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+            Last Quantitative Update
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
+            June 5, 2026
+          </div>
+          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
+            2,111 European equities · Value & Growth Scores recalculated · 2,000 US equities added to the research bar — Work in progress
+          </div>
+        </div>
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
-         
+          <span className="text-[9px] text-muted font-normal">· auto-refresh 60s · delayed 15-20 min</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {INDICES.map((idx) => {
@@ -1449,16 +1446,15 @@ function CookieBanner() {
 
 // - ROOT APP -
 export default function App() {
- const [page, setPage] = useState<Page>('dashboard')
- const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['dashboard','bestideas','bestvalue','bestgrowth','sectors']))
- const toggleMenu = (id: string) => setExpandedMenus(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
- const [user, setUser] = useState<any>(null)
- const [showAuth, setShowAuth] = useState(false)
- const [sidebarOpen, setSidebar] = useState(false)
- const [scrExchange, setScrExchange] = useState('MIL')
- const [scrSector, setScrSector] = useState('All')
- const [scrEpsMom, setScrEpsMom] = useState<string>('')
- const [detailStock, setDetailStock] = useState<Stock | null>(null)
+  const [page,        setPage]        = useState<Page>('dashboard')
+  const [user,        setUser]        = useState<SupabaseUser | null>(null)
+  const [showAuth,    setShowAuth]    = useState(false)
+  const [sidebarOpen, setSidebar]     = useState(false)
+  const [scrExchange, setScrExchange] = useState('MIL')
+  const [scrSector,   setScrSector]   = useState('All')
+  const [scrEpsMom,   setScrEpsMom]   = useState<string>('')
+  const [detailStock, setDetailStock] = useState<Stock | null>(null)
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
     const { data: sub } = supabase.auth.onAuthStateChange((_, sess) => {
@@ -1467,72 +1463,49 @@ export default function App() {
     return () => sub.subscription.unsubscribe()
   }, [])
 
- function goSector(sector: string, ex?: string) {
- const targetExchange = ex === 'US' ? 'US' : 'EZ'
- setScrExchange(targetExchange); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
+  function goSector(sector: string) {
+    setScrExchange('EZ'); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
+  }
 
   function goScreenerEpsMom(filter: string) {
     setScrExchange('EZ'); setScrSector('All'); setScrEpsMom(filter); setPage('screener'); setSidebar(false)
   }
 
- const nav = [
- { id: 'about' as Page, label: 'About', icon: <Info size={16} />, bold: true },
- { id: 'news' as Page, label: '📰 News', icon: null, bold: true },
- { id: 'research' as Page, label: '📄 Research', icon: <FileText size={16} />, bold: true },
- ]
- const singleMarkets = [
- { id: 'myscreen' as Page, label: '⭐ My Screen' },
- { id: 'screener' as Page, label: 'All Europe' },
- { id: 'eurozone' as Page, label: 'Eurozone' },
- { id: 'VI' as Page, label: '🇦🇹 Austria' },
- { id: 'BR' as Page, label: '🇧🇪 Belgium' },
- { id: 'CPSE' as Page, label: '🇩🇰 Denmark' },
- { id: 'HE' as Page, label: '🇫🇮 Finland' },
- { id: 'PA' as Page, label: '🇫🇷 France' },
- { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
- { id: 'GR' as Page, label: '🇬🇷 Greece' },
- { id: 'IR' as Page, label: '🇮🇪 Ireland' },
- { id: 'MIL' as Page, label: '🇮🇹 Italy' },
- { id: 'AS' as Page, label: '🇳🇱 Netherlands' },
- { id: 'OB' as Page, label: '🇳🇴 Norway' },
- { id: 'LS' as Page, label: '🇵🇹 Portugal' },
- { id: 'MC' as Page, label: '🇪🇸 Spain' },
- { id: 'SWX' as Page, label: '🇨🇭 Switzerland' },
- { id: 'OM' as Page, label: '🇸🇪 Sweden (OM)' },
- { id: 'LSE' as Page, label: '🇬🇧 UK (LSE)' },
- { id: 'usscreen' as Page, label: '🇺🇸 United States' },
- { id: 'portfolio' as Page, label: 'Portfolios' },
- { id: 'legal' as Page, label: 'Legal' },
- ]
- const accordionMenus = [
- { id: 'dashboard', label: '📊 Dashboard', items: [
- { id: 'northamerica', label: '🌎 North America' },
- { id: 'dashboard', label: '🌍 Europe' },
- { id: 'dashasiapac', label: '🌏 Asia Pacific 🔜', disabled: true },
- ]},
- { id: 'bestideas', label: '⭐ Best Ideas', items: [
- { id: 'bestideas_us', label: '🌎 North America' },
- { id: 'bestideas', label: '🌍 Europe' },
- { id: 'bestideas_ap', label: '🌏 Asia Pacific 🔜', disabled: true },
- ]},
- { id: 'bestvalue', label: '📈 Value', items: [
- { id: 'bestvalue_us', label: '🌎 North America' },
- { id: 'bestvalue', label: '🌍 Europe' },
- { id: 'bestvalue_ap', label: '🌏 Asia Pacific 🔜', disabled: true },
- ]},
- { id: 'bestgrowth', label: '🌱 Growth', items: [
- { id: 'bestgrowth_us', label: '🌎 North America' },
- { id: 'bestgrowth', label: '🌍 Europe' },
- { id: 'bestgrowth_ap', label: '🌏 Asia Pacific 🔜', disabled: true },
- ]},
- { id: 'sectors', label: '🏭 Sectors', items: [
- { id: 'sectors_us', label: '🌎 North America' },
- { id: 'sectors', label: '🌍 Europe' },
- { id: 'sectors_ap', label: '🌏 Asia Pacific 🔜', disabled: true },
- ]},
- ]
+  const nav = [
+    { id: 'about'      as Page, label: 'About',         icon: <Info size={16} />, bold: true },
+    { id: 'research'   as Page, label: '📄 Research',    icon: <FileText size={16} />, bold: true },
+    { id: 'dashboard'  as Page, label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
+ { id: 'northamerica' as Page, label: '🌎 North America', icon: <Globe size={16} /> },
+    { id: 'screener'   as Page, label: 'All Europe',    icon: <Globe size={16} /> },
+    { id: 'eurozone'   as Page, label: 'Eurozone',      icon: <Globe size={16} /> },
+ { id: 'bestideas' as Page, label: 'Best Ideas EU', icon: <TrendingUp size={16} /> },
+ { id: 'bestvalue' as Page, label: 'Best Value EU', icon: <TrendingUp size={16} /> },
+ { id: 'bestgrowth' as Page, label: 'Best Growth EU', icon: <TrendingUp size={16} /> },
+ { id: 'sectors' as Page, label: 'Sectors EU', icon: <Globe size={16} /> },
+    { id: 'myscreen'   as Page, label: '⭐ My Screen',   icon: <Star size={16} /> },
+    { id: 'VI'         as Page, label: '🇦🇹 Austria',     icon: <Globe size={16} /> },
+    { id: 'BR'         as Page, label: '🇧🇪 Belgium',     icon: <Globe size={16} /> },
+    { id: 'CPSE'       as Page, label: '🇩🇰 Denmark',     icon: <Globe size={16} /> },
+    { id: 'HE'         as Page, label: '🇫🇮 Finland',     icon: <Globe size={16} /> },
+    { id: 'PA'         as Page, label: '🇫🇷 France',      icon: <Globe size={16} /> },
+    { id: 'XETRA'      as Page, label: '🇩🇪 Germany',     icon: <Globe size={16} /> },
+    { id: 'GR'         as Page, label: '🇬🇷 Greece',      icon: <Globe size={16} /> },
+    { id: 'IR'         as Page, label: '🇮🇪 Ireland',     icon: <Globe size={16} /> },
+    { id: 'MIL'        as Page, label: '🇮🇹 Italy',       icon: <Globe size={16} /> },
+    { id: 'AS'         as Page, label: '🇳🇱 Netherlands', icon: <Globe size={16} /> },
+    { id: 'OB'         as Page, label: '🇳🇴 Norway',      icon: <Globe size={16} /> },
+    { id: 'LS'         as Page, label: '🇵🇹 Portugal',    icon: <Globe size={16} /> },
+    { id: 'MC'         as Page, label: '🇪🇸 Spain',       icon: <Globe size={16} /> },
+    { id: 'SWX'        as Page, label: '🇨🇭 Switzerland', icon: <Globe size={16} /> },
+    { id: 'OM'         as Page, label: '🇸🇪 Sweden (OM)', icon: <Globe size={16} /> },
+    { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
+ { id: 'usscreen' as Page, label: '🇺🇸 United States', icon: <Globe size={16} /> },
+    { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
+    { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
+  ]
 
- const externalNav: {href:string,label:string}[] = []
+  const externalNav: {href:string,label:string}[] = []
+
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
 
@@ -1554,48 +1527,29 @@ export default function App() {
         </div>
 
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
- {nav.map(item => (
- <button key={item.id}
- onClick={() => { if (item.id === 'research') { window.location.href = '/research'; } else if (item.id === 'news') { window.location.href = '/news'; } else { setPage(item.id as Page); setSidebar(false) } }}
- className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors text-left ${
- item.bold ? 'font-700' : 'font-500'
- } ${
- page === item.id ? 'bg-gold/15 text-gold' : item.bold ? 'text-orange-400 hover:text-orange-300 hover:bg-white/5' : 'text-muted hover:text-text hover:bg-white/5'
- }`}>
- {item.icon}{item.label}
- </button>
- ))}
- <div style={{ height:1, background:'var(--border)', margin:'8px 4px' }} />
- {accordionMenus.map(menu => (
- <div key={menu.id}>
- <button onClick={() => toggleMenu(menu.id)}
- className='w-full flex items-center justify-between px-3 py-2.5 rounded text-sm font-600 text-orange-400 hover:text-orange-300 hover:bg-white/5 transition-colors text-left'>
- <span>{menu.label}</span>
- <span style={{fontSize:10}}>{expandedMenus.has(menu.id) ? '▲' : '▼'}</span>
- </button>
- {expandedMenus.has(menu.id) && menu.items.map((item:any) => (
- <button key={item.id}
- onClick={() => { if (!item.disabled) { setPage(item.id as Page); setSidebar(false) } }}
- className={`w-full flex items-center gap-2.5 pl-6 pr-3 py-2 rounded text-sm transition-colors text-left ${
- item.disabled ? 'text-muted/40 cursor-not-allowed' :
- page === item.id ? 'bg-gold/15 text-gold' : 'text-muted hover:text-text hover:bg-white/5'
- }`}>
- {item.label}
- </button>
- ))}
- </div>
- ))}
- <div style={{ height:1, background:'var(--border)', margin:'8px 4px' }} />
- {singleMarkets.map((item:any) => (
- <button key={item.id}
- onClick={() => { setPage(item.id as Page); setSidebar(false) }}
- className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-500 transition-colors text-left ${
- page === item.id ? 'bg-gold/15 text-gold' : 'text-muted hover:text-text hover:bg-white/5'
- }`}>
- {item.label}
- </button>
- ))}
- </nav>
+          {nav.map(item => (
+            <button key={item.id}
+              onClick={() => { if (item.id === 'research') { window.location.href = '/research'; } else { setPage(item.id); setSidebar(false) } }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors text-left ${
+                item.bold ? 'font-700' : 'font-500'
+              } ${
+                page === item.id ? 'bg-gold/15 text-gold' : item.bold ? 'text-orange-400 hover:text-orange-300 hover:bg-white/5' : 'text-muted hover:text-text hover:bg-white/5'
+              }`}>
+              {item.icon}{item.label}
+            </button>
+          ))}
+          <div style={{ height:1, background:'var(--border)', margin:'8px 4px' }} />
+          {externalNav.map(item => (
+            <a key={item.href} href={item.href}
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px',
+                borderRadius:4, color:'var(--text3)', fontSize:13, fontWeight:500,
+                textDecoration:'none', transition:'all 0.12s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color='var(--text)'; (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.05)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color='var(--text3)'; (e.currentTarget as HTMLElement).style.background='transparent' }}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
 
         {/* User */}
         <div className="p-3 border-t border-border space-y-2">
@@ -1664,43 +1618,10 @@ export default function App() {
             ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
           )}
- {page === 'northamerica' && <Screener key="northamerica" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
- {page === 'usscreen' && <Screener key="usscreen" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
+ {page === 'northamerica' && <Screener key="northamerica" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
+ {page === 'usscreen' && <Screener key="usscreen" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
- {page === 'bestideas_us' && (user
- ? <Screener key="bestideas_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
- : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas North America" />
- )}
- {page === 'bestvalue_us' && (user
- ? <Screener key="bestvalue_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
- : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value North America" />
- )}
- {page === 'bestgrowth_us' && (user
- ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
- : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth North America" />
- )}
- {page === 'sectors_us' && <SectorScreen onSectorClick={goSector} exchange='US' />}
- {page === 'dashasiapac' && (
- <div className='flex-1 flex items-center justify-center'>
- <div style={{ textAlign:'center', color:'var(--text3)' }}>
- <div style={{ fontSize:48, marginBottom:16 }}>🌏</div>
- <div style={{ fontSize:20, fontWeight:700, color:'var(--orange)', marginBottom:8 }}>Asia Pacific</div>
- <div style={{ fontSize:14 }}>Coming Soon — Work in Progress</div>
- <div style={{ fontSize:12, marginTop:8, color:'var(--text4)' }}>Japan · Hong Kong · Korea · Australia · Singapore</div>
- </div>
- </div>
- )}
- {(page === 'bestideas_ap' || page === 'bestvalue_ap' || page === 'bestgrowth_ap' || page === 'sectors_ap') && (
- <div className='flex-1 flex items-center justify-center'>
- <div style={{ textAlign:'center', color:'var(--text3)' }}>
- <div style={{ fontSize:48, marginBottom:16 }}>🌏</div>
- <div style={{ fontSize:20, fontWeight:700, color:'var(--orange)', marginBottom:8 }}>Asia Pacific</div>
- <div style={{ fontSize:14 }}>Coming Soon — Work in Progress</div>
- <div style={{ fontSize:12, marginTop:8, color:'var(--text4)' }}>Japan · Hong Kong · Korea · Australia · Singapore</div>
- </div>
- </div>
- )}
           {page === 'about'     && (
           <div className="flex-1 overflow-y-auto">
             <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
