@@ -184,6 +184,8 @@ function mapStock(s: any, f: any) {
     rankEpsGr: f.rank_eps_gr ?? null,
     rankRevGr: f.rank_rev_gr ?? null,
     rankMom6Adj: f.rank_mom6_adj ?? null,
-    rankMom12Adj: f.rank_mom12_adj ?? null,
-  }
+ rankMom12Adj: f.rank_mom12_adj ?? null,
+ primaryExchange: s.primary_exchange ?? null,
+ yahooTicker: s.yahoo_ticker ?? null,
+ }
 }
