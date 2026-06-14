@@ -1464,9 +1464,9 @@ export default function App() {
     return () => sub.subscription.unsubscribe()
   }, [])
 
-  function goSector(sector: string) {
-    setScrExchange('EZ'); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
-  }
+ function goSector(sector: string, ex?: string) {
+ const targetExchange = ex === 'US' ? 'US' : 'EZ'
+ setScrExchange(targetExchange); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
 
   function goScreenerEpsMom(filter: string) {
     setScrExchange('EZ'); setScrSector('All'); setScrEpsMom(filter); setPage('screener'); setSidebar(false)
