@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
 
     if (ticker && exchange) {
       const [stockRes, fundRes] = await Promise.all([
-        supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date').eq('ticker', ticker).eq('exchange', exchange).limit(1),
+        supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj').eq('ticker', ticker).eq('exchange', exchange).limit(1),
       ])
       const s: any = stockRes.data?.[0] || {}
