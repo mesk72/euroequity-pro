@@ -28,15 +28,6 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null, prim
   }
   return null
 }
-  if (exchange === 'US') {
-    const pe = primaryExchange || ''
-    if (['NYSE','NYSEAM','ARCA','BATS'].includes(pe)) return `https://www.nyse.com/quote/XNYS:${ticker}`
-    if (['NasdaqGS','NasdaqGM','NasdaqCM'].includes(pe)) return `https://www.nasdaq.com/market-activity/stocks/${ticker.toLowerCase()}`
-    if (pe === 'OTCPK') return `https://www.otcmarkets.com/stock/${ticker}/overview`
-    return null
-  }
-  return null
-}
 
 function fp(v?: number | null, d = 2): string {
   if (v == null || isNaN(v as number)) return '-'
