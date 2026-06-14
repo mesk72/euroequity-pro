@@ -236,12 +236,16 @@ def calc_ranks(group):
         ey_f=ey(pe_f); r_eyf=pct_rank(ey_fwd_g,ey_f) if ey_f is not None else (1 if pe_f is not None and pe_f<0 else None)
         r_pb=pct_rank([1/x for x in pb_g if x>0],1/pb_v if pb_v and pb_v>0 else None) if pb_v and pb_v>0 else None
         val_inputs=[x for x in [r_eyt,r_eyf,r_pb] if x is not None]
+        value_score=int(round(sum(val_inputs)/len(val_inputs))) if val_inputs else None
+ value_score=int(round(sum(val_inputs)/len(val_inputs))) if len(val_inputs)>=2 else None
         r_revg=pct_rank(rev_g_vals,rev_g) if rev_g is not None else None
         mom6_adj=(m6-m1w) if m6 is not None and m1w is not None else None
         mom12_adj=(m12-m1m) if m12 is not None and m1m is not None else None
         r_m6=pct_rank(mom6_adj_g,mom6_adj) if mom6_adj is not None else None
         r_m12=pct_rank(mom12_adj_g,mom12_adj) if mom12_adj is not None else None
         gr_inputs=[x for x in [r_epsg,r_revg,r_m6,r_m12] if x is not None]
+ gr_inputs=[x for x in [r_epsg,r_revg,r_m6,r_m12] if x is not None]
+ growth_score=int(round(sum(gr_inputs)/len(gr_inputs))) if len(gr_inputs)>=3 else None
     return results
 
 rank_updates=[]
