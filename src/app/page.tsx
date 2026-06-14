@@ -415,8 +415,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
               className="cursor-pointer"
             >
               {COLUMNS.map((c, ci) => {
-                const isLocked = !userId && LOCKED_GUEST.has(c.key);
-                const { val, cls, style: cellStyle, sectorColor, flag: cellFlag } = cellFmt(s, c.key);
+                const { val, cls, style: cellStyle, sectorColor, flag: cellFlag } = cellFmt(s, c.key)
                 return (
                   <td key={c.key} style={{
                     maxWidth: c.width,
@@ -428,20 +427,21 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                       boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
                     } : {})
                   }}>
-                  <>
-                  {c.key === 'sector' && sectorColor ? (
-                    <span className="truncate block text-[10px] font-600"
-                      style={{ color: sectorColor }}>
-                        {val}
-                    </span>
-                  ) : isLocked ? (
-                    <span className="truncate block text-muted text-center">🔒</span>
-                  ) : (
-                    <span className={`truncate block ${cls}`} style={cellStyle}>
-                      {cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}
-                    </span>
-                  )}
-                  </>
+                    {c.key === 'sector' && sectorColor ? (
+                      <span className="truncate block text-[10px] font-600"
+                        style={{ color: sectorColor }}>
+                          {val}
+                      </span>
+                    ) : (!userId && LOCKED_GUEST.has(c.key)) ? (
+                      <span className="truncate block text-muted text-center">🔒</span>
+                    ) : (
+                      <span className={`truncate block ${cls}`} style={cellStyle}>
+                        {cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}
+                      </span>
+                    )}
+                  </td>
+                )
+              )}
               )}
               <td style={{ width: 28 }} onClick={(e) => e.stopPropagation()}>
                 <WatchlistButton stock={s} userId={userId} />
