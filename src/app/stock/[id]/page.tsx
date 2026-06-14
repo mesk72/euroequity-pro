@@ -255,10 +255,7 @@ export default function StockPage() {
   const [pf,    setPf]    = useState('Portfolio 1')
   const [added, setAdded] = useState(false)
   const [user, setUser] = useState<any>(null)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
-  }, [])
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null)) }, [])
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
@@ -397,11 +394,7 @@ export default function StockPage() {
           </div>
           {/* Scores */}
           <div style={{ display:'flex', gap:12 }}>
-            {!user ? (
-              <div style={{ display:'flex', gap:12, alignItems:'center', justifyContent:'center' }}>
-                <span style={{ fontSize:13, color:'var(--text3)' }}>🔒 Sign up free to see Value, Growth & Best scores</span>
-              </div>
-            ) : (
+            {[
               { label:'Value Score', val: stock.valueScore },
               { label:'Growth Score', val: stock.growthScore },
               { label:'Best', val: stock.combinedRank },
@@ -414,7 +407,7 @@ export default function StockPage() {
                   color:'var(--text4)', marginBottom:4 }}>{label}</div>
                 <div style={{ fontSize:28, fontFamily:'IBM Plex Mono',
                   fontWeight:700, color: scoreClr(val) }}>
-                  {fn(val)}
+                  {user ? fn(val) : '🔒'}
                 </div>
                 <div style={{ fontSize:9, color:'var(--text4)' }}>/ 100</div>
               </div>
