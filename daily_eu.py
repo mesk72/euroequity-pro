@@ -214,13 +214,13 @@ while True:
 mom1w_map = {(d["ticker"],d["exchange"]):d.get("mom1w") for d in mom_data}
 mom1m_map = {(d["ticker"],d["exchange"]):d.get("mom1m") for d in mom_data}
 
-RANK_GROUPS = {"ITA":["MIL"],"DEU":["XETRA"],"FRA":["PA"],"GBR":["LSE","AIM"],"SWE":["OM"],"NOR":["OB"],"CHE":["SWX"],"NLD":["AS"],"BEL":["BR"],"FIN":["HE"],"ESP":["MC"],"DNK":["CPSE"]}
-NO_RANK = {"AT","VI","LS","IR","NGM"}
+RANK_GROUPS = {"ITA":["MIL"],"DEU":["XETRA"],"FRA":["PA"],"GBR":["LSE"],"SWE":["OM"],"NOR":["OB"],"CHE":["SWX"],"NLD":["AS"],"BEL":["BR"],"FIN":["HE"],"ESP":["MC"],"DNK":["CPSE"]}
+NO_RANK = {"AT","VI","LS","IR","NGM","AIM"}
 
 def calc_ranks(group):
     ey_trail_g=[ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
     ey_fwd_g=[ey(d["pe_forward"]) for d in group if ey(d["pe_forward"]) is not None]
-    pb_g=[d["pb"] for d in group if d["pb"] is not None and not math.isnan(float(d["pb"])) and d["pb"]<50]
+    pb_g=[d["pb"] for d in group if d["pb"] is not None and not math.isnan(float(d["pb"]))]
     eps_g_vals=[d["eps_growth"] for d in group if d["eps_growth"] is not None and not math.isnan(float(d["eps_growth"]))]
     rev_g_vals=[d["rev_growth"] for d in group if d["rev_growth"] is not None and not math.isnan(float(d["rev_growth"]))]
     mom6_adj_g=[]; mom12_adj_g=[]
@@ -228,24 +228,30 @@ def calc_ranks(group):
         key=(d["ticker"],d["exchange"]); m6=d.get("mom6m"); m12=d.get("mom12m"); m1w=mom1w_map.get(key); m1m=mom1m_map.get(key)
         if m6 is not None and m1w is not None: mom6_adj_g.append(m6-m1w)
         if m12 is not None and m1m is not None: mom12_adj_g.append(m12-m1m)
-    results=[]
+    pre=[]
     for d in group:
-        key=(d["ticker"],d["exchange"]); pe_t=d.get("pe_trailing"); pe_f=d.get("pe_forward"); pb_v=d.get("pb"); eps_g=d.get("eps_growth"); rev_g=d.get("rev_growth")
+        key=(d["ticker"],d["exchange"]); pe_t=d.get("pe_trailing"); pe_f=d.get("pe_forward"); pb_v=d.get("pb")
+        eps_g=d.get("eps_growth"); rev_g=d.get("rev_growth")
         m6=d.get("mom6m"); m12=d.get("mom12m"); m1w=mom1w_map.get(key); m1m=mom1m_map.get(key)
         ey_t=ey(pe_t); r_eyt=pct_rank(ey_trail_g,ey_t) if ey_t is not None else (1 if pe_t is not None and pe_t<0 else None)
         ey_f=ey(pe_f); r_eyf=pct_rank(ey_fwd_g,ey_f) if ey_f is not None else (1 if pe_f is not None and pe_f<0 else None)
         r_pb=pct_rank([1/x for x in pb_g if x>0],1/pb_v if pb_v and pb_v>0 else None) if pb_v and pb_v>0 else None
-        val_inputs=[x for x in [r_eyt,r_eyf,r_pb] if x is not None]
-        value_score=int(round(sum(val_inputs)/len(val_inputs))) if len(val_inputs)>=2 else None
         r_epsg=pct_rank(eps_g_vals,eps_g) if eps_g is not None else None
         r_revg=pct_rank(rev_g_vals,rev_g) if rev_g is not None else None
         mom6_adj=(m6-m1w) if m6 is not None and m1w is not None else None
         mom12_adj=(m12-m1m) if m12 is not None and m1m is not None else None
         r_m6=pct_rank(mom6_adj_g,mom6_adj) if mom6_adj is not None else None
         r_m12=pct_rank(mom12_adj_g,mom12_adj) if mom12_adj is not None else None
-        gr_inputs=[x for x in [r_epsg,r_revg,r_m6,r_m12] if x is not None]
-        growth_score=int(round(sum(gr_inputs)/len(gr_inputs))) if len(gr_inputs)>=3 else None
-        results.append({"ticker":d["ticker"],"exchange":d["exchange"],"value_score":value_score,"growth_score":growth_score,"rank_pe_ltm":r_eyt,"rank_pe_ntm":r_eyf,"rank_pb":r_pb,"rank_eps_gr":r_epsg,"rank_rev_gr":r_revg})
+        pre.append({"ticker":d["ticker"],"exchange":d["exchange"],"r_eyt":r_eyt,"r_eyf":r_eyf,"r_pb":r_pb,"r_epsg":r_epsg,"r_revg":r_revg,"r_m6":r_m6,"r_m12":r_m12})
+    val_sums=[sum(x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None) for p in pre if len([x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None])>=2]
+    gr_sums=[sum(x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None) for p in pre if len([x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None])>=3]
+    results=[]
+    for p in pre:
+        val_inputs=[x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None]
+        gr_inputs=[x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None]
+        value_score=int(round(pct_rank(val_sums,sum(val_inputs)))) if len(val_inputs)>=2 and val_sums else None
+        growth_score=int(round(pct_rank(gr_sums,sum(gr_inputs)))) if len(gr_inputs)>=3 and gr_sums else None
+        results.append({"ticker":p["ticker"],"exchange":p["exchange"],"value_score":value_score,"growth_score":growth_score,"rank_pe_ltm":p["r_eyt"],"rank_pe_ntm":p["r_eyf"],"rank_pb":p["r_pb"],"rank_eps_gr":p["r_epsg"],"rank_rev_gr":p["r_revg"],"rank_mom6_adj":p["r_m6"],"rank_mom12_adj":p["r_m12"]})
     return results
 
 rank_updates=[]
