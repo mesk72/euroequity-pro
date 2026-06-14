@@ -257,7 +257,9 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
   }
 }
 
-function renderCell(val: string, cls: string, cellStyle: any, cellFlag: string|undefined, sectorColor: string|undefined, isLocked: boolean) {
+function CellRenderer({ val, cls, cellStyle, cellFlag, sectorColor, isLocked }: {
+  val: string; cls: string; cellStyle: any; cellFlag?: string; sectorColor?: string; isLocked: boolean
+}) {
   if (sectorColor) return <span className="truncate block text-[10px] font-600" style={{ color: sectorColor }}>{val}</span>
   if (isLocked) return <span className="truncate block text-muted text-center">🔒</span>
   return <span className={`truncate block ${cls}`} style={cellStyle}>{cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}</span>
@@ -434,7 +436,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                       boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
                     } : {})
                   }}>
-                    {renderCell(val, cls, cellStyle, cellFlag, sectorColor, isLocked)}
+                    <CellRenderer val={val} cls={cls} cellStyle={cellStyle} cellFlag={cellFlag} sectorColor={sectorColor} isLocked={isLocked} />
                   </td>
                 )
               )}
