@@ -981,7 +981,7 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
                 </tr></thead>
                 <tbody>
                   {sectors.map(s => (
-                    <tr key={s.name} onClick={() => onSectorClick(s.name)} className="cursor-pointer">
+ <tr key={s.name} onClick={() => onSectorClick(s.name, exchange)} className="cursor-pointer">
                       <td>
                         <span className="text-[11px] font-600" style={{ color: getSectorColor(s.name) }}>
                           {s.name}
@@ -990,9 +990,9 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clr(s.change1d)}>{fp(s.change1d)}</td>
-                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth)}</td>
-                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth)}</td>
-                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m)}</td>
+ <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth != null ? s.epsGrowth * 100 : null)}</td>
+ <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth != null ? s.revGrowth * 100 : null)}</td>
+ <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m != null ? s.mom12m * 100 : null)}</td>
                       <td className="font-mono">{fv(s.valueScore, 0)}</td>
                       <td className="font-mono">{fv(s.growthScore, 0)}</td>
                     </tr>
