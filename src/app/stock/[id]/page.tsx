@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { computeScores } from '@/lib/ranking'
@@ -253,6 +254,11 @@ export default function StockPage() {
   const [px,    setPx]    = useState(stock?.price?.toFixed(2) || '')
   const [pf,    setPf]    = useState('Portfolio 1')
   const [added, setAdded] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
+  }, [])
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
@@ -391,7 +397,11 @@ export default function StockPage() {
           </div>
           {/* Scores */}
           <div style={{ display:'flex', gap:12 }}>
-            {[
+            {!user ? (
+              <div style={{ display:'flex', gap:12, alignItems:'center', justifyContent:'center' }}>
+                <span style={{ fontSize:13, color:'var(--text3)' }}>🔒 Sign up free to see Value, Growth & Best scores</span>
+              </div>
+            ) : (
               { label:'Value Score', val: stock.valueScore },
               { label:'Growth Score', val: stock.growthScore },
               { label:'Best', val: stock.combinedRank },
