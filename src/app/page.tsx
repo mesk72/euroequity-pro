@@ -887,7 +887,7 @@ function FlagIcon({ flag }: { flag: string }) {
 }
 
 // - SECTORS -
-function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: string) => void, exchange?: string }) {
+function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: string, ex?: string) => void, exchange?: string }) {
   const [stocks, setStocks] = useState<Stock[]>([])
   const [loading, setLoading] = useState(true)
   const usdToEur = 0.8615
