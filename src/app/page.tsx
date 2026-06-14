@@ -1452,6 +1452,8 @@ export default function App() {
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
   const [showAuth,    setShowAuth]    = useState(false)
   const [sidebarOpen, setSidebar]     = useState(false)
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['dashboard']))
+  const toggleMenu = (id: string) => setExpandedMenus(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   const [scrExchange, setScrExchange] = useState('MIL')
   const [scrSector,   setScrSector]   = useState('All')
   const [scrEpsMom,   setScrEpsMom]   = useState<string>('')
@@ -1473,37 +1475,57 @@ export default function App() {
     setScrExchange('EZ'); setScrSector('All'); setScrEpsMom(filter); setPage('screener'); setSidebar(false)
   }
 
-  const nav = [
-    { id: 'about'      as Page, label: 'About',         icon: <Info size={16} />, bold: true },
-    { id: 'research'   as Page, label: '📄 Research',    icon: <FileText size={16} />, bold: true },
-    { id: 'dashboard'  as Page, label: 'Dashboard',    icon: <LayoutDashboard size={16} /> },
- { id: 'northamerica' as Page, label: '🌎 North America', icon: <Globe size={16} /> },
-    { id: 'screener'   as Page, label: 'All Europe',    icon: <Globe size={16} /> },
-    { id: 'eurozone'   as Page, label: 'Eurozone',      icon: <Globe size={16} /> },
- { id: 'bestideas' as Page, label: 'Best Ideas EU', icon: <TrendingUp size={16} /> },
- { id: 'bestvalue' as Page, label: 'Best Value EU', icon: <TrendingUp size={16} /> },
- { id: 'bestgrowth' as Page, label: 'Best Growth EU', icon: <TrendingUp size={16} /> },
- { id: 'sectors' as Page, label: 'Sectors EU', icon: <Globe size={16} /> },
-    { id: 'myscreen'   as Page, label: '⭐ My Screen',   icon: <Star size={16} /> },
-    { id: 'VI'         as Page, label: '🇦🇹 Austria',     icon: <Globe size={16} /> },
-    { id: 'BR'         as Page, label: '🇧🇪 Belgium',     icon: <Globe size={16} /> },
-    { id: 'CPSE'       as Page, label: '🇩🇰 Denmark',     icon: <Globe size={16} /> },
-    { id: 'HE'         as Page, label: '🇫🇮 Finland',     icon: <Globe size={16} /> },
-    { id: 'PA'         as Page, label: '🇫🇷 France',      icon: <Globe size={16} /> },
-    { id: 'XETRA'      as Page, label: '🇩🇪 Germany',     icon: <Globe size={16} /> },
-    { id: 'GR'         as Page, label: '🇬🇷 Greece',      icon: <Globe size={16} /> },
-    { id: 'IR'         as Page, label: '🇮🇪 Ireland',     icon: <Globe size={16} /> },
-    { id: 'MIL'        as Page, label: '🇮🇹 Italy',       icon: <Globe size={16} /> },
-    { id: 'AS'         as Page, label: '🇳🇱 Netherlands', icon: <Globe size={16} /> },
-    { id: 'OB'         as Page, label: '🇳🇴 Norway',      icon: <Globe size={16} /> },
-    { id: 'LS'         as Page, label: '🇵🇹 Portugal',    icon: <Globe size={16} /> },
-    { id: 'MC'         as Page, label: '🇪🇸 Spain',       icon: <Globe size={16} /> },
-    { id: 'SWX'        as Page, label: '🇨🇭 Switzerland', icon: <Globe size={16} /> },
-    { id: 'OM'         as Page, label: '🇸🇪 Sweden (OM)', icon: <Globe size={16} /> },
-    { id: 'LSE'        as Page, label: '🇬🇧 UK (LSE)',    icon: <Globe size={16} /> },
- { id: 'usscreen' as Page, label: '🇺🇸 United States', icon: <Globe size={16} /> },
-    { id: 'portfolio'  as Page, label: 'Portfolios',   icon: <Briefcase size={16} /> },
-    { id: 'legal'      as Page, label: 'Legal',        icon: <Globe size={16} /> },
+  const accordionMenus = [
+    { id: 'dashboard', label: '📊 Dashboard', items: [
+      { id: 'northamerica' as Page, label: '🌎 North America' },
+      { id: 'dashboard' as Page, label: '🌍 Europe' },
+      { id: null, label: '🌏 Asia Pacific 🔜' },
+    ]},
+    { id: 'bestideas', label: '⭐ Best Ideas', items: [
+      { id: 'bestideas_us' as Page, label: '🌎 North America' },
+      { id: 'bestideas' as Page, label: '🌍 Europe' },
+      { id: null, label: '🌏 Asia Pacific 🔜' },
+    ]},
+    { id: 'bestvalue', label: '📈 Best Value', items: [
+      { id: 'bestvalue_us' as Page, label: '🌎 North America' },
+      { id: 'bestvalue' as Page, label: '🌍 Europe' },
+      { id: null, label: '🌏 Asia Pacific 🔜' },
+    ]},
+    { id: 'bestgrowth', label: '🌱 Best Growth', items: [
+      { id: 'bestgrowth_us' as Page, label: '🌎 North America' },
+      { id: 'bestgrowth' as Page, label: '🌍 Europe' },
+      { id: null, label: '🌏 Asia Pacific 🔜' },
+    ]},
+    { id: 'sectors', label: '🏭 Sectors', items: [
+      { id: 'sectors_us' as Page, label: '🌎 North America' },
+      { id: 'sectors' as Page, label: '🌍 Europe' },
+      { id: null, label: '🌏 Asia Pacific 🔜' },
+    ]},
+  ]
+
+  const singleMarkets = [
+    { id: 'myscreen' as Page, label: '⭐ My Screen' },
+    { id: 'northamerica' as Page, label: '🌎 North America' },
+    { id: 'screener' as Page, label: '🌍 All Europe' },
+    { id: 'eurozone' as Page, label: '🇪🇺 Eurozone' },
+    { id: null, label: '🌏 Asia Pacific 🔜' },
+    { id: 'VI' as Page, label: '🇦🇹 Austria' },
+    { id: 'BR' as Page, label: '🇧🇪 Belgium' },
+    { id: 'CPSE' as Page, label: '🇩🇰 Denmark' },
+    { id: 'HE' as Page, label: '🇫🇮 Finland' },
+    { id: 'PA' as Page, label: '🇫🇷 France' },
+    { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
+    { id: 'GR' as Page, label: '🇬🇷 Greece' },
+    { id: 'IR' as Page, label: '🇮🇪 Ireland' },
+    { id: 'MIL' as Page, label: '🇮🇹 Italy' },
+    { id: 'AS' as Page, label: '🇳🇱 Netherlands' },
+    { id: 'OB' as Page, label: '🇳🇴 Norway' },
+    { id: 'LS' as Page, label: '🇵🇹 Portugal' },
+    { id: 'MC' as Page, label: '🇪🇸 Spain' },
+    { id: 'SWX' as Page, label: '🇨🇭 Switzerland' },
+    { id: 'OM' as Page, label: '🇸🇪 Sweden' },
+    { id: 'LSE' as Page, label: '🇬🇧 UK (LSE)' },
+    { id: 'usscreen' as Page, label: '🇺🇸 United States' },
   ]
 
   const externalNav: {href:string,label:string}[] = []
@@ -1529,29 +1551,47 @@ export default function App() {
         </div>
 
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
-          {nav.map(item => (
-            <button key={item.id}
-              onClick={() => { if (item.id === 'research') { window.location.href = '/research'; } else { setPage(item.id); setSidebar(false) } }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors text-left ${
-                item.bold ? 'font-700' : 'font-500'
-              } ${
-                page === item.id ? 'bg-gold/15 text-gold' : item.bold ? 'text-orange-400 hover:text-orange-300 hover:bg-white/5' : 'text-muted hover:text-text hover:bg-white/5'
-              }`}>
-              {item.icon}{item.label}
+        {/* About + Research */}
+        <button onClick={() => { setPage('about'); setSidebar(false) }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 transition-colors ${page === 'about' ? 'bg-gold/15 text-gold' : 'text-orange-400 hover:text-gold'}`}>
+          <Info size={16} /> About
+        </button>
+        <button onClick={() => { window.location.href='/research' }}
+          className='w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 text-orange-400 hover:text-gold transition-colors'>
+          <FileText size={16} /> 📄 Research
+        </button>
+        <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
+        {accordionMenus.map(menu => (
+          <div key={menu.id}>
+            <button onClick={() => toggleMenu(menu.id)}
+              className='w-full flex items-center justify-between px-3 py-2.5 rounded text-sm font-600 text-orange-400 hover:text-gold transition-colors'>
+              <span>{menu.label}</span>
+              <ChevronDown size={12} className={`transition-transform ${expandedMenus.has(menu.id) ? 'rotate-180' : ''}`} />
             </button>
-          ))}
-          <div style={{ height:1, background:'var(--border)', margin:'8px 4px' }} />
-          {externalNav.map(item => (
-            <a key={item.href} href={item.href}
-              style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px',
-                borderRadius:4, color:'var(--text3)', fontSize:13, fontWeight:500,
-                textDecoration:'none', transition:'all 0.12s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color='var(--text)'; (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.05)' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color='var(--text3)'; (e.currentTarget as HTMLElement).style.background='transparent' }}>
-              {item.label}
-            </a>
-          ))}
-        </nav>
+            {expandedMenus.has(menu.id) && (
+              <div className='ml-2 space-y-0.5'>
+                {menu.items.map((item, idx) => item.id ? (
+                  <button key={idx} onClick={() => { setPage(item.id as Page); setSidebar(false); toggleMenu(menu.id) }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded text-xs transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text'}`}>
+                    {item.label}
+                  </button>
+                ) : (
+                  <div key={idx} className='px-3 py-2 text-xs text-muted'>{item.label}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+        <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
+        {singleMarkets.map((item, idx) => item.id ? (
+          <button key={idx} onClick={() => { setPage(item.id as Page); setSidebar(false) }}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text'}`}>
+            {item.label}
+          </button>
+        ) : (
+          <div key={idx} className='px-3 py-2 text-xs text-muted'>{item.label}</div>
+        ))}
+      </nav>
 
         {/* User */}
         <div className="p-3 border-t border-border space-y-2">
