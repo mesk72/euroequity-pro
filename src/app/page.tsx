@@ -903,45 +903,58 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
   }))
 
   // Aggrega per settore
-  const sectorMap: Record<string, {
-    mktCap: number, count: number,
-    change1d: number[], epsGrowth: number[], revGrowth: number[],
-    mom12m: number[], valueScore: number[], growthScore: number[]
-  }> = {}
+ const sectorMap: Record<string, {
+ mktCap: number, count: number,
+ change1d_w: number, change1d_m: number,
+ epsGrowth_w: number, epsGrowth_m: number,
+ revGrowth_w: number, revGrowth_m: number,
+ mom12m_w: number, mom12m_m: number,
+ valueScore_w: number, valueScore_m: number,
+ growthScore_w: number, growthScore_m: number,
+ combinedRank_w: number, combinedRank_m: number,
+ }> = {}
 
-  for (const s of stocksEur) {
-    const sec = s.sector || 'Other'
-    if (!sectorMap[sec]) sectorMap[sec] = {
-      mktCap: 0, count: 0,
-      change1d: [], epsGrowth: [], revGrowth: [],
-      mom12m: [], valueScore: [], growthScore: []
-    }
-    const g = sectorMap[sec]
-    g.count++
-    if (s.mktCap) g.mktCap += s.mktCap
-    if (s.change1d != null) g.change1d.push(s.change1d)
-    if (s.epsGrowth != null) g.epsGrowth.push(s.epsGrowth)
-    if (s.revGrowth != null) g.revGrowth.push(s.revGrowth)
-    if (s.mom12m != null) g.mom12m.push(s.mom12m)
-    if (s.valueScore != null) g.valueScore.push(s.valueScore)
-    if (s.growthScore != null) g.growthScore.push(s.growthScore)
-  }
+ for (const s of stocksEur) {
+ const sec = s.sector || 'Other'
+ if (!sectorMap[sec]) sectorMap[sec] = {
+ mktCap: 0, count: 0,
+ change1d_w: 0, change1d_m: 0,
+ epsGrowth_w: 0, epsGrowth_m: 0,
+ revGrowth_w: 0, revGrowth_m: 0,
+ mom12m_w: 0, mom12m_m: 0,
+ valueScore_w: 0, valueScore_m: 0,
+ growthScore_w: 0, growthScore_m: 0,
+ combinedRank_w: 0, combinedRank_m: 0,
+ }
+ const g = sectorMap[sec]
+ const mc = s.mktCap || 0
+ g.count++
+ if (mc) g.mktCap += mc
+ if (s.change1d != null && mc) { g.change1d_w += s.change1d * mc; g.change1d_m += mc }
+ if (s.epsGrowth != null && mc) { g.epsGrowth_w += s.epsGrowth * mc; g.epsGrowth_m += mc }
+ if (s.revGrowth != null && mc) { g.revGrowth_w += s.revGrowth * mc; g.revGrowth_m += mc }
+ if (s.mom12m != null && mc) { g.mom12m_w += s.mom12m * mc; g.mom12m_m += mc }
+ if (s.valueScore != null && mc) { g.valueScore_w += s.valueScore * mc; g.valueScore_m += mc }
+ if (s.growthScore != null && mc) { g.growthScore_w += s.growthScore * mc; g.growthScore_m += mc }
+ if (s.combinedRank != null && mc) { g.combinedRank_w += s.combinedRank * mc; g.combinedRank_m += mc }
+ }
 
-  const avg = (arr: number[]) => arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : null
+ const mcw = (w: number, m: number): number | null => m > 0 ? w / m : null
 
-  const sectors = Object.entries(sectorMap)
-    .map(([name, g]) => ({
-      name,
-      count: g.count,
-      mktCap: g.mktCap,
-      change1d: avg(g.change1d),
-      epsGrowth: avg(g.epsGrowth),
-      revGrowth: avg(g.revGrowth),
-      mom12m: avg(g.mom12m),
-      valueScore: avg(g.valueScore),
-      growthScore: avg(g.growthScore),
-    }))
-    .sort((a, b) => b.mktCap - a.mktCap)
+ const sectors = Object.entries(sectorMap)
+ .map(([name, g]) => ({
+ name,
+ count: g.count,
+ mktCap: g.mktCap,
+ change1d: mcw(g.change1d_w, g.change1d_m),
+ epsGrowth: mcw(g.epsGrowth_w, g.epsGrowth_m),
+ revGrowth: mcw(g.revGrowth_w, g.revGrowth_m),
+ mom12m: mcw(g.mom12m_w, g.mom12m_m),
+ valueScore: mcw(g.valueScore_w, g.valueScore_m),
+ growthScore: mcw(g.growthScore_w, g.growthScore_m),
+ combinedRank: mcw(g.combinedRank_w, g.combinedRank_m),
+ }))
+ .sort((a, b) => b.mktCap - a.mktCap)
 
  const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
   const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
