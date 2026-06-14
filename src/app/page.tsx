@@ -416,7 +416,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
             >
               {COLUMNS.map((c, ci) => {
                 const isLocked = !userId && LOCKED_GUEST.has(c.key)
-                const { val, cls, style: cellStyle, sectorColor, flag: cellFlag } = cellFmt(s, c.key)
                 return (
                   <td key={c.key} style={{
                     maxWidth: c.width,
@@ -431,10 +430,8 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                     {c.key === 'sector' && sectorColor ? (
                       <span className="truncate block text-[10px] font-600"
                         style={{ color: sectorColor }}>
-                          {val}
+                        {val}
                       </span>
-                    ) : isLocked ? (
-                      <span className="truncate block text-muted text-center">🔒</span>
                     ) : (
                       <span className={`truncate block ${cls}`} style={cellStyle}>
                         {cellFlag ? <FlagIcon flag={cellFlag} /> : null}{val}
@@ -442,7 +439,10 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
                     )}
                   </td>
                 )
-              )}
+              })}
+              <td style={{ width: 28 }} onClick={(e) => e.stopPropagation()}>
+                <WatchlistButton stock={s} userId={userId} />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -903,58 +903,58 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
   }))
 
   // Aggrega per settore
- const sectorMap: Record<string, {
-  mktCap: number, count: number,
-  change1d_w: number, change1d_m: number,
-  epsGrowth_w: number, epsGrowth_m: number,
-  revGrowth_w: number, revGrowth_m: number,
-  mom12m_w: number, mom12m_m: number,
-  valueScore_w: number, valueScore_m: number,
-  growthScore_w: number, growthScore_m: number,
-  combinedRank_w: number, combinedRank_m: number,
- }> = {}
+  const sectorMap: Record<string, {
+    mktCap: number, count: number,
+    change1d_w: number, change1d_m: number,
+    epsGrowth_w: number, epsGrowth_m: number,
+    revGrowth_w: number, revGrowth_m: number,
+    mom12m_w: number, mom12m_m: number,
+    valueScore_w: number, valueScore_m: number,
+    growthScore_w: number, growthScore_m: number,
+    combinedRank_w: number, combinedRank_m: number,
+  }> = {}
 
- for (const s of stocksEur) {
-  const sec = s.sector || 'Other'
-  if (!sectorMap[sec]) sectorMap[sec] = {
-   mktCap: 0, count: 0,
-   change1d_w: 0, change1d_m: 0,
-   epsGrowth_w: 0, epsGrowth_m: 0,
-   revGrowth_w: 0, revGrowth_m: 0,
-   mom12m_w: 0, mom12m_m: 0,
-   valueScore_w: 0, valueScore_m: 0,
-   growthScore_w: 0, growthScore_m: 0,
-   combinedRank_w: 0, combinedRank_m: 0,
+  for (const s of stocksEur) {
+    const sec = s.sector || 'Other'
+    if (!sectorMap[sec]) sectorMap[sec] = {
+      mktCap: 0, count: 0,
+      change1d_w: 0, change1d_m: 0,
+      epsGrowth_w: 0, epsGrowth_m: 0,
+      revGrowth_w: 0, revGrowth_m: 0,
+      mom12m_w: 0, mom12m_m: 0,
+      valueScore_w: 0, valueScore_m: 0,
+      growthScore_w: 0, growthScore_m: 0,
+      combinedRank_w: 0, combinedRank_m: 0,
+    }
+    const g = sectorMap[sec]
+    const mc = s.mktCap || 0
+    g.count++
+    if (mc) g.mktCap += mc
+    if (s.change1d != null && mc) { g.change1d_w += s.change1d * mc; g.change1d_m += mc }
+    if (s.epsGrowth != null && mc) { g.epsGrowth_w += s.epsGrowth * mc; g.epsGrowth_m += mc }
+    if (s.revGrowth != null && mc) { g.revGrowth_w += s.revGrowth * mc; g.revGrowth_m += mc }
+    if (s.mom12m != null && mc) { g.mom12m_w += s.mom12m * mc; g.mom12m_m += mc }
+    if (s.valueScore != null && mc) { g.valueScore_w += s.valueScore * mc; g.valueScore_m += mc }
+    if (s.growthScore != null && mc) { g.growthScore_w += s.growthScore * mc; g.growthScore_m += mc }
+    if (s.combinedRank != null && mc) { g.combinedRank_w += s.combinedRank * mc; g.combinedRank_m += mc }
   }
-  const g = sectorMap[sec]
-  const mc = s.mktCap || 0
-  g.count++
-  if (mc) g.mktCap += mc
-  if (s.change1d != null && mc) { g.change1d_w += s.change1d * mc; g.change1d_m += mc }
-  if (s.epsGrowth != null && mc) { g.epsGrowth_w += s.epsGrowth * mc; g.epsGrowth_m += mc }
-  if (s.revGrowth != null && mc) { g.revGrowth_w += s.revGrowth * mc; g.revGrowth_m += mc }
-  if (s.mom12m != null && mc) { g.mom12m_w += s.mom12m * mc; g.mom12m_m += mc }
-  if (s.valueScore != null && mc) { g.valueScore_w += s.valueScore * mc; g.valueScore_m += mc }
-  if (s.growthScore != null && mc) { g.growthScore_w += s.growthScore * mc; g.growthScore_m += mc }
-  if (s.combinedRank != null && mc) { g.combinedRank_w += s.combinedRank * mc; g.combinedRank_m += mc }
- }
 
- const mcw = (w: number, m: number): number | null => m > 0 ? w / m : null
+  const mcw = (w: number, m: number): number | null => m > 0 ? w / m : null
 
- const sectors = Object.entries(sectorMap)
-  .map(([name, g]) => ({
-   name,
-   count: g.count,
-   mktCap: g.mktCap,
-   change1d: mcw(g.change1d_w, g.change1d_m),
-   epsGrowth: mcw(g.epsGrowth_w, g.epsGrowth_m),
-   revGrowth: mcw(g.revGrowth_w, g.revGrowth_m),
-   mom12m: mcw(g.mom12m_w, g.mom12m_m),
-   valueScore: mcw(g.valueScore_w, g.valueScore_m),
-   growthScore: mcw(g.growthScore_w, g.growthScore_m),
-   combinedRank: mcw(g.combinedRank_w, g.combinedRank_m),
-  }))
-  .sort((a, b) => b.mktCap - a.mktCap)
+  const sectors = Object.entries(sectorMap)
+    .map(([name, g]) => ({
+      name,
+      count: g.count,
+      mktCap: g.mktCap,
+      change1d: mcw(g.change1d_w, g.change1d_m),
+      epsGrowth: mcw(g.epsGrowth_w, g.epsGrowth_m),
+      revGrowth: mcw(g.revGrowth_w, g.revGrowth_m),
+      mom12m: mcw(g.mom12m_w, g.mom12m_m),
+      valueScore: mcw(g.valueScore_w, g.valueScore_m),
+      growthScore: mcw(g.growthScore_w, g.growthScore_m),
+      combinedRank: mcw(g.combinedRank_w, g.combinedRank_m),
+    }))
+    .sort((a, b) => b.mktCap - a.mktCap)
 
  const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
   const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
@@ -962,7 +962,7 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
 
   return (
     <div className="space-y-4 p-3">
-      <div className="section-hdr">Sector Heatmap — {exchange === "US" ? "North America" : "All Europe"}</div>
+      <div className="section-hdr">Sector Heatmap — All Europe</div>
 
       {loading ? (
         <div className="text-center py-12 text-muted">
@@ -977,7 +977,7 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
 
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
             <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
-              Sector Aggregates - {exchange === "US" ? "North America" : "All Europe"} ({stocksEur.length} stocks)
+              Sector Aggregates - All Europe ({stocksEur.length} stocks)
             </div>
             <div className="overflow-x-auto">
               <table className="data-table w-full">
@@ -991,11 +991,11 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
                   <th>Mom 12M %</th>
                   <th>Value</th>
                   <th>Growth</th>
- <th>Growth</th>
  <th>Best</th>
+                </tr></thead>
                 <tbody>
                   {sectors.map(s => (
- <tr key={s.name} onClick={() => onSectorClick(s.name, exchange)} className="cursor-pointer">
+                    <tr key={s.name} onClick={() => onSectorClick(s.name, exchange)} className="cursor-pointer">
                       <td>
                         <span className="text-[11px] font-600" style={{ color: getSectorColor(s.name) }}>
                           {s.name}
@@ -1004,13 +1004,13 @@ function SectorScreen({ onSectorClick, exchange = 'EZ' }: { onSectorClick: (s: s
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clr(s.change1d)}>{fp(s.change1d)}</td>
- <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth != null ? s.epsGrowth * 100 : null)}</td>
- <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth != null ? s.revGrowth * 100 : null)}</td>
- <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m != null ? s.mom12m * 100 : null)}</td>
+                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth != null ? s.epsGrowth * 100 : null)}</td>
+                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth != null ? s.revGrowth * 100 : null)}</td>
+                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m != null ? s.mom12m * 100 : null)}</td>
                       <td className="font-mono">{fv(s.valueScore, 0)}</td>
                       <td className="font-mono">{fv(s.growthScore, 0)}</td>
- <td className="font-mono">{fv(s.growthScore, 0)}</td>
- <td className="font-mono font-700" style={clr((s.combinedRank || 50) - 50)}>{fv(s.combinedRank, 0)}</td>
+ <td className="font-mono font-700">{fv(s.combinedRank, 0)}</td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -1081,10 +1081,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   }, [search])
 
 
-  // Tutti i titoli per market cap
- const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null})).sort((a:any,b:any) => (b.mktCap||0)-(a.mktCap||0)).slice(0, 600)
+  // Top 600 Europe per market cap
+  const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null}))
     .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
-    
+    .slice(0, 600)
 
   const valid   = u200.filter((s:any) => s.change1d != null)
   const allGainers = [...valid].filter((s:any) => (s.change1d || 0) > 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
@@ -1191,10 +1191,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total Stocks', value: loading ? '…' : allStocks.length.toString() },
+          { label: 'Total Stocks',              value: loading ? '…' : '2,111' },
           { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
-          { label: 'Gainers/Losers',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
+          { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
           <div key={label} className="metric-card">
             <div className="metric-label">{label}</div>
@@ -1207,12 +1207,12 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       {!loading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {[
-            { title: '🟢 Top 10 Gainers Today (top 600)', list: gainers, color: 'text-[#22d48a]', field: 'change1d' },
+            { title: '🟢 Top 10 Gainers Today', list: gainers, color: 'text-[#22d48a]', field: 'change1d' },
             { title: '🔴 Top 10 Losers Today',  list: losers,  color: 'text-[#e84560]',   field: 'change1d' },
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
-                {title}
+                {title} - Top 600 Europe by Mkt Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
               </div>
               <table className="data-table">
                 <thead><tr>
