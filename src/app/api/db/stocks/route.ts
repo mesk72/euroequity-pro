@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
     if (search) {
       const { data } = await supabase
         .from('stocks')
-        .select('ticker,exchange,isin,company,sector,country,flag,website')
+        .select('ticker,exchange,isin,company,sector,country,flag,website,primary_exchange')
         .or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
         .limit(limit > 0 ? limit : 20)
       const stocksData = data || []
