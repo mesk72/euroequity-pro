@@ -416,6 +416,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
             >
               {COLUMNS.map((c, ci) => {
                 const isLocked = !userId && LOCKED_GUEST.has(c.key)
+                const isLocked = !userId && LOCKED_GUEST.has(c.key)
                 const { val, cls, style: cellStyle, sectorColor, flag: cellFlag } = cellFmt(s, c.key)
                 return (
                   <td key={c.key} style={{
