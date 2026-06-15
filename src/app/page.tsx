@@ -1081,6 +1081,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   const eyFV  = allStocks.map((s:any) => ey_d(s.peFwd)).filter((v:any) => v != null) as number[]
   const pbV = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0) as number[]
   const rgV   = allStocks.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
+  const egV = allStocks.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
   const m6AV  = allStocks.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
   const m12AV = allStocks.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null).filter((v:any) => v != null) as number[]
 
