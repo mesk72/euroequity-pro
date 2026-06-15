@@ -311,7 +311,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   if (isMobile) return (
     <div>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
-        Prices delayed 15-20 min
+ Prices indicative · new data source coming soon
       </div>
       {sorted.map((s, i) => {
         const sColor = getSectorColor(s.sector)
@@ -594,7 +594,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
             </button>
           ))}
         </div>
-        <div className="text-[9px] text-muted mb-1">Prices delayed 15-20 min</div>
+ <div className="text-[9px] text-muted mb-1">Prices indicative</div>
         <div className="bg-bg border border-border rounded-lg overflow-hidden">
           {loadingChart
             ? <div className="h-48 flex items-center justify-center"><RefreshCw size={16} className="animate-spin text-gold" /></div>
@@ -854,7 +854,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Status */}
       <div className="text-xs text-muted">
-        <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100 · <span className="text-[10px]">Prices delayed 15-20 min</span>
+ <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100
       </div>
 
       {/* Table */}
@@ -1159,7 +1159,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
-          <span className="text-[9px] text-muted font-normal">· auto-refresh 60s · delayed 15-20 min</span>
+ <span className="text-[9px] text-muted font-normal">· auto-refresh 60s</span>
  <span className="text-[9px] text-muted font-normal">· auto-refresh 60s</span>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {INDICES.map((idx) => {
@@ -1201,7 +1201,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
-                {title} - Top 600 Europe by Mkt Cap · <span className="font-normal opacity-70">⚠️ 15-20 min delay</span>
+ {title} - Top 600 Europe by Mkt Cap
               </div>
               <table className="data-table">
                 <thead><tr>
@@ -1601,7 +1601,7 @@ export default function App() {
 
         <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
           <span className="text-green font-700">● DATA</span> · EODHD<br />
-          ⚠️ Prices: 15-20 min delay<br />
+ ⚠️ Prices indicative — new data source coming soon<br />
           Fundamentals: daily
         </div>
       </aside>
@@ -1704,7 +1704,7 @@ export default function App() {
         <footer className="border-t border-border px-4 py-2 bg-surface text-[9px] text-muted flex flex-wrap gap-x-4 gap-y-1">
           <span className="font-700 text-sub">ForwardAlpha · Verona, Italy</span>
           <span>⚠️ Not investment advice</span>
-          <span>Prices delayed 15-20 min</span>
+ <span>Prices indicative</span>
           <button onClick={() => setPage('legal')} className="hover:text-gold underline">Terms & Privacy</button>
           <a href="mailto:andrea@forwardalpha.pro" className="hover:text-gold">Contact</a>
           <span>© 2026 Andrea Meschini</span>
