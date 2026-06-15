@@ -10,8 +10,7 @@ export const EXCHANGES: Record<string, { flag: string; label: string; market: st
   VI: { flag: '🇦🇹', label: 'Austria', market: 'Wiener Börse', isin: 'AT' },
   HE: { flag: '🇫🇮', label: 'Finland', market: 'Nasdaq Helsinki', isin: 'FI' },
   IR: { flag: '🇮🇪', label: 'Ireland', market: 'Euronext Dublin', isin: 'IE' },
-  GR: { flag: '🇬🇷', label: 'Greece', market: 'Athens SE', isin: 'GR' },
-}
+ }
 
 // ── EXCHANGES EX-EMU ──────────────────────────────────────────────
 export const EXCHANGES_EXEMU: Record<string, { flag: string; label: string; market: string; currency: string }> = {
@@ -38,7 +37,7 @@ export const USD_TO_EUR = 0.8615
 // Valuta locale per exchange
 export const EXCHANGE_CURRENCY: Record<string, string> = {
   MIL:'EUR', XETRA:'EUR', PA:'EUR', AS:'EUR', MC:'EUR',
-  BR:'EUR', LS:'EUR', VI:'EUR', HE:'EUR', IR:'EUR', GR:'EUR',
+  BR:'EUR', LS:'EUR', VI:'EUR', HE:'EUR', IR:'EUR',
   LSE:'GBP', SWX:'CHF', OM:'SEK',
   OB:'NOK', CPSE:'DKK', US:'USD',
 }
