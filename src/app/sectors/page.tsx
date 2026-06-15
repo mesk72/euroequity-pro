@@ -15,8 +15,8 @@ function fv(v?:number|null,d=2):string{ if(v==null||isNaN(v))return'-'; return (
 function fn(v?:number|null):string{ if(v==null||isNaN(v as number))return'-'; return String(Math.round(v as number)) }
 
 export default function SectorsPage() {
-  const [stocks,   setStocks]   = useState<any[]>([])
-  const [loading,  setLoading]  = useState(true)
+  const [stocks, setStocks] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<string|null>(null)
   const [exchange, setExchange] = useState('All')
 
@@ -29,7 +29,7 @@ export default function SectorsPage() {
   }, [])
 
   const exchanges = ['All', ...Array.from(new Set(stocks.map((s:any)=>s.exchange))).sort()] as string[]
-  const filtered  = exchange === 'All' ? stocks : stocks.filter((s:any)=>s.exchange===exchange)
+  const filtered = exchange === 'All' ? stocks : stocks.filter((s:any)=>s.exchange===exchange)
 
   // Aggrega per settore
   const sectorMap: Record<string, any[]> = {}
@@ -64,13 +64,13 @@ export default function SectorsPage() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');
       *{box-sizing:border-box;margin:0;padding:0}
       table{width:100%;border-collapse:collapse;font-size:12px}
-      th{padding:8px 10px;text-align:left;border-bottom:1px solid #1e2840;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#6b7280;white-space:nowrap}
+      th{padding:8px 10px;text-align:left;border-bottom:1px solid #1e2840;font-size:9px;font-weight:700;letter-spacing:0.08em;color:#6b7280;text-transform:uppercase}
       td{padding:7px 10px;border-bottom:1px solid #0f1623;white-space:nowrap}
       tr:hover td{background:rgba(255,255,255,0.03)}
-      select{background:#0f1623;border:1px solid #1e2840;color:#e2e8f0;padding:6px 10px;border-radius:4px;font-size:12px;font-family:inherit}
+      select{background:#0f1623;border:1px solid #1e2840;color:#e2e8f0;padding:6px 10px;border-radius:4px;font-size:12px}
       `}</style>
 
-      <a href="/" style={{ display:'flex',alignItems:'center',gap:8,color:'#f97316',textDecoration:'none',fontSize:13,marginBottom:20 }}>
+      <a href="/" style={{ display:'flex',alignItems:'center',gap:8,color:'#f97316',textDecoration:'none',fontSize:13,marginBottom:16 }}>
         <ArrowLeft size={14}/> Back
       </a>
 
@@ -99,7 +99,7 @@ export default function SectorsPage() {
         <>
           {/* Heatmap settori */}
           <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:8,marginBottom:24 }}>
-            {sectorStats.map(({sector,count,avgChg,totalCap,avgVal,avgGrow})=>{
+            {sectorStats.map(({sector,count,avgChg,totalCap,avgVal,avgGrow,avgBest})=>{
               const color = SECTOR_COLORS[sector]||'#6b7280'
               const isSelected = selected===sector
               return (
@@ -126,8 +126,8 @@ export default function SectorsPage() {
                       G:{fn(avgGrow)}
                     </span>
                     <span style={{ fontSize:10,color:(avgBest||0)>=70?'#22c55e':(avgBest||0)>=40?'#f97316':'#ef4444' }}>
-                     B:{fn(avgBest)}
-                    }
+                      B:{fn(avgBest)}
+                    </span>
                   </div>
                 </div>
               )
@@ -147,7 +147,7 @@ export default function SectorsPage() {
                 <thead><tr>
                   <th>Ticker</th><th>Company</th><th>Exchange</th>
                   <th>Price</th><th>1D %</th><th>Mkt Cap B</th>
-                  <th>P/E</th><th>P/B</th><th>Value</th><th>Growth</th>
+                  <th>P/E</th><th>P/B</th><th>Value</th><th>Growth</th><th>Best</th>
                 </tr></thead>
                 <tbody>
                   {selectedStocks.map((s:any,i:number)=>(
@@ -168,6 +168,10 @@ export default function SectorsPage() {
                       <td style={{ fontFamily:'IBM Plex Mono',fontWeight:700,
                         color:(s.growthScore||0)>=70?'#22c55e':(s.growthScore||0)>=40?'#f97316':'#ef4444' }}>
                         {fn(s.growthScore)}
+                      </td>
+                      <td style={{ fontFamily:'IBM Plex Mono',fontWeight:700,
+                        color:(s.combinedRank||0)>=70?'#22c55e':(s.combinedRank||0)>=40?'#f97316':'#ef4444' }}>
+                        {fn(s.combinedRank)}
                       </td>
                     </tr>
                   ))}
