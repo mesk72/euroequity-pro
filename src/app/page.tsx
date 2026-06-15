@@ -311,7 +311,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   if (isMobile) return (
     <div>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
-        Prices delayed 15-20 min
+ Prices indicative · new data source coming soon
       </div>
       {sorted.map((s, i) => {
         const sColor = getSectorColor(s.sector)
@@ -854,7 +854,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Status */}
       <div className="text-xs text-muted">
-        <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100 · <span className="text-[10px]">Prices delayed 15-20 min</span>
+ <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100
       </div>
 
       {/* Table */}
@@ -1335,7 +1335,7 @@ function Legal() {
             ['3. Legal Disclaimer – No Financial Advice',
              'ForwardAlpha is for informational and educational purposes only. The Owner is not a registered financial advisor and does not provide investment advisory services. No content constitutes a personalised recommendation or offer to buy/sell financial instruments under MiFID II. Investing involves significant risk of capital loss. Past performance is not indicative of future results.'],
             ['4. Data Accuracy & Limitation of Liability',
-             'Market prices are delayed approximately 15–20 minutes. Fundamental data is updated end of day. The service is provided "as is" without warranty of accuracy, completeness or uninterrupted availability. The Owner shall not be liable for any direct or indirect losses arising from use of the Platform. Data is sourced from third-party providers; the Owner does not guarantee compliance with their individual licence terms for commercial use.'],
+ 'Market prices are indicative. Fundamental data is updated end of day. The service is provided "as is" without warranty of any kind.'
             ['5. Intellectual Property',
              'All content (UI, source code, Value Score and Growth Score algorithms, brand name "ForwardAlpha") is the exclusive property of Andrea Meschini. Strictly prohibited: automated scraping or crawling, reverse engineering of algorithms, redistribution or resale of Platform data to third parties without prior written consent.'],
             ['6. Account, Suspension & Termination',
