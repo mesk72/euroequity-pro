@@ -173,6 +173,7 @@ for i in range(0,len(rank_updates),100):
 print(f" Rank: {ok}/{len(rank_updates)}")
 
 requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",headers={**headers_up,"Prefer":"return=minimal"},params={"exchange":"eq.US"},json={"combined_rank":None})
+requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",headers={**headers_up,"Prefer":"return=minimal"},params={"exchange":"eq.US"},json={"combined_rank":None})
 all_scores=[d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
 sum_arr_us=[d["value_score"]+d["growth_score"] for d in all_scores]
 combined_updates=[{"ticker":d["ticker"],"exchange":d["exchange"],"combined_rank":min(99,pct_rank(sum_arr_us,d["value_score"]+d["growth_score"]))} for d in all_scores]
