@@ -1091,6 +1091,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     const pb = s.pb != null && s.pb > 0 ? (100 - pRk(pbV, s.pb)!) : null
     const vc = [pet,pef,pb].filter((v:any) => v != null) as number[]
     const m6a = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
+    const eV = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
     const m12a= s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null
     const eg  = s.epsGrowth != null ? pRk(egV,  s.epsGrowth) : null
     const rg  = s.revGrowth != null ? pRk(rgV,  s.revGrowth) : null
