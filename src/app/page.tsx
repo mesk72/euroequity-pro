@@ -109,7 +109,7 @@ async function apiExchange(code: string): Promise<Stock[]> {
   if (USE_DB) {
     try {
       const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR'
-      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE'
+      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,LSE,SWX,OM,OB,CPSE'
       const url = code === 'EZ' || code === 'ALL'
         ? `/api/db/stocks?exchanges=${ALL_EX}`
         : code === 'EMU'
@@ -1515,7 +1515,7 @@ export default function App() {
     { id: 'HE' as Page, label: '🇫🇮 Finland' },
     { id: 'PA' as Page, label: '🇫🇷 France' },
     { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
-    { id: 'GR' as Page, label: '🇬🇷 Greece' },
+   
     { id: 'IR' as Page, label: '🇮🇪 Ireland' },
     { id: 'MIL' as Page, label: '🇮🇹 Italy' },
     { id: 'AS' as Page, label: '🇳🇱 Netherlands' },
