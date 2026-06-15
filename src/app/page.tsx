@@ -1311,7 +1311,7 @@ function Legal() {
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
-      <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities — Value & Growth Scores updated · 2,000 US stocks added to the research bar. WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days..</div>
+      <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities · 2,000 US stocks</div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
         {(['terms','privacy','cookie'] as const).map(t => (
