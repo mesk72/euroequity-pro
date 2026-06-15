@@ -888,62 +888,47 @@ function FlagIcon({ flag }: { flag: string }) {
 function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void }) {
   const [stocks, setStocks] = useState<Stock[]>([])
   const [loading, setLoading] = useState(true)
-  const usdToEur = 0.8615
 
   useEffect(() => {
     setLoading(true)
     apiExchange('EZ').then(data => { setStocks(data); setLoading(false) })
   }, [])
 
-  const stocksEur = stocks.map(s => ({
-    ...s,
-    mktCap: s.mktCap ?? null
-  }))
+  const stocksEur = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
 
-  // Aggrega per settore
-  const sectorMap: Record<string, {
-    mktCap: number, count: number,
-    change1d: number[], epsGrowth: number[], revGrowth: number[],
-    mom12m: number[], valueScore: number[], growthScore: number[]
-  }> = {}
-
+  const sectorMap: Record<string, any[]> = {}
   for (const s of stocksEur) {
     const sec = s.sector || 'Other'
-    if (!sectorMap[sec]) sectorMap[sec] = {
-      mktCap: 0, count: 0,
-      change1d: [], epsGrowth: [], revGrowth: [],
-      mom12m: [], valueScore: [], growthScore: []
-    }
-    const g = sectorMap[sec]
-    g.count++
-    if (s.mktCap) g.mktCap += s.mktCap
-    if (s.change1d != null) g.change1d.push(s.change1d)
-    if (s.epsGrowth != null) g.epsGrowth.push(s.epsGrowth)
-    if (s.revGrowth != null) g.revGrowth.push(s.revGrowth)
-    if (s.mom12m != null) g.mom12m.push(s.mom12m)
-    if (s.valueScore != null) g.valueScore.push(s.valueScore)
-    if (s.growthScore != null) g.growthScore.push(s.growthScore)
+    if (!sectorMap[sec]) sectorMap[sec] = []
+    sectorMap[sec].push(s)
   }
 
-  const avg = (arr: number[]) => arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : null
+  const mcw = (list: any[], field: string) => {
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
+    return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
+  }
 
   const sectors = Object.entries(sectorMap)
-    .map(([name, g]) => ({
+    .map(([name, list]) => ({
       name,
-      count: g.count,
-      mktCap: g.mktCap,
-      change1d: avg(g.change1d),
-      epsGrowth: avg(g.epsGrowth),
-      revGrowth: avg(g.revGrowth),
-      mom12m: avg(g.mom12m),
-      valueScore: avg(g.valueScore),
-      growthScore: avg(g.growthScore),
+      count: list.length,
+      mktCap: list.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
+      change1d: mcw(list, 'change1d'),
+      epsGrowth: mcw(list, 'epsGrowth'),
+      revGrowth: mcw(list, 'revGrowth'),
+      mom12m: mcw(list, 'mom12m'),
+      valueScore: mcw(list, 'valueScore'),
+      growthScore: mcw(list, 'growthScore'),
+      combinedRank: mcw(list, 'combinedRank'),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
-  const fp = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
+  const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
+  const fpDec = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
   const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
   const clr = (v: number | null) => ({ color: v == null ? 'var(--muted)' : v >= 0 ? '#22d48a' : '#e84560' })
+  const clrScore = (v: number | null) => ({ color: v == null ? 'var(--muted)' : v >= 70 ? '#22d48a' : v >= 40 ? '#f97316' : '#e84560' })
 
   return (
     <div className="space-y-4 p-3">
@@ -976,6 +961,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                   <th>Mom 12M %</th>
                   <th>Value</th>
                   <th>Growth</th>
+                  <th>Best</th>
                 </tr></thead>
                 <tbody>
                   {sectors.map(s => (
@@ -987,12 +973,13 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       </td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clr(s.change1d)}>{fp(s.change1d)}</td>
-                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fp(s.epsGrowth)}</td>
-                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fp(s.revGrowth)}</td>
-                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fp(s.mom12m)}</td>
-                      <td className="font-mono">{fv(s.valueScore, 0)}</td>
-                      <td className="font-mono">{fv(s.growthScore, 0)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
+                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
+                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
+                      <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fv(s.valueScore, 0)}</td>
+                      <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fv(s.growthScore, 0)}</td>
+                      <td className="font-mono font-600" style={clrScore(s.combinedRank)}>{fv(s.combinedRank, 0)}</td>
                     </tr>
                   ))}
                 </tbody>
