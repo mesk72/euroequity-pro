@@ -40,13 +40,18 @@ export default function SectorsPage() {
   }
 
   const sectorStats = Object.entries(sectorMap).map(([sector, list]) => {
-    const withPrice = list.filter((s:any)=>s.change1d!=null)
-    const avgChg    = withPrice.length ? withPrice.reduce((a:number,s:any)=>a+(s.change1d||0),0)/withPrice.length : null
-    const totalCap  = list.reduce((a:number,s:any)=>a+(s.mktCap||0),0)
-    const avgPE     = (() => { const v=list.filter((s:any)=>s.peTrail!=null&&s.peTrail>0); return v.length?v.reduce((a:number,s:any)=>a+s.peTrail,0)/v.length:null })()
-    const avgVal    = (() => { const v=list.filter((s:any)=>s.valueScore!=null); return v.length?v.reduce((a:number,s:any)=>a+s.valueScore,0)/v.length:null })()
-    const avgGrow   = (() => { const v=list.filter((s:any)=>s.growthScore!=null); return v.length?v.reduce((a:number,s:any)=>a+s.growthScore,0)/v.length:null })()
-    return { sector, count:list.length, avgChg, totalCap, avgPE, avgVal, avgGrow, stocks:list }
+    const totalCap = list.reduce((a:number,s:any)=>a+(s.mktCap||0),0)
+    const mcw = (field:string) => {
+      const v = list.filter((s:any)=>s[field]!=null&&s.mktCap!=null&&s.mktCap>0)
+      const tw = v.reduce((a:number,s:any)=>a+(s.mktCap||0),0)
+      return tw>0 ? v.reduce((a:number,s:any)=>a+(s[field]||0)*(s.mktCap||0),0)/tw : null
+    }
+    const avgChg = mcw('change1d')
+    const avgVal = mcw('valueScore')
+    const avgGrow = mcw('growthScore')
+    const avgBest = mcw('combinedRank')
+    const avgPE = (() => { const v=list.filter((s:any)=>s.peTrail!=null&&s.peTrail>0&&s.mktCap!=null&&s.mktCap>0); const tw=v.reduce((a:number,s:any)=>a+(s.mktCap||0),0); return tw>0?v.reduce((a:number,s:any)=>a+(s.peTrail||0)*(s.mktCap||0),0)/tw:null })()
+    return { sector, count:list.length, avgChg, totalCap, avgPE, avgVal, avgGrow, avgBest, stocks:list }
   }).sort((a,b)=>b.totalCap-a.totalCap)
 
   const selectedStocks = selected
