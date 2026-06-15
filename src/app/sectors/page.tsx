@@ -125,6 +125,9 @@ export default function SectorsPage() {
                     <span style={{ fontSize:10,color:(avgGrow||0)>=70?'#22c55e':(avgGrow||0)>=40?'#f97316':'#ef4444' }}>
                       G:{fn(avgGrow)}
                     </span>
+                    <span style={{ fontSize:10,color:(avgBest||0)>=70?'#22c55e':(avgBest||0)>=40?'#f97316':'#ef4444' }}>
+                     B:{fn(avgBest)}
+                    }
                   </div>
                 </div>
               )
