@@ -311,7 +311,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   if (isMobile) return (
     <div>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
- Prices indicative · new data source coming soon
+        Prices delayed 15-20 min
       </div>
       {sorted.map((s, i) => {
         const sColor = getSectorColor(s.sector)
@@ -374,7 +374,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   return (
     <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
- Fundamentals updated daily
+        Fundamentals updated daily
       </div>
       <table className="data-table" style={{ minWidth: "900px", width: "max-content" }}>
         <thead>
@@ -594,7 +594,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
             </button>
           ))}
         </div>
- <div className="text-[9px] text-muted mb-1">Prices indicative</div>
+        <div className="text-[9px] text-muted mb-1">Prices indicative</div>
         <div className="bg-bg border border-border rounded-lg overflow-hidden">
           {loadingChart
             ? <div className="h-48 flex items-center justify-center"><RefreshCw size={16} className="animate-spin text-gold" /></div>
@@ -854,7 +854,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Status */}
       <div className="text-xs text-muted">
- <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100
+        <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100 · <span className="text-[10px]">Prices delayed 15-20 min</span>
       </div>
 
       {/* Table */}
@@ -1079,9 +1079,9 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
   const eyTV  = allStocks.map((s:any) => ey_d(s.peTrail)).filter((v:any) => v != null) as number[]
   const eyFV  = allStocks.map((s:any) => ey_d(s.peFwd)).filter((v:any) => v != null) as number[]
-  const pbV = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0) as number[]
+  const pbV   = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0 && v < 50) as number[]
+  const egV   = allStocks.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
   const rgV   = allStocks.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
-  const egV = allStocks.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
   const m6AV  = allStocks.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
   const m12AV = allStocks.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null).filter((v:any) => v != null) as number[]
 
@@ -1089,10 +1089,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     const eyt = ey_d(s.peTrail); const eyf = ey_d(s.peFwd)
     const pet = eyt != null ? (s.peTrail > 200 ? 1 : pRk(eyTV, eyt)) : null
     const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pRk(eyFV, eyf)) : null
-    const pb = s.pb != null && s.pb > 0 ? (100 - pRk(pbV, s.pb)!) : null
-    const vc = [pet,pef,pb].filter((v:any) => v != null) as number[]
+    const pb  = s.pb != null && s.pb > 0 && s.pb < 50 ? (100 - pRk(pbV, s.pb)!) : null
+    const vc  = [pet,pef,pb].filter((v:any) => v != null) as number[]
+    const eV  = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
     const m6a = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
-    const eV = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
     const m12a= s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null
     const eg  = s.epsGrowth != null ? pRk(egV,  s.epsGrowth) : null
     const rg  = s.revGrowth != null ? pRk(rgV,  s.revGrowth) : null
@@ -1147,20 +1147,20 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           textAlign: 'center'
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
- <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
- ⚠️ QUANTITATIVE UPDATE — JUNE 14, 2026 — 14:41 CET
- </div>
- <div style={{ fontSize: 16, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
- WORK IN PROGRESS
- </div>
- <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
- Prices may be incorrect. New data source coming in a few days. Please be patient.
- </div>
+            ⚠️ QUANTITATIVE UPDATE — JUNE 14, 2026 — 14:41 CET
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
+            June 14, 2026 — 14:41 CET
+          </div>
+          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
+            WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days.
+          </div>
+        </div>
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
- <span className="text-[9px] text-muted font-normal">· auto-refresh 60s</span>
- <span className="text-[9px] text-muted font-normal">· auto-refresh 60s</span>
+          <span className="text-[9px] text-muted font-normal">· auto-refresh 60s</span>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {INDICES.map((idx) => {
             const d = indices.find((x: any) => x.ticker === idx.ticker)
@@ -1201,7 +1201,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           ].map(({ title, list, color, field }) => (
             <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
- {title} - Top 600 Europe by Mkt Cap
+                {title} - Top 600 Europe by Mkt Cap · <span className="font-normal opacity-70"></span>
               </div>
               <table className="data-table">
                 <thead><tr>
@@ -1311,7 +1311,7 @@ function Legal() {
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
-      <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities — Value &amp; Growth Scores updated daily</div>
+      <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities — Value & Growth Scores updated · 2,000 US stocks added to the research bar. WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days..</div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
         {(['terms','privacy','cookie'] as const).map(t => (
@@ -1601,7 +1601,7 @@ export default function App() {
 
         <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
           <span className="text-green font-700">● DATA</span> · EODHD<br />
- ⚠️ Prices indicative — new data source coming soon<br />
+          ⚠️ Prices indicative — new data source coming soon<br />
           Fundamentals: daily
         </div>
       </aside>
@@ -1704,7 +1704,7 @@ export default function App() {
         <footer className="border-t border-border px-4 py-2 bg-surface text-[9px] text-muted flex flex-wrap gap-x-4 gap-y-1">
           <span className="font-700 text-sub">ForwardAlpha · Verona, Italy</span>
           <span>⚠️ Not investment advice</span>
- <span>Prices indicative</span>
+          <span>Prices indicative</span>
           <button onClick={() => setPage('legal')} className="hover:text-gold underline">Terms & Privacy</button>
           <a href="mailto:andrea@forwardalpha.pro" className="hover:text-gold">Contact</a>
           <span>© 2026 Andrea Meschini</span>
