@@ -374,7 +374,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
   return (
     <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
       <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
-        Prices delayed 15-20 min · Fundamentals updated daily
+ Fundamentals updated daily
       </div>
       <table className="data-table" style={{ minWidth: "900px", width: "max-content" }}>
         <thead>
@@ -1147,20 +1147,20 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           textAlign: 'center'
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
-            Last Quantitative Update
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-            June 14, 2026 — 14:41 CET
-          </div>
-          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            Work in progress
-          </div>
-        </div>
+ <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+ ⚠️ QUANTITATIVE UPDATE — JUNE 14, 2026 — 14:41 CET
+ </div>
+ <div style={{ fontSize: 16, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
+ WORK IN PROGRESS
+ </div>
+ <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
+ Prices may be incorrect. New data source coming in a few days. Please be patient.
+ </div>
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
           <span className="text-[9px] text-muted font-normal">· auto-refresh 60s · delayed 15-20 min</span>
-        </div>
+ <span className="text-[9px] text-muted font-normal">· auto-refresh 60s</span>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {INDICES.map((idx) => {
             const d = indices.find((x: any) => x.ticker === idx.ticker)
@@ -1311,7 +1311,7 @@ function Legal() {
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
-      <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities — Value & Growth Scores updated · 2,000 US stocks added to the research bar. Work in progress.</div>
+ <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities — Value &amp; Growth Scores updated daily</div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
         {(['terms','privacy','cookie'] as const).map(t => (
