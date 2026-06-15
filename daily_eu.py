@@ -233,8 +233,8 @@ def calc_ranks(group):
         key=(d["ticker"],d["exchange"]); pe_t=d.get("pe_trailing"); pe_f=d.get("pe_forward"); pb_v=d.get("pb")
         eps_g=d.get("eps_growth"); rev_g=d.get("rev_growth")
         m6=d.get("mom6m"); m12=d.get("mom12m"); m1w=mom1w_map.get(key); m1m=mom1m_map.get(key)
-        ey_t=ey(pe_t); r_eyt=pct_rank(ey_trail_g,ey_t) if ey_t is not None else (1 if pe_t is not None and pe_t<0 else None)
-        ey_f=ey(pe_f); r_eyf=pct_rank(ey_fwd_g,ey_f) if ey_f is not None else (1 if pe_f is not None and pe_f<0 else None)
+        ey_t=ey(pe_t); r_eyt=pct_rank(ey_trail_g,ey_t) if ey_t is not None else None
+        ey_f=ey(pe_f); r_eyf=pct_rank(ey_fwd_g,ey_f) if ey_f is not None else None
         r_pb=pct_rank([1/x for x in pb_g if x>0],1/pb_v if pb_v and pb_v>0 else None) if pb_v and pb_v>0 else None
         r_epsg=pct_rank(eps_g_vals,eps_g) if eps_g is not None else None
         r_revg=pct_rank(rev_g_vals,rev_g) if rev_g is not None else None
