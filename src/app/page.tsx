@@ -1079,8 +1079,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
   const eyTV  = allStocks.map((s:any) => ey_d(s.peTrail)).filter((v:any) => v != null) as number[]
   const eyFV  = allStocks.map((s:any) => ey_d(s.peFwd)).filter((v:any) => v != null) as number[]
-  const pbV   = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0 && v < 50) as number[]
- const pbV = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0) as number[]
+  const pbV = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0) as number[]
   const rgV   = allStocks.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
   const m6AV  = allStocks.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
   const m12AV = allStocks.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null).filter((v:any) => v != null) as number[]
@@ -1089,9 +1088,8 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     const eyt = ey_d(s.peTrail); const eyf = ey_d(s.peFwd)
     const pet = eyt != null ? (s.peTrail > 200 ? 1 : pRk(eyTV, eyt)) : null
     const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pRk(eyFV, eyf)) : null
-    const pb  = s.pb != null && s.pb > 0 && s.pb < 50 ? (100 - pRk(pbV, s.pb)!) : null
- const pb = s.pb != null && s.pb > 0 ? (100 - pRk(pbV, s.pb)!) : null
-    const eV  = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
+    const pb = s.pb != null && s.pb > 0 ? (100 - pRk(pbV, s.pb)!) : null
+    const vc = [pet,pef,pb].filter((v:any) => v != null) as number[]
     const m6a = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
     const m12a= s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null
     const eg  = s.epsGrowth != null ? pRk(egV,  s.epsGrowth) : null
