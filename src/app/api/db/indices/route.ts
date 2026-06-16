@@ -11,16 +11,18 @@ const supabase = createClient(
 export async function GET() {
   try {
     const { data, error } = await supabase
-      .from('indices_live')
-      .select('ticker,name,close,change_pct')
+      .from('indices')
+      .select('ticker,name,price,change1d,ytd')
+      .order('exchange', { ascending: true })
 
     if (error || !data) return NextResponse.json({ indices: [] })
 
     const indices = data.map((d: any) => ({
       ticker: d.ticker,
       name: d.name,
-      close: d.close,
-      changeP: d.change_pct,
+      close: d.price,
+      changeP: d.change1d,
+      ytd: d.ytd,
     }))
 
     return NextResponse.json({ indices })
