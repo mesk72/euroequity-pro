@@ -1443,6 +1443,7 @@ export default function App() {
   const toggleMenu = (id: string) => setExpandedMenus(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   const [scrExchange, setScrExchange] = useState('MIL')
   const [scrSector,   setScrSector]   = useState('All')
+  const [scrSectorUS, setScrSectorUS] = useState('All')
   const [scrEpsMom,   setScrEpsMom]   = useState<string>('')
   const [detailStock, setDetailStock] = useState<Stock | null>(null)
 
@@ -1459,7 +1460,7 @@ export default function App() {
     const p = params.get("page")
     const s = params.get("sector")
     if (p) {
-      if (p === "northamerica") { setScrExchange("US"); setScrSector(s || "All"); setPage("northamerica") }
+      if (p === "northamerica") { setScrSectorUS(s || "All"); setPage("northamerica") }
       else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setPage("screener") }
       else { setPage(p as Page) }
     }
