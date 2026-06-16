@@ -1147,10 +1147,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           textAlign: 'center'
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
-            ⚠️ QUANTITATIVE UPDATE — JUNE 14, 2026 — 14:41 CET
+
           </div>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-            June 14, 2026 — 14:41 CET
+
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
             WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days.
