@@ -1579,14 +1579,8 @@ export default function App() {
           <div key={idx} className='px-3 py-2 text-xs text-muted'>{item.label}</div>
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
-        <button onClick={() => { setPage('portfolio'); setSidebar(false) }}
-         className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>
-         💼 Portfolio
-        </button>
-        <button onClick={() => { setPage('legal'); setSidebar(false) }}
-         className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>
-         📋 Legal
-        </button>
+        <button onClick={() => { setPage('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
+        <button onClick={() => { setPage('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
       </nav>
 
         {/* User */}
@@ -1609,9 +1603,9 @@ export default function App() {
         </div>
 
         <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
-        <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
-         ⚠️ Prices indicative — new data source coming soon<br />
-         Fundamentals: daily
+          ⚠️ Prices indicative — new data source coming soon<br />
+          ⚠️ Prices indicative — new data source coming soon<br />
+          Fundamentals: daily
         </div>
       </aside>
 
