@@ -1454,6 +1454,17 @@ export default function App() {
     return () => sub.subscription.unsubscribe()
   }, [])
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const p = params.get("page")
+    const s = params.get("sector")
+    if (p) {
+      if (p === "northamerica") { setScrExchange("US"); setScrSector(s || "All"); setPage("northamerica") }
+      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setPage("screener") }
+      else { setPage(p as Page) }
+    }
+  }, [])
+
   function goSector(sector: string) {
     setScrExchange('EZ'); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
   }
