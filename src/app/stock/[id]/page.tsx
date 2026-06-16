@@ -565,6 +565,20 @@ export default function StockPage() {
           )
         })()}
 
+        {/* Company Description */}
+        {(stock as any).description && (
+         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+         borderRadius:4, padding:'16px 20px', marginTop:0 }}>
+         <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+         letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
+         About the Company
+         </div>
+         <div style={{ fontSize:12, color:'var(--text3)', lineHeight:1.75, maxWidth:680 }}>
+         {(stock as any).description}
+         </div>
+         </div>
+        )}
+
         {/* Disclaimer */}
         <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
           textAlign:'center', paddingTop:12, borderTop:'1px solid var(--border)' }}>
