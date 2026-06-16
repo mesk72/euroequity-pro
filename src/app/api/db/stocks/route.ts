@@ -187,5 +187,6 @@ function mapStock(s: any, f: any) {
  rankMom12Adj: f.rank_mom12_adj ?? null,
  primaryExchange: s.primary_exchange ?? null,
  yahooTicker: s.yahoo_ticker ?? null,
+ description: s.description ?? null,
  }
 }
