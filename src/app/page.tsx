@@ -1460,7 +1460,6 @@ export default function App() {
     const p = params.get("page")
     const s = params.get("sector")
     if (p) {
-    if (p) {
       if (p === "northamerica") { setScrSectorUS(s || "All"); setPage("northamerica") }
       else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setPage("screener") }
       else { setScrSectorUS("All"); setPage(p as Page) }
