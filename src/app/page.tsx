@@ -1466,7 +1466,7 @@ export default function App() {
     } else {
       setScrSectorUS("All")
     }
-
+  }, [])
   function goSector(sector: string) {
     setScrExchange('EZ'); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
   }
