@@ -1137,29 +1137,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
       {/* Indices - aggiornati automaticamente ogni 60s */}
       <div>
-        {/* Last Update Banner */}
-        <div style={{
-          background: 'linear-gradient(135deg, #0f1923 0%, #1e3a5f 100%)',
-          border: '1px solid rgba(249,115,22,0.3)',
-          borderRadius: 8,
-          padding: '12px 20px',
-          marginBottom: 16,
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
-
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-
-          </div>
-          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days.
-          </div>
-        </div>
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
-          <span className="text-[9px] text-muted font-normal">· auto-refresh 60s</span>
+          <span className="text-[9px] text-muted font-normal"></span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {INDICES.map((idx) => {
@@ -1311,7 +1292,6 @@ function Legal() {
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
-      <div className="text-xs text-muted">Last updated: 5 June 2026</div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
         {(['terms','privacy','cookie'] as const).map(t => (
