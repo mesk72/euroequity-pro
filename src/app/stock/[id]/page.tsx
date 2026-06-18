@@ -229,6 +229,7 @@ export default function StockPage() {
   const [ticker, exchangeCode] = id.split('-')
 
   const [stock, setStock] = useState<any>(null)
+  const [showFullDesc, setShowFullDesc] = useState(false)
   const [loadingStock, setLoadingStock] = useState(true)
 
   useEffect(() => {
@@ -551,6 +552,34 @@ export default function StockPage() {
             </div>
           )
         })()}
+
+        {/* Company Description */}
+        {(stock as any).description && (
+         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+         borderRadius:4, padding:'16px 20px', marginBottom:12 }}>
+         <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+         letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
+         About the Company
+         </div>
+         <div style={{
+         fontSize:12, color:'var(--text3)', lineHeight:1.75, textAlign:'justify',
+         maxWidth:680,
+         overflow: showFullDesc ? 'visible' : 'hidden',
+         display: showFullDesc ? 'block' : '-webkit-box',
+         WebkitLineClamp: showFullDesc ? 'unset' : 4,
+         WebkitBoxOrient: 'vertical'
+         }}>
+         {(stock as any).description}
+         </div>
+         {(stock as any).description.length > 300 && (
+         <button onClick={() => setShowFullDesc(!showFullDesc)}
+         style={{ fontSize:11, color:'var(--orange)', background:'none', border:'none',
+         cursor:'pointer', padding:'4px 0', marginTop:4 }}>
+         {showFullDesc ? 'Show less ▲' : 'Read more ▼'}
+         </button>
+         )}
+         </div>
+        )}
 
         {/* Disclaimer */}
         <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
