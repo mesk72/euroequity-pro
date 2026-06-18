@@ -1557,7 +1557,7 @@ export default function App() {
     }
   }, [])
   function goSector(sector: string) {
-    setScrExchange('EZ'); setScrSector(sector); setScrEpsMom(''); setPage('screener'); setSidebar(false)
+    setScrExchange('EZ'); setScrSector(sector); setScrSectorUS('All'); setScrEpsMom(''); setPage('screener'); setSidebar(false)
   }
 
   function goScreenerEpsMom(filter: string) {
@@ -1768,7 +1768,7 @@ export default function App() {
  {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
-          {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} />}
+          {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); setPage('northamerica') }} />}
           {page === 'about' && (
             <div className="flex-1 overflow-y-auto">
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
