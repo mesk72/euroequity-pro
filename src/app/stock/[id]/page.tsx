@@ -530,7 +530,7 @@ export default function StockPage() {
           const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
           const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
           const companyUrl = (stock as any).website || null
-          if (!borseUrl && !companyUrl && !researchSlug) return null
+          if (!borseUrl && !companyUrl && !researchSlug && !(stock as any).yahooTicker) return null
           return (
             <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
