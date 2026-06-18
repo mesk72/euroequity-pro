@@ -1647,19 +1647,19 @@ export default function App() {
 
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
         {/* About + Research */}
+        {/* About + News + Research */}
         <button onClick={() => { setPage('about'); setSidebar(false) }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 transition-colors ${page === 'about' ? 'bg-gold/15 text-gold' : 'text-orange-400 hover:text-gold'}`}>
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 transition-colors ${page === 'about' ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text hover:bg-white/5'}`}>
           <Info size={16} /> About
         </button>
-        <button onClick={() => { window.location.href='/research' }}
-          className='w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 text-orange-400 hover:text-gold transition-colors'>
         <button onClick={() => { setPage('news'); setSidebar(false) }}
           className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 transition-colors ${page === 'news' ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text hover:bg-white/5'}`}>
           <span>📰 News</span>
         </button>
+        <button onClick={() => { window.location.href='/research' }}
+          className='w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 text-orange-400 hover:text-gold transition-colors'>
           <FileText size={16} /> 📄 Research
         </button>
-        <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         {accordionMenus.map(menu => (
           <div key={menu.id}>
             <button onClick={() => toggleMenu(menu.id)}
