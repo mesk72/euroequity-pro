@@ -311,9 +311,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
 
   if (isMobile) return (
     <div>
-      <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
-        Prices delayed 15-20 min
-      </div>
       {sorted.map((s, i) => {
         const sColor = getSectorColor(s.sector)
         return (
