@@ -1051,6 +1051,10 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
       ) : (
         <>
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
+          <div className="bg-surface border border-border rounded-lg p-4">
+            <SectorHeatmap stocks={stocksUS} onSectorClick={onSectorClick} />
+          </div>
+
             <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
               Sector Aggregates - North America ({stocksUS.length} stocks)
             </div>
