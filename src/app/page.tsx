@@ -1766,9 +1766,9 @@ export default function App() {
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} />}
           {page === 'about' && (
-          <div className="flex-1 overflow-y-auto">
-            <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
-          </div>
+            <div className="flex-1 overflow-y-auto">
+              <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
+            </div>
           )}
         {page === 'myscreen' && (
             user
