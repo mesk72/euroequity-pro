@@ -258,7 +258,6 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
 }
 
 function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, fromPage = "" }: {
-function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, fromPage = "" }: {
   stocks: Stock[]
   onSelect: (s: Stock) => void
   loading?: boolean
