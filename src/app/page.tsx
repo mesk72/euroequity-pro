@@ -1079,7 +1079,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
   const eyTV  = allStocks.map((s:any) => ey_d(s.peTrail)).filter((v:any) => v != null) as number[]
   const eyFV  = allStocks.map((s:any) => ey_d(s.peFwd)).filter((v:any) => v != null) as number[]
-  const pbV   = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0 && v < 50) as number[]
+  const pbV = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0) as number[]
   const egV   = allStocks.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
   const rgV   = allStocks.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
   const m6AV  = allStocks.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
@@ -1089,7 +1089,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     const eyt = ey_d(s.peTrail); const eyf = ey_d(s.peFwd)
     const pet = eyt != null ? (s.peTrail > 200 ? 1 : pRk(eyTV, eyt)) : null
     const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pRk(eyFV, eyf)) : null
-    const pb  = s.pb != null && s.pb > 0 && s.pb < 50 ? (100 - pRk(pbV, s.pb)!) : null
+    const pb = s.pb != null && s.pb > 0 ? (100 - pRk(pbV, s.pb)!) : null
     const vc  = [pet,pef,pb].filter((v:any) => v != null) as number[]
     const eV  = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
     const m6a = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
@@ -1311,7 +1311,7 @@ function Legal() {
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
-      <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities — Value & Growth Scores updated · 2,000 US stocks added to the research bar. WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days..</div>
+      <div className="text-xs text-muted">Last updated: 5 June 2026</div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
         {(['terms','privacy','cookie'] as const).map(t => (
