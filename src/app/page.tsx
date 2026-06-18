@@ -1721,7 +1721,7 @@ export default function App() {
           <span className="font-700 text-sub">ForwardAlpha · Verona, Italy</span>
           <span>⚠️ Not investment advice</span>
           <span>Prices indicative</span>
-          <button onClick={() => setPage('legal')} className="hover:text-gold underline">Terms & Privacy</button>
+          <button onClick={() => setPage('legal')} className="hover:text-gold underline">Terms &amp; Privacy</button>
           <a href="mailto:andrea@forwardalpha.pro" className="hover:text-gold">Contact</a>
           <span>© 2026 Andrea Meschini</span>
         </footer>
