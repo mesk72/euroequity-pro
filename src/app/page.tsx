@@ -264,7 +264,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
   maxRows?: number
   userId?: string | null
   fromPage?: string
-})
+}) {
   const [sortKey, setSortKey] = useState<SortKey>('mktCap')
   const [sortAsc, setSortAsc] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
