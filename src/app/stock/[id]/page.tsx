@@ -547,7 +547,7 @@ export default function StockPage() {
                 {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
                 {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
                 {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
-                <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent((stock as any).yahoo_ticker || ticker)+'+stock' : encodeURIComponent(((stock as any).company || ticker).split(' ')[0])}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
+                <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent((stock as any).yahoo_ticker || ticker)+'+stock' : encodeURIComponent(((stock as any).company || ticker).split(' ').slice(0,2).join(' '))}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
               </div>
             </div>
           )
@@ -563,7 +563,7 @@ export default function StockPage() {
          </div>
          <div style={{
          fontSize:12, color:'var(--text3)', lineHeight:1.75, textAlign:'justify',
-         maxWidth:680,
+         
          overflow: showFullDesc ? 'visible' : 'hidden',
          display: showFullDesc ? 'block' : '-webkit-box',
          WebkitLineClamp: showFullDesc ? 'unset' : 4,
