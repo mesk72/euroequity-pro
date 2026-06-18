@@ -994,6 +994,110 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
 }
 
 
+function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void }) {
+  const [stocks, setStocks] = useState<Stock[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    apiExchange('US').then(data => { setStocks(data); setLoading(false) })
+  }, [])
+
+  const stocksUS = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
+
+  const sectorMap: Record<string, any[]> = {}
+  for (const s of stocksUS) {
+    const sec = s.sector || 'Other'
+    if (!sectorMap[sec]) sectorMap[sec] = []
+    sectorMap[sec].push(s)
+  }
+
+  const mcw = (list: any[], field: string) => {
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
+    return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
+  }
+
+  const sectors = Object.entries(sectorMap)
+    .map(([name, list]) => ({
+      name,
+      count: list.length,
+      mktCap: list.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
+      change1d: mcw(list, 'change1d'),
+      epsGrowth: mcw(list, 'epsGrowth'),
+      revGrowth: mcw(list, 'revGrowth'),
+      mom12m: mcw(list, 'mom12m'),
+      valueScore: mcw(list, 'valueScore'),
+      growthScore: mcw(list, 'growthScore'),
+      combinedRank: mcw(list, 'combinedRank'),
+    }))
+    .sort((a, b) => b.mktCap - a.mktCap)
+
+  const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
+  const fpDec = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
+  const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
+  const clr = (v: number | null) => ({ color: v == null ? 'var(--muted)' : v >= 0 ? '#22d48a' : '#e84560' })
+  const clrScore = (v: number | null) => ({ color: v == null ? 'var(--muted)' : v >= 70 ? '#22d48a' : v >= 40 ? '#f97316' : '#e84560' })
+
+  return (
+    <div className="space-y-4 p-3">
+      <div className="section-hdr">Sector Heatmap — North America</div>
+
+      {loading ? (
+        <div className="text-center py-12 text-muted">
+          <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-gold" />
+          <p className="text-sm">Loading…</p>
+        </div>
+      ) : (
+        <>
+          <div className="bg-surface border border-border rounded-lg overflow-hidden">
+            <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
+              Sector Aggregates - North America ({stocksUS.length} stocks)
+            </div>
+            <div className="overflow-x-auto">
+              <table className="data-table w-full">
+                <thead><tr>
+                  <th>Sector</th>
+                  <th>Stocks</th>
+                  <th>Mkt Cap $B</th>
+                  <th>1D %</th>
+                  <th>EPS Gr %</th>
+                  <th>Rev Gr %</th>
+                  <th>Mom 12M %</th>
+                  <th>Value</th>
+                  <th>Growth</th>
+                  <th>Best</th>
+                </tr></thead>
+                <tbody>
+                  {sectors.map(s => (
+                    <tr key={s.name} onClick={() => onSectorClick(s.name)} className="cursor-pointer">
+                      <td>
+                        <span className="text-[11px] font-600" style={{ color: getSectorColor(s.name) }}>
+                          {s.name}
+                        </span>
+                      </td>
+                      <td className="font-mono text-muted">{s.count}</td>
+                      <td className="font-mono">{fv(s.mktCap, 0)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
+                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
+                      <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
+                      <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fv(s.valueScore, 0)}</td>
+                      <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fv(s.growthScore, 0)}</td>
+                      <td className="font-mono font-600" style={clrScore(s.combinedRank)}>{fv(s.combinedRank, 0)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+
 // - DASHBOARD -
 function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   onSectorClick: (s: string) => void
