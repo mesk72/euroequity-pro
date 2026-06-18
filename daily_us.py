@@ -97,13 +97,13 @@ for stock in all_stocks:
     data = r.json()
     if not data or len(data) < 2: fail+=1; continue
     last_px = data[0]["adj_close"]
- last_date = datetime.strptime(data[0]["date"], "%Y-%m-%d")
+    last_date = datetime.strptime(data[0]["date"], "%Y-%m-%d")
     if not last_px: fail+=1; continue
     chg1d = round((data[0]["adj_close"]/data[1]["adj_close"]-1)*100,4) if len(data)>=2 and data[1]["adj_close"] else None
 
     def mom_cal(days):
         target = last_date - timedelta(days=days)
- closest = min(data, key=lambda x: abs((datetime.strptime(x["date"],"%Y-%m-%d")-target).days))
+        closest = min(data, key=lambda x: abs((datetime.strptime(x["date"],"%Y-%m-%d")-target).days))
         if closest["adj_close"] and closest["adj_close"] != 0:
             return round(last_px/closest["adj_close"]-1, 6)
         return None
