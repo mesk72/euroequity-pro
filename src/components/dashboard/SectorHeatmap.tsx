@@ -45,8 +45,9 @@ function computeSectors(stocks: Stock[], field: string): SectorData[] {
   for (const [sector, ss] of Array.from(map.entries())) {
     const valid = ss.filter(s => s.mktCap && (s as any)[field] != null)
     const totalMkt = valid.reduce((a, s) => a + (s.mktCap || 0), 0)
+    const multiplier = field === 'change1d' ? 1 : 100
     const mcwReturn = totalMkt > 0
-      ? valid.reduce((a, s) => a + ((s as any)[field] || 0) * (s.mktCap || 0), 0) / totalMkt
+      ? valid.reduce((a, s) => a + ((s as any)[field] || 0) * (s.mktCap || 0), 0) / totalMkt * multiplier
       : 0
     result.push({ sector, count: ss.length, mcwReturn, totalMktCap: totalMkt })
   }
