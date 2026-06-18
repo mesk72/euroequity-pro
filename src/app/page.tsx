@@ -1747,6 +1747,7 @@ export default function App() {
           {page === 'bestgrowth' && (user
             ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
+          )}
           {page === 'bestvalue_us' && (user
             ? <Screener key="bestvalue_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value US" />
