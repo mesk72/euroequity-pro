@@ -1147,10 +1147,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           textAlign: 'center'
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
-
+            ⚠️ QUANTITATIVE UPDATE — JUNE 14, 2026 — 14:41 CET
           </div>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff', letterSpacing: '0.02em' }}>
-
+            June 14, 2026 — 14:41 CET
           </div>
           <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
             WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days.
@@ -1311,7 +1311,7 @@ function Legal() {
   return (
     <div className="max-w-2xl space-y-5 fade-in">
       <div className="section-hdr">📋 Legal - ForwardAlpha</div>
-      <div className="text-xs text-muted">Last updated: 5 June 2026</div>
+      <div className="text-xs text-muted">Last updated: 5 June 2026 · 2,111 European equities — Value & Growth Scores updated · 2,000 US stocks added to the research bar. WORK IN PROGRESS — Prices may be incorrect. New data source coming in a few days..</div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
         {(['terms','privacy','cookie'] as const).map(t => (
@@ -1443,7 +1443,6 @@ export default function App() {
   const toggleMenu = (id: string) => setExpandedMenus(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   const [scrExchange, setScrExchange] = useState('MIL')
   const [scrSector,   setScrSector]   = useState('All')
-  const [scrSectorUS, setScrSectorUS] = useState('All')
   const [scrEpsMom,   setScrEpsMom]   = useState<string>('')
   const [detailStock, setDetailStock] = useState<Stock | null>(null)
 
@@ -1453,19 +1452,6 @@ export default function App() {
       setUser(sess?.user ?? null)
     })
     return () => sub.subscription.unsubscribe()
-  }, [])
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const p = params.get("page")
-    const s = params.get("sector")
-    if (p) {
-      if (p === "northamerica") { setScrSectorUS(s || "All"); setPage("northamerica") }
-      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setPage("screener") }
-      else { setScrSectorUS("All"); setPage(p as Page) }
-    } else {
-      setScrSectorUS("All")
-    }
   }, [])
 
   function goSector(sector: string) {
@@ -1585,17 +1571,13 @@ export default function App() {
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         {singleMarkets.map((item, idx) => item.id ? (
-        {singleMarkets.map((item, idx) => item.id ? (
-          <button key={idx} onClick={() => { setScrSectorUS("All"); setScrSector("All"); setPage(item.id as Page); setSidebar(false) }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>
+          <button key={idx} onClick={() => { setPage(item.id as Page); setSidebar(false) }}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text'}`}>
             {item.label}
           </button>
         ) : (
           <div key={idx} className='px-3 py-2 text-xs text-muted'>{item.label}</div>
         ))}
-        <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
-        <button onClick={() => { setPage('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
-        <button onClick={() => { setPage('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
       </nav>
 
         {/* User */}
@@ -1617,7 +1599,8 @@ export default function App() {
           )}
         </div>
 
-          ⚠️ Prices indicative — new data source coming soon<br />
+        <div className="px-3 pb-3 text-[9px] text-muted leading-relaxed">
+          <span className="text-green font-700">● DATA</span> · EODHD<br />
           ⚠️ Prices indicative — new data source coming soon<br />
           Fundamentals: daily
         </div>
@@ -1664,8 +1647,8 @@ export default function App() {
             ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
           )}
- {page === 'northamerica' && <Screener key="northamerica" initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
- {page === 'usscreen' && <Screener key="usscreen" initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
+ {page === 'northamerica' && <Screener key="northamerica" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
+ {page === 'usscreen' && <Screener key="usscreen" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'about'     && (
