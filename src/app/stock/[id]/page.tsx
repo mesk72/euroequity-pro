@@ -296,7 +296,7 @@ export default function StockPage() {
       <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
         fontFamily:'IBM Plex Sans, sans-serif', padding:40 }}>
         <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
-        <button onClick={() => { const ref = document.referrer; if (ref && ref.includes(window.location.hostname)) { history.back() } else { window.location.href = '/' } }}
+        <button onClick={() => router.back()}
           style={{ display:'flex', alignItems:'center', gap:8, color:'var(--orange)',
             background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
           <ArrowLeft size={16} /> Back
@@ -350,7 +350,7 @@ export default function StockPage() {
       {/* Top nav */}
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
         padding:'0 24px', height:44, display:'flex', alignItems:'center', gap:16 }}>
-        <button onClick={() => { const ref = document.referrer; if (ref && ref.includes(window.location.hostname)) { history.back() } else { window.location.href = '/' } }}
+        <button onClick={() => router.back()}
           style={{ display:'flex', alignItems:'center', gap:6, color:'var(--text4)',
             background:'none', border:'none', cursor:'pointer', fontSize:13 }}>
           <ArrowLeft size={15} /> Back
@@ -546,38 +546,11 @@ export default function StockPage() {
                 {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
                 {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
                 {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
-                <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent((stock as any).yahoo_ticker || ticker)+'+stock' : encodeURIComponent(((stock as any).company || ticker).split(' ').slice(0,2).join(' '))}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
-                {(stock as any).sector && (
-                 <button
-                 onClick={() => {
-                 const s = encodeURIComponent((stock as any).sector)
-                 const isUS = (stock as any).exchange === 'US'
-                 window.location.href = isUS ? `/?page=northamerica&sector=${s}` : `/?page=screener&sector=${s}`
-                 }}
-                 style={{ background:'#1e2840', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed',
-                 fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3,
-                 border:'1px solid var(--border)', cursor:'pointer' }}>
-                 🏭 {(stock as any).sector} {(stock as any).exchange === 'US' ? '🇺🇸' : '🌍'}
-                 </button>
-                )}
+                <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent((stock as any).yahoo_ticker || ticker)+'+stock' : encodeURIComponent(((stock as any).company || ticker).split(' ')[0])}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
               </div>
             </div>
           )
         })()}
-
-        {/* Company Description */}
-        {(stock as any).description && (
-         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-         borderRadius:4, padding:'16px 20px', marginTop:0 }}>
-         <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-         letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
-         About the Company
-         </div>
-         <div style={{ fontSize:12, color:'var(--text3)', lineHeight:1.75, maxWidth:680 }}>
-         {(stock as any).description}
-         </div>
-         </div>
-        )}
 
         {/* Disclaimer */}
         <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
