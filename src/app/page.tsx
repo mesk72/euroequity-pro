@@ -258,16 +258,14 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
 }
 
 function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, fromPage = "" }: {
-  stocks: Stock[]
+function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, fromPage = "" }: {
   stocks: Stock[]
   onSelect: (s: Stock) => void
   loading?: boolean
   maxRows?: number
   userId?: string | null
   fromPage?: string
-  maxRows?: number
-  userId?: string | null
-}) {
+})
   const [sortKey, setSortKey] = useState<SortKey>('mktCap')
   const [sortAsc, setSortAsc] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
