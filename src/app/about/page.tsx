@@ -14,9 +14,9 @@ We combine two of the most proven investment philosophies — Value Investing an
 
 Andrea began his career at Gestiveneto SGR, one of Italy's established asset management firms, before moving to JPMorgan Asset Management in London, where he worked as a European equity analyst covering multiple sectors.
 
-He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as a portfolio manager running long-only European equity mandates, followed by five years as Head of Equity Research, overseeing a team of analysts covering the Italian and broader European equity universe.
+He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as Investment Analyst on Hedge Fund and Value Fund strategies, and five years as Portfolio Manager running long-only Euroequity and Italian Equity portfolios equity mandates, followed by five years as Head of Equity Research, overseeing a team of analysts covering the Italian and broader European equity universe.
 
-Prior to founding ForwardAlpha, Andrea served as Senior Hedge Fund Analyst at Integrated Alternative Investments, focusing on manager selection and due diligence across European long/short equity strategies.
+Prior to founding ForwardAlpha, Andrea served as Senior Hedge Fund Analyst at Integrated Alternative Investments, focusing on manager selection and due diligencee diligence across European long/short equity strategies.
 
 This background informs every aspect of ForwardAlpha's methodology — from the way we construct our scoring models to the metrics we prioritise and the rigour we apply to data quality.`,
     },
@@ -44,8 +44,8 @@ Our Growth Score combines four rank components, each calculated relative to all 
 
 • EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months.
 • Revenue Growth Rank — ranks stocks by top-line growth momentum using a time-weighted blend of fiscal year estimates.
-• Price Momentum 6M — 6-month return excluding the most recent month to reduce short-term noise.
-• Price Momentum 12M — 12-month return excluding the most recent month.
+• Price Momentum 6M — 6-month price return, market-cap weighted.
+• Price Momentum 12M — 12-month price return, market-cap weighted.
 
 The four components are averaged and re-ranked to produce the final Growth Score.
 
