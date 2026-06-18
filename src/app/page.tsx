@@ -13,6 +13,7 @@ import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
 import ResearchPage from '@/components/research/ResearchPage'
+import NewsPage from '@/app/news/page'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
@@ -97,7 +98,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -1652,6 +1653,10 @@ export default function App() {
         </button>
         <button onClick={() => { window.location.href='/research' }}
           className='w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 text-orange-400 hover:text-gold transition-colors'>
+        <button onClick={() => { setPage('news'); setSidebar(false) }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 transition-colors ${page === 'news' ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text hover:bg-white/5'}`}>
+          <span>📰 News</span>
+        </button>
           <FileText size={16} /> 📄 Research
         </button>
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
@@ -1687,6 +1692,7 @@ export default function App() {
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         <button onClick={() => { setPage('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
+          {page === 'news' && <NewsPage />}
         <button onClick={() => { setPage('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
       </nav>
 
