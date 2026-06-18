@@ -548,8 +548,8 @@ export default function StockPage() {
                 {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
                 {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
                 <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent((stock as any).yahooTicker || ticker)+'+stock' : encodeURIComponent(((stock as any).company || ticker).split(' ').slice(0,2).join(' '))}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
-              </div>
                 {(stock as any).yahooTicker && <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/analysis/`} target="_blank" rel="noopener noreferrer" style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, textDecoration:'none' }}>📊 Estimates</a>}
+              </div>
             </div>
           )
         })()}
