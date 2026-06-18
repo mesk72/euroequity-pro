@@ -257,10 +257,10 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
   }
 }
 
-function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }: {
+function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, fromPage = "" }: {
   stocks: Stock[]
   onSelect: (s: Stock) => void
-  loading?: boolean
+  fromPage?: string
   maxRows?: number
   userId?: string | null
 }) {
@@ -317,7 +317,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
         const sColor = getSectorColor(s.sector)
         return (
           <div key={i}
-            onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
+            onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
             className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
@@ -411,7 +411,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null }:
           {sorted.map((s, i) => (
             <tr
               key={`${s.ticker}.${s.exchange}.${i}`}
-              onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
+              onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
               className="cursor-pointer"
             >
               {COLUMNS.map((c, ci) => {
@@ -859,7 +859,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Table */}
       <div className="bg-surface border border-border rounded overflow-hidden">
-        <StockTable stocks={filtered} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={showAll ? 9999 : 100} userId={userId} />
+        <StockTable stocks={filtered} fromPage={initExchange === "US" ? "northamerica" : "screener"} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={showAll ? 9999 : 100} userId={userId} />
       </div>
     </div>
   )
