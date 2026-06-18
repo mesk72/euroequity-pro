@@ -1747,18 +1747,30 @@ export default function App() {
           {page === 'bestgrowth' && (user
             ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
+          {page === 'bestvalue_us' && (user
+            ? <Screener key="bestvalue_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} initCombinedMin={0} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value US" />
+          )}
+          {page === 'bestideas_us' && (user
+            ? <Screener key="bestideas_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas US" />
+          )}
+          {page === 'bestgrowth_us' && (user
+            ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
+          )}
           )}
  {page === 'northamerica' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
  {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
-          {page === 'about'     && (
+          {page === 'sectors' && <SectorScreen onSectorClick={goSector} />}
           {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} />}
+          {page === 'about' && (
           <div className="flex-1 overflow-y-auto">
             <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
           </div>
-        )}
-          {page === 'research' && <ResearchPage />}
+          )}
         {page === 'myscreen' && (
             user
               ? <MyScreen userId={user!.id} onSelectStock={setDetailStock} />
