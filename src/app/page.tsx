@@ -348,16 +348,16 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
               <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-              <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{s.valueScore != null ? Math.round(s.valueScore) : '-'}</span></span>
+            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
+              <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{userId ? (s.valueScore != null ? Math.round(s.valueScore) : '-') : '🔒'}</span></span>
               <span className="text-[#444]">|</span>
-              <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{s.growthScore != null ? Math.round(s.growthScore) : '-'}</span></span>
+              <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{userId ? (s.growthScore != null ? Math.round(s.growthScore) : '-') : '🔒'}</span></span>
               <span className="text-[#444]">|</span>
-              <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{s.combinedRank != null ? Math.round(s.combinedRank) : '-'}</span></span>
+              <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{userId ? (s.combinedRank != null ? Math.round(s.combinedRank) : '-') : '🔒'}</span></span>
               <span className="text-[#444]">|</span>
-              <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom1m != null ? `${(s.mom1m*100).toFixed(1)}%` : '-'}</span></span>
+              <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom1m != null ? `${(s.mom1m*100).toFixed(1)}%` : '-') : '🔒'}</span></span>
               <span className="text-[#444]">|</span>
-              <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-'}</span></span>
-            </div>
+              <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-') : '🔒'}</span></span>
           </div>
         )
       })}
