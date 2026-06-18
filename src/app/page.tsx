@@ -348,7 +348,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
               <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
               <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{userId ? (s.valueScore != null ? Math.round(s.valueScore) : '-') : '🔒'}</span></span>
               <span className="text-[#444]">|</span>
               <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{userId ? (s.growthScore != null ? Math.round(s.growthScore) : '-') : '🔒'}</span></span>
@@ -359,7 +358,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
               <span className="text-[#444]">|</span>
               <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom12m != null ? `${(s.mom12m*100).toFixed(1)}%` : '-') : '🔒'}</span></span>
           </div>
-        )
+            </div>
       })}
       {stocks.length > maxRows && (
         <div className="text-[10px] text-muted text-center py-2 border-t border-border">
