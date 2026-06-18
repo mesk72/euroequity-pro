@@ -1407,7 +1407,7 @@ function CookieBanner() {
       <button
         onClick={() => { localStorage.setItem('cookie-ok','1'); setVisible(false) }}
         className="btn-primary py-1.5 px-4 text-xs whitespace-nowrap">
-        Accept & Close
+        Accept &amp; Close
       </button>
     </div>
   )
@@ -1568,7 +1568,6 @@ export default function App() {
           <button key={idx} onClick={() => { setScrSectorUS("All"); setScrSector("All"); setPage(item.id as Page); setSidebar(false) }}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>
             {item.label}
-          </button>
           </button>
         ) : (
           <div key={idx} className='px-3 py-2 text-xs text-muted'>{item.label}</div>
