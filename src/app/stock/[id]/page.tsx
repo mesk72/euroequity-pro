@@ -15,7 +15,7 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null, prim
   if (['PA','AS','BR','LS','IR'].includes(exchange) && isin) return `https://live.euronext.com/en/product/equities/${isin}-${MIC[exchange]}`
   if (exchange === 'OB') return isin ? `https://live.euronext.com/nb/product/equities/${isin}-XOSL` : `https://live.euronext.com/nb/search?q=${ticker}`
   if (exchange === 'XETRA' && isin) return `https://www.boerse-frankfurt.de/equity/${isin}`
-  if (exchange === 'MC' && isin) return `https://www.bolsaymercados.es/bme-exchange/en/Stocks/Detail/${isin}`
+  if (exchange === 'MC' && isin) return `https://www.bolsamadrid.es/esp/aspx/Empresas/FichaValor.aspx?ISIN=${isin}`
   if (['LSE','AIM'].includes(exchange)) return `https://www.londonstockexchange.com/stock/${ticker}/company-page`
   if (['OM','HE','CPSE','NGM'].includes(exchange)) return `https://www.nasdaq.com/european-market-activity/shares/${ticker.toLowerCase()}`
   if (exchange === 'SWX') return 'https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html'
