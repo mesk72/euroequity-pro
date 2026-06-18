@@ -1564,9 +1564,11 @@ export default function App() {
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         {singleMarkets.map((item, idx) => item.id ? (
-          <button key={idx} onClick={() => { setPage(item.id as Page); setSidebar(false) }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text'}`}>
+        {singleMarkets.map((item, idx) => item.id ? (
+          <button key={idx} onClick={() => { setScrSectorUS("All"); setScrSector("All"); setPage(item.id as Page); setSidebar(false) }}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>
             {item.label}
+          </button>
           </button>
         ) : (
           <div key={idx} className='px-3 py-2 text-xs text-muted'>{item.label}</div>
