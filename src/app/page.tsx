@@ -1759,12 +1759,10 @@ export default function App() {
             ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
-          )}
  {page === 'northamerica' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
  {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
-          {page === 'sectors' && <SectorScreen onSectorClick={goSector} />}
           {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} />}
           {page === 'about' && (
           <div className="flex-1 overflow-y-auto">
