@@ -1246,6 +1246,14 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
       {/* Indices - aggiornati automaticamente ogni 60s */}
       <div>
+        <div style={{
+          background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.3)',
+          borderRadius: 6, padding: '10px 16px', marginBottom: 12,
+          fontSize: 11, color: 'var(--orange)', fontWeight: 600,
+          fontFamily: 'IBM Plex Sans Condensed'
+        }}>
+          ⚠️ WORK IN PROGRESS — Prices may be incorrect. New data source coming soon.
+        </div>
 
         <div className="section-hdr flex items-center gap-2">
           📈 Index Performance
