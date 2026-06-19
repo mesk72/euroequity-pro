@@ -73,7 +73,7 @@ function NewsSection({ title, items, loading }: { title: string, items: NewsItem
 }
 
 export default function NewsPage() {
-  const [news, setNews] = useState<NewsData>({ americas: [], europe: [], asia: [] })
+  const [news, setNews] = useState<NewsData>({ world: [], americas: [], europe: [], asia: [] })
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
@@ -113,7 +113,8 @@ export default function NewsPage() {
         </div>
       </div>
 
-      <NewsSection title="🌎 North America" items={news.americas} loading={loading} />
+      <NewsSection title="🌐 World" items={news.world} loading={loading} />
+ <NewsSection title="🌎 North America" items={news.americas} loading={loading} />
       <NewsSection title="🌍 Europe" items={news.europe} loading={loading} />
       <NewsSection title="🌏 Asia Pacific" items={news.asia} loading={loading} />
 
