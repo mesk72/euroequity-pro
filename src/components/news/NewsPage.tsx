@@ -16,9 +16,6 @@ interface NewsData {
   europe: NewsItem[]
   asia: NewsItem[]
 }
-  americas: NewsItem[]
-  asia: NewsItem[]
-}
 
 function timeAgo(dateStr: string): string {
   if (!dateStr) return ''
