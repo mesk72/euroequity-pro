@@ -31,10 +31,25 @@ RANK_GROUPS = {
 NO_RANK = {"AT","VI","IR","NGM","AIM"}
 
 def parse_num(v):
-    if not v or str(v).strip() in ("","−","-","N/A","NM","nan"): return None
+    if v is None: return None
     try:
-        return float(str(v).replace(",","").replace("$","").replace("%","").replace("x","").strip())
+        import pandas as pd
+        if pd.isna(v): return None
+    except: pass
+    s = str(v).strip()
+    negative = False
+    if s.startswith('(') and s.endswith(')'):
+        negative = True
+        s = s[1:-1]
+    s = s.replace('$','').replace(',','').replace('x','').replace('%','').strip()
+    if s in ['-', '', 'N/A', 'nm', chr(8212)]: return None
+    try:
+        import math
+        f = float(s)
+        if math.isnan(f) or math.isinf(f): return None
+        return -f if negative else f
     except: return None
+
 
 def pct_rank(values, v):
     if v is None: return None
