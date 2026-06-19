@@ -11,8 +11,8 @@ interface NewsItem {
 }
 
 interface NewsData {
+  world: NewsItem[]
   americas: NewsItem[]
-  europe: NewsItem[]
   asia: NewsItem[]
 }
 
