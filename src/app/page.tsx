@@ -1,6 +1,6 @@
 'use client'
 
-
+import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   FileText, LayoutDashboard, Search, Briefcase, Globe, Info,
@@ -8,13 +8,12 @@ import {
   ChevronUp, ChevronDown, TrendingUp, TrendingDown, Star
 } from 'lucide-react'
 import { supabase, createProfile, ensureDefaultPortfolios } from '@/lib/supabase'
-import { supabase } from '@/lib/supabase'
+import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/constants'
 import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
 import ResearchPage from '@/components/research/ResearchPage'
-
-
+import NewsPage from '@/app/news/page'
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
@@ -311,65 +310,65 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
     <div className="p-8 text-center text-muted text-sm">No stocks match your filters.</div>
   )
 
-  if (isMobile) return (
-    <div>
-      {sorted.map((s, i) => {
-        const sColor = getSectorColor(s.sector)
-        return (
-          <div key={i}
-            onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
-            className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="font-700 text-sm text-orange">{s.flag} {s.ticker}</span>
-                <span className="text-[9px] text-muted">{s.exchange}</span>
-                <WatchlistButton stock={s} userId={userId || null} />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-600 text-sm text-text">
-                  {s.price != null ? s.price.toFixed(2) : '-'}
-                </span>
-                <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
-                  {s.change1d != null ? fpd(s.change1d/100) : '-'}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
-              <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-              <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? ('$'+s.mktCap.toFixed(1)+'B') : '-'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">PEv: <span style={{color:'#3b82f6'}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : '-'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">PEf: <span style={{color:'#3b82f6'}}>{(s as any).rankPeNtm != null ? Math.round((s as any).rankPeNtm) : '-'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">EPS: <span style={{color:'#22c55e'}}>{(s as any).rankEpsGr != null ? Math.round((s as any).rankEpsGr) : '-'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
-            </div>
-            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
-              <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{userId ? (s.valueScore != null ? Math.round(s.valueScore) : '-') : '🔒'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{userId ? (s.growthScore != null ? Math.round(s.growthScore) : '-') : '🔒'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{userId ? (s.combinedRank != null ? Math.round(s.combinedRank) : '-') : '🔒'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom1m != null ? ((s.mom1m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
-              <span className="text-[#444]">|</span>
-              <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom12m != null ? ((s.mom12m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
-            </div>
-          </div>
-        )
-      })}
-      {stocks.length > maxRows && (
-        <div className="text-[10px] text-muted text-center py-2 border-t border-border">
-          Showing top {maxRows} of {stocks.length} by market cap
-        </div>
-      )}
-    </div>
-  )
+ if (isMobile) return (
+ <div>
+ {sorted.map((s, i) => {
+ const sColor = getSectorColor(s.sector)
+ return (
+ <div key={i}
+ onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
+ className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
+ <div className="flex items-center justify-between mb-1">
+ <div className="flex items-center gap-2">
+ <span className="font-700 text-sm text-orange">{s.flag} {s.ticker}</span>
+ <span className="text-[9px] text-muted">{s.exchange}</span>
+ <WatchlistButton stock={s} userId={userId || null} />
+ </div>
+ <div className="flex items-center gap-2">
+ <span className="font-mono font-600 text-sm text-text">
+ {s.price != null ? s.price.toFixed(2) : '-'}
+ </span>
+ <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
+ {s.change1d != null ? fpd(s.change1d/100) : '-'}
+ </span>
+ </div>
+ </div>
+ <div className="flex items-center justify-between mb-1">
+ <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
+ <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
+ </div>
+ <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
+ <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? ('$'+s.mktCap.toFixed(1)+'B') : '-'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">PEv: <span style={{color:'#3b82f6'}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : '-'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">PEf: <span style={{color:'#3b82f6'}}>{(s as any).rankPeNtm != null ? Math.round((s as any).rankPeNtm) : '-'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">EPS: <span style={{color:'#22c55e'}}>{(s as any).rankEpsGr != null ? Math.round((s as any).rankEpsGr) : '-'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
+ </div>
+ <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
+ <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{userId ? (s.valueScore != null ? Math.round(s.valueScore) : '-') : '🔒'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{userId ? (s.growthScore != null ? Math.round(s.growthScore) : '-') : '🔒'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{userId ? (s.combinedRank != null ? Math.round(s.combinedRank) : '-') : '🔒'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom1m != null ? ((s.mom1m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
+ <span className="text-[#444]">|</span>
+ <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom12m != null ? ((s.mom12m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
+ </div>
+ </div>
+ )
+ })}
+ {stocks.length > maxRows && (
+ <div className="text-[10px] text-muted text-center py-2 border-t border-border">
+ Showing top {maxRows} of {stocks.length} by market cap
+ </div>
+ )}
+ </div>
+ )
 
   return (
     <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
@@ -1049,11 +1048,11 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
         </div>
       ) : (
         <>
+          <div className="bg-surface border border-border rounded-lg overflow-hidden">
           <div className="bg-surface border border-border rounded-lg p-4">
             <SectorHeatmap stocks={stocksUS} onSectorClick={onSectorClick} />
           </div>
 
-          <div className="bg-surface border border-border rounded-lg overflow-hidden">
             <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
               Sector Aggregates - North America ({stocksUS.length} stocks)
             </div>
@@ -1611,6 +1610,7 @@ export default function App() {
     { id: 'HE' as Page, label: '🇫🇮 Finland' },
     { id: 'PA' as Page, label: '🇫🇷 France' },
     { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
+   
     { id: 'IR' as Page, label: '🇮🇪 Ireland' },
     { id: 'MIL' as Page, label: '🇮🇹 Italy' },
     { id: 'AS' as Page, label: '🇳🇱 Netherlands' },
@@ -1623,7 +1623,7 @@ export default function App() {
     { id: 'usscreen' as Page, label: '🇺🇸 United States' },
   ]
 
-
+  const externalNav: {href:string,label:string}[] = []
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
@@ -1659,7 +1659,7 @@ export default function App() {
         <button onClick={() => { window.location.href='/research' }}
           className='w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 text-orange-400 hover:text-gold transition-colors'>
           <FileText size={16} /> 📄 Research
-          📄 Research
+        </button>
         {accordionMenus.map(menu => (
           <div key={menu.id}>
             <button onClick={() => toggleMenu(menu.id)}
@@ -1692,7 +1692,7 @@ export default function App() {
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         <button onClick={() => { setPage('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
-
+          {page === 'news' && <NewsPage />}
         <button onClick={() => { setPage('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
       </nav>
 
@@ -1775,8 +1775,8 @@ export default function App() {
             ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
-          {page === 'northamerica' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
-          {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
+ {page === 'northamerica' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
+ {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); setPage('northamerica') }} />}
@@ -1785,7 +1785,7 @@ export default function App() {
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
             </div>
           )}
-          {page === 'myscreen' && (
+        {page === 'myscreen' && (
             user
               ? <MyScreen userId={user!.id} onSelectStock={setDetailStock} />
               : <LoginGate onLogin={() => setShowAuth(true)} title="My Screen" />
