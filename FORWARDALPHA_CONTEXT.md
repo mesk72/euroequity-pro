@@ -106,3 +106,10 @@
 - VI: ATH, BMAG, EIOS, GHC, HRX5, HST, HUI, ICG, K2G, MWB, REGU, RWT, UKO, VAS, ZHT
 - IR: SENUS
 - HE: AUROORA, CANATU, CITYVA
+
+## PARSE_NUM — FORMULA CORRETTA
+- Parentesi = negativo: (0.79x) -> -0.79
+- Rimuove $ , x % prima del float
+- Gestisce N/A, nm, — come None
+- Prima rimuovi parentesi, poi rimuovi caratteri speciali
+- USARE IN: daily_eu.py, daily_us.py, daily_load.py, weekly_eu.py, weekly_us.py
