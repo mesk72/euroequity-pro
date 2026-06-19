@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   FileText, LayoutDashboard, Search, Briefcase, Globe, Info,
@@ -8,7 +8,7 @@ import {
   ChevronUp, ChevronDown, TrendingUp, TrendingDown, Star
 } from 'lucide-react'
 import { supabase, createProfile, ensureDefaultPortfolios } from '@/lib/supabase'
-import { EXCHANGES, EXCHANGES_EXEMU, ALL_EXCHANGES, INDICES } from '@/lib/constants'
+import { supabase } from '@/lib/supabase'
 import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
