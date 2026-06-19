@@ -13,7 +13,6 @@ export async function GET() {
     const { data, error } = await supabase
       .from('indices')
       .select('ticker,name,price,change1d,ytd')
-      .order('exchange', { ascending: true })
 
     if (error || !data) return NextResponse.json({ indices: [] })
 
