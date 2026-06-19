@@ -447,9 +447,9 @@ def pct_rank(values,v,invert=False):
     return int(round(100-rank if invert else rank))
 
 def ey(pe):
-    if pe is None or pe==0: return None
+    if pe is None or pe == 0: return None
     try:
-        if math.isnan(float(pe)): return None
+        if isinstance(pe, float) and math.isnan(pe): return None
     except: return None
     if abs(pe)>200: return None
     return 1.0/pe
