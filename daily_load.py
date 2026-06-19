@@ -212,228 +212,25 @@ df = pd.read_csv(csv_name)
 print(f" CSV caricato: {len(df)} righe")
 
 def parse_num(v):
-    if pd.isna(v): return None
-    s = str(v).strip().replace(',','').replace('$','').replace('%','').replace('x','')
-    if s in ('','-','N/A','nan','—'): return None
-    if s.startswith('(') and s.endswith(')'): s = '-' + s[1:-1]
-    try: return float(s)
+    if v is None: return None
+    try:
+        import pandas as pd
+        if pd.isna(v): return None
+    except: pass
+    s = str(v).strip()
+    negative = False
+    if s.startswith('(') and s.endswith(')'):
+        negative = True
+        s = s[1:-1]
+    s = s.replace('$','').replace(',','').replace('x','').replace('%','').strip()
+    if s in ['-', '', 'N/A', 'nm', chr(8212)]: return None
+    try:
+        import math
+        f = float(s)
+        if math.isnan(f) or math.isinf(f): return None
+        return -f if negative else f
     except: return None
 
-COL_MAP = {
-    'ticker': 'Ticker',
-    'exchange': 'Primary Exchange',
-    'mkt_cap': 'Last Market Capitalization',
-    'price_usd': 'Last Close Price',
-    'pb': 'Trailing P/BVPS LTM',
-    'pe_trail_tikr':'Trailing P/Diluted EPS before Extra LTM',
-    'eps_fy24': 'EPS Normalized (FY 2024)',
-    'eps_fy25': 'EPS Normalized (FY 2025)',
-    'eps_fy26': 'Mean EPS Normalized (FY 2026)',
-    'eps_fy27': 'Mean EPS Normalized (FY 2027)',
-    'eps_fy28': 'Mean EPS Normalized (FY 2028)',
-    'eps_cy25': 'EPS Normalized (CY 2025)',
-    'eps_cy26': 'Mean EPS Normalized (CY 2026)',
-    'eps_cy27': 'Mean EPS Normalized (CY 2027)',
-    'rev_fy24': 'Revenue (FY 2024)',
-    'rev_fy25': 'Revenue (FY 2025)',
-    'rev_fy26': 'Mean Revenue (FY 2026)',
-    'rev_fy27': 'Mean Revenue (FY 2027)',
-    'rev_fy28': 'Mean Revenue (FY 2028)',
-    'rev_cy25': 'Revenue (CY 2025)',
-    'rev_cy26': 'Mean Revenue (CY 2026)',
-    'rev_cy27': 'Mean Revenue (CY 2027)',
-}
-
-# Mappa exchange TIKR -> nostro DB
-EXCHANGE_MAP = {
-    'ENXTAM':'AS', 'ENXTPA':'PA', 'ENXTBR':'BR', 'ENXTLS':'LS',
-    'XTRA':'XETRA', 'BIT':'MIL', 'HLSE':'HE', 'WBAG':'VI',
-    'ISE':'IR', 'ATSE':'AT', 'BME':'MC', 'DB':'XETRA',
-    'DUSE':'XETRA', 'MUN':'XETRA', 'BST':'XETRA',
-    'SWX':'SWX', 'LSE':'LSE', 'AIM':'AIM', 'OM':'OM',
-    'NGM':'NGM', 'OB':'OB', 'CPSE':'CPSE',
-    'HMSE':'OM', 'HNSE':'OB',
-}
-
-# Legge next earnings da Supabase
-next_earn_map = {}
-offset = 0
-while True:
-    r = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,next_report","offset":offset,"limit":1000})
-    data = r.json()
-    if not data: break
-    for d in data:
-        if d.get("next_report"):
-            next_earn_map[(d["ticker"],d["exchange"])] = d["next_report"]
-    offset+=1000
-    if len(data)<1000: break
-print(f" Next earnings: {len(next_earn_map)}")
-
-today_dt = datetime.strptime(TODAY, "%Y-%m-%d")
-MONTH = today_dt.month
-fund_updates = []
-
-for _, row in df.iterrows():
-    ticker = str(row.get(COL_MAP['ticker'],'') or '').strip()
-    exchange_tikr = str(row.get(COL_MAP['exchange'],'') or '').strip()
-    exchange = EXCHANGE_MAP.get(exchange_tikr, exchange_tikr)
-    if not ticker or not exchange: continue
-
-    price_usd = parse_num(row.get(COL_MAP['price_usd']))
-    mkt_cap = parse_num(row.get(COL_MAP['mkt_cap']))
-    pb = parse_num(row.get(COL_MAP['pb']))
-    pe_trail_tikr = parse_num(row.get(COL_MAP['pe_trail_tikr']))
-
-    eps_fy = {24:parse_num(row.get(COL_MAP['eps_fy24'])),
-              25:parse_num(row.get(COL_MAP['eps_fy25'])),
-              26:parse_num(row.get(COL_MAP['eps_fy26'])),
-              27:parse_num(row.get(COL_MAP['eps_fy27'])),
-              28:parse_num(row.get(COL_MAP['eps_fy28']))}
-
-    eps_cy = {25:parse_num(row.get(COL_MAP['eps_cy25'])),
-              26:parse_num(row.get(COL_MAP['eps_cy26'])),
-              27:parse_num(row.get(COL_MAP['eps_cy27']))}
-
-    rev_fy = {24:parse_num(row.get(COL_MAP['rev_fy24'])),
-              25:parse_num(row.get(COL_MAP['rev_fy25'])),
-              26:parse_num(row.get(COL_MAP['rev_fy26'])),
-              27:parse_num(row.get(COL_MAP['rev_fy27'])),
-              28:parse_num(row.get(COL_MAP['rev_fy28']))}
-
-    rev_cy = {25:parse_num(row.get(COL_MAP['rev_cy25'])),
-              26:parse_num(row.get(COL_MAP['rev_cy26'])),
-              27:parse_num(row.get(COL_MAP['rev_cy27']))}
-
-    next_report = next_earn_map.get((ticker, exchange))
-    eps_ltm = eps_ntm = rev_ltm = rev_ntm = None
-    W_CURR = (12 - MONTH) / 12
-    W_NEXT = 1 - W_CURR
-
-    # Usa sempre CY — più affidabile finché non abbiamo Leeway
-    if eps_cy.get(25) is not None and eps_cy.get(26) is not None:
-        eps_ltm = W_CURR*eps_cy[25] + W_NEXT*eps_cy[26]
-    if eps_cy.get(26) is not None and eps_cy.get(27) is not None:
-        eps_ntm = W_CURR*eps_cy[26] + W_NEXT*eps_cy[27]
-    if rev_cy.get(25) is not None and rev_cy.get(26) is not None:
-        rev_ltm = W_CURR*rev_cy[25] + W_NEXT*rev_cy[26]
-    if rev_cy.get(26) is not None and rev_cy.get(27) is not None:
-        rev_ntm = W_CURR*rev_cy[26] + W_NEXT*rev_cy[27]
-
-    if price_usd and eps_ltm and eps_ltm != 0:
-        pe_our = price_usd/eps_ltm
-        if abs(pe_our) > 500:
-            pe_trailing = pe_trail_tikr
-        elif pe_trail_tikr and pe_trail_tikr != 0:
-            diff_pct = abs(pe_our - pe_trail_tikr) / abs(pe_trail_tikr)
-            pe_trailing = pe_trail_tikr if diff_pct > 0.03 else pe_our
-        else:
-            pe_trailing = pe_our
-    else:
-        pe_trailing = pe_trail_tikr
-
-    if price_usd and eps_ntm and eps_ntm != 0:
-        pe_forward = price_usd/eps_ntm
-        if abs(pe_forward)>500: pe_forward=None
-    else:
-        pe_forward = None
-
-    eps_growth = None
-    if eps_ltm and eps_ntm and eps_ltm != 0:
-        eps_growth = round(eps_ntm / abs(eps_ltm) - 1, 6)
-
-    rev_growth = None
-    if rev_ltm and rev_ntm and rev_ltm != 0:
-        rev_growth = round(rev_ntm / abs(rev_ltm) - 1, 6)
-
-    fund_updates.append({
-        "ticker":ticker,"exchange":exchange,"mkt_cap":mkt_cap,"pb":pb,
-        "pe_trailing":round(pe_trailing,2) if pe_trailing is not None else None,
-        "pe_forward": round(pe_forward,2) if pe_forward is not None else None,
-        "eps_growth": eps_growth,"rev_growth":rev_growth,
-    })
-
-ok=0
-for i in range(0,len(fund_updates),100):
-    r=requests.post(SUPABASE_URL+"/rest/v1/fundamentals",headers=headers_up,json=fund_updates[i:i+100])
-    if r.status_code in (200,201,204): ok+=len(fund_updates[i:i+100])
-print(f" Fondamentali aggiornati: {ok}/{len(fund_updates)}")
-
-# ============================================================
-# STEP 5 — RICALCOLA RANK
-# ============================================================
-print("\n[5/5] Ricalcolo rank Value/Growth Score...")
-
-# Salva rank correnti in _prev prima di sovrascrivere
-print(" Salvataggio rank precedenti...")
-prev_data=[]
-offset=0
-while True:
-    r=requests.get(SUPABASE_URL+"/rest/v1/fundamentals",headers=headers_r,
-        params={"select":"ticker,exchange,value_score,growth_score",
-                "offset":offset,"limit":1000})
-    data=r.json()
-    if not data: break
-    for d in data:
-        if d.get("value_score") is not None or d.get("growth_score") is not None:
-            prev_data.append({
-                "ticker":d["ticker"],"exchange":d["exchange"],
-                "value_score_prev":d.get("value_score"),
-                "growth_score_prev":d.get("growth_score")
-            })
-    offset+=1000
-    if len(data)<1000: break
-ok=0
-for i in range(0,len(prev_data),100):
-    r=requests.post(SUPABASE_URL+"/rest/v1/fundamentals",
-        headers=headers_up,json=prev_data[i:i+100])
-    if r.status_code in (200,201,204): ok+=len(prev_data[i:i+100])
-print(f" Rank precedenti salvati: {ok}/{len(prev_data)}")
-
-# Legge tutti i fondamentali + momentum
-all_data=[]
-offset=0
-while True:
-    r=requests.get(SUPABASE_URL+"/rest/v1/fundamentals",headers=headers_r,
-        params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m",
-                "offset":offset,"limit":1000})
-    data=r.json()
-    if not data: break
-    all_data.extend(data)
-    offset+=1000
-    if len(data)<1000: break
-
-# Legge mom1w e mom1m
-mom_data=[]
-offset=0
-while True:
-    r=requests.get(SUPABASE_URL+"/rest/v1/fundamentals",headers=headers_r,
-        params={"select":"ticker,exchange,mom1w,mom1m","offset":offset,"limit":1000})
-    data=r.json()
-    if not data: break
-    mom_data.extend(data)
-    offset+=1000
-    if len(data)<1000: break
-
-mom1w_map={(d["ticker"],d["exchange"]):d.get("mom1w") for d in mom_data}
-mom1m_map={(d["ticker"],d["exchange"]):d.get("mom1m") for d in mom_data}
-
-# Gruppi rank per country
-RANK_GROUPS = {
-    'ITA':['MIL'],
-    'DEU':['XETRA'],
-    'FRA':['PA'],
-    'GBR':['LSE','AIM'],
-    'SWE':['OM'],
-    'NOR':['OB'],
-    'CHE':['SWX'],
-    'NLD':['AS'],
-    'BEL':['BR'],
-    'FIN':['HE'],
-    'ESP':['MC'],
-    'DNK':['CPSE'],
-}
-NO_RANK = {'AT','VI','LS','IR','NGM'}
 
 def pct_rank(values,v,invert=False):
     if v is None: return None
