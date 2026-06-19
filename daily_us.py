@@ -31,7 +31,7 @@ def pct_rank(values, v):
     return int(round(below / len(valid) * 100))
 
 def ey(pe):
-    if pe is None or pe == 0: return None
+    if pe is None or pe == 0 or (isinstance(pe, float) and math.isnan(pe)): return None
     try:
         if math.isnan(float(pe)): return None
     except: return None
