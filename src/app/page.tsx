@@ -1659,7 +1659,7 @@ export default function App() {
         <button onClick={() => { window.location.href='/research' }}
           className='w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 text-orange-400 hover:text-gold transition-colors'>
           <FileText size={16} /> 📄 Research
-        </button>
+          📄 Research
         {accordionMenus.map(menu => (
           <div key={menu.id}>
             <button onClick={() => toggleMenu(menu.id)}
