@@ -1775,8 +1775,8 @@ export default function App() {
             ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
- {page === 'northamerica' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
- {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
+          {page === 'northamerica' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
+          {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); setPage('northamerica') }} />}
@@ -1785,7 +1785,7 @@ export default function App() {
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
             </div>
           )}
-        {page === 'myscreen' && (
+          {page === 'myscreen' && (
             user
               ? <MyScreen userId={user!.id} onSelectStock={setDetailStock} />
               : <LoginGate onLogin={() => setShowAuth(true)} title="My Screen" />
