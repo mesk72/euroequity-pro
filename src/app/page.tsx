@@ -1610,7 +1610,7 @@ export default function App() {
     { id: 'HE' as Page, label: '🇫🇮 Finland' },
     { id: 'PA' as Page, label: '🇫🇷 France' },
     { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
-   
+    { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
     { id: 'IR' as Page, label: '🇮🇪 Ireland' },
     { id: 'MIL' as Page, label: '🇮🇹 Italy' },
     { id: 'AS' as Page, label: '🇳🇱 Netherlands' },
