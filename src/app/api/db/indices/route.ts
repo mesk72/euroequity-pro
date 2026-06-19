@@ -5,7 +5,7 @@ export const revalidate = 60
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 export async function GET() {
@@ -14,7 +14,11 @@ export async function GET() {
       .from('indices')
       .select('ticker,name,price,change1d,ytd')
 
-    if (error || !data) return NextResponse.json({ indices: [] })
+    if (error) {
+      console.error('indices error:', error)
+      return NextResponse.json({ indices: [], error: error.message })
+    }
+    if (!data) return NextResponse.json({ indices: [] })
 
     const indices = data.map((d: any) => ({
       ticker: d.ticker,
@@ -25,7 +29,7 @@ export async function GET() {
     }))
 
     return NextResponse.json({ indices })
-  } catch {
-    return NextResponse.json({ indices: [] })
+  } catch (e: any) {
+    return NextResponse.json({ indices: [], error: e.message })
   }
 }
