@@ -49,7 +49,7 @@ def pct_rank(values, v):
 def ey(pe):
     if pe is None or pe == 0: return None
     try:
-        if math.isnan(float(pe)): return None
+        if isinstance(pe, float) and math.isnan(pe): return None
     except: return None
     return 1.0 / pe
 
