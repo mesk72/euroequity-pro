@@ -369,14 +369,6 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
       )}
     </div>
   )
- })}
- {stocks.length > maxRows && (
- <div className="text-[10px] text-muted text-center py-2 border-t border-border">
- Showing top {maxRows} of {stocks.length} by market cap
- </div>
- )}
- </div>
- )
 
   return (
     <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overflowX: "auto", touchAction: "pan-x pan-y" }}>
