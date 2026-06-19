@@ -13,7 +13,7 @@ import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
 import ResearchPage from '@/components/research/ResearchPage'
-import NewsPage from '@/components/news/NewsPage'
+
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
@@ -1692,7 +1692,7 @@ export default function App() {
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         <button onClick={() => { setPage('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
-          {page === 'news' && <NewsPage />}
+          {page === 'news' && <div className="flex-1 overflow-y-auto"><iframe src="/news" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} /></div>}
         <button onClick={() => { setPage('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
       </nav>
 
