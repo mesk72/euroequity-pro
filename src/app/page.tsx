@@ -1374,6 +1374,290 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   )
 }
 
+
+
+const INDICES_US = [
+  { ticker: 'DJI', name: 'Dow Jones' },
+  { ticker: 'IXIC', name: 'Nasdaq 100' },
+  { ticker: 'SPX', name: 'S&P 500' },
+  { ticker: 'TSX', name: 'TSX Canada' },
+]
+
+
+function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
+  onSectorClick: (s: string) => void
+  onSelectStock?: (s: Stock) => void
+  onGoScreener?: (filter: string) => void
+}) {
+  const [indices,   setIndices]   = useState<any[]>([])
+  const [allStocks, setAllStocks] = useState<Stock[]>([])
+  const [loading,   setLoading]   = useState(true)
+  const [search,    setSearch]    = useState('')
+  const [searchRes, setSearchRes] = useState<any[]>([])
+  const [usdToEur,  setUsdToEur]  = useState(0.8615)
+  const searchTimer = useRef<any>(null)
+
+  useEffect(() => {
+    // Aggiorna indici ogni 60 secondi
+    const loadIndices = () => apiIndices().then(setIndices)
+    loadIndices()
+    const timer = setInterval(loadIndices, 60000)
+
+    // Carica tasso USD/EUR
+    fetch('/api/fx').then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.usdToEur) setUsdToEur(d.usdToEur) })
+      .catch(() => {})
+
+    setLoading(true)
+    // Carica da tutti gli exchange - EMU + ex-EMU
+    apiExchange('US').then(stocks => {
+      setAllStocks(stocks)
+      setLoading(false)
+    })
+
+    return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    clearTimeout(searchTimer.current)
+    if (search.length < 2) { setSearchRes([]); return }
+    searchTimer.current = setTimeout(async () => {
+      if (USE_DB) {
+        try {
+          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`)
+          if (r.ok) {
+            const d = await r.json()
+            setSearchRes(d.stocks || [])
+            return
+          }
+        } catch {}
+      }
+      const q = search.toLowerCase()
+      const results = computeScores([...DEMO_STOCKS])
+        .filter((s: any) => s.ticker.toLowerCase().includes(q) || (s.company||'').toLowerCase().includes(q))
+        .slice(0, 10)
+      setSearchRes(results)
+    }, 200)
+  }, [search])
+
+
+  // Top 500 North America per market cap
+  const u200 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null}))
+    .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0))
+    .slice(0, 500)
+
+  const valid   = u200.filter((s:any) => s.change1d != null)
+  const allGainers = [...valid].filter((s:any) => (s.change1d || 0) > 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
+  const allLosers  = [...valid].filter((s:any) => (s.change1d || 0) < 0).sort((a, b) => (a.change1d || 0) - (b.change1d || 0))
+  const gainers = allGainers.slice(0, 10)
+  const losers  = allLosers.slice(0, 10)
+  const ewReturn = valid.length > 0
+    ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length
+    : null
+
+
+
+  // Price Momentum 12M top/bottom 10
+  const allWithMom12 = u200.filter(s => s.mom12m != null)
+  const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
+  const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
+
+  // KPI V+G >= 80 - entrambi i rank >= 70 (titoli con buon value E buon growth)
+  // Best Combined: calcolo identico al Best Ideas screen (combinedRank >= 80 su All Europe)
+  const ey_d = (pe: number | null) => (pe && pe !== 0 && Math.abs(pe) <= 200) ? 1/pe : null
+  const pRk  = (vals: number[], v: number) => vals.length ? Math.round(vals.filter(x => x < v).length / vals.length * 100) : null
+
+  const eyTV  = allStocks.map((s:any) => ey_d(s.peTrail)).filter((v:any) => v != null) as number[]
+  const eyFV  = allStocks.map((s:any) => ey_d(s.peFwd)).filter((v:any) => v != null) as number[]
+  const pbV = allStocks.map((s:any) => s.pb).filter((v:any) => v != null && v > 0) as number[]
+  const egV   = allStocks.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
+  const rgV   = allStocks.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
+  const m6AV  = allStocks.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
+  const m12AV = allStocks.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null).filter((v:any) => v != null) as number[]
+
+  const calcEuroScore = (s: any) => {
+    const eyt = ey_d(s.peTrail); const eyf = ey_d(s.peFwd)
+    const pet = eyt != null ? (s.peTrail > 200 ? 1 : pRk(eyTV, eyt)) : null
+    const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pRk(eyFV, eyf)) : null
+    const pb = s.pb != null && s.pb > 0 ? (100 - pRk(pbV, s.pb)!) : null
+    const vc  = [pet,pef,pb].filter((v:any) => v != null) as number[]
+    const eV  = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
+    const m6a = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
+    const m12a= s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m  : null
+    const eg  = s.epsGrowth != null ? pRk(egV,  s.epsGrowth) : null
+    const rg  = s.revGrowth != null ? pRk(rgV,  s.revGrowth) : null
+    const m6r = m6a  != null ? pRk(m6AV,  m6a)  : null
+    const m12r= m12a != null ? pRk(m12AV, m12a) : null
+    const gc  = [eg,rg,m6r,m12r].filter((v:any) => v != null) as number[]
+    const eG  = gc.length >= 2 ? gc.reduce((a:number,b:number)=>a+b,0)/gc.length : null
+    return eV != null && eG != null ? (eV + eG) / 2 : null
+  }
+
+  const allScores = u200.map(calcEuroScore).filter((v:any) => v != null) as number[]
+  const highVG = u200.filter((s:any) => s.combinedRank != null && s.combinedRank >= 80).length
+
+  return (
+    <div className="space-y-6 fade-in">
+
+      {/* Search */}
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search ticker or company…"
+          className="input-field pl-9 text-sm"
+        />
+        {searchRes.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
+            {searchRes.map((r: any) => (
+              <div key={`${r.ticker}.${r.exchange}`}
+                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}`}
+                className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
+                <span style={{ fontSize:15 }}>{r.flag || ''}</span>
+                <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
+                <span className="text-sub flex-1 truncate">{r.company}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', fontSize:11, color:'var(--text3)' }}>{r.price?.toFixed(2)||'-'}</span>
+                <span className="badge badge-delay text-[9px]">{r.exchange}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Indices - aggiornati automaticamente ogni 60s */}
+      <div>
+        <div style={{
+          background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.3)',
+          borderRadius: 6, padding: '10px 16px', marginBottom: 12,
+          fontSize: 11, color: 'var(--orange)', fontWeight: 600,
+          fontFamily: 'IBM Plex Sans Condensed'
+        }}>
+          ⚠️ WORK IN PROGRESS — Prices may be incorrect. New data source coming soon.
+        </div>
+
+        <div className="section-hdr flex items-center gap-2">
+          📈 Index Performance — North America
+          <span className="text-[9px] text-muted font-normal"></span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+          {INDICES_US.map((idx) => {
+            const d = indices.find((x: any) => x.ticker === idx.ticker)
+            return (
+              <IndexCard
+                key={idx.ticker}
+                name={idx.name}
+                close={d?.close ?? null}
+                changeP={d?.changeP ?? null}
+                loading={indices.length === 0}
+              />
+            )
+          })}
+        </div>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Total Stocks',              value: loading ? '…' : '1,972' },
+          { label: 'MCW 1D Return (top 500 North America)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'V+G Best Combined (top 500)', value: loading ? '…' : highVG.toString() },
+          { label: 'Gainers/Losers (top 500)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
+        ].map(({ label, value }) => (
+          <div key={label} className="metric-card">
+            <div className="metric-label">{label}</div>
+            <div className="metric-value">{value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Gainers / Losers today - top 200 market cap */}
+      {!loading && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[
+            { title: '🟢 Top 10 Gainers Today', list: gainers, color: 'text-[#22d48a]', field: 'change1d' },
+            { title: '🔴 Top 10 Losers Today',  list: losers,  color: 'text-[#e84560]',   field: 'change1d' },
+          ].map(({ title, list, color, field }) => (
+            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
+              <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
+                {title} - Top 500 North America by Mkt Cap · <span className="font-normal opacity-70"></span>
+              </div>
+              <table className="data-table">
+                <thead><tr>
+                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:65}}>1D %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      className="cursor-pointer">
+                      <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Top 10 Price Momentum 12M */}
+      {!loading && topMom12.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[
+            { title: '🚀 Top 10 Price Mom 12M (Top 500 North America)', list: topMom12, color: 'var(--green)' },
+            { title: '💣 Bottom 10 Price Mom 12M (Top 500 North America)', list: botMom12, color: 'var(--red)' },
+          ].map(({ title, list, color }) => (
+            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
+              <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border"
+                style={{ color }}>
+                {title}
+              </div>
+              <table className="data-table w-full">
+                <thead><tr>
+                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:72}}>12M %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      className="cursor-pointer">
+                      <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap"
+                        style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
+                        {s.mom12m != null ? fp(s.mom12m * 100) : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Heatmap settoriale */}
+      {!loading && u200.length > 0 && (
+        <div className="bg-surface border border-border rounded-lg p-4">
+          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · Top 500 North America</div>
+          <SectorHeatmap stocks={u200} onSectorClick={onSectorClick} />
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-12 text-muted">
+          <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-gold" />
+          <p className="text-sm">Loading market data…</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+
 // - LOGIN GATE -
 function LoginGate({ onLogin, title }: { onLogin: () => void, title: string }) {
   return (
@@ -1775,7 +2059,8 @@ export default function App() {
             ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
- {page === 'northamerica' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
+ {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
+ {page === 'usscreen' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
  {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
