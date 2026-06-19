@@ -1,3 +1,23 @@
+def parse_num(v):
+    if v is None: return None
+    try:
+        import pandas as pd
+        if pd.isna(v): return None
+    except: pass
+    s = str(v).strip()
+    negative = False
+    if s.startswith('(') and s.endswith(')'):
+        negative = True
+        s = s[1:-1]
+    s = s.replace('$','').replace(',','').replace('x','').replace('%','').strip()
+    if s in ['-', '', 'N/A', 'nm', chr(8212)]: return None
+    try:
+        import math
+        f = float(s)
+        if math.isnan(f) or math.isinf(f): return None
+        return -f if negative else f
+    except: return None
+
 import yfinance as yf, requests, pandas as pd
 import time, math, os, time as time_module
 from datetime import datetime, timedelta
