@@ -1377,10 +1377,10 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
 
 const INDICES_US = [
-  { ticker: 'DJI', name: 'Dow Jones' },
-  { ticker: 'IXIC', name: 'Nasdaq 100' },
-  { ticker: 'SPX', name: 'S&P 500' },
-  { ticker: 'TSX', name: 'TSX Canada' },
+  { ticker: '^DJI', name: 'Dow Jones' },
+  { ticker: '^IXIC', name: 'Nasdaq' },
+  { ticker: '^GSPC', name: 'S&P 500' },
+  { ticker: '^GSPTSE', name: 'TSX' },
 ]
 
 
