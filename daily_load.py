@@ -348,8 +348,8 @@ for _, row in df.iterrows():
 
     fund_updates.append({
         "ticker":ticker,"exchange":exchange,"mkt_cap":mkt_cap,"pb":pb,
-        "pe_trailing":round(pe_trailing,2) if pe_trailing else None,
-        "pe_forward": round(pe_forward,2) if pe_forward else None,
+ "pe_trailing":round(pe_trailing,2) if pe_trailing is not None else None,
+ "pe_forward": round(pe_forward,2) if pe_forward is not None else None,
         "eps_growth": eps_growth,"rev_growth":rev_growth,
     })
 
