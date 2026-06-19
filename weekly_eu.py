@@ -153,8 +153,8 @@ for r in tikr_rows:
 
     fund_updates.append({
         "ticker": ticker, "exchange": exchange,
- "pe_trailing": round(r["pe_trailing"],2) if r["pe_trailing"] is not None else None,
- "pe_forward": round(r["pe_forward"],2) if r["pe_forward"] is not None else None,
+        "pe_trailing": round(r["pe_trailing"],2) if r["pe_trailing"] is not None else None,
+        "pe_forward": round(r["pe_forward"],2) if r["pe_forward"] is not None else None,
         "pb": r["pb"],
         "eps_fy0": r["eps_fy0"], "eps_fy1": r["eps_fy1"],
         "eps_fy2": r["eps_fy2"], "eps_fy3": r["eps_fy3"],
