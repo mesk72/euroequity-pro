@@ -13,7 +13,7 @@ import { Stock } from '@/lib/ranking'
 import SectorHeatmap from '@/components/dashboard/SectorHeatmap'
 import AuthModal from '@/components/auth/AuthModal'
 import ResearchPage from '@/components/research/ResearchPage'
-import NewsPage from '@/components/news/NewsPage'
+
 
 import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
