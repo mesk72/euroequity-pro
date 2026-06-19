@@ -310,57 +310,65 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
     <div className="p-8 text-center text-muted text-sm">No stocks match your filters.</div>
   )
 
- if (isMobile) return (
- <div>
- {sorted.map((s, i) => {
- const sColor = getSectorColor(s.sector)
- return (
- <div key={i}
- onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
- className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
- <div className="flex items-center justify-between mb-1">
- <div className="flex items-center gap-2">
- <span className="font-700 text-sm text-orange">{s.flag} {s.ticker}</span>
- <span className="text-[9px] text-muted">{s.exchange}</span>
- <WatchlistButton stock={s} userId={userId || null} />
- </div>
- <div className="flex items-center gap-2">
- <span className="font-mono font-600 text-sm text-text">
- {s.price != null ? s.price.toFixed(2) : '-'}
- </span>
- <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
- {s.change1d != null ? fpd(s.change1d/100) : '-'}
- </span>
- </div>
- </div>
- <div className="flex items-center justify-between mb-1">
- <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
- <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
- </div>
- <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
- <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? ('$'+s.mktCap.toFixed(1)+'B') : '-'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">PEv: <span style={{color:'#3b82f6'}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : '-'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">PEf: <span style={{color:'#3b82f6'}}>{(s as any).rankPeNtm != null ? Math.round((s as any).rankPeNtm) : '-'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">EPS: <span style={{color:'#22c55e'}}>{(s as any).rankEpsGr != null ? Math.round((s as any).rankEpsGr) : '-'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
- </div>
- <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
- <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{userId ? (s.valueScore != null ? Math.round(s.valueScore) : '-') : '🔒'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{userId ? (s.growthScore != null ? Math.round(s.growthScore) : '-') : '🔒'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{userId ? (s.combinedRank != null ? Math.round(s.combinedRank) : '-') : '🔒'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom1m != null ? ((s.mom1m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
- <span className="text-[#444]">|</span>
- <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom12m != null ? ((s.mom12m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
- </div>
- </div>
- )
+  if (isMobile) return (
+    <div>
+      {sorted.map((s, i) => {
+        const sColor = getSectorColor(s.sector)
+        return (
+          <div key={i}
+            onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
+            className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="font-700 text-sm text-orange">{s.flag} {s.ticker}</span>
+                <span className="text-[9px] text-muted">{s.exchange}</span>
+                <WatchlistButton stock={s} userId={userId || null} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-600 text-sm text-text">
+                  {s.price != null ? s.price.toFixed(2) : '-'}
+                </span>
+                <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
+                  {s.change1d != null ? fpd(s.change1d/100) : '-'}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
+              <span className="text-[9px] font-600" style={{ color: sColor }}>{s.sector || '-'}</span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
+              <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? ('$'+s.mktCap.toFixed(1)+'B') : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">PEv: <span style={{color:'#3b82f6'}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">PEf: <span style={{color:'#3b82f6'}}>{(s as any).rankPeNtm != null ? Math.round((s as any).rankPeNtm) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">EPS: <span style={{color:'#22c55e'}}>{(s as any).rankEpsGr != null ? Math.round((s as any).rankEpsGr) : '-'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
+              <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{userId ? (s.valueScore != null ? Math.round(s.valueScore) : '-') : '🔒'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{userId ? (s.growthScore != null ? Math.round(s.growthScore) : '-') : '🔒'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{userId ? (s.combinedRank != null ? Math.round(s.combinedRank) : '-') : '🔒'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">1M: <span style={{color: s.mom1m != null ? (s.mom1m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom1m != null ? ((s.mom1m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
+              <span className="text-[#444]">|</span>
+              <span className="text-muted">12M: <span style={{color: s.mom12m != null ? (s.mom12m >= 0 ? '#22d48a' : '#e84560') : '#8a9ab8'}}>{userId ? (s.mom12m != null ? ((s.mom12m*100).toFixed(1)+'%') : '-') : '🔒'}</span></span>
+            </div>
+          </div>
+        )
+      })}
+      {stocks.length > maxRows && (
+        <div className="text-[10px] text-muted text-center py-2 border-t border-border">
+          Showing top {maxRows} of {stocks.length} by market cap
+        </div>
+      )}
+    </div>
+  )
  })}
  {stocks.length > maxRows && (
  <div className="text-[10px] text-muted text-center py-2 border-t border-border">
