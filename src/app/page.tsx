@@ -1904,8 +1904,8 @@ export default function App() {
     { id: 'SWX' as Page, label: '🇨🇭 Switzerland' },
     { id: 'OM' as Page, label: '🇸🇪 Sweden' },
     { id: 'LSE' as Page, label: '🇬🇧 UK (LSE)' },
+    { id: 'northamerica' as Page, label: '🌎 North America' },
     { id: 'usscreen' as Page, label: '🇺🇸 United States' },
-  ]
 
   const externalNav: {href:string,label:string}[] = []
 
@@ -2060,8 +2060,8 @@ export default function App() {
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
  {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
- {page === 'usscreen' && <Screener key={"northamerica-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
- {page === 'usscreen' && <Screener key={"usscreen-"+scrSectorUS} initExchange="US" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={undefined} initGrowMin={undefined} initCombinedMin={undefined} />}
+          {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
+          {page === 'usscreen' && <Screener key={'usscreen-'+scrSectorUS} initExchange='US' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); setPage('northamerica') }} />}
