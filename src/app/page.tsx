@@ -1907,6 +1907,7 @@ export default function App() {
     { id: 'northamerica' as Page, label: '🌎 North America' },
     { id: 'usscreen' as Page, label: '🇺🇸 United States' },
 
+  ]
   const externalNav: {href:string,label:string}[] = []
 
   return (
