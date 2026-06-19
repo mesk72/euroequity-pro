@@ -1623,7 +1623,7 @@ export default function App() {
     { id: 'usscreen' as Page, label: '🇺🇸 United States' },
   ]
 
-  const externalNav: {href:string,label:string}[] = []
+
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
