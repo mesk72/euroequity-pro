@@ -18,9 +18,6 @@ def parse_num(v):
         return -f if negative else f
     except: return None
 
-import yfinance as yf, requests, pandas as pd
-import time, math, os, time as time_module
-from datetime import datetime, timedelta
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
