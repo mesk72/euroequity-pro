@@ -219,6 +219,60 @@ for i in range(0,len(combined_updates),100):
 print(f" Combined rank US: {ok}/{len(combined_updates)}")
 ok_rank=ok
 
+
+# ── AGGIORNAMENTO INDICI NORD AMERICA ────────────────────────
+print("\n Aggiornamento indici Nord America...")
+
+NA_INDICES = [
+    ("^DJI", "US", "DJI", "Dow Jones"),
+    ("^GSPC", "US", "GSPC", "S&P 500"),
+    ("^IXIC", "US", "IXIC", "Nasdaq"),
+    ("^GSPTSE", "TSX", "GSPTSE.INDX", "TSX"),
+]
+
+ok_idx = 0
+for db_ticker, exchange, leeway_ticker, name in NA_INDICES:
+    url = f"https://api.leeway.tech/api/v1/public/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={TODAY}&to={TODAY}"
+    try:
+        r = requests.get(url, timeout=10)
+        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        if not data:
+            ieri = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+            url2 = f"https://api.leeway.tech/api/v1/public/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={ieri}&to={TODAY}"
+            r2 = requests.get(url2, timeout=10)
+            data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
+        if not data: continue
+
+        rows = [{"ticker": db_ticker, "exchange": exchange,
+                 "date": d["date"], "close": d["adjusted_close"]}
+                for d in data if d.get("adjusted_close")]
+        if rows:
+            requests.post(SUPABASE_URL+"/rest/v1/price_history",
+                headers=headers_up, json=rows)
+
+        price = data[-1]["adjusted_close"]
+        change1d = None
+        if len(data) >= 2:
+            change1d = round((data[-1]["adjusted_close"]/data[-2]["adjusted_close"]-1)*100, 2)
+        else:
+            r_prev = requests.get(SUPABASE_URL+"/rest/v1/price_history", headers=headers_r,
+                params={"select":"close","ticker":f"eq.{db_ticker}","exchange":f"eq.{exchange}",
+                        "order":"date.desc","limit":"2"})
+            prev_data = r_prev.json()
+            if len(prev_data) >= 2:
+                change1d = round((price/prev_data[1]["close"]-1)*100, 2)
+
+        requests.patch(SUPABASE_URL+"/rest/v1/indices", headers=headers_up,
+            params={"ticker": f"eq.{db_ticker}"},
+            json={"price": price, "change1d": change1d, "date": data[-1]["date"]})
+        print(f" {name}: {price} ({change1d}%)")
+        ok_idx += 1
+    except Exception as e:
+        print(f" ERR {name}: {e}")
+    time.sleep(0.2)
+
+print(f" Indici NA aggiornati: {ok_idx}/{len(NA_INDICES)}")
+
 end_time=time_module.time()
 log_entry={"run_date":TODAY,"market":"US","prices_updated":ok_prices,"prices_failed":fail_prices,"last_price_date":TODAY,"momentum_updated":ok_momentum,"rank_updated":ok_rank,"duration_seconds":int(end_time-start_time)}
 requests.post(SUPABASE_URL+"/rest/v1/daily_log",headers=headers_up,json=[log_entry])
