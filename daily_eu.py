@@ -2,6 +2,8 @@ import os
 import math
 import time
 import time as time_module
+import requests
+import yfinance as yf
 from datetime import datetime, timedelta
 
 def parse_num(v):
