@@ -304,6 +304,78 @@ for i in range(0,len(combined_updates),100):
 print(f" Combined rank EU: {ok}/{len(combined_updates)}")
 ok_rank=ok
 
+
+# ── AGGIORNAMENTO INDICI EU ──────────────────────────────────
+print("\n Aggiornamento indici EU...")
+
+EU_INDICES = [
+    ("GDAXI.INDX", "XETRA", "DAX", "DAX"),
+    ("FCHI.INDX", "PA", "FCHI", "CAC 40"),
+    ("AEX.INDX", "AS", "AEX", "AEX"),
+    ("IBEX.INDX", "MC", "IBEX", "IBEX 35"),
+    ("BFX.INDX", "BR", "BFX", "BEL 20"),
+    ("^FTSE", "LSE", "FTSE", "FTSE 100"),
+    ("SSMI.INDX", "SWX", "SMI", "SMI"),
+    ("OMXS30.INDX","OM", "OMXS30", "OMX Stockholm"),
+    ("OMXC25.INDX","CPSE", "C25", "OMX Copenhagen"),
+    ("ATX.INDX", "VI", "ATX", "ATX"),
+    ("ISEQ.INDX", "IR", "IEX", "ISEQ"),
+    ("STOXX50E.INDX","EZ", "SX5E", "Euro Stoxx 50"),
+    ("SXXP.INDX", "EZ", "SXXP.INDX", "STOXX 600"),
+    ("OMXHPI.INDX","HE", "HEX", "OMX Helsinki"),
+    ("FTSEMIB.MI", "MIL", "MIB", "FTSE MIB"),
+    ("PSI20.INDX", "LS", "PSI", "PSI 20"),
+]
+
+ok_idx = 0
+for db_ticker, exchange, leeway_ticker, name in EU_INDICES:
+    # Scarica ultimo prezzo da Leeway
+    url = f"https://api.leeway.tech/api/v1/public/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={TODAY}&to={TODAY}"
+    try:
+        r = requests.get(url, timeout=10)
+        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        if not data:
+            # Prova ieri
+            ieri = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+            url2 = f"https://api.leeway.tech/api/v1/public/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={ieri}&to={TODAY}"
+            r2 = requests.get(url2, timeout=10)
+            data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
+        if not data: continue
+
+        # Salva in price_history
+        rows = [{"ticker": db_ticker, "exchange": exchange,
+                 "date": d["date"], "close": d["adjusted_close"]}
+                for d in data if d.get("adjusted_close")]
+        if rows:
+            requests.post(SUPABASE_URL+"/rest/v1/price_history",
+                headers=headers_up, json=rows)
+
+        # Calcola change1d
+        price = data[-1]["adjusted_close"]
+        change1d = None
+        if len(data) >= 2:
+            change1d = round((data[-1]["adjusted_close"]/data[-2]["adjusted_close"]-1)*100, 2)
+        else:
+            # Leggi prezzo precedente da price_history
+            r_prev = requests.get(SUPABASE_URL+"/rest/v1/price_history", headers=headers_r,
+                params={"select":"close","ticker":f"eq.{db_ticker}","exchange":f"eq.{exchange}",
+                        "order":"date.desc","limit":"2"})
+            prev_data = r_prev.json()
+            if len(prev_data) >= 2:
+                change1d = round((price/prev_data[1]["close"]-1)*100, 2)
+
+        # Aggiorna tabella indices
+        requests.patch(SUPABASE_URL+"/rest/v1/indices", headers=headers_up,
+            params={"ticker": f"eq.{db_ticker}"},
+            json={"price": price, "change1d": change1d, "date": data[-1]["date"]})
+        print(f" {name}: {price} ({change1d}%)")
+        ok_idx += 1
+    except Exception as e:
+        print(f" ERR {name}: {e}")
+    time.sleep(0.2)
+
+print(f" Indici EU aggiornati: {ok_idx}/{len(EU_INDICES)}")
+
 end_time=time_module.time()
 log_entry={"run_date":TODAY,"market":"EU","prices_updated":ok_prices,"prices_failed":fail_prices,"last_price_date":TODAY,"momentum_updated":ok_momentum,"rank_updated":ok_rank,"duration_seconds":int(end_time-start_time)}
 requests.post(SUPABASE_URL+"/rest/v1/daily_log",headers=headers_up,json=[log_entry])
