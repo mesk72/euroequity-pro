@@ -191,7 +191,7 @@ offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,rank_mom6_adj,rank_mom12_adj",
-                "exchange":"not.eq.US","offset":str(offset),"limit":"1000"})
+                "exchange":"not.in.(US,TSE,SEHK,TSX,ASX)","in_universe":"eq.true","offset":str(offset),"limit":"1000"})
     data = res.json()
     if not data: break
     for d in data:
@@ -210,7 +210,7 @@ offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth",
-                "exchange":"not.eq.US","offset":str(offset),"limit":"1000"})
+                "exchange":"not.in.(US,TSE,SEHK,TSX,ASX)","in_universe":"eq.true","offset":str(offset),"limit":"1000"})
     data = res.json()
     if not data: break
     all_data.extend(data)
@@ -238,7 +238,7 @@ def calc_ranks(group):
         rev_g = d.get("rev_growth")
         r_eyt = pct_rank(ey_trail_g, ey_t) if ey_t is not None else None
         r_eyf = pct_rank(ey_fwd_g, ey_f) if ey_f is not None else None
-        r_pb = pct_rank([1/x for x in pb_g if x!=0], 1/pb_v if pb_v and pb_v!=0 else None) if pb_v and pb_v!=0 else None
+        r_pb = (100 - pct_rank(pb_g, pb_v)) if pb_v is not None and pb_g else None
         r_epsg = pct_rank(eps_g_vals, eps_g) if eps_g is not None else None
         r_revg = pct_rank(rev_g_vals, rev_g) if rev_g is not None else None
         mom = mom_rank_map.get(key, {})
@@ -287,7 +287,7 @@ print(f" Rank aggiornati: {ok}/{len(rank_updates)}")
 print("\n Calcola combined rank...")
 requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",
     headers={**headers_up,"Prefer":"return=minimal"},
-    params={"exchange":"not.eq.US"},
+    params={"exchange":"not.in.(US,TSE,SEHK,TSX,ASX)"},
     json={"combined_rank": None})
 
 all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
