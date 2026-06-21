@@ -23,7 +23,7 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null, prim
   if (exchange === 'SEHK') { const code = ticker.padStart(4, '0'); return `https://www.hkex.com.hk/Market-Data/Securities-Prices/Equities?sym=${code}&sc_lang=en` }
   if (exchange === 'TSX') return `https://www.tsx.com/listings/listing-with-us/listed-company-directory/company-directory-details?ticker=${ticker}`
   if (exchange === 'ASX') return `https://www.asx.com.au/markets/company/${ticker.toLowerCase()}`
- if (exchange === 'SWX') return 'https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html'
+  if (exchange === 'SWX') return 'https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html'
   if (exchange === 'US') {
     const pe = primaryExchange || ''
     if (['NYSE','NYSEAM','ARCA','BATS'].includes(pe)) return `https://www.nyse.com/quote/XNYS:${ticker}`
@@ -67,7 +67,7 @@ function scoreClr(v?: number | null): string {
 function PriceChart({ history, days, momentum }: { history: any[]; days: number; momentum?: any }) {
   const data = history
     .map((d: any) => ({
-      date:  d.date || d.Date || '',
+      date: d.date || d.Date || '',
       close: parseFloat(d.adjusted_close || d.close || '0'),
     }))
     .filter(d => !isNaN(d.close) && d.close > 0)
@@ -90,7 +90,6 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   function toX(i: number) { return PX + (i / (data.length - 1)) * (W - 2 * PX) }
   function toY(p: number) { return PY + ((maxP - p) / range) * (H - 2 * PY) }
 
-  // Moving averages
   function ma(n: number): (number | null)[] {
     return closes.map((_, i) => {
       if (i < n - 1) return null
@@ -99,7 +98,7 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
     })
   }
 
-  const ma50  = ma(Math.min(50,  data.length))
+  const ma50 = ma(Math.min(50, data.length))
   const ma200 = ma(Math.min(200, data.length))
 
   function maPath(values: (number | null)[]): string {
@@ -115,37 +114,32 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   const pricePoints = closes.map((p, i) => `${toX(i).toFixed(1)},${toY(p).toFixed(1)}`).join(' ')
   const isUp = closes[closes.length - 1] >= closes[0]
   const c = isUp ? 'var(--green)' : 'var(--red)'
-  // Performance calcolata sul periodo selezionato (prezzi adjusted close)
   const _fb = ((closes[closes.length-1]/closes[0]-1)*100).toFixed(2)
   const _pct = (v: number | null) => v != null ? Number(v).toFixed(2) : null
   const perf = momentum
-    ? (days <= 10  ? (_pct(momentum.mom1w)  ?? _fb)
-    : days <= 40   ? (_pct(momentum.mom1m)  ?? _fb)
-    : days <= 200  ? (_pct(momentum.mom6m)  ?? _fb)
-    : days <= 400  ? (_pct(momentum.mom12m) ?? _fb)
-    : days <= 1000 ? (_pct(momentum.mom3y)  ?? _fb)
-    :                (_pct(momentum.mom5y)  ?? _fb))
+    ? (days <= 10 ? (_pct(momentum.mom1w) ?? _fb)
+    : days <= 40 ? (_pct(momentum.mom1m) ?? _fb)
+    : days <= 200 ? (_pct(momentum.mom6m) ?? _fb)
+    : days <= 400 ? (_pct(momentum.mom12m) ?? _fb)
+    : days <= 1000 ? (_pct(momentum.mom3y) ?? _fb)
+    : (_pct(momentum.mom5y) ?? _fb))
     : _fb
 
-  // Y axis labels
   const yLabels = [0, 0.25, 0.5, 0.75, 1].map(r => ({
     val: (maxP - r * range).toFixed(2),
     y: PY + r * (H - 2 * PY)
   }))
 
-  // X axis labels (dates)
   const xLabels = [0, 0.25, 0.5, 0.75, 1].map(r => {
     const idx = Math.min(Math.round(r * (data.length - 1)), data.length - 1)
     return { label: data[idx]?.date?.slice(0, 7) || '', x: toX(idx) }
   })
 
-  // Last MA values for legend
-  const lastMa50  = ma50.filter(v => v != null).pop()
+  const lastMa50 = ma50.filter(v => v != null).pop()
   const lastMa200 = ma200.filter(v => v != null).pop()
 
   return (
     <div style={{ position:'relative', background:'var(--bg2)', borderRadius:3, padding:'12px 0 4px' }}>
-      {/* Performance badge */}
       <div style={{ position:'absolute', top:12, right:16,
         fontFamily:'IBM Plex Mono', fontSize:15, fontWeight:700,
         color: isUp ? 'var(--green)' : 'var(--red)',
@@ -154,7 +148,6 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
         {isUp ? '▲' : '▼'} {parseFloat(perf) > 0 ? '+' : ''}{perf}%
       </div>
 
-      {/* Legend */}
       <div style={{ display:'flex', gap:16, paddingLeft:PX, marginBottom:8 }}>
         <span style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', color:'var(--text3)' }}>
           Price
@@ -179,46 +172,38 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
           </linearGradient>
         </defs>
 
-        {/* Grid */}
         {yLabels.map(({ y }) => (
           <line key={y} x1={PX} y1={y} x2={W - 4} y2={y}
             stroke="rgba(30,45,69,0.7)" strokeWidth="1" strokeDasharray="3,4" />
         ))}
 
-        {/* Y labels */}
         {yLabels.map(({ val, y }) => (
           <text key={val} x={PX - 4} y={y + 4} textAnchor="end" fill="var(--text4)"
             style={{ fontSize:9, fontFamily:'IBM Plex Mono' }}>{val}</text>
         ))}
 
-        {/* X labels */}
         {xLabels.map(({ label, x }) => (
           <text key={label} x={x} y={H - 4} textAnchor="middle" fill="var(--text4)"
             style={{ fontSize:9, fontFamily:'IBM Plex Mono' }}>{label}</text>
         ))}
 
-        {/* Area fill */}
         <polygon
           points={`${PX},${H - PY} ${pricePoints} ${W - PX},${H - PY}`}
           fill="url(#priceFill)" />
 
-        {/* Price line */}
         <polyline points={pricePoints} fill="none" stroke={c}
           strokeWidth="1.5" strokeLinejoin="round" />
 
-        {/* MA50 */}
         {lastMa50 && (
           <path d={maPath(ma50)} fill="none" stroke="#f59e0b"
             strokeWidth="1.2" strokeDasharray="4,2" />
         )}
 
-        {/* MA200 */}
         {lastMa200 && data.length >= 100 && (
           <path d={maPath(ma200)} fill="none" stroke="#8b5cf6"
             strokeWidth="1.2" strokeDasharray="6,3" />
         )}
 
-        {/* Last price dot */}
         <circle cx={toX(data.length - 1)} cy={toY(closes[closes.length - 1])}
           r="3.5" fill={c} stroke="var(--bg2)" strokeWidth="1.5" />
       </svg>
@@ -228,9 +213,9 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
 
 // ── MAIN PAGE ─────────────────────────────────────────────────────
 export default function StockPage() {
-  const params  = useParams()
-  const router  = useRouter()
-  const id      = (params?.id as string) || ''
+  const params = useParams()
+  const router = useRouter()
+  const id = (params?.id as string) || ''
   const [ticker, exchangeCode] = id.split('-')
 
   const [stock, setStock] = useState<any>(null)
@@ -239,14 +224,12 @@ export default function StockPage() {
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
-    // Prova prima dal DB
     fetch(`/api/db/stocks?ticker=${ticker}&exchange=${exchangeCode}`)
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d?.stocks?.[0]) {
           setStock(d.stocks[0])
         } else {
-          // Fallback a demo
           const allStocks = computeScores([...DEMO_STOCKS])
           const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
           setStock(found || null)
@@ -261,13 +244,13 @@ export default function StockPage() {
       })
   }, [ticker, exchangeCode])
 
-  const [chartDays, setChartDays]   = useState(252)
-  const [history,   setHistory]     = useState<any[]>([])
+  const [chartDays, setChartDays] = useState(252)
+  const [history, setHistory] = useState<any[]>([])
   const [momentum, setMomentum] = useState<any>(null)
-  const [loadingChart, setLoading]  = useState(true)
-  const [qty,   setQty]   = useState('')
-  const [px,    setPx]    = useState(stock?.price?.toFixed(2) || '')
-  const [pf,    setPf]    = useState('Portfolio 1')
+  const [loadingChart, setLoading] = useState(true)
+  const [qty, setQty] = useState('')
+  const [px, setPx] = useState(stock?.price?.toFixed(2) || '')
+  const [pf, setPf] = useState('Portfolio 1')
   const [added, setAdded] = useState(false)
   const [user, setUser] = useState<any>(null)
   useEffect(() => { supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null)) }, [])
@@ -314,16 +297,16 @@ export default function StockPage() {
 
   const s = stock as any
   const metrics = [
-    { label:'Price',         val: fv(stock.price, 2),    color: 'var(--text)' },
-    { label:'Mkt Cap $B',    val: stock.mktCap ? fv(stock.mktCap, 1) : '—', color: 'var(--text)' },
-    { label:'PE LTM Rank',   val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'PE NTM Rank',   val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'PB Rank',       val: s.rankPb    != null ? String(Math.round(s.rankPb))    : '—', color: s.rankPb    >= 70 ? 'var(--green)' : s.rankPb    <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'EPS Gr Rank',   val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'Rev Gr Rank',   val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'Mom 1 Week',    val: stock.mom1w  != null ? fp(stock.mom1w  * 100, 1) : '—', color: clr(stock.mom1w) },
-    { label:'Mom 1 Month',   val: stock.mom1m  != null ? fp(stock.mom1m  * 100, 1) : '—', color: clr(stock.mom1m) },
-    { label:'Mom 6 Months',  val: stock.mom6m  != null ? fp(stock.mom6m  * 100, 1) : '—', color: clr(stock.mom6m) },
+    { label:'Price', val: fv(stock.price, 2), color: 'var(--text)' },
+    { label:'Mkt Cap $B', val: stock.mktCap ? fv(stock.mktCap, 1) : '—', color: 'var(--text)' },
+    { label:'PE LTM Rank', val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'PE NTM Rank', val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'PB Rank', val: s.rankPb != null ? String(Math.round(s.rankPb)) : '—', color: s.rankPb >= 70 ? 'var(--green)' : s.rankPb <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'EPS Gr Rank', val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'Rev Gr Rank', val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'Mom 1 Week', val: stock.mom1w != null ? fp(stock.mom1w * 100, 1) : '—', color: clr(stock.mom1w) },
+    { label:'Mom 1 Month', val: stock.mom1m != null ? fp(stock.mom1m * 100, 1) : '—', color: clr(stock.mom1m) },
+    { label:'Mom 6 Months', val: stock.mom6m != null ? fp(stock.mom6m * 100, 1) : '—', color: clr(stock.mom6m) },
     { label:'Mom 12 Months', val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—', color: clr(stock.mom12m) },
   ]
 
@@ -353,7 +336,6 @@ export default function StockPage() {
         .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
       `}</style>
 
-      {/* Top nav */}
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
         padding:'0 24px', height:44, display:'flex', alignItems:'center', gap:16 }}>
         <button onClick={() => { const p = new URLSearchParams(window.location.search).get('from'); window.location.href = p ? '/?page='+p : '/' }}
@@ -382,18 +364,23 @@ export default function StockPage() {
               </span>
               <span style={{ fontSize:24, fontFamily:'IBM Plex Mono',
                 fontWeight:700, color:'var(--text)' }}>
+                {/* ── VALUTA CORRETTA PER TUTTI GLI EXCHANGE ── */}
                 {['LSE','AIM'].includes(stock.exchange) ? 'p' :
-               ['SWX'].includes(stock.exchange) ? 'CHF' :
-               ['OM','NGM'].includes(stock.exchange) ? 'kr' :
-               ['OB'].includes(stock.exchange) ? 'kr' :
-               ['CPSE'].includes(stock.exchange) ? 'kr' :
-               stock.exchange === 'US' ? 'USD' : stock.exchange === 'SWX' ? 'CHF' : stock.exchange === 'LSE' ? 'GBp' : '€'}{fv(stock.price, 2)}
+                 stock.exchange === 'SWX' ? 'CHF' :
+                 ['OM','NGM'].includes(stock.exchange) ? 'kr' :
+                 stock.exchange === 'OB' ? 'kr' :
+                 stock.exchange === 'CPSE' ? 'kr' :
+                 stock.exchange === 'US' ? 'USD' :
+                 stock.exchange === 'TSE' ? '¥' :
+                 stock.exchange === 'SEHK' ? 'HK$' :
+                 stock.exchange === 'TSX' ? 'C$' :
+                 stock.exchange === 'ASX' ? 'A$' :
+                 '€'}{fv(stock.price, 2)}
               </span>
               <span style={{ fontSize:18, fontFamily:'IBM Plex Mono', fontWeight:600,
                 color: (stock.change1d ?? 0) >= 0 ? 'var(--green)' : 'var(--red)' }}>
                 {stock.change1d != null ? fp(stock.change1d, 2) : ''}
               </span>
-
             </div>
             <div style={{ fontSize:14, color:'var(--text3)', marginTop:4 }}>
               {stock.company}
@@ -401,11 +388,11 @@ export default function StockPage() {
             <div style={{ fontSize:12, color:'var(--text4)', marginTop:2 }}>
               {stock.exchange} · {stock.sector} · {stock.country}
             </div>
- {history.length > 0 && (
- <div style={{ fontSize:11, color:'var(--text4)', marginTop:4 }}>
- Last price: {stock.last_price_date || history[history.length - 1]?.date || '-'}
- </div>
- )}
+            {history.length > 0 && (
+              <div style={{ fontSize:11, color:'var(--text4)', marginTop:4 }}>
+                Last price: {stock.last_price_date || history[history.length - 1]?.date || '-'}
+              </div>
+            )}
           </div>
           {/* Scores */}
           <div style={{ display:'flex', gap:12 }}>
@@ -424,177 +411,4 @@ export default function StockPage() {
                   fontWeight:700, color: scoreClr(val) }}>
                   {user ? fn(val) : '🔒'}
                 </div>
-                <div style={{ fontSize:9, color:'var(--text4)' }}>/ 100</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Chart */}
-        <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-          borderRadius:4, padding:16, marginBottom:16 }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
-            marginBottom:12, flexWrap:'wrap', gap:8 }}>
-            <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-              letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)' }}>
-              Price Chart · MA50 · MA200
-            </div>
-            <div style={{ display:'flex', gap:4 }}>
-              {([['1W',7],['1M',30],['6M',182],['1Y',252],['3Y',756],['5Y',1260]] as [string,number][]).map(([lbl,d]) => (
-                <button key={lbl} onClick={() => setChartDays(d)}
-                  style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                    fontSize:11, padding:'4px 12px', borderRadius:2, cursor:'pointer',
-                    border:`1px solid ${chartDays===d?'var(--orange)':'var(--border)'}`,
-                    background: chartDays===d?'var(--orange)':'transparent',
-                    color: chartDays===d?'#fff':'var(--text4)' }}>
-                  {lbl}
-                </button>
-              ))}
-            </div>
-          </div>
-          {loadingChart ? (
-            <div style={{ height:280, display:'flex', alignItems:'center',
-              justifyContent:'center', color:'var(--text4)', fontSize:13 }}>
-              Loading chart…
-            </div>
-          ) : (
-            <PriceChart history={history} days={chartDays} momentum={momentum} />
-
-          )}
-          <div style={{ display:'flex', gap:16, marginTop:8, fontSize:10,
-            fontFamily:'IBM Plex Mono', color:'var(--text4)' }}>
-            <span>―― Price</span>
-            <span style={{ color:'#f59e0b' }}>- - MA50</span>
-            <span style={{ color:'#8b5cf6' }}>- - - MA200</span>
-          </div>
-        </div>
-
-        {/* Metrics grid */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
-          {metrics.map(({ label, val, color }) => (
-            <div key={label} style={{ background:'var(--surface)', border:'1px solid var(--border)',
-              borderRadius:3, padding:'8px 12px' }}>
-              <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--text4)',
-                marginBottom:3 }}>{label}</div>
-              <div style={{ fontFamily:'IBM Plex Mono', fontWeight:600, fontSize:15, color }}>
-                {val}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Add to portfolio */}
-        <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-          borderRadius:4, padding:16 }}>
-          <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-            letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)',
-            marginBottom:12 }}>
-            Add to Portfolio
-          </div>
-          <div style={{ display:'flex', alignItems:'flex-end', gap:10, flexWrap:'wrap' }}>
-            <div>
-              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
-                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                textTransform:'uppercase' }}>Portfolio</div>
-              <select value={pf} onChange={e => setPf(e.target.value)}
-                className="input-field" style={{ width:140 }}>
-                {['Portfolio 1','Portfolio 2','Portfolio 3'].map(p => <option key={p}>{p}</option>)}
-              </select>
-            </div>
-            <div>
-              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
-                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                textTransform:'uppercase' }}>Quantity</div>
-              <input type="number" placeholder="100" value={qty}
-                onChange={e => setQty(e.target.value)}
-                className="input-field" style={{ width:90 }} />
-            </div>
-            <div>
-              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
-                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                textTransform:'uppercase' }}>Buy Price</div>
-              <input type="number" value={px}
-                onChange={e => setPx(e.target.value)}
-                className="input-field" style={{ width:100 }} />
-            </div>
-            <button onClick={handleAdd} disabled={!qty || !px || added}
-              className="btn-primary">
-              {added ? '✅ Added' : '+ Add to Portfolio'}
-            </button>
-          </div>
-          {added && (
-            <div style={{ marginTop:8, fontSize:12, color:'var(--green)' }}>
-              ✅ {stock.ticker} added to {pf}
-            </div>
-          )}
-        </div>
-
-        {/* Official links */}
-        {(() => {
-          const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
-          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
-          const companyUrl = (stock as any).website || null
-          if (!borseUrl && !companyUrl && !researchSlug && !(stock as any).yahooTicker) return null
-          return (
-            <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-              borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
-              justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
-              <div>
-                <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                  letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)',
-                  marginBottom:6 }}>Official Links</div>
-                <div style={{ fontSize:12, color:'var(--text3)', fontFamily:'IBM Plex Mono' }}>
-                  ISIN: {(stock as any).isin || "N/A"}
-                </div>
-              </div>
-              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
-                {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
-                {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
-                {(stock as any).sector && <button onClick={() => { window.location.href = `/?page=${(stock as any).exchange === 'US' ? 'northamerica' : 'screener'}&sector=${encodeURIComponent((stock as any).sector)}` }} style={{ background:'var(--surface2)', color:'var(--text3)', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, border:'1px solid var(--border)', cursor:'pointer' }}>🏭 {(stock as any).sector}</button>}
-                <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent((stock as any).yahooTicker || ticker)+'+stock' : encodeURIComponent(((stock as any).company || ticker).split(' ').slice(0,2).join(' '))}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
-                {(stock as any).yahooTicker && <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/analysis/?p=${(stock as any).yahooTicker}`} target="_blank" rel="noopener noreferrer" style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, textDecoration:'none' }}>📊 Estimates</a>}
-              </div>
-            </div>
-          )
-        })()}
-
-        {/* Company Description */}
-        {(stock as any).description && (
-         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-         borderRadius:4, padding:'16px 20px', marginBottom:12 }}>
-         <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-         letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
-         About the Company
-         </div>
-         <div style={{
-         fontSize:12, color:'var(--text3)', lineHeight:1.75, textAlign:'justify',
-         
-         overflow: showFullDesc ? 'visible' : 'hidden',
-         display: showFullDesc ? 'block' : '-webkit-box',
-         WebkitLineClamp: showFullDesc ? 'unset' : 4,
-         WebkitBoxOrient: 'vertical'
-         }}>
-         {(stock as any).description}
-         </div>
-         {(stock as any).description.length > 300 && (
-         <button onClick={() => setShowFullDesc(!showFullDesc)}
-         style={{ fontSize:11, color:'var(--orange)', background:'none', border:'none',
-         cursor:'pointer', padding:'4px 0', marginTop:4 }}>
-         {showFullDesc ? 'Show less ▲' : 'Read more ▼'}
-         </button>
-         )}
-         </div>
-        )}
-
-        {/* Disclaimer */}
-        <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
-          textAlign:'center', paddingTop:12, borderTop:'1px solid var(--border)' }}>
-          ⚠️ Data for informational purposes only · Not investment advice ·
-          Andrea Meschini · Verona, Italy · andrea@forwardalpha.pro
-        </div>
-      </div>
-    </div>
-  )
-}
+        
