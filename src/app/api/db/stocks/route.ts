@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE']
+const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM','TSE','SEHK','TSX','ASX','US']
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR']
 const FILTER_500M = new Set(['LSE','XETRA','PA','OM','SWX','MIL'])
 const TOP_100_EX = new Set(['OB','MC','AS','BR','CPSE','HE','GR'])
@@ -32,18 +32,15 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
   return all
 }
 
-// Filtro universo su dati grezzi (mkt_cap in milioni USD)
 function applyUniverseFilter(fundData: any[], stocksData: any[]) {
   const fundMap: Record<string, any> = {}
   for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
-  // Step 1: costruisce stockMap per join
   const stockMap: Record<string, any> = {}
   for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
-  // Filtra su fundData (sorgente corretta per mkt_cap)
   const filtered = fundData.filter(f => {
-    if (!stockMap[`${f.ticker}.${f.exchange}`]) return false // deve esistere in stocks
+    if (!stockMap[`${f.ticker}.${f.exchange}`]) return false
     const mktCap = f.mkt_cap ?? null
     if (NO_FILTER.has(f.exchange)) return true
     if (TOP_100_EX.has(f.exchange)) return true
@@ -51,7 +48,6 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
     return true
   }).map(f => stockMap[`${f.ticker}.${f.exchange}`])
 
-  // Step 2: top 100 per exchange nei mercati minori
   const top100Map: Record<string, any[]> = {}
   filtered.forEach(s => {
     if (s && TOP_100_EX.has(s.exchange)) {
@@ -72,6 +68,7 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
 
   return result.map(s => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
 }
+
 
 export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
@@ -129,7 +126,6 @@ export async function GET(req: NextRequest) {
       fetchAll('fundamentals', 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj', exList),
     ])
 
-    // Per US usa stocksData come fonte principale
     const isUSOnly = exList.length === 1 && exList[0] === 'US'
     let stocks: any[]
     if (isUSOnly) {
@@ -156,9 +152,11 @@ function mapStock(s: any, f: any) {
     country: s.country ?? null,
     flag: s.flag ?? null,
     website: s.website ?? null,
-    price: s.price ?? f.price ?? null,
+    price: ['TSE','SEHK','TSX','ASX'].includes(s.exchange)
+      ? (f.price ?? null)
+      : (s.price ?? f.price ?? null),
     change1d: f.change1d ?? null,
- lastPriceDate: s.last_price_date ?? null,
+    lastPriceDate: s.last_price_date ?? null,
     volume: null,
     mktCap: f.mkt_cap != null ? Math.round(f.mkt_cap / 1000 * 100) / 100 : null,
     peTrail: f.pe_trailing ?? null,
@@ -184,9 +182,10 @@ function mapStock(s: any, f: any) {
     rankEpsGr: f.rank_eps_gr ?? null,
     rankRevGr: f.rank_rev_gr ?? null,
     rankMom6Adj: f.rank_mom6_adj ?? null,
- rankMom12Adj: f.rank_mom12_adj ?? null,
- primaryExchange: s.primary_exchange ?? null,
- yahooTicker: s.yahoo_ticker ?? null,
- description: s.description ?? null,
- }
+    rankMom12Adj: f.rank_mom12_adj ?? null,
+    primaryExchange: s.primary_exchange ?? null,
+    yahooTicker: s.yahoo_ticker ?? null,
+    description: s.description ?? null,
+  }
 }
+
