@@ -19,11 +19,11 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null, prim
   if (['LSE','AIM'].includes(exchange)) return `https://www.londonstockexchange.com/stock/${ticker}/company-page`
   if (['OM','HE','CPSE','NGM'].includes(exchange)) return `https://www.nasdaq.com/european-market-activity/shares/${ticker.toLowerCase()}`
   if (exchange === 'VI' && isin) return `https://www.wienerborse.at/aktien-prime-market/${ticker.toLowerCase()}-${isin}/`
+  if (exchange === 'SWX') return 'https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html'
   if (exchange === 'TSE') { const code = ticker.padStart(4, '0'); return `https://www.jpx.co.jp/english/listing/stocks/detail/${code}/` }
   if (exchange === 'SEHK') { const code = ticker.padStart(4, '0'); return `https://www.hkex.com.hk/Market-Data/Securities-Prices/Equities?sym=${code}&sc_lang=en` }
   if (exchange === 'TSX') return `https://www.tsx.com/listings/listing-with-us/listed-company-directory/company-directory-details?ticker=${ticker}`
   if (exchange === 'ASX') return `https://www.asx.com.au/markets/company/${ticker.toLowerCase()}`
-  if (exchange === 'SWX') return 'https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html'
   if (exchange === 'US') {
     const pe = primaryExchange || ''
     if (['NYSE','NYSEAM','ARCA','BATS'].includes(pe)) return `https://www.nyse.com/quote/XNYS:${ticker}`
@@ -63,7 +63,6 @@ function scoreClr(v?: number | null): string {
   return 'var(--red)'
 }
 
-// ── PRICE CHART WITH MOVING AVERAGES ──────────────────────────────
 function PriceChart({ history, days, momentum }: { history: any[]; days: number; momentum?: any }) {
   const data = history
     .map((d: any) => ({
@@ -84,7 +83,6 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   const minP = Math.min(...closes)
   const maxP = Math.max(...closes)
   const range = maxP - minP || 1
-
   const W = 900, H = 260, PX = 52, PY = 20
 
   function toX(i: number) { return PX + (i / (data.length - 1)) * (W - 2 * PX) }
@@ -147,11 +145,8 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
         border:`1px solid ${isUp ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
         {isUp ? '▲' : '▼'} {parseFloat(perf) > 0 ? '+' : ''}{perf}%
       </div>
-
       <div style={{ display:'flex', gap:16, paddingLeft:PX, marginBottom:8 }}>
-        <span style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', color:'var(--text3)' }}>
-          Price
-        </span>
+        <span style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', color:'var(--text3)' }}>Price</span>
         {lastMa50 && (
           <span style={{ fontSize:10, fontFamily:'IBM Plex Mono', color:'#f59e0b' }}>
             MA50: {lastMa50.toFixed(2)}
@@ -163,7 +158,6 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
           </span>
         )}
       </div>
-
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width:'100%', height:280 }}>
         <defs>
           <linearGradient id="priceFill" x1="0" y1="0" x2="0" y2="1">
@@ -171,39 +165,26 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
             <stop offset="100%" stopColor={c} stopOpacity="0.01" />
           </linearGradient>
         </defs>
-
         {yLabels.map(({ y }) => (
           <line key={y} x1={PX} y1={y} x2={W - 4} y2={y}
             stroke="rgba(30,45,69,0.7)" strokeWidth="1" strokeDasharray="3,4" />
         ))}
-
         {yLabels.map(({ val, y }) => (
           <text key={val} x={PX - 4} y={y + 4} textAnchor="end" fill="var(--text4)"
             style={{ fontSize:9, fontFamily:'IBM Plex Mono' }}>{val}</text>
         ))}
-
         {xLabels.map(({ label, x }) => (
           <text key={label} x={x} y={H - 4} textAnchor="middle" fill="var(--text4)"
             style={{ fontSize:9, fontFamily:'IBM Plex Mono' }}>{label}</text>
         ))}
-
-        <polygon
-          points={`${PX},${H - PY} ${pricePoints} ${W - PX},${H - PY}`}
-          fill="url(#priceFill)" />
-
-        <polyline points={pricePoints} fill="none" stroke={c}
-          strokeWidth="1.5" strokeLinejoin="round" />
-
+        <polygon points={`${PX},${H - PY} ${pricePoints} ${W - PX},${H - PY}`} fill="url(#priceFill)" />
+        <polyline points={pricePoints} fill="none" stroke={c} strokeWidth="1.5" strokeLinejoin="round" />
         {lastMa50 && (
-          <path d={maPath(ma50)} fill="none" stroke="#f59e0b"
-            strokeWidth="1.2" strokeDasharray="4,2" />
+          <path d={maPath(ma50)} fill="none" stroke="#f59e0b" strokeWidth="1.2" strokeDasharray="4,2" />
         )}
-
         {lastMa200 && data.length >= 100 && (
-          <path d={maPath(ma200)} fill="none" stroke="#8b5cf6"
-            strokeWidth="1.2" strokeDasharray="6,3" />
+          <path d={maPath(ma200)} fill="none" stroke="#8b5cf6" strokeWidth="1.2" strokeDasharray="6,3" />
         )}
-
         <circle cx={toX(data.length - 1)} cy={toY(closes[closes.length - 1])}
           r="3.5" fill={c} stroke="var(--bg2)" strokeWidth="1.5" />
       </svg>
@@ -211,7 +192,6 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   )
 }
 
-// ── MAIN PAGE ─────────────────────────────────────────────────────
 export default function StockPage() {
   const params = useParams()
   const router = useRouter()
@@ -350,8 +330,6 @@ export default function StockPage() {
       </div>
 
       <div style={{ maxWidth:1100, margin:'0 auto', padding:'24px 16px' }}>
-
-        {/* Stock header */}
         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
           borderLeft:'4px solid var(--orange)', borderRadius:4, padding:'16px 20px',
           marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -364,7 +342,6 @@ export default function StockPage() {
               </span>
               <span style={{ fontSize:24, fontFamily:'IBM Plex Mono',
                 fontWeight:700, color:'var(--text)' }}>
-                {/* ── VALUTA CORRETTA PER TUTTI GLI EXCHANGE ── */}
                 {['LSE','AIM'].includes(stock.exchange) ? 'p' :
                  stock.exchange === 'SWX' ? 'CHF' :
                  ['OM','NGM'].includes(stock.exchange) ? 'kr' :
@@ -382,9 +359,7 @@ export default function StockPage() {
                 {stock.change1d != null ? fp(stock.change1d, 2) : ''}
               </span>
             </div>
-            <div style={{ fontSize:14, color:'var(--text3)', marginTop:4 }}>
-              {stock.company}
-            </div>
+            <div style={{ fontSize:14, color:'var(--text3)', marginTop:4 }}>{stock.company}</div>
             <div style={{ fontSize:12, color:'var(--text4)', marginTop:2 }}>
               {stock.exchange} · {stock.sector} · {stock.country}
             </div>
@@ -394,7 +369,6 @@ export default function StockPage() {
               </div>
             )}
           </div>
-          {/* Scores */}
           <div style={{ display:'flex', gap:12 }}>
             {[
               { label:'Value Score', val: stock.valueScore },
@@ -411,4 +385,169 @@ export default function StockPage() {
                   fontWeight:700, color: scoreClr(val) }}>
                   {user ? fn(val) : '🔒'}
                 </div>
-        
+                <div style={{ fontSize:9, color:'var(--text4)' }}>/ 100</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+          borderRadius:4, padding:16, marginBottom:16 }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
+            marginBottom:12, flexWrap:'wrap', gap:8 }}>
+            <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)' }}>
+              Price Chart · MA50 · MA200
+            </div>
+            <div style={{ display:'flex', gap:4 }}>
+              {([['1W',7],['1M',30],['6M',182],['1Y',252],['3Y',756],['5Y',1260]] as [string,number][]).map(([lbl,d]) => (
+                <button key={lbl} onClick={() => setChartDays(d)}
+                  style={{ fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                    fontSize:11, padding:'4px 12px', borderRadius:2, cursor:'pointer',
+                    border:`1px solid ${chartDays===d?'var(--orange)':'var(--border)'}`,
+                    background: chartDays===d?'var(--orange)':'transparent',
+                    color: chartDays===d?'#fff':'var(--text4)' }}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
+          </div>
+          {loadingChart ? (
+            <div style={{ height:280, display:'flex', alignItems:'center',
+              justifyContent:'center', color:'var(--text4)', fontSize:13 }}>
+              Loading chart…
+            </div>
+          ) : (
+            <PriceChart history={history} days={chartDays} momentum={momentum} />
+          )}
+          <div style={{ display:'flex', gap:16, marginTop:8, fontSize:10,
+            fontFamily:'IBM Plex Mono', color:'var(--text4)' }}>
+            <span>―― Price</span>
+            <span style={{ color:'#f59e0b' }}>- - MA50</span>
+            <span style={{ color:'#8b5cf6' }}>- - - MA200</span>
+          </div>
+        </div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
+          {metrics.map(({ label, val, color }) => (
+            <div key={label} style={{ background:'var(--surface)', border:'1px solid var(--border)',
+              borderRadius:3, padding:'8px 12px' }}>
+              <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--text4)',
+                marginBottom:3 }}>{label}</div>
+              <div style={{ fontFamily:'IBM Plex Mono', fontWeight:600, fontSize:15, color }}>
+                {val}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+          borderRadius:4, padding:16 }}>
+          <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+            letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)',
+            marginBottom:12 }}>
+            Add to Portfolio
+          </div>
+          <div style={{ display:'flex', alignItems:'flex-end', gap:10, flexWrap:'wrap' }}>
+            <div>
+              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                textTransform:'uppercase' }}>Portfolio</div>
+              <select value={pf} onChange={e => setPf(e.target.value)}
+                className="input-field" style={{ width:140 }}>
+                {['Portfolio 1','Portfolio 2','Portfolio 3'].map(p => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+            <div>
+              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                textTransform:'uppercase' }}>Quantity</div>
+              <input type="number" placeholder="100" value={qty}
+                onChange={e => setQty(e.target.value)}
+                className="input-field" style={{ width:90 }} />
+            </div>
+            <div>
+              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
+                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                textTransform:'uppercase' }}>Buy Price</div>
+              <input type="number" value={px}
+                onChange={e => setPx(e.target.value)}
+                className="input-field" style={{ width:100 }} />
+            </div>
+            <button onClick={handleAdd} disabled={!qty || !px || added} className="btn-primary">
+              {added ? '✅ Added' : '+ Add to Portfolio'}
+            </button>
+          </div>
+          {added && (
+            <div style={{ marginTop:8, fontSize:12, color:'var(--green)' }}>
+              ✅ {stock.ticker} added to {pf}
+            </div>
+          )}
+        </div>
+
+        {(() => {
+          const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
+          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
+          const companyUrl = (stock as any).website || null
+          if (!borseUrl && !companyUrl && !researchSlug && !(stock as any).yahooTicker) return null
+          return (
+            <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+              borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
+              justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+              <div>
+                <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                  letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)',
+                  marginBottom:6 }}>Official Links</div>
+                <div style={{ fontSize:12, color:'var(--text3)', fontFamily:'IBM Plex Mono' }}>
+                  ISIN: {(stock as any).isin || "N/A"}
+                </div>
+              </div>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
+                {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
+                {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
+                {(stock as any).sector && <button onClick={() => { window.location.href = `/?page=${(stock as any).exchange === 'US' ? 'northamerica' : 'screener'}&sector=${encodeURIComponent((stock as any).sector)}` }} style={{ background:'var(--surface2)', color:'var(--text3)', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, border:'1px solid var(--border)', cursor:'pointer' }}>🏭 {(stock as any).sector}</button>}
+                <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent((stock as any).yahooTicker || ticker)+'+stock' : encodeURIComponent(((stock as any).company || ticker).split(' ').slice(0,2).join(' '))}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
+                {(stock as any).yahooTicker && <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/analysis/?p=${(stock as any).yahooTicker}`} target="_blank" rel="noopener noreferrer" style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, textDecoration:'none' }}>📊 Estimates</a>}
+              </div>
+            </div>
+          )
+        })()}
+
+        {(stock as any).description && (
+          <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+            borderRadius:4, padding:'16px 20px', marginBottom:12 }}>
+            <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
+              About the Company
+            </div>
+            <div style={{
+              fontSize:12, color:'var(--text3)', lineHeight:1.75, textAlign:'justify',
+              overflow: showFullDesc ? 'visible' : 'hidden',
+              display: showFullDesc ? 'block' : '-webkit-box',
+              WebkitLineClamp: showFullDesc ? 'unset' : 4,
+              WebkitBoxOrient: 'vertical'
+            }}>
+              {(stock as any).description}
+            </div>
+            {(stock as any).description.length > 300 && (
+              <button onClick={() => setShowFullDesc(!showFullDesc)}
+                style={{ fontSize:11, color:'var(--orange)', background:'none', border:'none',
+                  cursor:'pointer', padding:'4px 0', marginTop:4 }}>
+                {showFullDesc ? 'Show less ▲' : 'Read more ▼'}
+              </button>
+            )}
+          </div>
+        )}
+
+        <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
+          textAlign:'center', paddingTop:12, borderTop:'1px solid var(--border)' }}>
+          ⚠️ Data for informational purposes only · Not investment advice ·
+          Andrea Meschini · Verona, Italy · andrea@forwardalpha.pro
+        </div>
+      </div>
+    </div>
+  )
+}
+
