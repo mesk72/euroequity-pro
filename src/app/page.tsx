@@ -729,7 +729,13 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       const q = search.toLowerCase()
       if (!s.ticker.toLowerCase().includes(q) && !(s.company || '').toLowerCase().includes(q)) return false
     }
-    if (sector !== 'All' && s.sector !== sector) return false
+    if (sector !== 'All') {
+      if (sector === 'Other') {
+        if (s.sector && s.sector !== 'Other') return false
+      } else {
+        if (s.sector !== sector) return false
+      }
+    }
     if (initEpsMom === 'epsMomPos' && (s.epsMom30d == null || s.epsMom30d <= 0)) return false
     if (initEpsMom === 'epsMomNeg' && (s.epsMom30d == null || s.epsMom30d >= 0)) return false
     if (mom6Min > 0 && (s.mom6m || 0) < mom6Min) return false
