@@ -78,13 +78,12 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
   const stockMap: Record<string, any> = {}
   for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
-  // Restituisce TUTTI i titoli con mkt_cap, escludendo settori 71-77 e G6M
+  // Restituisce TUTTI i titoli, escludendo settori 71-77 e G6M
   // Il frontend ordina per mktCap e mostra top N tramite maxRows
   return fundData
     .filter(f => {
       const s = stockMap[`${f.ticker}.${f.exchange}`]
       if (!s) return false
-      if (f.mkt_cap == null) return false
       if (s.sector && ['71','72','73','74','75','76','77'].includes(s.sector)) return false
       if (s.ticker === 'G6M' && s.exchange === 'ASX') return false
       return true
