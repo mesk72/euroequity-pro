@@ -74,23 +74,24 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
 
 
 function applyAPACFilter(fundData: any[], stocksData: any[]) {
-  // Costruisci mappa da fundamentals
-  const fundMap: Record<string, any> = {}
-  for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
+  // stockMap da stocks - ha company e sector
+  const stockMap: Record<string, any> = {}
+  for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
   // Top N per exchange ordinati per mktCap
   const TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, ASX: 350, TSX: 400, US: 2000 }
   const EXCL_SECTORS = new Set(['71','72','73','74','75','76','77'])
 
-  // Itera su STOCKS (che ha company e sector) e unisci con fundamentals
+  // Itera su fundData (tutti i titoli con rank)
+  // prende company/sector da stockMap
   const byExchange: Record<string, any[]> = {}
-  for (const s of stocksData) {
-    if (s.sector && EXCL_SECTORS.has(s.sector)) continue
-    if (s.ticker === 'G6M' && s.exchange === 'ASX') continue
-    const f = fundMap[`${s.ticker}.${s.exchange}`]
-    if (!f) continue  // solo titoli che hanno dati fondamentali
-    if (!byExchange[s.exchange]) byExchange[s.exchange] = []
-    byExchange[s.exchange].push({ s, f, mktCap: f.mkt_cap ?? 0 })
+  for (const f of fundData) {
+    if (f.ticker === 'G6M' && f.exchange === 'ASX') continue
+    const s = stockMap[`${f.ticker}.${f.exchange}`] || {}
+    const sector = s.sector ?? null
+    if (sector && EXCL_SECTORS.has(sector)) continue
+    if (!byExchange[f.exchange]) byExchange[f.exchange] = []
+    byExchange[f.exchange].push({ f, s, mktCap: f.mkt_cap ?? 0 })
   }
 
   const result: any[] = []
@@ -99,8 +100,22 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
     const sorted = items
       .sort((a, b) => b.mktCap - a.mktCap)
       .slice(0, topN)
-    for (const { s, f } of sorted) {
-      result.push(mapStock(s, f))
+    for (const { f, s } of sorted) {
+      // Costruisce stock con company/sector da stocks
+      const stockRecord = {
+        ticker: f.ticker,
+        exchange: f.exchange,
+        isin: s.isin ?? null,
+        company: s.company ?? null,
+        sector: s.sector ?? null,
+        country: s.country ?? null,
+        flag: s.flag ?? null,
+        website: s.website ?? null,
+        primary_exchange: s.primary_exchange ?? null,
+        yahoo_ticker: s.yahoo_ticker ?? null,
+        description: s.description ?? null,
+      }
+      result.push(mapStock(stockRecord, f))
     }
   }
   return result
