@@ -97,8 +97,8 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
       .sort((a, b) => (b.mkt_cap ?? 0) - (a.mkt_cap ?? 0))
       .slice(0, topN)
     for (const f of sorted) {
-      const s = stockMap[`${f.ticker}.${f.exchange}`] || {}
-      result.push(mapStock({ ...s, ticker: f.ticker, exchange: f.exchange }, f))
+      const s = stockMap[`${f.ticker}.${f.exchange}`] || { ticker: f.ticker, exchange: f.exchange }
+      result.push(mapStock(s, f))
     }
   }
   return result
