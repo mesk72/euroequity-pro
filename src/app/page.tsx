@@ -748,24 +748,35 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     <div className="space-y-3 p-3">
       {/* Exchange tabs */}
       <div className="flex gap-1.5 flex-wrap pb-1">
-        <button onClick={() => setExchange('EZ')}
-          className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === 'EZ' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
-          All Europe
-        </button>
-        <button onClick={() => setExchange('EMU')}
-          className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === 'EMU' ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
-          Eurozone
-        </button>
-        {Object.entries(EXCHANGES).map(([code, meta]) => (
+        {[
+          { code: 'US,TSX',        label: '🌎 North America' },
+          { code: 'EZ',            label: '🌍 All Europe' },
+          { code: 'EMU',           label: '🇪🇺 Eurozone' },
+          { code: 'TSE,SEHK,ASX', label: '🌏 Asia Pacific' },
+          { code: 'MIL',           label: '🇮🇹 Italy' },
+          { code: 'XETRA',         label: '🇩🇪 Germany' },
+          { code: 'PA',            label: '🇫🇷 France' },
+          { code: 'AS',            label: '🇳🇱 Netherlands' },
+          { code: 'MC',            label: '🇪🇸 Spain' },
+          { code: 'BR',            label: '🇧🇪 Belgium' },
+          { code: 'LS',            label: '🇵🇹 Portugal' },
+          { code: 'VI',            label: '🇦🇹 Austria' },
+          { code: 'HE',            label: '🇫🇮 Finland' },
+          { code: 'IR',            label: '🇮🇪 Ireland' },
+          { code: 'LSE',           label: '🇬🇧 UK (LSE)' },
+          { code: 'SWX',           label: '🇨🇭 Switzerland' },
+          { code: 'OM',            label: '🇸🇪 Sweden' },
+          { code: 'OB',            label: '🇳🇴 Norway' },
+          { code: 'CPSE',          label: '🇩🇰 Denmark' },
+          { code: 'US',            label: '🇺🇸 United States' },
+          { code: 'TSX',           label: '🇨🇦 Canada' },
+          { code: 'TSE',           label: '🇯🇵 Japan' },
+          { code: 'SEHK',          label: '🇭🇰 Hong Kong' },
+          { code: 'ASX',           label: '🇦🇺 Australia' },
+        ].map(({ code, label }) => (
           <button key={code} onClick={() => setExchange(code)}
             className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === code ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
-            {(meta as any).flag} {(meta as any).label}
-          </button>
-        ))}
-        {Object.entries(EXCHANGES_EXEMU).map(([code, meta]) => (
-          <button key={code} onClick={() => setExchange(code)}
-            className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === code ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
-            {(meta as any).flag} {(meta as any).label}
+            {label}
           </button>
         ))}
       </div>
@@ -1886,30 +1897,29 @@ export default function App() {
   const singleMarkets = [
     { id: 'myscreen' as Page, label: '⭐ My Screen' },
     { id: 'northamerica' as Page, label: '🌎 North America' },
-    { id: 'usscreen' as Page, label: '🇺🇸 United States' },
-    { id: 'TSX' as Page, label: '🇨🇦 Canada' },
     { id: 'screener' as Page, label: '🌍 All Europe' },
     { id: 'eurozone' as Page, label: '🇪🇺 Eurozone' },
     { id: 'asiapacific' as Page, label: '🌏 Asia Pacific' },
-    { id: 'TSE' as Page, label: '🇯🇵 Japan' },
-    { id: 'SEHK' as Page, label: '🇭🇰 Hong Kong' },
     { id: 'ASX' as Page, label: '🇦🇺 Australia' },
     { id: 'VI' as Page, label: '🇦🇹 Austria' },
     { id: 'BR' as Page, label: '🇧🇪 Belgium' },
+    { id: 'TSX' as Page, label: '🇨🇦 Canada' },
     { id: 'CPSE' as Page, label: '🇩🇰 Denmark' },
     { id: 'HE' as Page, label: '🇫🇮 Finland' },
     { id: 'PA' as Page, label: '🇫🇷 France' },
     { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
-   
+    { id: 'SEHK' as Page, label: '🇭🇰 Hong Kong' },
     { id: 'IR' as Page, label: '🇮🇪 Ireland' },
     { id: 'MIL' as Page, label: '🇮🇹 Italy' },
+    { id: 'TSE' as Page, label: '🇯🇵 Japan' },
     { id: 'AS' as Page, label: '🇳🇱 Netherlands' },
     { id: 'OB' as Page, label: '🇳🇴 Norway' },
     { id: 'LS' as Page, label: '🇵🇹 Portugal' },
     { id: 'MC' as Page, label: '🇪🇸 Spain' },
-    { id: 'SWX' as Page, label: '🇨🇭 Switzerland' },
     { id: 'OM' as Page, label: '🇸🇪 Sweden' },
+    { id: 'SWX' as Page, label: '🇨🇭 Switzerland' },
     { id: 'LSE' as Page, label: '🇬🇧 UK (LSE)' },
+    { id: 'usscreen' as Page, label: '🇺🇸 United States' },
   ]
   const externalNav: {href:string,label:string}[] = []
 
