@@ -78,27 +78,18 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
   const stockMap: Record<string, any> = {}
   for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
-  // Per ogni exchange presente nei dati prendi top N per mktCap con company e sector
-  const presentExchanges = new Set(fundData.map(f => f.exchange))
-  const result: any[] = []
-  for (const [ex, topN] of Object.entries(APAC_TOP_N)) {
-    if (!presentExchanges.has(ex)) continue
-    const exFunds = fundData
-      .filter(f => f.exchange === ex)
-      .map(f => {
-        const s = stockMap[`${f.ticker}.${f.exchange}`]
-        return { f, s, mktCap: f.mkt_cap ?? 0 }
-      })
-      .filter(({ s }) => s
-        && !(s.sector && ['71','72','73','74','75','76','77'].includes(s.sector))
-        && !(s.ticker === 'G6M' && s.exchange === 'ASX'))
-      .sort((a, b) => b.mktCap - a.mktCap)
-      .slice(0, topN)
-    for (const { f, s } of exFunds) {
-      result.push(mapStock(s, f))
-    }
-  }
-  return result
+  // Restituisce TUTTI i titoli con mkt_cap, escludendo settori 71-77 e G6M
+  // Il frontend ordina per mktCap e mostra top N tramite maxRows
+  return fundData
+    .filter(f => {
+      const s = stockMap[`${f.ticker}.${f.exchange}`]
+      if (!s) return false
+      if (f.mkt_cap == null) return false
+      if (s.sector && ['71','72','73','74','75','76','77'].includes(s.sector)) return false
+      if (s.ticker === 'G6M' && s.exchange === 'ASX') return false
+      return true
+    })
+    .map(f => mapStock(stockMap[`${f.ticker}.${f.exchange}`], f))
 }
 
 export async function GET(req: NextRequest) {
