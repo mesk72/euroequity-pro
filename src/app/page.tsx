@@ -1421,7 +1421,14 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
     setLoading(true)
     // Carica da tutti gli exchange - EMU + ex-EMU
     apiExchange('US').then(stocks => {
-      setAllStocks(stocks)
+      const seen = new Set()
+      const deduped = stocks.filter((s: any) => {
+        const key = `${s.ticker}.${s.exchange}`
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+      setAllStocks(deduped)
       setLoading(false)
     })
 
