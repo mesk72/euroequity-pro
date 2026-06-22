@@ -196,17 +196,28 @@ export async function GET(req: NextRequest) {
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj'
 
-    // Per APAC e North America usa fetchAllByExchange per leggere stocks uno exchange alla volta
-    // Questo evita il limite di 1000 righe miste e i duplicati
-    const needsByExchange = exList.some(e => ['TSE','SEHK','TSX','ASX'].includes(e)) || isMultiNorthAmerica
+    // stocks: usa fetchAllByExchange solo per APAC puro (non US, non misto)
+    // US e North America usano fetchAll normale per evitare duplicati
+    const isAPACPure = exList.every(e => ['TSE','SEHK','TSX','ASX'].includes(e))
+
     const [stocksData, fundData] = await Promise.all([
-      needsByExchange
+      isAPACPure
         ? fetchAllByExchange('stocks', stocksSelect, exList)
         : fetchAll('stocks', stocksSelect, exList),
-      needsByExchange
+      isAPACPure
         ? fetchAllByExchange('fundamentals', fundSelect, exList)
         : fetchAll('fundamentals', fundSelect, exList),
     ])
+
+    // Per North America (US+TSX): leggi stocks US e TSX separatamente e unisci
+    let stocksDataFinal = stocksData
+    if (isMultiNorthAmerica) {
+      const [usStocks, tsxStocks] = await Promise.all([
+        fetchAllByExchange('stocks', stocksSelect, ['US']),
+        fetchAllByExchange('stocks', stocksSelect, ['TSX']),
+      ])
+      stocksDataFinal = [...usStocks, ...tsxStocks]
+    }
 
     let stocks: any[]
     if (isUSOnly) {
@@ -214,7 +225,7 @@ export async function GET(req: NextRequest) {
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
     } else if (hasAPAC || isMultiNorthAmerica) {
-      stocks = applyAPACFilter(fundData, stocksData)
+      stocks = applyAPACFilter(fundData, stocksDataFinal)
     } else {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
