@@ -76,17 +76,32 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
   const stockMap: Record<string, any> = {}
   for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
-  // Identico a US: restituisce TUTTI i titoli in fundamentals
-  // escludendo solo settori 71-77 e G6M
-  return fundData
-    .map(f => {
+  // Top N per exchange ordinati per mktCap
+  const TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, ASX: 350, TSX: 400, US: 2000 }
+  const EXCL_SECTORS = new Set(['71','72','73','74','75','76','77'])
+
+  const byExchange: Record<string, any[]> = {}
+  for (const f of fundData) {
+    const s = stockMap[`${f.ticker}.${f.exchange}`] || {}
+    const sector = s.sector ?? null
+    if (sector && EXCL_SECTORS.has(sector)) continue
+    if (f.ticker === 'G6M' && f.exchange === 'ASX') continue
+    if (!byExchange[f.exchange]) byExchange[f.exchange] = []
+    byExchange[f.exchange].push(f)
+  }
+
+  const result: any[] = []
+  for (const [ex, funds] of Object.entries(byExchange)) {
+    const topN = TOP_N[ex] ?? 9999
+    const sorted = funds
+      .sort((a, b) => (b.mkt_cap ?? 0) - (a.mkt_cap ?? 0))
+      .slice(0, topN)
+    for (const f of sorted) {
       const s = stockMap[`${f.ticker}.${f.exchange}`] || {}
-      const sector = s.sector ?? null
-      if (sector && ['71','72','73','74','75','76','77'].includes(sector)) return null
-      if (f.ticker === 'G6M' && f.exchange === 'ASX') return null
-      return mapStock({ ...s, ticker: f.ticker, exchange: f.exchange }, f)
-    })
-    .filter(Boolean)
+      result.push(mapStock({ ...s, ticker: f.ticker, exchange: f.exchange }, f))
+    }
+  }
+  return result
 }
 
 export async function GET(req: NextRequest) {
