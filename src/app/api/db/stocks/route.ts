@@ -26,6 +26,7 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
       .select(select)
       .in('exchange', exchangeList)
       .range(from, from + PAGE - 1)
+      .limit(PAGE)
     if (error || !data || data.length === 0) break
     all = all.concat(data)
     if (data.length < PAGE) break
@@ -193,11 +194,11 @@ export async function GET(req: NextRequest) {
 
 function mapStock(s: any, f: any) {
   return {
-    ticker: s.ticker,
-    exchange: s.exchange,
+    ticker: s.ticker ?? f.ticker,
+    exchange: s.exchange ?? f.exchange,
     isin: s.isin ?? null,
-    company: s.company ?? null,
-    sector: s.sector ?? null,
+    company: s.company ?? f.company ?? null,
+    sector: s.sector ?? f.sector ?? null,
     country: s.country ?? null,
     flag: s.flag ?? null,
     website: s.website ?? null,
