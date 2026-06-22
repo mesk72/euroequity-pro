@@ -2168,7 +2168,6 @@ export default function App() {
   const singleMarkets = [
     { id: 'myscreen' as Page, label: '⭐ My Screen' },
     { id: 'nascreen' as Page, label: '🌎 North America' },
-    { id: 'northamerica' as Page, label: '📊 Dashboard US' },
     { id: 'screener' as Page, label: '🌍 All Europe' },
     { id: 'eurozone' as Page, label: '🇪🇺 Eurozone' },
     { id: 'asiapacific' as Page, label: '🌏 Asia Pacific' },
@@ -2345,8 +2344,6 @@ export default function App() {
             ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
-          {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
-          {page === 'nascreen' && <Screener key="nascreen" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
           {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
           {page === 'nascreen' && <Screener key="nascreen" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
           {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { setPage('asiapacific') }} onSelectStock={setDetailStock} />}
