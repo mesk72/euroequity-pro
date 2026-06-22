@@ -196,13 +196,16 @@ export async function GET(req: NextRequest) {
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj'
 
-    const APAC_EX2 = new Set(['TSE','SEHK','TSX','ASX'])
-    const isAPACReq = exList.some(e => APAC_EX2.has(e))
+    // Per APAC e North America usa fetchAllByExchange per leggere stocks uno exchange alla volta
+    // Questo evita il limite di 1000 righe miste e i duplicati
+    const needsByExchange = exList.some(e => ['TSE','SEHK','TSX','ASX'].includes(e)) || isMultiNorthAmerica
     const [stocksData, fundData] = await Promise.all([
-      isAPACReq
+      needsByExchange
         ? fetchAllByExchange('stocks', stocksSelect, exList)
         : fetchAll('stocks', stocksSelect, exList),
-      fetchAll('fundamentals', fundSelect, exList),
+      needsByExchange
+        ? fetchAllByExchange('fundamentals', fundSelect, exList)
+        : fetchAll('fundamentals', fundSelect, exList),
     ])
 
     let stocks: any[]
