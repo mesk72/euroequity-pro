@@ -1926,6 +1926,7 @@ export default function App() {
   const [scrExchange, setScrExchange] = useState('MIL')
   const [scrSector,   setScrSector]   = useState('All')
   const [scrSectorUS, setScrSectorUS] = useState('All')
+  const [scrSectorAP, setScrSectorAP] = useState('All')
   const [scrEpsMom,   setScrEpsMom]   = useState<string>('')
   const [detailStock, setDetailStock] = useState<Stock | null>(null)
 
@@ -2166,7 +2167,7 @@ export default function App() {
           )}
           {page === 'northamerica' && <Screener key={'northamerica-'+scrSectorUS} initExchange='US' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
-          {page === 'asiapacific' && <Screener key="asiapacific" initExchange="TSE,SEHK,ASX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
+          {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
           {page === 'TSE' && <Screener key="TSE" initExchange="TSE" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={300} />}
           {page === 'SEHK' && <Screener key="SEHK" initExchange="SEHK" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={250} />}
           {page === 'TSX' && <Screener key="TSX" initExchange="TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={200} />}
@@ -2187,7 +2188,7 @@ export default function App() {
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
           {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); setPage('northamerica') }} />}
-          {page === 'sectors_ap' && <SectorScreenAP onSectorClick={() => { setPage('asiapacific') }} />}
+          {page === 'sectors_ap' && <SectorScreenAP onSectorClick={(s) => { setScrSectorAP(s); setPage('asiapacific') }} />}
           {page === 'about' && (
             <div className="flex-1 overflow-y-auto">
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
