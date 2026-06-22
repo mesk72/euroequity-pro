@@ -2346,6 +2346,8 @@ export default function App() {
           )}
           {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
           {page === 'nascreen' && <Screener key="nascreen" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
+          {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
+          {page === 'nascreen' && <Screener key="nascreen" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
           {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { setPage('asiapacific') }} onSelectStock={setDetailStock} />}
           {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
           {page === 'TSE' && <Screener key="TSE" initExchange="TSE" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={300} />}
