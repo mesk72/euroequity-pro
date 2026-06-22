@@ -83,12 +83,12 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
   const TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, ASX: 350, TSX: 400, US: 2000 }
   const EXCL_SECTORS = new Set(['71','72','73','74','75','76','77'])
 
-  // Identico a EU: filtra fundData, restituisce oggetti da stocks con dati da fundamentals
+  // Filtra fundData - NON esclude se non in stockMap
   const filtered = fundData.filter(f => {
     if (f.ticker === 'G6M' && f.exchange === 'ASX') return false
     const s = stockMap[`${f.ticker}.${f.exchange}`]
-    if (!s) return false
-    if (s.sector && EXCL_SECTORS.has(s.sector)) return false
+    const sector = s?.sector ?? null
+    if (sector && EXCL_SECTORS.has(sector)) return false
     return true
   })
 
@@ -105,9 +105,8 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
     const sorted = funds
       .sort((a, b) => (b.mkt_cap ?? 0) - (a.mkt_cap ?? 0))
       .slice(0, topN)
-    // Come EU: usa stockMap per avere company/sector, fundMap per rank/prezzi
     for (const f of sorted) {
-      const s = stockMap[`${f.ticker}.${f.exchange}`]
+      const s = stockMap[`${f.ticker}.${f.exchange}`] || { ticker: f.ticker, exchange: f.exchange }
       result.push(mapStock(s, f))
     }
   }
