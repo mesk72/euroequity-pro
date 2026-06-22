@@ -16,6 +16,28 @@ const NO_FILTER = new Set(['VI','IR','LS'])
 // APAC + North America: top N per market cap, solo titoli con company e sector
 const APAC_TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, TSX: 400, ASX: 350, US: 2000 }
 
+async function fetchAllByExchange(table: string, select: string, exchangeList: string[]) {
+  // Legge un exchange alla volta per evitare il limite di 1000 righe miste
+  const all: any[] = []
+  for (const exchange of exchangeList) {
+    const PAGE = 1000
+    let from = 0
+    while (true) {
+      const { data, error } = await supabase
+        .from(table)
+        .select(select)
+        .eq('exchange', exchange)
+        .range(from, from + PAGE - 1)
+        .limit(PAGE)
+      if (error || !data || data.length === 0) break
+      all.push(...data)
+      if (data.length < PAGE) break
+      from += PAGE
+    }
+  }
+  return all
+}
+
 async function fetchAll(table: string, select: string, exchangeList: string[]) {
   const PAGE = 1000
   let all: any[] = []
@@ -174,8 +196,12 @@ export async function GET(req: NextRequest) {
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj'
 
+    const APAC_EX2 = new Set(['TSE','SEHK','TSX','ASX'])
+    const isAPACReq = exList.some(e => APAC_EX2.has(e))
     const [stocksData, fundData] = await Promise.all([
-      fetchAll('stocks', stocksSelect, exList),
+      isAPACReq
+        ? fetchAllByExchange('stocks', stocksSelect, exList)
+        : fetchAll('stocks', stocksSelect, exList),
       fetchAll('fundamentals', fundSelect, exList),
     ])
 
