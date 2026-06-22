@@ -1856,13 +1856,9 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
   }, [])
 
   const stocksAP = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
-  const VALID_SECTORS = new Set(['Technology','Financials','Health Care',
-    'Consumer Discretionary','Industrials','Communication Services',
-    'Consumer Staples','Energy','Materials','Real Estate','Utilities'])
-  const stocksAPvalid = stocksAP.filter(s => s.sector && VALID_SECTORS.has(s.sector))
   const sectorMap: Record<string, any[]> = {}
-  for (const s of stocksAPvalid) {
-    const sec = s.sector!
+  for (const s of stocksAP) {
+    const sec = s.sector || 'Other'
     if (!sectorMap[sec]) sectorMap[sec] = []
     sectorMap[sec].push(s)
   }
@@ -1899,11 +1895,11 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
       ) : (
         <>
           <div className="bg-surface border border-border rounded-lg p-4">
-            <SectorHeatmap stocks={stocksAPvalid} onSectorClick={onSectorClick} />
+            <SectorHeatmap stocks={stocksAP} onSectorClick={onSectorClick} />
           </div>
           <div className="bg-surface border border-border rounded-lg overflow-hidden">
             <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border text-gold">
-              Sector Aggregates - Asia Pacific ({stocksAPvalid.length} stocks)
+              Sector Aggregates - Asia Pacific ({stocksAP.length} stocks)
             </div>
             <div className="overflow-x-auto">
               <table className="data-table w-full">
