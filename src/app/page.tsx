@@ -98,7 +98,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -1675,6 +1675,177 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
 
 
 // - LOGIN GATE -
+const INDICES_AP = [
+  { ticker: '^N225',  name: 'Nikkei 225' },
+  { ticker: '^TOPX',  name: 'TOPIX' },
+  { ticker: '^HSI',   name: 'Hang Seng' },
+  { ticker: '^AXJO',  name: 'ASX 200' },
+]
+
+function DashboardAP({ onSectorClick, onSelectStock }: {
+  onSectorClick: (s: string) => void
+  onSelectStock?: (s: Stock) => void
+}) {
+  const [indices,   setIndices]   = useState<any[]>([])
+  const [allStocks, setAllStocks] = useState<Stock[]>([])
+  const [loading,   setLoading]   = useState(true)
+  const [search,    setSearch]    = useState('')
+  const [searchRes, setSearchRes] = useState<any[]>([])
+  const searchTimer = useRef<any>(null)
+
+  useEffect(() => {
+    const loadIndices = () => apiIndices().then(setIndices)
+    loadIndices()
+    const timer = setInterval(loadIndices, 60000)
+    setLoading(true)
+    apiExchange('TSE,SEHK,ASX').then(stocks => { setAllStocks(stocks); setLoading(false) })
+    return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    clearTimeout(searchTimer.current)
+    if (search.length < 2) { setSearchRes([]); return }
+    searchTimer.current = setTimeout(async () => {
+      if (USE_DB) {
+        try {
+          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`)
+          if (r.ok) { const d = await r.json(); setSearchRes(d.stocks || []); return }
+        } catch {}
+      }
+    }, 200)
+  }, [search])
+
+  const u600 = allStocks.map((s:any) => ({...s, mktCap: s.mktCap ?? null}))
+    .sort((a:any, b:any) => (b.mktCap || 0) - (a.mktCap || 0)).slice(0, 600)
+  const valid = u600.filter((s:any) => s.change1d != null)
+  const allGainers = [...valid].filter((s:any) => (s.change1d || 0) > 0).sort((a, b) => (b.change1d || 0) - (a.change1d || 0))
+  const allLosers  = [...valid].filter((s:any) => (s.change1d || 0) < 0).sort((a, b) => (a.change1d || 0) - (b.change1d || 0))
+  const gainers  = allGainers.slice(0, 10)
+  const losers   = allLosers.slice(0, 10)
+  const ewReturn = valid.length > 0 ? valid.reduce((a, s) => a + (s.change1d || 0), 0) / valid.length : null
+  const allWithMom12 = u600.filter(s => s.mom12m != null)
+  const topMom12 = [...allWithMom12].sort((a, b) => (b.mom12m || 0) - (a.mom12m || 0)).slice(0, 10)
+  const botMom12 = [...allWithMom12].sort((a, b) => (a.mom12m || 0) - (b.mom12m || 0)).slice(0, 10)
+  const highVG   = u600.filter((s:any) => s.combinedRank != null && s.combinedRank >= 80).length
+
+  return (
+    <div className="space-y-6 fade-in">
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search ticker or company…" className="input-field pl-9 text-sm" />
+        {searchRes.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
+            {searchRes.map((r: any) => (
+              <div key={`${r.ticker}.${r.exchange}`}
+                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}`}
+                className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
+                <span style={{ fontSize:15 }}>{r.flag || ''}</span>
+                <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
+                <span className="text-sub flex-1 truncate">{r.company}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', fontSize:11, color:'var(--text3)' }}>{r.price?.toFixed(2)||'-'}</span>
+                <span className="badge badge-delay text-[9px]">{r.exchange}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div>
+        <div className="section-hdr flex items-center gap-2">📈 Index Performance — Asia Pacific</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          {INDICES_AP.map((idx) => {
+            const d = indices.find((x: any) => x.ticker === idx.ticker)
+            return <IndexCard key={idx.ticker} name={idx.name} close={d?.close ?? null} changeP={d?.changeP ?? null} loading={indices.length === 0} />
+          })}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Total Stocks', value: loading ? '…' : allStocks.length.toString() },
+          { label: 'MCW 1D Return (top 600 Asia Pacific)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'V+G Best Combined ≥80 (top 600)', value: loading ? '…' : highVG.toString() },
+          { label: 'Gainers/Losers (top 600)', value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
+        ].map(({ label, value }) => (
+          <div key={label} className="metric-card">
+            <div className="metric-label">{label}</div>
+            <div className="metric-value">{value}</div>
+          </div>
+        ))}
+      </div>
+      {!loading && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[
+            { title: '🟢 Top 10 Gainers Today', list: gainers, color: 'text-[#22d48a]' },
+            { title: '🔴 Top 10 Losers Today',  list: losers,  color: 'text-[#e84560]' },
+          ].map(({ title, list, color }) => (
+            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
+              <div className={`px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border ${color}`}>
+                {title} — Top 600 Asia Pacific by Mkt Cap
+              </div>
+              <table className="data-table">
+                <thead><tr>
+                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:65}}>1D %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`} className="cursor-pointer">
+                      <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+      {!loading && topMom12.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[
+            { title: '🚀 Top 10 Price Mom 12M', list: topMom12, color: 'var(--green)' },
+            { title: '💣 Bottom 10 Price Mom 12M', list: botMom12, color: 'var(--red)' },
+          ].map(({ title, list, color }) => (
+            <div key={title} className="bg-surface border border-border rounded-lg overflow-hidden">
+              <div className="px-4 py-2 text-[10px] font-700 uppercase tracking-wide border-b border-border" style={{ color }}>
+                {title} — Top 600 Asia Pacific by Mkt Cap
+              </div>
+              <table className="data-table w-full">
+                <thead><tr>
+                  <th style={{width:90}}>Ticker</th><th>Company</th><th style={{width:72}}>12M %</th>
+                </tr></thead>
+                <tbody>
+                  {list.map((s, i) => (
+                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`} className="cursor-pointer">
+                      <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
+                      <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
+                        {s.mom12m != null ? fp(s.mom12m * 100) : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+      {!loading && u600.length > 0 && (
+        <div className="bg-surface border border-border rounded-lg p-4">
+          <div className="text-[10px] text-muted mb-2">Market cap weighted return by sector · Top 600 Asia Pacific</div>
+          <SectorHeatmap stocks={u600} onSectorClick={onSectorClick} />
+        </div>
+      )}
+      {loading && (
+        <div className="text-center py-12 text-muted">
+          <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-gold" />
+          <p className="text-sm">Loading market data…</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void }) {
   const [stocks, setStocks] = useState<Stock[]>([])
   const [loading, setLoading] = useState(true)
@@ -1962,7 +2133,7 @@ export default function App() {
     { id: 'dashboard', label: '📊 Dashboard', items: [
       { id: 'northamerica' as Page, label: '🌎 North America' },
       { id: 'dashboard' as Page, label: '🌍 Europe' },
-      { id: 'asiapacific' as Page, label: '🌏 Asia Pacific' },
+      { id: 'apdashboard' as Page, label: '🌏 Asia Pacific' },
     ]},
     { id: 'bestideas', label: '⭐ Best Ideas', items: [
       { id: 'bestideas_us' as Page, label: '🌎 North America' },
@@ -2170,6 +2341,7 @@ export default function App() {
           {page === 'nascreen' && <Screener key="nascreen" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
           {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
           {page === 'nascreen' && <Screener key="nascreen" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
+          {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { setPage('asiapacific') }} onSelectStock={setDetailStock} />}
           {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
           {page === 'TSE' && <Screener key="TSE" initExchange="TSE" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={300} />}
           {page === 'SEHK' && <Screener key="SEHK" initExchange="SEHK" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={250} />}
