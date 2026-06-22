@@ -13,6 +13,8 @@ const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR
 const FILTER_500M = new Set(['LSE','XETRA','PA','OM','SWX','MIL'])
 const TOP_100_EX = new Set(['OB','MC','AS','BR','CPSE','HE','GR'])
 const NO_FILTER = new Set(['VI','IR','LS'])
+// APAC: top N per market cap, solo titoli con company e sector
+const APAC_TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, TSX: 400, ASX: 350 }
 
 async function fetchAll(table: string, select: string, exchangeList: string[]) {
   const PAGE = 1000
@@ -70,6 +72,31 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
 }
 
 
+function applyAPACFilter(fundData: any[], stocksData: any[]) {
+  const fundMap: Record<string, any> = {}
+  for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
+  const stockMap: Record<string, any> = {}
+  for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
+
+  // Per ogni exchange APAC prendi top N per mktCap con company e sector
+  const result: any[] = []
+  for (const [ex, topN] of Object.entries(APAC_TOP_N)) {
+    const exFunds = fundData
+      .filter(f => f.exchange === ex)
+      .map(f => {
+        const s = stockMap[`${f.ticker}.${f.exchange}`]
+        return { f, s, mktCap: f.mkt_cap ?? 0 }
+      })
+      .filter(({ s }) => s && s.company && s.company !== s.ticker && s.sector)
+      .sort((a, b) => b.mktCap - a.mktCap)
+      .slice(0, topN)
+    for (const { f, s } of exFunds) {
+      result.push(mapStock(s, f))
+    }
+  }
+  return result
+}
+
 export async function GET(req: NextRequest) {
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
@@ -126,12 +153,16 @@ export async function GET(req: NextRequest) {
       fetchAll('fundamentals', 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj', exList),
     ])
 
+    const APAC_EX = new Set(['TSE','SEHK','TSX','ASX'])
     const isUSOnly = exList.length === 1 && exList[0] === 'US'
+    const isAPACOnly = exList.every(e => APAC_EX.has(e))
     let stocks: any[]
     if (isUSOnly) {
       const fundMap: Record<string, any> = {}
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+    } else if (isAPACOnly) {
+      stocks = applyAPACFilter(fundData, stocksData)
     } else {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
