@@ -2120,11 +2120,13 @@ export default function App() {
     const p = params.get("page")
     const s = params.get("sector")
     if (p) {
-      if (p === "northamerica") { setScrSectorUS(s || "All"); setPage("northamerica") }
-      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setPage("screener") }
-      else { setScrSectorUS("All"); setPage(p as Page) }
+      if (p === "northamerica") { setScrSectorUS(s || "All"); setScrSectorAP("All"); setPage("northamerica") }
+      else if (p === "nascreen") { setScrSectorUS(s || "All"); setScrSectorAP("All"); setPage("nascreen") }
+      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setScrSectorAP("All"); setPage("screener") }
+      else if (p === "asiapacific") { setScrSectorAP(s || "All"); setScrSectorUS("All"); setScrSector("All"); setPage("asiapacific") }
+      else { setScrSectorUS("All"); setScrSectorAP("All"); setScrSector("All"); setPage(p as Page) }
     } else {
-      setScrSectorUS("All")
+      setScrSectorUS("All"); setScrSectorAP("All")
     }
   }, [])
   function goSector(sector: string) {
