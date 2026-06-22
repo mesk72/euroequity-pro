@@ -73,22 +73,20 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
 
 
 function applyAPACFilter(fundData: any[], stocksData: any[]) {
-  const fundMap: Record<string, any> = {}
-  for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
   const stockMap: Record<string, any> = {}
   for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
-  // Restituisce TUTTI i titoli, escludendo settori 71-77 e G6M
-  // Il frontend ordina per mktCap e mostra top N tramite maxRows
+  // Identico a US: restituisce TUTTI i titoli in fundamentals
+  // escludendo solo settori 71-77 e G6M
   return fundData
-    .filter(f => {
-      const s = stockMap[`${f.ticker}.${f.exchange}`]
-      if (!s) return false
-      if (s.sector && ['71','72','73','74','75','76','77'].includes(s.sector)) return false
-      if (s.ticker === 'G6M' && s.exchange === 'ASX') return false
-      return true
+    .map(f => {
+      const s = stockMap[`${f.ticker}.${f.exchange}`] || {}
+      const sector = s.sector ?? null
+      if (sector && ['71','72','73','74','75','76','77'].includes(sector)) return null
+      if (f.ticker === 'G6M' && f.exchange === 'ASX') return null
+      return mapStock({ ...s, ticker: f.ticker, exchange: f.exchange }, f)
     })
-    .map(f => mapStock(stockMap[`${f.ticker}.${f.exchange}`], f))
+    .filter(Boolean)
 }
 
 export async function GET(req: NextRequest) {
