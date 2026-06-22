@@ -74,37 +74,33 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
 
 
 function applyAPACFilter(fundData: any[], stocksData: any[]) {
-  const stockMap: Record<string, any> = {}
-  for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
+  // Costruisci mappa da fundamentals
+  const fundMap: Record<string, any> = {}
+  for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
   // Top N per exchange ordinati per mktCap
   const TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, ASX: 350, TSX: 400, US: 2000 }
   const EXCL_SECTORS = new Set(['71','72','73','74','75','76','77'])
 
+  // Itera su STOCKS (che ha company e sector) e unisci con fundamentals
   const byExchange: Record<string, any[]> = {}
-  for (const f of fundData) {
-    const s = stockMap[`${f.ticker}.${f.exchange}`] || {}
-    const sector = s.sector ?? null
-    if (sector && EXCL_SECTORS.has(sector)) continue
-    if (f.ticker === 'G6M' && f.exchange === 'ASX') continue
-    if (!byExchange[f.exchange]) byExchange[f.exchange] = []
-    byExchange[f.exchange].push(f)
+  for (const s of stocksData) {
+    if (s.sector && EXCL_SECTORS.has(s.sector)) continue
+    if (s.ticker === 'G6M' && s.exchange === 'ASX') continue
+    const f = fundMap[`${s.ticker}.${s.exchange}`]
+    if (!f) continue  // solo titoli che hanno dati fondamentali
+    if (!byExchange[s.exchange]) byExchange[s.exchange] = []
+    byExchange[s.exchange].push({ s, f, mktCap: f.mkt_cap ?? 0 })
   }
 
   const result: any[] = []
-  for (const [ex, funds] of Object.entries(byExchange)) {
+  for (const [ex, items] of Object.entries(byExchange)) {
     const topN = TOP_N[ex] ?? 9999
-    const sorted = funds
-      .sort((a, b) => (b.mkt_cap ?? 0) - (a.mkt_cap ?? 0))
+    const sorted = items
+      .sort((a, b) => b.mktCap - a.mktCap)
       .slice(0, topN)
-    for (const f of sorted) {
-      const s = stockMap[`${f.ticker}.${f.exchange}`]
-      if (s) {
-        result.push(mapStock(s, f))
-      } else {
-        // ticker non in stocks - usa solo i dati di fundamentals
-        result.push(mapStock({ ticker: f.ticker, exchange: f.exchange }, f))
-      }
+    for (const { s, f } of sorted) {
+      result.push(mapStock(s, f))
     }
   }
   return result
