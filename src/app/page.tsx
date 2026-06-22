@@ -111,11 +111,15 @@ async function apiExchange(code: string): Promise<Stock[]> {
     try {
       const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR'
       const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,LSE,SWX,OM,OB,CPSE'
+      // Gestisce exchange multipli separati da virgola (es. "US,TSX" o "TSE,SEHK,ASX")
+      const isMulti = code.includes(',')
       const url = code === 'EZ' || code === 'ALL'
         ? `/api/db/stocks?exchanges=${ALL_EX}`
         : code === 'EMU'
           ? `/api/db/stocks?exchanges=${EMU_EXCHANGES}`
-          : `/api/db/stocks?exchange=${encodeURIComponent(code)}`
+          : isMulti
+            ? `/api/db/stocks?exchanges=${encodeURIComponent(code)}`
+            : `/api/db/stocks?exchange=${encodeURIComponent(code)}`
       const r = await fetch(url)
       if (r.ok) {
         const d = await r.json()
