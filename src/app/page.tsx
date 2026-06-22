@@ -793,18 +793,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Preset screens */}
       <div className="flex gap-2 flex-wrap">
-        <button onClick={() => { setValMin(80); setGrowMin(30); setCombinedMin(0) }}
-          className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          ⭐ Best Value V≥80 G≥30
-        </button>
-        <button onClick={() => { setValMin(0); setGrowMin(80); setCombinedMin(0) }}
-          className="px-3 py-1 rounded text-xs font-600 border border-border text-gold hover:bg-gold/10">
-          🚀 Best Growth G≥80
-        </button>
-        <button onClick={() => { setValMin(0); setGrowMin(0); setCombinedMin(80) }}
-          className="px-3 py-1 rounded text-xs font-600 border border-border text-orange hover:bg-orange/10">
-          🏆 Best Combined ≥80
-        </button>
         <button onClick={() => { setValMin(0); setGrowMin(0); setMom6Min(0); setPbMax(0); setMom12Min(0); setCombinedMin(0); setSearch(''); setSector('All') }}
           className="px-3 py-1 rounded text-xs font-600 border border-border text-muted hover:border-gold">
           Reset
