@@ -97,8 +97,13 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
       .sort((a, b) => (b.mkt_cap ?? 0) - (a.mkt_cap ?? 0))
       .slice(0, topN)
     for (const f of sorted) {
-      const s = stockMap[`${f.ticker}.${f.exchange}`] || { ticker: f.ticker, exchange: f.exchange }
-      result.push(mapStock(s, f))
+      const s = stockMap[`${f.ticker}.${f.exchange}`]
+      if (s) {
+        result.push(mapStock(s, f))
+      } else {
+        // ticker non in stocks - usa solo i dati di fundamentals
+        result.push(mapStock({ ticker: f.ticker, exchange: f.exchange }, f))
+      }
     }
   }
   return result
@@ -155,17 +160,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ stocks, source: 'supabase' })
     }
 
-    const [stocksData, fundData] = await Promise.all([
-      fetchAll('stocks', 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker', exList),
-      fetchAll('fundamentals', 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj', exList),
-    ])
-
     const APAC_EX = new Set(['TSE','SEHK','TSX','ASX'])
     const isUSOnly = exList.length === 1 && exList[0] === 'US'
-    // APAC o misto US+Canada: usa applyAPACFilter che gestisce top N per mktCap
     const hasAPAC = exList.some(e => APAC_EX.has(e))
-    const hasUSCA = exList.includes('US') || exList.includes('TSX')
     const isMultiNorthAmerica = exList.includes('US') && exList.includes('TSX') && exList.length === 2
+
+    // Per APAC leggi stocks con limit=5000 per assicurarsi di prendere tutti i record
+    const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
+    const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj'
+
+    const [stocksData, fundData] = await Promise.all([
+      fetchAll('stocks', stocksSelect, exList),
+      fetchAll('fundamentals', fundSelect, exList),
+    ])
+
     let stocks: any[]
     if (isUSOnly) {
       const fundMap: Record<string, any> = {}
