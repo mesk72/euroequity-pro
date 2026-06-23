@@ -95,7 +95,7 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
 }
 
 
-function applyAPACFilter(fundData: any[], stocksData: any[], noLimit = false) {
+function applyAPACFilter(fundData: any[], stocksData: any[]) {
   const fundMap: Record<string, any> = {}
   for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
@@ -123,7 +123,7 @@ function applyAPACFilter(fundData: any[], stocksData: any[], noLimit = false) {
 
   const result: any[] = []
   for (const [ex, funds] of Object.entries(byExchange)) {
-    const topN = noLimit ? 9999 : (TOP_N[ex] ?? 9999)
+    const topN = TOP_N[ex] ?? 9999
     const sorted = funds
       .sort((a, b) => (b.mkt_cap ?? 0) - (a.mkt_cap ?? 0))
       .slice(0, topN)
@@ -142,7 +142,6 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get('search') || ''
   const ticker = req.nextUrl.searchParams.get('ticker') || ''
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
-  const noLimit = req.nextUrl.searchParams.get('noLimit') === 'true'
 
   try {
     let exList: string[] = []
@@ -214,7 +213,7 @@ export async function GET(req: NextRequest) {
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
     } else if (hasAPAC || isMultiNorthAmerica) {
-      stocks = applyAPACFilter(fundData, stocksData, noLimit)
+      stocks = applyAPACFilter(fundData, stocksData)
     } else {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
