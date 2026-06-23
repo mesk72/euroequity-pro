@@ -123,7 +123,7 @@ function applyAPACFilter(fundData: any[], stocksData: any[], noLimit = false) {
 
   const result: any[] = []
   for (const [ex, funds] of Object.entries(byExchange)) {
-    const topN = TOP_N[ex] ?? 9999
+    const topN = noLimit ? 9999 : (TOP_N[ex] ?? 9999)
     const sorted = funds
       .sort((a, b) => (b.mkt_cap ?? 0) - (a.mkt_cap ?? 0))
       .slice(0, topN)
