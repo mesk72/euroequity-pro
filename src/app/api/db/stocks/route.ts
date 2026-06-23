@@ -95,7 +95,7 @@ function applyUniverseFilter(fundData: any[], stocksData: any[]) {
 }
 
 
-function applyAPACFilter(fundData: any[], stocksData: any[]) {
+function applyAPACFilter(fundData: any[], stocksData: any[], noLimit = false) {
   const fundMap: Record<string, any> = {}
   for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
@@ -142,6 +142,7 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get('search') || ''
   const ticker = req.nextUrl.searchParams.get('ticker') || ''
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
+  const noLimit = req.nextUrl.searchParams.get('noLimit') === 'true'
 
   try {
     let exList: string[] = []
@@ -213,7 +214,7 @@ export async function GET(req: NextRequest) {
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
     } else if (hasAPAC || isMultiNorthAmerica) {
-      stocks = applyAPACFilter(fundData, stocksData)
+      stocks = applyAPACFilter(fundData, stocksData, noLimit)
     } else {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
