@@ -103,8 +103,8 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
       try {
         // Usa la stessa API degli screener ma con exchange singolo
         const url = ['TSE','SEHK','ASX','TSX'].includes(ex)
-          ? `/api/db/stocks?exchanges=${ex}`
-          : `/api/db/stocks?exchange=${ex}`
+          ? `/api/db/stocks?exchanges=${ex}&noLimit=true`
+          : `/api/db/stocks?exchange=${ex}&noLimit=true`
         const r = await fetch(url)
         if (!r.ok) return
         const d = await r.json()
