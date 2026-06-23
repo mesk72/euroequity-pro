@@ -90,29 +90,16 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
 
     if (!data || data.length === 0) { setAllStocks([]); setLoading(false); return }
 
-    // Raggruppa per exchange e carica con la stessa chiamata degli screener
-    // Poi fa il match per ticker
-    const exchangeGroups: Record<string, string[]> = {}
-    for (const w of data) {
-      if (!exchangeGroups[w.exchange]) exchangeGroups[w.exchange] = []
-      exchangeGroups[w.exchange].push(w.ticker)
-    }
-
+    // Carica ogni titolo singolarmente con ticker+exchange
+    // Questo bypassa i filtri top N e funziona per qualsiasi titolo
     const liveMap: Record<string, any> = {}
-    await Promise.all(Object.entries(exchangeGroups).map(async ([ex, tickers]) => {
+    await Promise.all(data.map(async (w: any) => {
       try {
-        // Usa la stessa API degli screener ma con exchange singolo
-        const url = ['TSE','SEHK','ASX','TSX'].includes(ex)
-          ? `/api/db/stocks?exchanges=${ex}&noLimit=true`
-          : `/api/db/stocks?exchange=${ex}&noLimit=true`
-        const r = await fetch(url)
+        const r = await fetch(`/api/db/stocks?ticker=${encodeURIComponent(w.ticker)}&exchange=${encodeURIComponent(w.exchange)}`)
         if (!r.ok) return
         const d = await r.json()
-        for (const s of (d.stocks || [])) {
-          if (tickers.includes(s.ticker)) {
-            liveMap[`${s.ticker}.${s.exchange}`] = s
-          }
-        }
+        const s = (d.stocks || [])[0]
+        if (s) liveMap[`${s.ticker}.${s.exchange}`] = s
       } catch {}
     }))
 
