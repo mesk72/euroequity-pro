@@ -90,19 +90,15 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
 
     if (!data || data.length === 0) { setAllStocks([]); setLoading(false); return }
 
-    const exchanges = data
-      .map((s: any) => s.exchange)
-      .filter((ex: string, i: number, arr: string[]) => arr.indexOf(ex) === i)
-
+    // Carica i dati live per ogni titolo singolarmente tramite search
     const liveMap: Record<string, any> = {}
-    await Promise.all(exchanges.map(async (ex: string) => {
+    await Promise.all(data.map(async (w: any) => {
       try {
-        const r = await fetch(`/api/db/stocks?exchange=${ex}`)
+        const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(w.ticker)}&exchange=${encodeURIComponent(w.exchange)}&limit=1`)
         if (!r.ok) return
         const d = await r.json()
-        for (const s of (d.stocks || [])) {
-          liveMap[`${s.ticker}.${s.exchange}`] = s
-        }
+        const s = (d.stocks || []).find((s: any) => s.ticker === w.ticker && s.exchange === w.exchange)
+        if (s) liveMap[`${w.ticker}.${w.exchange}`] = s
       } catch {}
     }))
 
