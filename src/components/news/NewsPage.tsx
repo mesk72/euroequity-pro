@@ -133,8 +133,8 @@ export default function NewsPage() {
     try {
       const syms = encodeURIComponent('^GSPC,^IXIC,^DJI,^GDAXI,^FTSE,^FCHI,FTSEMIB.MI,^N225,^HSI,^AXJO,GC=F,CL=F,EURUSD=X,USDJPY=X,GBPUSD=X')
       const fields = 'regularMarketPrice,regularMarketChange,regularMarketChangePercent,shortName'
-      const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=${fields}`
-      const mktRes = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
+      const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=${fields}&crumb=`
+      const mktRes = await fetch(url, { mode: 'cors' })
       if (mktRes.ok) {
         const mktJson = await mktRes.json()
         const quotes = mktJson?.quoteResponse?.result || []
@@ -259,10 +259,6 @@ export default function NewsPage() {
     themes.slice(0, 5).forEach(t => { txt += '• ' + t + '\n' })
     txt += '\n'
 
-    txt += '**TOP HEADLINES**\n'
-    const topNews = allNews.slice(0, 8)
-    topNews.forEach(n => { txt += '• [' + n.source + '] ' + n.title + '\n' })
-    txt += '\n'
 
     if (data.europe.length > 0) {
       txt += '**EUROPE**\n'
