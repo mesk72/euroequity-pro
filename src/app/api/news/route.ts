@@ -17,7 +17,7 @@ async function fetchYahooNews(query: string): Promise<any[]> {
         'Accept': 'application/json',
       },
       signal: AbortSignal.timeout(8000),
-      next: { revalidate: 900 },
+      cache: 'no-store',
     })
     if (!r.ok) return []
     const d = await r.json()
@@ -31,8 +31,6 @@ async function fetchYahooNews(query: string): Promise<any[]> {
     })).filter((n: any) => n.title.length > 10)
   } catch { return [] }
 }
-
-export const revalidate = 900
 
 export async function GET() {
   const results: Record<string, any[]> = { world: [], americas: [], europe: [], asia: [] }
