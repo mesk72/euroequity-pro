@@ -23,7 +23,6 @@ const FEEDS: Record<Region, { name: string; url: string }[]> = {
   world: [
     { name: 'Reuters', url: 'https://feeds.feedburner.com/reuters/topNews' },
     { name: 'CNBC', url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html' },
-    { name: 'MarketWatch', url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
   ],
   americas: [
     { name: 'CNBC Markets', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
@@ -85,7 +84,7 @@ export default function NewsPage() {
           const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url)
           const r = await fetch(api)
           const d = await r.json()
-          logs.push(`${name}: status=${d.status} items=${d.items?.length || 0}`)
+          logs.push(`${name}: status=${d.status} items=${d.items?.length || 0} first=${d.items?.[0]?.title?.slice(0,30) || 'none'}`)
           if (d.status === 'ok' && Array.isArray(d.items)) {
             const items: NewsItem[] = d.items
               .map((item: any) => ({
@@ -94,7 +93,7 @@ export default function NewsPage() {
                 pubDate: item.pubDate || item.published || new Date().toISOString(),
                 source: name,
               }))
-              .filter((n: NewsItem) => n.title.length > 10)
+              .filter((n: NewsItem) => n.title.length > 3)
               .slice(0, 5)
             results[region].push(...items)
           }
