@@ -2,28 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { RefreshCw } from 'lucide-react'
+import MarketStrip from './MarketStrip'
 
 interface NewsItem {
   title: string
   link: string
   pubDate: string
   source: string
-}
-
-interface MarketQuote {
-  symbol: string
-  name: string
-  region?: string
-  price?: number
-  change?: number
-  changePct?: number
-}
-
-interface MarketData {
-  indices: MarketQuote[]
-  commodities: MarketQuote[]
-  fx: MarketQuote[]
-  timestamp?: string
 }
 
 type Region = 'world' | 'americas' | 'europe' | 'asia'
@@ -74,16 +59,6 @@ function srcColor(s: string): string {
   return '#f97316'
 }
 
-function pct(v?: number) {
-  if (v == null) return 'N/A'
-  return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'
-}
-
-function clr(v?: number) {
-  if (v == null) return 'var(--text4)'
-  return v >= 0 ? '#22c55e' : '#ef4444'
-}
-
 function timeAgo(d: string): string {
   if (!d) return ''
   const m = Math.floor((Date.now() - new Date(d).getTime()) / 60000)
@@ -114,11 +89,8 @@ async function fetchFeed(name: string, url: string): Promise<NewsItem[]> {
 }
 
 const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
-const EMPTY_MKT: MarketData = { indices: [], commodities: [], fx: [] }
-
 export default function NewsPage() {
   const [data, setData] = useState<Record<Region, NewsItem[]>>(EMPTY)
-  const [mktData, setMktData] = useState<MarketData>(EMPTY_MKT)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('world')
   const [lastUpdate, setLast] = useState('')
@@ -129,45 +101,7 @@ export default function NewsPage() {
 
   const load = async () => {
     setLoading(true)
-    // Carica market data direttamente da Yahoo Finance (lato client)
-    try {
-      const syms = encodeURIComponent('^GSPC,^IXIC,^DJI,^GDAXI,^FTSE,^FCHI,FTSEMIB.MI,^N225,^HSI,^AXJO,GC=F,CL=F,EURUSD=X,USDJPY=X,GBPUSD=X')
-      const fields = 'regularMarketPrice,regularMarketChange,regularMarketChangePercent,shortName'
-      const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=${fields}&crumb=`
-      const mktRes = await fetch(url, { mode: 'cors' })
-      if (mktRes.ok) {
-        const mktJson = await mktRes.json()
-        const quotes = mktJson?.quoteResponse?.result || []
-        const indexSyms = ['^GSPC','^IXIC','^DJI','^GDAXI','^FTSE','^FCHI','FTSEMIB.MI','^N225','^HSI','^AXJO']
-        const commodSyms = ['GC=F','CL=F']
-        const fxSyms = ['EURUSD=X','USDJPY=X','GBPUSD=X']
-        const regionMap: Record<string, string> = {
-          '^GSPC':'americas','^IXIC':'americas','^DJI':'americas',
-          '^GDAXI':'europe','^FTSE':'europe','^FCHI':'europe','FTSEMIB.MI':'europe',
-          '^N225':'asia','^HSI':'asia','^AXJO':'asia'
-        }
-        const nameMap: Record<string, string> = {
-          '^GSPC':'S&P 500','^IXIC':'Nasdaq','^DJI':'Dow Jones',
-          '^GDAXI':'DAX','^FTSE':'FTSE 100','^FCHI':'CAC 40','FTSEMIB.MI':'FTSE MIB',
-          '^N225':'Nikkei','^HSI':'Hang Seng','^AXJO':'ASX 200',
-          'GC=F':'Gold','CL=F':'Oil WTI',
-          'EURUSD=X':'EUR/USD','USDJPY=X':'USD/JPY','GBPUSD=X':'GBP/USD'
-        }
-        const toQuote = (q: any) => ({
-          symbol: q.symbol,
-          name: nameMap[q.symbol] || q.shortName || q.symbol,
-          region: regionMap[q.symbol] || '',
-          price: q.regularMarketPrice,
-          change: q.regularMarketChange,
-          changePct: q.regularMarketChangePercent,
-        })
-        setMktData({
-          indices: quotes.filter((q: any) => indexSyms.includes(q.symbol)).map(toQuote),
-          commodities: quotes.filter((q: any) => commodSyms.includes(q.symbol)).map(toQuote),
-          fx: quotes.filter((q: any) => fxSyms.includes(q.symbol)).map(toQuote),
-        })
-      }
-    } catch {}
+
 
     const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
     for (const region of ['world', 'americas', 'europe', 'asia'] as Region[]) {
@@ -190,9 +124,6 @@ export default function NewsPage() {
 
   const generateReport = async () => {
     setReportLoading(true)
-    // Usa market data già caricato
-    const mkt = mktData
-
     const allNews = [
       ...data.world, ...data.americas, ...data.europe, ...data.asia,
     ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
@@ -206,12 +137,7 @@ export default function NewsPage() {
     const fmtIndex = (idx: MarketQuote) =>
       idx.name + ': ' + (idx.price?.toFixed(0) || 'N/A') + ' (' + pct(idx.changePct) + ')'
 
-    const americasIdx = mkt.indices.filter(i => i.region === 'americas').map(fmtIndex).join(' | ')
-    const europeIdx = mkt.indices.filter(i => i.region === 'europe').map(fmtIndex).join(' | ')
-    const asiaIdx = mkt.indices.filter(i => i.region === 'asia').map(fmtIndex).join(' | ')
 
-    const commodStr = mkt.commodities.map(c => c.name + ': $' + (c.price?.toFixed(2) || 'N/A') + ' (' + pct(c.changePct) + ')').join(' | ')
-    const fxStr = mkt.fx.map(f => f.name + ': ' + (f.price?.toFixed(4) || 'N/A')).join(' | ')
 
     // Temi chiave dalle notizie
     const allTitles = allNews.map(n => n.title.toLowerCase())
@@ -243,15 +169,9 @@ export default function NewsPage() {
     txt += today + ' · ' + time + '\n\n'
 
     txt += '**MARKET OVERVIEW**\n'
-    txt += 'Overall sentiment: **' + sentiment + '**. '
-    if (americasIdx) txt += 'US markets: ' + americasIdx + '. '
-    if (europeIdx) txt += 'European markets: ' + europeIdx + '. '
-    if (asiaIdx) txt += 'Asian session: ' + asiaIdx + '.\n\n'
 
-    if (commodStr || fxStr) {
       txt += '**COMMODITIES & FX**\n'
-      if (commodStr) txt += commodStr + '\n'
-      if (fxStr) txt += fxStr + '\n'
+        if (fxStr) txt += fxStr + '\n'
       txt += '\n'
     }
 
@@ -307,44 +227,7 @@ export default function NewsPage() {
         </div>
       </div>
 
-      {/* Market strip */}
-      {mktData.indices.length > 0 && (
-        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
-          {mktData.indices.map(idx => (
-            <div key={idx.symbol} style={{ flexShrink: 0, textAlign: 'center', minWidth: 80 }}>
-              <div style={{ fontSize: 9, color: 'var(--text4)', fontWeight: 700 }}>{idx.name}</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
-                {idx.price?.toFixed(0) || '-'}
-              </div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: clr(idx.changePct), fontFamily: 'IBM Plex Mono' }}>
-                {pct(idx.changePct)}
-              </div>
-            </div>
-          ))}
-          {mktData.commodities.map(c => (
-            <div key={c.symbol} style={{ flexShrink: 0, textAlign: 'center', minWidth: 80 }}>
-              <div style={{ fontSize: 9, color: '#f59e0b', fontWeight: 700 }}>{c.name}</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
-                ${c.price?.toFixed(0) || '-'}
-              </div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: clr(c.changePct), fontFamily: 'IBM Plex Mono' }}>
-                {pct(c.changePct)}
-              </div>
-            </div>
-          ))}
-          {mktData.fx.map(f => (
-            <div key={f.symbol} style={{ flexShrink: 0, textAlign: 'center', minWidth: 80 }}>
-              <div style={{ fontSize: 9, color: '#06b6d4', fontWeight: 700 }}>{f.name}</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
-                {f.price?.toFixed(4) || '-'}
-              </div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: clr(f.changePct), fontFamily: 'IBM Plex Mono' }}>
-                {pct(f.changePct)}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <MarketStrip />
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
         {REGIONS.map(({ key, label, emoji }) => (
