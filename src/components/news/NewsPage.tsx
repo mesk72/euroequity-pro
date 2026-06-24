@@ -184,7 +184,15 @@ export default function NewsPage() {
     }
     setReportLoading(true)
     try {
-      const text = await generateDailyReport(allNews)
+      const res = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ headlines: allNews.slice(0, 25) }),
+      })
+      if (!res.ok) throw new Error('Report API error: ' + res.status)
+      const d = await res.json()
+      if (d.error) throw new Error(d.error)
+      const text = d.report || 'No report generated.'
       setReport(text)
       setReportDate(new Date().toLocaleString('en-US'))
     } catch (e: any) {
