@@ -154,35 +154,80 @@ export default function NewsPage() {
     return () => clearInterval(t)
   }, [])
 
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = () => {
     const allNews = [
       ...data.world,
       ...data.americas,
       ...data.europe,
       ...data.asia,
     ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+
     if (allNews.length === 0) {
       setReport('No news available yet. Please wait for news to load and try again.')
       setReportDate(new Date().toLocaleString('en-US'))
       return
     }
-    setReportLoading(true)
-    try {
-      const res = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ headlines: allNews.slice(0, 25) }),
-      })
-      if (!res.ok) throw new Error('Report API error: ' + res.status)
-      const d = await res.json()
-      if (d.error) throw new Error(d.error)
-      const text = d.report || 'No report generated.'
-      setReport(text)
-      setReportDate(new Date().toLocaleString('en-US'))
-    } catch (e: any) {
-      setReport('Error generating report: ' + (e.message || 'unknown error'))
+
+    const today = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    })
+
+    // Raggruppa per regione
+    const byRegion: Record<string, NewsItem[]> = {
+      'Global': data.world.slice(0, 6),
+      'North America': data.americas.slice(0, 6),
+      'Europe': data.europe.slice(0, 6),
+      'Asia Pacific': data.asia.slice(0, 6),
     }
-    setReportLoading(false)
+
+    // Identifica temi chiave dalle fonti
+    const allTitles = allNews.map(n => n.title.toLowerCase())
+    const themes: string[] = []
+    if (allTitles.some(t => t.includes('fed') || t.includes('federal reserve') || t.includes('interest rate')))
+      themes.push('Central bank policy and interest rates remain in focus')
+    if (allTitles.some(t => t.includes('inflation') || t.includes('cpi') || t.includes('price')))
+      themes.push('Inflation data continues to drive market sentiment')
+    if (allTitles.some(t => t.includes('earning') || t.includes('profit') || t.includes('revenue') || t.includes('result')))
+      themes.push('Corporate earnings season influencing individual stock moves')
+    if (allTitles.some(t => t.includes('oil') || t.includes('gold') || t.includes('commodit')))
+      themes.push('Commodity markets showing notable price action')
+    if (allTitles.some(t => t.includes('china') || t.includes('trade') || t.includes('tariff')))
+      themes.push('Global trade dynamics and geopolitical tensions in view')
+    if (allTitles.some(t => t.includes('tech') || t.includes('ai') || t.includes('nvidia') || t.includes('microsoft')))
+      themes.push('Technology and AI sector driving market leadership')
+    if (allTitles.some(t => t.includes('bank') || t.includes('financial') || t.includes('credit')))
+      themes.push('Banking and financial sector news attracting attention')
+    if (themes.length === 0)
+      themes.push('Mixed signals across global markets', 'Investors monitoring macro developments')
+
+    // Costruisci report
+    let report = `**FORWARDALPHA DAILY MARKET BRIEFING**\n${today}\n\n`
+
+    report += `**MARKET OVERVIEW**\n`
+    const worldHeadlines = data.world.slice(0, 3).map(n => n.title).join(' | ')
+    report += `Global financial markets are being shaped by the following developments: ${data.world[0]?.title || 'markets in focus'}. `
+    report += `Sentiment across regions reflects a mix of macro and micro drivers as investors digest the latest news flow.\n\n`
+
+    report += `**KEY THEMES**\n`
+    themes.slice(0, 4).forEach(t => { report += `• ${t}\n` })
+    report += '\n'
+
+    report += `**REGIONAL SNAPSHOT**\n`
+    Object.entries(byRegion).forEach(([region, items]) => {
+      if (items.length === 0) return
+      report += `\n${region}:\n`
+      items.slice(0, 3).forEach(n => { report += `  • [${n.source}] ${n.title}\n` })
+    })
+    report += '\n'
+
+    report += `**SOURCES**\n`
+    const sources = [...new Set(allNews.map(n => n.source))].slice(0, 8)
+    report += sources.join(' · ') + '\n\n'
+
+    report += `_This briefing is compiled from ${allNews.length} headlines across ${sources.length} sources. ForwardAlpha ranks and scores are available for individual stocks mentioned._`
+
+    setReport(report)
+    setReportDate(new Date().toLocaleString('en-US'))
   }
 
   useEffect(() => {
