@@ -47,7 +47,6 @@ const FEEDS: Record<Region, { name: string; url: string }[]> = {
 }
 
 function srcColor(s: string): string {
-  if (s.includes('Reuters')) return '#ef4444'
   if (s.includes('CNBC')) return '#0ea5e9'
   if (s.includes('Yahoo')) return '#7c3aed'
   if (s.includes('Il Sole')) return '#ef4444'
@@ -89,6 +88,7 @@ async function fetchFeed(name: string, url: string): Promise<NewsItem[]> {
 }
 
 const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
+
 export default function NewsPage() {
   const [data, setData] = useState<Record<Region, NewsItem[]>>(EMPTY)
   const [loading, setLoading] = useState(true)
@@ -101,8 +101,6 @@ export default function NewsPage() {
 
   const load = async () => {
     setLoading(true)
-
-
     const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
     for (const region of ['world', 'americas', 'europe', 'asia'] as Region[]) {
       const all: NewsItem[] = []
@@ -112,7 +110,12 @@ export default function NewsPage() {
       }
       const seen: Record<string, boolean> = {}
       results[region] = all
-        .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (seen[k]) return false; seen[k] = true; return true })
+        .filter(n => {
+          const k = n.title.slice(0, 50).toLowerCase()
+          if (seen[k]) return false
+          seen[k] = true
+          return true
+        })
         .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
         .slice(0, 25)
     }
@@ -122,24 +125,24 @@ export default function NewsPage() {
     setLoading(false)
   }
 
-  const generateReport = async () => {
+  const generateReport = () => {
     setReportLoading(true)
     const allNews = [
       ...data.world, ...data.americas, ...data.europe, ...data.asia,
     ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
 
+    if (allNews.length === 0) {
+      setReport('No news available yet. Please wait for news to load and try again.')
+      setReportDate(new Date().toLocaleString('en-US'))
+      setReportLoading(false)
+      return
+    }
+
     const today = new Date().toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     })
-    const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+    const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 
-    // Formatta indici per regione
-    const fmtIndex = (idx: MarketQuote) =>
-      idx.name + ': ' + (idx.price?.toFixed(0) || 'N/A') + ' (' + pct(idx.changePct) + ')'
-
-
-
-    // Temi chiave dalle notizie
     const allTitles = allNews.map(n => n.title.toLowerCase())
     const themes: string[] = []
     if (allTitles.some(t => t.includes('fed') || t.includes('federal reserve') || t.includes('interest rate')))
@@ -147,39 +150,33 @@ export default function NewsPage() {
     if (allTitles.some(t => t.includes('inflation') || t.includes('cpi') || t.includes('price')))
       themes.push('Inflation dynamics influencing rate expectations and market positioning')
     if (allTitles.some(t => t.includes('earning') || t.includes('profit') || t.includes('revenue') || t.includes('result')))
-      themes.push('Earnings season — corporate results moving individual stocks significantly')
+      themes.push('Corporate earnings season — results moving individual stocks significantly')
     if (allTitles.some(t => t.includes('oil') || t.includes('gold') || t.includes('commodit')))
       themes.push('Commodity markets volatile — energy and metals prices in focus')
     if (allTitles.some(t => t.includes('china') || t.includes('trade') || t.includes('tariff')))
       themes.push('Trade tensions and China macro data weighing on global risk sentiment')
     if (allTitles.some(t => t.includes('tech') || t.includes('ai') || t.includes('nvidia') || t.includes('microsoft')))
-      themes.push('Technology and AI names leading market moves — megacap earnings key catalyst')
+      themes.push('Technology and AI names leading market moves')
     if (allTitles.some(t => t.includes('bank') || t.includes('financial') || t.includes('credit')))
       themes.push('Financial sector under scrutiny — banking stocks and credit spreads watched')
     if (allTitles.some(t => t.includes('recession') || t.includes('gdp') || t.includes('growth')))
       themes.push('Growth outlook debated — recession fears vs soft landing narrative')
     if (themes.length === 0)
-      themes.push('Markets digesting mixed macro signals', 'Low conviction session with investors on sidelines')
-
-    // Overall sentiment
-    const spChange = mkt.indices.find(i => i.symbol === '^GSPC')?.changePct || 0
-    const sentiment = spChange > 0.5 ? 'Risk-on' : spChange < -0.5 ? 'Risk-off' : 'Cautious/Mixed'
+      themes.push('Markets digesting mixed macro signals', 'Low conviction session with investors cautious')
 
     let txt = '**FORWARDALPHA DAILY MARKET BRIEFING**\n'
     txt += today + ' · ' + time + '\n\n'
-
-    txt += '**MARKET OVERVIEW**\n'
-
-      txt += '**COMMODITIES & FX**\n'
-        if (fxStr) txt += fxStr + '\n'
-      txt += '\n'
-    }
-
-    txt += '**KEY THEMES**\n'
+    txt += '**LIVE MARKET DATA**\n'
+    txt += 'See the ticker strip above for real-time prices: S&P 500, Nasdaq, DAX, FTSE 100, CAC 40, FTSE MIB, Nikkei 225, Hang Seng, ASX 200, Gold, Oil WTI, EUR/USD, USD/JPY.\n\n'
+    txt += '**KEY THEMES TODAY**\n'
     themes.slice(0, 5).forEach(t => { txt += '• ' + t + '\n' })
     txt += '\n'
 
-
+    if (data.americas.length > 0) {
+      txt += '**NORTH AMERICA**\n'
+      data.americas.slice(0, 4).forEach(n => { txt += '• [' + n.source + '] ' + n.title + '\n' })
+      txt += '\n'
+    }
     if (data.europe.length > 0) {
       txt += '**EUROPE**\n'
       data.europe.slice(0, 4).forEach(n => { txt += '• [' + n.source + '] ' + n.title + '\n' })
@@ -194,7 +191,7 @@ export default function NewsPage() {
     const sourcesSet: Record<string, boolean> = {}
     allNews.forEach(n => { sourcesSet[n.source] = true })
     const sources = Object.keys(sourcesSet).slice(0, 8)
-    txt += '_Sources: ' + sources.join(' · ') + '_'
+    txt += '_Sources: ' + sources.join(' · ') + ' · Auto-generated ' + time + '_'
 
     setReport(txt)
     setReportDate(new Date().toLocaleString('en-US'))
@@ -265,21 +262,21 @@ export default function NewsPage() {
             {!report && !reportLoading && (
               <div style={{ textAlign: 'center', padding: 32 }}>
                 <div style={{ fontSize: 14, color: 'var(--text3)', marginBottom: 16 }}>
-                  Generate a daily market briefing based on real index data and today headlines.
+                  Generate a daily market briefing based on live market data and today's headlines.
                 </div>
                 <button onClick={generateReport}
                   style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: '#22c55e', color: '#000' }}>
                   📋 Generate Daily Report
                 </button>
                 <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 8 }}>
-                  Real market data: S&P 500, Nasdaq, DAX, FTSE, Nikkei, Hang Seng + Gold, Oil, FX
+                  S&P 500 · Nasdaq · DAX · FTSE · Nikkei · Hang Seng · Gold · Oil · FX rates
                 </div>
               </div>
             )}
             {reportLoading && (
               <div style={{ textAlign: 'center', padding: 48 }}>
                 <RefreshCw size={20} style={{ margin: '0 auto 10px', animation: 'spin 1s linear infinite', color: '#22c55e' }} />
-                <p style={{ fontSize: 13, color: 'var(--text4)' }}>Fetching market data and building report...</p>
+                <p style={{ fontSize: 13, color: 'var(--text4)' }}>Building report...</p>
               </div>
             )}
             {report && !reportLoading && (
