@@ -71,7 +71,7 @@ function timeAgo(d: string): string {
 
 async function fetchFeed(name: string, url: string): Promise<NewsItem[]> {
   try {
-    const api = 'https://api.rss2json.com/v1/api.json?count=5&rss_url=' + encodeURIComponent(url)
+    const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url)
     const r = await fetch(api)
     if (!r.ok) return []
     const d = await r.json()
