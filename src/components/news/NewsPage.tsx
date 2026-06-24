@@ -190,7 +190,7 @@ export default function NewsPage() {
   }, [])
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
-  const items = data[tab] || []
+  const items = tab !== 'report' ? (data[tab as Region] || []) : []
 
   return (
     <div className="space-y-4 p-3 fade-in">
