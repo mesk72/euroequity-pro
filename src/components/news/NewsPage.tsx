@@ -68,14 +68,12 @@ export default function NewsPage() {
     world: [], americas: [], europe: [], asia: []
   })
   const [loading, setLoading] = useState(true)
-  const [debugLog, setDebugLog] = useState<string[]>([])
   const [tab, setTab] = useState<Region>('world')
   const [lastUpdate, setLast] = useState('')
   const [countdown, setCountdown] = useState(900)
 
   const load = async () => {
     setLoading(true)
-    const logs: string[] = []
     const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
     
     for (const region of ['world', 'americas', 'europe', 'asia'] as Region[]) {
@@ -84,7 +82,6 @@ export default function NewsPage() {
           const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url)
           const r = await fetch(api)
           const d = await r.json()
-          logs.push(`${name}: status=${d.status} items=${d.items?.length || 0} first=${d.items?.[0]?.title?.slice(0,30) || 'none'}`)
           if (d.status === 'ok' && Array.isArray(d.items)) {
             const items: NewsItem[] = d.items
               .map((item: any) => ({
@@ -98,7 +95,6 @@ export default function NewsPage() {
             results[region].push(...items)
           }
         } catch (e: any) {
-          logs.push(`${name}: ERROR ${e.message}`)
         }
       }
       // Deduplica e ordina
@@ -109,7 +105,6 @@ export default function NewsPage() {
         .slice(0, 20)
     }
     
-    setDebugLog(logs)
     setData(results)
     setLast(new Date().toLocaleTimeString())
     setCountdown(900)
@@ -142,12 +137,7 @@ export default function NewsPage() {
         </div>
       </div>
 
-      {/* Debug log - visibile temporaneamente */}
-      {debugLog.length > 0 && (
-        <div style={{ padding: 8, background: 'rgba(0,0,0,0.3)', borderRadius: 4, fontSize: 9, fontFamily: 'monospace', color: '#22c55e', maxHeight: 120, overflowY: 'auto' }}>
-          {debugLog.map((l, i) => <div key={i}>{l}</div>)}
-        </div>
-      )}
+
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
         {REGIONS.map(({ key, label, emoji }) => (
