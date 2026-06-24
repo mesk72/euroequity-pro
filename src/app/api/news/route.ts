@@ -1,79 +1,64 @@
 import { NextResponse } from 'next/server'
 
-const YAHOO_QUERIES = {
-  world: [
-    'global markets economy finance',
-    'commodities oil gold prices',
-    'central bank interest rates monetary policy',
-    'inflation GDP growth recession',
-    'Bloomberg Reuters financial news',
-  ],
-  americas: [
-    'US stock market S&P 500 nasdaq dow jones',
-    'Federal Reserve interest rates economy',
-    'Wall Street earnings quarterly results',
-    'canada economy TSX bank of canada',
-    'US treasury bonds dollar forex',
-  ],
-  europe: [
-    'european markets DAX FTSE CAC eurostoxx',
-    'ECB european central bank eurozone inflation',
-    'italy economy borsa milano',
-    'germany economy DAX',
-    'UK economy FTSE Bank of England pound',
-    'france economy CAC paris',
-    'switzerland SNB CHF',
-  ],
-  asia: [
-    'japan nikkei economy yen bank of japan',
-    'china hang seng economy yuan',
-    'australia ASX economy RBA interest rates',
-    'hong kong markets economy',
-    'india sensex nifty economy',
-    'asia pacific markets emerging',
-  ],
+const NEWSAPI_KEY = '401c56a715b445ff89181369faf48b4b'
+const BASE = 'https://newsapi.org/v2/everything'
+
+const QUERIES: Record<string, { q: string; domains?: string }> = {
+  world: {
+    q: 'markets OR economy OR finance OR stocks OR bonds OR inflation OR GDP',
+    domains: 'bloomberg.com,reuters.com,ft.com,wsj.com,cnbc.com,marketwatch.com,seekingalpha.com',
+  },
+  americas: {
+    q: 'US economy OR "Federal Reserve" OR "S&P 500" OR nasdaq OR "Wall Street" OR canada OR TSX',
+    domains: 'bloomberg.com,reuters.com,wsj.com,cnbc.com,marketwatch.com,ft.com,financialpost.com',
+  },
+  europe: {
+    q: 'ECB OR eurozone OR DAX OR FTSE OR "Bank of England" OR "european markets" OR italy OR germany OR france',
+    domains: 'bloomberg.com,reuters.com,ft.com,cnbc.com,ilsole24ore.com,handelsblatt.com,economist.com',
+  },
+  asia: {
+    q: 'nikkei OR "hang seng" OR ASX OR "Bank of Japan" OR china OR japan OR australia OR "hong kong" OR "asia pacific"',
+    domains: 'bloomberg.com,reuters.com,ft.com,cnbc.com,scmp.com,japantimes.co.jp,businesstimes.com.sg',
+  },
 }
 
-async function fetchYahooNews(query: string): Promise<any[]> {
+async function fetchNewsAPI(region: string): Promise<any[]> {
   try {
-    const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&newsCount=8&quotesCount=0&enableFuzzyQuery=false`
+    const { q, domains } = QUERIES[region]
+    const url = `${BASE}?q=${encodeURIComponent(q)}&domains=${domains}&sortBy=publishedAt&pageSize=30&language=en&apiKey=${NEWSAPI_KEY}`
     const r = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(10000),
       cache: 'no-store',
     })
-    if (!r.ok) return []
+    if (!r.ok) {
+      console.error(`NewsAPI error ${region}: ${r.status}`)
+      return []
+    }
     const d = await r.json()
-    return (d?.news || []).map((item: any) => ({
-      title: item.title || '',
-      link: item.link || '#',
-      pubDate: item.providerPublishTime
-        ? new Date(item.providerPublishTime * 1000).toISOString()
-        : new Date().toISOString(),
-      source: item.publisher || 'Yahoo Finance',
-    })).filter((n: any) => n.title.length > 10)
-  } catch { return [] }
+    if (d.status !== 'ok') {
+      console.error(`NewsAPI status ${region}: ${d.message}`)
+      return []
+    }
+    return (d.articles || [])
+      .filter((a: any) => a.title && a.title !== '[Removed]' && a.url)
+      .map((a: any) => ({
+        title: a.title,
+        link: a.url,
+        pubDate: a.publishedAt || new Date().toISOString(),
+        source: a.source?.name || 'Unknown',
+      }))
+  } catch (e) {
+    console.error(`NewsAPI fetch error ${region}:`, e)
+    return []
+  }
 }
 
 export async function GET() {
   const results: Record<string, any[]> = { world: [], americas: [], europe: [], asia: [] }
 
   await Promise.all(
-    Object.entries(YAHOO_QUERIES).map(async ([region, queries]) => {
-      const allItems: any[] = []
-      await Promise.all(queries.map(async q => {
-        const items = await fetchYahooNews(q)
-        allItems.push(...items)
-      }))
-      const seen = new Set<string>()
-      const deduped = allItems.filter(item => {
-        const key = item.title.slice(0, 50).toLowerCase()
-        if (seen.has(key)) return false
-        seen.add(key)
-        return true
-      })
-      deduped.sort((a: any, b: any) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-      results[region] = deduped.slice(0, 30)
+    Object.keys(QUERIES).map(async region => {
+      results[region] = await fetchNewsAPI(region)
     })
   )
 
