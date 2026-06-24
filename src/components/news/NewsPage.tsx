@@ -21,31 +21,28 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
 
 const FEEDS: Record<Region, { name: string; url: string }[]> = {
   world: [
-    { name: 'Reuters Markets', url: 'https://feeds.feedburner.com/reuters/financialsNews' },
-    { name: 'Reuters Business', url: 'https://feeds.feedburner.com/reuters/businessNews' },
-    { name: 'CNBC Markets', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
-    { name: 'CNBC Finance', url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html' },
+    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
     { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
+    { name: 'Google Finance', url: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlnQVAB?hl=en&gl=US&ceid=US:en' },
+    { name: 'Investing.com', url: 'https://www.investing.com/rss/market_overview.rss' },
   ],
   americas: [
+    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
     { name: 'CNBC Markets', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
-    { name: 'CNBC Economy', url: 'https://www.cnbc.com/id/20910274/device/rss/rss.html' },
     { name: 'CNBC Earnings', url: 'https://www.cnbc.com/id/15839069/device/rss/rss.html' },
-    { name: 'Reuters Finance', url: 'https://feeds.feedburner.com/reuters/financialsNews' },
     { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
-    { name: 'Financial Post', url: 'https://financialpost.com/feed/investing/' },
+    { name: 'Google US Markets', url: 'https://news.google.com/rss/search?q=stock+market+earnings+S%26P500+nasdaq+Fed&hl=en&gl=US&ceid=US:en' },
   ],
   europe: [
+    { name: 'Yahoo Finance EU', url: 'https://finance.yahoo.com/rss/topstories' },
     { name: 'CNBC Europe Mkts', url: 'https://www.cnbc.com/id/19836768/device/rss/rss.html' },
-    { name: 'Reuters Finance', url: 'https://feeds.feedburner.com/reuters/financialsNews' },
-    { name: 'Il Sole Finanza', url: 'https://www.ilsole24ore.com/rss/finanza.xml' },
-    { name: 'Handelsblatt', url: 'https://www.handelsblatt.com/contentexport/feed/finanzen' },
+    { name: 'Il Sole Mercati', url: 'https://www.ilsole24ore.com/rss/mercati.xml' },
+    { name: 'Google EU Markets', url: 'https://news.google.com/rss/search?q=DAX+FTSE+CAC+eurostoxx+ECB+earnings&hl=en&gl=US&ceid=US:en' },
   ],
   asia: [
     { name: 'CNBC Asia Mkts', url: 'https://www.cnbc.com/id/19832390/device/rss/rss.html' },
-    { name: 'Reuters Finance', url: 'https://feeds.feedburner.com/reuters/financialsNews' },
-    { name: 'SCMP Business', url: 'https://www.scmp.com/rss/92/feed' },
-    { name: 'NHK Economy', url: 'https://www3.nhk.or.jp/rss/news/cat7.xml' },
+    { name: 'SCMP Markets', url: 'https://www.scmp.com/rss/92/feed' },
+    { name: 'Google Asia Mkts', url: 'https://news.google.com/rss/search?q=nikkei+hangseng+ASX+stocks+earnings+asia&hl=en&gl=US&ceid=US:en' },
     { name: 'Japan Times Biz', url: 'https://www.japantimes.co.jp/feed/business/' },
   ],
 }
