@@ -19,12 +19,49 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'asia',     label: 'Asia Pacific',  emoji: '🌏' },
 ]
 
+// Feed RSS via rss2json - chiamata dal browser, niente CORS
+const FEEDS: Record<Region, { name: string; url: string }[]> = {
+  world: [
+    { name: 'Reuters', url: 'https://feeds.feedburner.com/reuters/topNews' },
+    { name: 'Reuters Business', url: 'https://feeds.feedburner.com/reuters/businessNews' },
+    { name: 'CNBC', url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html' },
+    { name: 'MarketWatch', url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
+    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
+    { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
+  ],
+  americas: [
+    { name: 'CNBC Markets', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
+    { name: 'CNBC Economy', url: 'https://www.cnbc.com/id/20910274/device/rss/rss.html' },
+    { name: 'MarketWatch', url: 'https://feeds.marketwatch.com/marketwatch/marketpulse/' },
+    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
+    { name: 'Reuters Business', url: 'https://feeds.feedburner.com/reuters/businessNews' },
+    { name: 'Financial Post', url: 'https://financialpost.com/feed/' },
+    { name: 'Globe and Mail', url: 'https://www.theglobeandmail.com/arc/outboundfeeds/rss/category/business/' },
+  ],
+  europe: [
+    { name: 'CNBC Europe', url: 'https://www.cnbc.com/id/19794221/device/rss/rss.html' },
+    { name: 'Reuters EU', url: 'https://feeds.feedburner.com/reuters/topNews' },
+    { name: 'Il Sole 24 Ore', url: 'https://www.ilsole24ore.com/rss/finanza.xml' },
+    { name: 'Handelsblatt', url: 'https://www.handelsblatt.com/contentexport/feed/top-themen' },
+    { name: 'Les Echos', url: 'https://www.lesechos.fr/rss/rss_finance.xml' },
+    { name: 'Expansion', url: 'https://www.expansion.com/rss/mercados.xml' },
+  ],
+  asia: [
+    { name: 'CNBC Asia', url: 'https://www.cnbc.com/id/19832390/device/rss/rss.html' },
+    { name: 'NHK', url: 'https://www3.nhk.or.jp/rss/news/cat7.xml' },
+    { name: 'SCMP', url: 'https://www.scmp.com/rss/92/feed' },
+    { name: 'Japan Times', url: 'https://www.japantimes.co.jp/feed/' },
+    { name: 'Business Times', url: 'https://www.businesstimes.com.sg/rss/top-stories' },
+    { name: 'Reuters Asia', url: 'https://feeds.feedburner.com/reuters/topNews' },
+  ],
+}
+
 const SRC_COLORS: Record<string, string> = {
-  'Bloomberg': '#f59e0b', 'Reuters': '#ef4444', 'CNBC': '#0ea5e9',
+  'Reuters': '#ef4444', 'CNBC': '#0ea5e9', 'Bloomberg': '#f59e0b',
   'Yahoo': '#7c3aed', 'MarketWatch': '#2563eb', 'WSJ': '#1d4ed8',
-  'FT': '#f97316', 'Financial Times': '#f97316', 'Seeking': '#f59e0b',
   'Il Sole': '#ef4444', 'Handelsblatt': '#f97316', 'NHK': '#ec4899',
-  'Google': '#22c55e', 'Financial Post': '#14b8a6',
+  'SCMP': '#10b981', 'Japan': '#f472b6', 'Financial': '#14b8a6',
+  'Seeking': '#f59e0b', 'Globe': '#06b6d4', 'Les Echos': '#8b5cf6',
 }
 function srcColor(s: string) {
   for (const [k, v] of Object.entries(SRC_COLORS)) if (s.includes(k)) return v
@@ -41,34 +78,65 @@ function timeAgo(d: string) {
   return Math.floor(h / 24) + 'd ago'
 }
 
+async function fetchFeed(name: string, url: string): Promise<NewsItem[]> {
+  try {
+    const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=5`
+    const r = await fetch(api, { signal: AbortSignal.timeout(8000) })
+    if (!r.ok) return []
+    const d = await r.json()
+    if (d.status !== 'ok' || !Array.isArray(d.items)) return []
+    return d.items
+      .map((item: any) => ({
+        title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
+        link: item.link || '#',
+        pubDate: item.pubDate || new Date().toISOString(),
+        source: name,
+      }))
+      .filter((n: NewsItem) => n.title.length > 10)
+      .slice(0, 4)
+  } catch { return [] }
+}
+
 const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
 
 export default function NewsPage() {
   const [data, setData] = useState<Record<Region, NewsItem[]>>(EMPTY)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [tab, setTab] = useState<Region>('world')
   const [lastUpdate, setLast] = useState<Date | null>(null)
   const [countdown, setCountdown] = useState(900)
 
+  const loadRegion = async (region: Region): Promise<NewsItem[]> => {
+    const all: NewsItem[] = []
+    await Promise.all(
+      FEEDS[region].map(async ({ name, url }) => {
+        const items = await fetchFeed(name, url)
+        all.push(...items)
+      })
+    )
+    const seen = new Set<string>()
+    return all
+      .filter(n => {
+        const k = n.title.slice(0, 50).toLowerCase()
+        if (seen.has(k)) return false
+        seen.add(k)
+        return true
+      })
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+      .slice(0, 25)
+  }
+
   const load = async () => {
     setLoading(true)
-    setError('')
-    try {
-      const res = await fetch('/api/news', { cache: 'no-store' })
-      if (!res.ok) throw new Error('HTTP ' + res.status)
-      const json = await res.json()
-      setData({
-        world:    Array.isArray(json.world)    ? json.world    : [],
-        americas: Array.isArray(json.americas) ? json.americas : [],
-        europe:   Array.isArray(json.europe)   ? json.europe   : [],
-        asia:     Array.isArray(json.asia)     ? json.asia     : [],
-      })
-      setLast(new Date())
-      setCountdown(900)
-    } catch (e: any) {
-      setError(e.message || 'Error loading news')
-    }
+    const [world, americas, europe, asia] = await Promise.all([
+      loadRegion('world'),
+      loadRegion('americas'),
+      loadRegion('europe'),
+      loadRegion('asia'),
+    ])
+    setData({ world, americas, europe, asia })
+    setLast(new Date())
+    setCountdown(900)
     setLoading(false)
   }
 
@@ -93,7 +161,7 @@ export default function NewsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {lastUpdate && (
             <span style={{ fontSize: 10, color: 'var(--text4)', fontFamily: 'IBM Plex Mono' }}>
-              {lastUpdate.toLocaleTimeString()} · next {fmt(countdown)}
+              {lastUpdate.toLocaleTimeString()} · {fmt(countdown)}
             </span>
           )}
           <button onClick={load} disabled={loading}
@@ -102,13 +170,6 @@ export default function NewsPage() {
           </button>
         </div>
       </div>
-
-      {error && (
-        <div style={{ padding: 10, background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 6, fontSize: 12, color: '#ef4444', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          ❌ {error}
-          <button onClick={load} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: 12 }}>Retry</button>
-        </div>
-      )}
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
         {REGIONS.map(({ key, label, emoji }) => (
@@ -135,7 +196,7 @@ export default function NewsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: 48 }}>
             <RefreshCw size={24} style={{ margin: '0 auto 12px', animation: 'spin 1s linear infinite', color: 'var(--orange)' }} />
-            <p style={{ fontSize: 13, color: 'var(--text4)' }}>Loading news...</p>
+            <p style={{ fontSize: 13, color: 'var(--text4)' }}>Loading news from Reuters, CNBC, Yahoo Finance...</p>
           </div>
         ) : items.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 48 }}>
@@ -173,7 +234,7 @@ export default function NewsPage() {
       </div>
 
       <div style={{ fontSize: 10, color: 'var(--text4)', textAlign: 'center' }}>
-        Sources: Bloomberg · Reuters · CNBC · Yahoo Finance · MarketWatch · WSJ · FT · Il Sole 24 Ore · Handelsblatt · NHK · Google News · Auto-refresh every 15 min
+        Reuters · CNBC · Yahoo Finance · MarketWatch · Il Sole 24 Ore · Handelsblatt · NHK · SCMP · Auto-refresh every 15 min
       </div>
     </div>
   )
