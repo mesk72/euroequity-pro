@@ -1,21 +1,44 @@
 import { NextResponse } from 'next/server'
 
-// Yahoo Finance news API - funziona sempre da Vercel
 const YAHOO_QUERIES = {
-  world: ['global markets', 'economy finance', 'commodities oil gold', 'central bank rates'],
-  americas: ['US stock market', 'Federal Reserve', 'S&P 500 nasdaq', 'canada economy TSX'],
-  europe: ['european markets DAX FTSE', 'ECB eurozone', 'italy economy', 'germany economy'],
-  asia: ['japan nikkei economy', 'china hang seng', 'australia ASX', 'hong kong markets'],
+  world: [
+    'global markets economy finance',
+    'commodities oil gold prices',
+    'central bank interest rates monetary policy',
+    'inflation GDP growth recession',
+    'Bloomberg Reuters financial news',
+  ],
+  americas: [
+    'US stock market S&P 500 nasdaq dow jones',
+    'Federal Reserve interest rates economy',
+    'Wall Street earnings quarterly results',
+    'canada economy TSX bank of canada',
+    'US treasury bonds dollar forex',
+  ],
+  europe: [
+    'european markets DAX FTSE CAC eurostoxx',
+    'ECB european central bank eurozone inflation',
+    'italy economy borsa milano',
+    'germany economy DAX',
+    'UK economy FTSE Bank of England pound',
+    'france economy CAC paris',
+    'switzerland SNB CHF',
+  ],
+  asia: [
+    'japan nikkei economy yen bank of japan',
+    'china hang seng economy yuan',
+    'australia ASX economy RBA interest rates',
+    'hong kong markets economy',
+    'india sensex nifty economy',
+    'asia pacific markets emerging',
+  ],
 }
 
 async function fetchYahooNews(query: string): Promise<any[]> {
   try {
     const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&newsCount=8&quotesCount=0&enableFuzzyQuery=false`
     const r = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-        'Accept': 'application/json',
-      },
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
       signal: AbortSignal.timeout(8000),
       cache: 'no-store',
     })
@@ -42,7 +65,6 @@ export async function GET() {
         const items = await fetchYahooNews(q)
         allItems.push(...items)
       }))
-      // Deduplica per titolo
       const seen = new Set<string>()
       const deduped = allItems.filter(item => {
         const key = item.title.slice(0, 50).toLowerCase()
@@ -51,7 +73,7 @@ export async function GET() {
         return true
       })
       deduped.sort((a: any, b: any) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-      results[region] = deduped.slice(0, 25)
+      results[region] = deduped.slice(0, 30)
     })
   )
 
