@@ -10,6 +10,22 @@ interface NewsItem {
   source: string
 }
 
+interface MarketQuote {
+  symbol: string
+  name: string
+  region?: string
+  price?: number
+  change?: number
+  changePct?: number
+}
+
+interface MarketData {
+  indices: MarketQuote[]
+  commodities: MarketQuote[]
+  fx: MarketQuote[]
+  timestamp?: string
+}
+
 type Region = 'world' | 'americas' | 'europe' | 'asia'
 type Tab = Region | 'report'
 
@@ -31,13 +47,11 @@ const FEEDS: Record<Region, { name: string; url: string }[]> = {
     { name: 'CNBC Earnings', url: 'https://www.cnbc.com/id/15839069/device/rss/rss.html' },
     { name: 'CNBC Markets', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
     { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
-    { name: 'Financial Post', url: 'https://financialpost.com/feed/investing/' },
   ],
   europe: [
     { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
     { name: 'Il Sole Mercati', url: 'https://www.ilsole24ore.com/rss/mercati.xml' },
     { name: 'Handelsblatt', url: 'https://www.handelsblatt.com/contentexport/feed/finanzen' },
-    { name: 'CNBC Europe', url: 'https://www.cnbc.com/id/19836768/device/rss/rss.html' },
   ],
   asia: [
     { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
@@ -55,10 +69,19 @@ function srcColor(s: string): string {
   if (s.includes('Handelsblatt')) return '#f97316'
   if (s.includes('NHK')) return '#ec4899'
   if (s.includes('SCMP')) return '#10b981'
-  if (s.includes('Financial')) return '#14b8a6'
   if (s.includes('Seeking')) return '#f59e0b'
   if (s.includes('Motley')) return '#8b5cf6'
   return '#f97316'
+}
+
+function pct(v?: number) {
+  if (v == null) return 'N/A'
+  return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'
+}
+
+function clr(v?: number) {
+  if (v == null) return 'var(--text4)'
+  return v >= 0 ? '#22c55e' : '#ef4444'
 }
 
 function timeAgo(d: string): string {
@@ -91,18 +114,27 @@ async function fetchFeed(name: string, url: string): Promise<NewsItem[]> {
 }
 
 const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
+const EMPTY_MKT: MarketData = { indices: [], commodities: [], fx: [] }
 
 export default function NewsPage() {
   const [data, setData] = useState<Record<Region, NewsItem[]>>(EMPTY)
+  const [mktData, setMktData] = useState<MarketData>(EMPTY_MKT)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('world')
   const [lastUpdate, setLast] = useState('')
   const [countdown, setCountdown] = useState(900)
   const [report, setReport] = useState('')
   const [reportDate, setReportDate] = useState('')
+  const [reportLoading, setReportLoading] = useState(false)
 
   const load = async () => {
     setLoading(true)
+    // Carica news e market data in parallelo
+    const [mkt] = await Promise.all([
+      fetch('/api/market-data').then(r => r.json()).catch(() => EMPTY_MKT),
+    ])
+    setMktData(mkt)
+
     const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
     for (const region of ['world', 'americas', 'europe', 'asia'] as Region[]) {
       const all: NewsItem[] = []
@@ -110,9 +142,9 @@ export default function NewsPage() {
         const items = await fetchFeed(name, url)
         all.push(...items)
       }
-      const seen = new Set<string>()
+      const seen: Record<string, boolean> = {}
       results[region] = all
-        .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true })
+        .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (seen[k]) return false; seen[k] = true; return true })
         .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
         .slice(0, 25)
     }
@@ -122,67 +154,106 @@ export default function NewsPage() {
     setLoading(false)
   }
 
-  const generateReport = () => {
+  const generateReport = async () => {
+    setReportLoading(true)
+    // Ri-carica market data fresco
+    let mkt = mktData
+    try {
+      const r = await fetch('/api/market-data')
+      mkt = await r.json()
+      setMktData(mkt)
+    } catch {}
+
     const allNews = [
       ...data.world, ...data.americas, ...data.europe, ...data.asia,
     ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
 
-    if (allNews.length === 0) {
-      setReport('No news available yet. Please wait for news to load and try again.')
-      setReportDate(new Date().toLocaleString('en-US'))
-      return
-    }
-
     const today = new Date().toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     })
+    const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
 
-    const byRegion: Record<string, NewsItem[]> = {
-      'Global': data.world.slice(0, 5),
-      'North America': data.americas.slice(0, 5),
-      'Europe': data.europe.slice(0, 5),
-      'Asia Pacific': data.asia.slice(0, 5),
-    }
+    // Formatta indici per regione
+    const fmtIndex = (idx: MarketQuote) =>
+      idx.name + ': ' + (idx.price?.toFixed(0) || 'N/A') + ' (' + pct(idx.changePct) + ')'
 
+    const americasIdx = mkt.indices.filter(i => i.region === 'americas').map(fmtIndex).join(' | ')
+    const europeIdx = mkt.indices.filter(i => i.region === 'europe').map(fmtIndex).join(' | ')
+    const asiaIdx = mkt.indices.filter(i => i.region === 'asia').map(fmtIndex).join(' | ')
+
+    const commodStr = mkt.commodities.map(c => c.name + ': $' + (c.price?.toFixed(2) || 'N/A') + ' (' + pct(c.changePct) + ')').join(' | ')
+    const fxStr = mkt.fx.map(f => f.name + ': ' + (f.price?.toFixed(4) || 'N/A')).join(' | ')
+
+    // Temi chiave dalle notizie
     const allTitles = allNews.map(n => n.title.toLowerCase())
     const themes: string[] = []
     if (allTitles.some(t => t.includes('fed') || t.includes('federal reserve') || t.includes('interest rate')))
-      themes.push('Central bank policy and interest rates remain in focus')
+      themes.push('Central bank policy in focus — Fed decisions driving bond and equity markets')
     if (allTitles.some(t => t.includes('inflation') || t.includes('cpi') || t.includes('price')))
-      themes.push('Inflation data continues to drive market sentiment')
+      themes.push('Inflation dynamics influencing rate expectations and market positioning')
     if (allTitles.some(t => t.includes('earning') || t.includes('profit') || t.includes('revenue') || t.includes('result')))
-      themes.push('Corporate earnings season influencing individual stock moves')
+      themes.push('Earnings season — corporate results moving individual stocks significantly')
     if (allTitles.some(t => t.includes('oil') || t.includes('gold') || t.includes('commodit')))
-      themes.push('Commodity markets showing notable price action')
+      themes.push('Commodity markets volatile — energy and metals prices in focus')
     if (allTitles.some(t => t.includes('china') || t.includes('trade') || t.includes('tariff')))
-      themes.push('Global trade dynamics and geopolitical tensions in view')
+      themes.push('Trade tensions and China macro data weighing on global risk sentiment')
     if (allTitles.some(t => t.includes('tech') || t.includes('ai') || t.includes('nvidia') || t.includes('microsoft')))
-      themes.push('Technology and AI sector driving market leadership')
+      themes.push('Technology and AI names leading market moves — megacap earnings key catalyst')
     if (allTitles.some(t => t.includes('bank') || t.includes('financial') || t.includes('credit')))
-      themes.push('Banking and financial sector news attracting attention')
+      themes.push('Financial sector under scrutiny — banking stocks and credit spreads watched')
+    if (allTitles.some(t => t.includes('recession') || t.includes('gdp') || t.includes('growth')))
+      themes.push('Growth outlook debated — recession fears vs soft landing narrative')
     if (themes.length === 0)
-      themes.push('Mixed signals across global markets', 'Investors monitoring macro developments')
+      themes.push('Markets digesting mixed macro signals', 'Low conviction session with investors on sidelines')
 
-    let txt = '**FORWARDALPHA DAILY MARKET BRIEFING**\n' + today + '\n\n'
+    // Overall sentiment
+    const spChange = mkt.indices.find(i => i.symbol === '^GSPC')?.changePct || 0
+    const sentiment = spChange > 0.5 ? 'Risk-on' : spChange < -0.5 ? 'Risk-off' : 'Cautious/Mixed'
+
+    let txt = '**FORWARDALPHA DAILY MARKET BRIEFING**\n'
+    txt += today + ' · ' + time + '\n\n'
+
     txt += '**MARKET OVERVIEW**\n'
-    txt += 'Global financial markets are being shaped by the following developments: '
-    txt += (data.world[0]?.title || 'markets in focus') + '. '
-    txt += 'Sentiment across regions reflects a mix of macro and micro drivers as investors digest the latest news flow.\n\n'
+    txt += 'Overall sentiment: **' + sentiment + '**. '
+    if (americasIdx) txt += 'US markets: ' + americasIdx + '. '
+    if (europeIdx) txt += 'European markets: ' + europeIdx + '. '
+    if (asiaIdx) txt += 'Asian session: ' + asiaIdx + '.\n\n'
+
+    if (commodStr || fxStr) {
+      txt += '**COMMODITIES & FX**\n'
+      if (commodStr) txt += commodStr + '\n'
+      if (fxStr) txt += fxStr + '\n'
+      txt += '\n'
+    }
+
     txt += '**KEY THEMES**\n'
-    themes.slice(0, 4).forEach(t => { txt += '• ' + t + '\n' })
-    txt += '\n**REGIONAL SNAPSHOT**\n'
-    Object.entries(byRegion).forEach(([region, items]) => {
-      if (items.length === 0) return
-      txt += '\n' + region + ':\n'
-      items.slice(0, 3).forEach(n => { txt += '  • [' + n.source + '] ' + n.title + '\n' })
-    })
-    txt += '\n**SOURCES**\n'
-    const sourcesSet: Record<string, boolean> = {}; allNews.forEach(n => { sourcesSet[n.source] = true }); const sources = Object.keys(sourcesSet).slice(0, 8)
-    txt += sources.join(' · ') + '\n\n'
-    txt += '_Compiled from ' + allNews.length + ' headlines across ' + sources.length + ' sources._'
+    themes.slice(0, 5).forEach(t => { txt += '• ' + t + '\n' })
+    txt += '\n'
+
+    txt += '**TOP HEADLINES**\n'
+    const topNews = allNews.slice(0, 8)
+    topNews.forEach(n => { txt += '• [' + n.source + '] ' + n.title + '\n' })
+    txt += '\n'
+
+    if (data.europe.length > 0) {
+      txt += '**EUROPE**\n'
+      data.europe.slice(0, 4).forEach(n => { txt += '• [' + n.source + '] ' + n.title + '\n' })
+      txt += '\n'
+    }
+    if (data.asia.length > 0) {
+      txt += '**ASIA PACIFIC**\n'
+      data.asia.slice(0, 4).forEach(n => { txt += '• [' + n.source + '] ' + n.title + '\n' })
+      txt += '\n'
+    }
+
+    const sourcesSet: Record<string, boolean> = {}
+    allNews.forEach(n => { sourcesSet[n.source] = true })
+    const sources = Object.keys(sourcesSet).slice(0, 8)
+    txt += '_Sources: ' + sources.join(' · ') + '_'
 
     setReport(txt)
     setReportDate(new Date().toLocaleString('en-US'))
+    setReportLoading(false)
   }
 
   useEffect(() => {
@@ -210,6 +281,45 @@ export default function NewsPage() {
           </button>
         </div>
       </div>
+
+      {/* Market strip */}
+      {mktData.indices.length > 0 && (
+        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+          {mktData.indices.map(idx => (
+            <div key={idx.symbol} style={{ flexShrink: 0, textAlign: 'center', minWidth: 80 }}>
+              <div style={{ fontSize: 9, color: 'var(--text4)', fontWeight: 700 }}>{idx.name}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
+                {idx.price?.toFixed(0) || '-'}
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: clr(idx.changePct), fontFamily: 'IBM Plex Mono' }}>
+                {pct(idx.changePct)}
+              </div>
+            </div>
+          ))}
+          {mktData.commodities.map(c => (
+            <div key={c.symbol} style={{ flexShrink: 0, textAlign: 'center', minWidth: 80 }}>
+              <div style={{ fontSize: 9, color: '#f59e0b', fontWeight: 700 }}>{c.name}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
+                ${c.price?.toFixed(0) || '-'}
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: clr(c.changePct), fontFamily: 'IBM Plex Mono' }}>
+                {pct(c.changePct)}
+              </div>
+            </div>
+          ))}
+          {mktData.fx.map(f => (
+            <div key={f.symbol} style={{ flexShrink: 0, textAlign: 'center', minWidth: 80 }}>
+              <div style={{ fontSize: 9, color: '#06b6d4', fontWeight: 700 }}>{f.name}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
+                {f.price?.toFixed(4) || '-'}
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: clr(f.changePct), fontFamily: 'IBM Plex Mono' }}>
+                {pct(f.changePct)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
         {REGIONS.map(({ key, label, emoji }) => (
@@ -244,20 +354,27 @@ export default function NewsPage() {
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', minHeight: 200 }}>
         {tab === 'report' ? (
           <div style={{ padding: 20 }}>
-            {!report ? (
+            {!report && !reportLoading && (
               <div style={{ textAlign: 'center', padding: 32 }}>
                 <div style={{ fontSize: 14, color: 'var(--text3)', marginBottom: 16 }}>
-                  Generate a daily market briefing based on today\'s headlines.
+                  Generate a daily market briefing based on real index data and today headlines.
                 </div>
                 <button onClick={generateReport}
                   style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: '#22c55e', color: '#000' }}>
                   📋 Generate Daily Report
                 </button>
                 <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 8 }}>
-                  Based on real headlines from Yahoo Finance, CNBC, Reuters and more
+                  Real market data: S&P 500, Nasdaq, DAX, FTSE, Nikkei, Hang Seng + Gold, Oil, FX
                 </div>
               </div>
-            ) : (
+            )}
+            {reportLoading && (
+              <div style={{ textAlign: 'center', padding: 48 }}>
+                <RefreshCw size={20} style={{ margin: '0 auto 10px', animation: 'spin 1s linear infinite', color: '#22c55e' }} />
+                <p style={{ fontSize: 13, color: 'var(--text4)' }}>Fetching market data and building report...</p>
+              </div>
+            )}
+            {report && !reportLoading && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <div style={{ fontSize: 11, color: 'var(--text4)' }}>Generated: {reportDate}</div>
@@ -266,7 +383,7 @@ export default function NewsPage() {
                     🔄 Refresh
                   </button>
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>
                   {report.split('**').map((part, i) =>
                     i % 2 === 1
                       ? <strong key={i} style={{ color: 'var(--orange)' }}>{part}</strong>
