@@ -310,7 +310,8 @@ export default function NewsPage() {
               </div>
             </div>
           </a>
-        ))}
+        ))
+        }
       </div>
       <div style={{ fontSize: 10, color: 'var(--text4)', textAlign: 'center' }}>
         Reuters · CNBC · MarketWatch · Il Sole 24 Ore · Handelsblatt · NHK · SCMP · Auto-refresh 15 min
