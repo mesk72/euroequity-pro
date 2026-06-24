@@ -129,11 +129,45 @@ export default function NewsPage() {
 
   const load = async () => {
     setLoading(true)
-    // Carica news e market data in parallelo
-    const [mkt] = await Promise.all([
-      fetch('/api/market-data').then(r => r.json()).catch(() => EMPTY_MKT),
-    ])
-    setMktData(mkt)
+    // Carica market data direttamente da Yahoo Finance (lato client)
+    try {
+      const syms = encodeURIComponent('^GSPC,^IXIC,^DJI,^GDAXI,^FTSE,^FCHI,FTSEMIB.MI,^N225,^HSI,^AXJO,GC=F,CL=F,EURUSD=X,USDJPY=X,GBPUSD=X')
+      const fields = 'regularMarketPrice,regularMarketChange,regularMarketChangePercent,shortName'
+      const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=${fields}`
+      const mktRes = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
+      if (mktRes.ok) {
+        const mktJson = await mktRes.json()
+        const quotes = mktJson?.quoteResponse?.result || []
+        const indexSyms = ['^GSPC','^IXIC','^DJI','^GDAXI','^FTSE','^FCHI','FTSEMIB.MI','^N225','^HSI','^AXJO']
+        const commodSyms = ['GC=F','CL=F']
+        const fxSyms = ['EURUSD=X','USDJPY=X','GBPUSD=X']
+        const regionMap: Record<string, string> = {
+          '^GSPC':'americas','^IXIC':'americas','^DJI':'americas',
+          '^GDAXI':'europe','^FTSE':'europe','^FCHI':'europe','FTSEMIB.MI':'europe',
+          '^N225':'asia','^HSI':'asia','^AXJO':'asia'
+        }
+        const nameMap: Record<string, string> = {
+          '^GSPC':'S&P 500','^IXIC':'Nasdaq','^DJI':'Dow Jones',
+          '^GDAXI':'DAX','^FTSE':'FTSE 100','^FCHI':'CAC 40','FTSEMIB.MI':'FTSE MIB',
+          '^N225':'Nikkei','^HSI':'Hang Seng','^AXJO':'ASX 200',
+          'GC=F':'Gold','CL=F':'Oil WTI',
+          'EURUSD=X':'EUR/USD','USDJPY=X':'USD/JPY','GBPUSD=X':'GBP/USD'
+        }
+        const toQuote = (q: any) => ({
+          symbol: q.symbol,
+          name: nameMap[q.symbol] || q.shortName || q.symbol,
+          region: regionMap[q.symbol] || '',
+          price: q.regularMarketPrice,
+          change: q.regularMarketChange,
+          changePct: q.regularMarketChangePercent,
+        })
+        setMktData({
+          indices: quotes.filter((q: any) => indexSyms.includes(q.symbol)).map(toQuote),
+          commodities: quotes.filter((q: any) => commodSyms.includes(q.symbol)).map(toQuote),
+          fx: quotes.filter((q: any) => fxSyms.includes(q.symbol)).map(toQuote),
+        })
+      }
+    } catch {}
 
     const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
     for (const region of ['world', 'americas', 'europe', 'asia'] as Region[]) {
@@ -156,13 +190,8 @@ export default function NewsPage() {
 
   const generateReport = async () => {
     setReportLoading(true)
-    // Ri-carica market data fresco
-    let mkt = mktData
-    try {
-      const r = await fetch('/api/market-data')
-      mkt = await r.json()
-      setMktData(mkt)
-    } catch {}
+    // Usa market data già caricato
+    const mkt = mktData
 
     const allNews = [
       ...data.world, ...data.americas, ...data.europe, ...data.asia,
