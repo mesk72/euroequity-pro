@@ -30,31 +30,40 @@ function timeAgo(d: string) {
 }
 
 export default function NewsPage() {
-  const [items, setItems] = useState<NewsItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [activeTab, setTab] = useState<Region>('world')
   const [allNews, setAllNews] = useState<Record<Region, NewsItem[]>>({
     world: [], americas: [], europe: [], asia: []
   })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [activeTab, setTab] = useState<Region>('world')
 
   const loadNews = async () => {
     setLoading(true)
     setError('')
     try {
-      const r = await fetch('/api/news', { cache: 'no-store' })
-      if (!r.ok) { setError('HTTP ' + r.status); setLoading(false); return }
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 15000)
+      const r = await fetch('/api/news', {
+        cache: 'no-store',
+        signal: controller.signal
+      })
+      clearTimeout(timeout)
+      if (!r.ok) throw new Error('HTTP ' + r.status)
       const d = await r.json()
       setAllNews(d)
-      setItems(d[activeTab] || [])
     } catch (e: any) {
-      setError(e.message || 'fetch failed')
+      if (e.name === 'AbortError') {
+        setError('Timeout - news API taking too long')
+      } else {
+        setError(e.message || 'Failed to load news')
+      }
     }
     setLoading(false)
   }
 
   useEffect(() => { loadNews() }, [])
-  useEffect(() => { setItems(allNews[activeTab] || []) }, [activeTab, allNews])
+
+  const items = allNews[activeTab] || []
 
   return (
     <div className="space-y-4 p-3 fade-in">
@@ -62,13 +71,13 @@ export default function NewsPage() {
         <div className="section-hdr">📰 Global Financial News</div>
         <button onClick={loadNews} disabled={loading}
           style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text4)' }}>
-          <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} style={{ color: loading ? 'var(--orange)' : undefined }} />
         </button>
       </div>
 
       {error && (
-        <div style={{ padding: 12, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 6, fontSize: 12, color: '#ef4444' }}>
-          Error: {error}
+        <div style={{ padding: 12, background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 6, fontSize: 12, color: '#ef4444' }}>
+          ❌ {error} — <button onClick={loadNews} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Retry</button>
         </div>
       )}
 
@@ -94,51 +103,50 @@ export default function NewsPage() {
         ))}
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', minHeight: 300 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', minHeight: 200 }}>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 64 }}>
+          <div style={{ textAlign: 'center', padding: 48 }}>
             <RefreshCw size={24} style={{ margin: '0 auto 12px', animation: 'spin 1s linear infinite', color: 'var(--orange)' }} />
             <p style={{ fontSize: 13, color: 'var(--text4)' }}>Loading news...</p>
           </div>
         ) : items.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 64, color: 'var(--text4)' }}>
-            <p style={{ fontSize: 13 }}>No news available.</p>
-            <button onClick={loadNews} style={{ marginTop: 12, color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 12 }}>
-              Retry
+          <div style={{ textAlign: 'center', padding: 48, color: 'var(--text4)' }}>
+            <p style={{ fontSize: 14, marginBottom: 12 }}>No news for this region.</p>
+            <button onClick={loadNews}
+              style={{ color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 13 }}>
+              🔄 Refresh
             </button>
           </div>
-        ) : (
-          items.map((item, i) => (
-            <a key={i} href={item.link} target="_blank" rel="noopener noreferrer"
-              style={{
-                display: 'block', padding: '12px 16px',
-                background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
-                borderLeft: '3px solid var(--orange)',
-                borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                textDecoration: 'none',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(249,115,22,0.06)')}
-              onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)')}>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                <div style={{ flex: 1, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
-                  {item.title}
+        ) : items.map((item, i) => (
+          <a key={i} href={item.link} target="_blank" rel="noopener noreferrer"
+            style={{
+              display: 'block', padding: '12px 16px',
+              background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
+              borderLeft: '3px solid var(--orange)',
+              borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+              textDecoration: 'none',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(249,115,22,0.08)')}
+            onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)')}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <div style={{ flex: 1, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
+                {item.title}
+              </div>
+              <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 90 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', fontFamily: 'IBM Plex Sans Condensed' }}>
+                  {item.source}
                 </div>
-                <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 80 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', fontFamily: 'IBM Plex Sans Condensed' }}>
-                    {item.source}
-                  </div>
-                  <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 2 }}>
-                    {timeAgo(item.pubDate)}
-                  </div>
+                <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 2 }}>
+                  {timeAgo(item.pubDate)}
                 </div>
               </div>
-            </a>
-          ))
-        )}
+            </div>
+          </a>
+        ))}
       </div>
 
       <div style={{ fontSize: 10, color: 'var(--text4)', textAlign: 'center' }}>
-        Sources: Yahoo Finance · CNBC · MarketWatch · Google News · Auto-refresh every 15 min
+        Yahoo Finance · CNBC · MarketWatch · Google News · Auto-refresh every 15 min
       </div>
     </div>
   )
