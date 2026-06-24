@@ -177,7 +177,7 @@ export default function NewsPage() {
       items.slice(0, 3).forEach(n => { txt += '  • [' + n.source + '] ' + n.title + '\n' })
     })
     txt += '\n**SOURCES**\n'
-    const sources = [...new Set(allNews.map(n => n.source))].slice(0, 8)
+    const sourcesSet: Record<string, boolean> = {}; allNews.forEach(n => { sourcesSet[n.source] = true }); const sources = Object.keys(sourcesSet).slice(0, 8)
     txt += sources.join(' · ') + '\n\n'
     txt += '_Compiled from ' + allNews.length + ' headlines across ' + sources.length + ' sources._'
 
