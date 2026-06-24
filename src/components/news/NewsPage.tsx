@@ -29,55 +29,54 @@ function timeAgo(d: string) {
   return Math.floor(h / 24) + 'd ago'
 }
 
+const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
+
 export default function NewsPage() {
-  const [allNews, setAllNews] = useState<Record<Region, NewsItem[]>>({
-    world: [], americas: [], europe: [], asia: []
-  })
+  const [data, setData] = useState<Record<Region, NewsItem[]>>(EMPTY)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [activeTab, setTab] = useState<Region>('world')
+  const [tab, setTab] = useState<Region>('world')
 
-  const loadNews = async () => {
+  const load = async () => {
     setLoading(true)
     setError('')
     try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 15000)
-      const r = await fetch('/api/news', {
-        cache: 'no-store',
-        signal: controller.signal
-      })
-      clearTimeout(timeout)
-      if (!r.ok) throw new Error('HTTP ' + r.status)
-      const d = await r.json()
-      setAllNews(d)
-    } catch (e: any) {
-      if (e.name === 'AbortError') {
-        setError('Timeout - news API taking too long')
-      } else {
-        setError(e.message || 'Failed to load news')
+      const res = await fetch('/api/news', { cache: 'no-store' })
+      if (!res.ok) throw new Error('HTTP ' + res.status)
+      const json = await res.json()
+      // Verifica che json sia un oggetto con le chiavi giuste
+      const safe: Record<Region, NewsItem[]> = {
+        world:    Array.isArray(json.world)    ? json.world    : [],
+        americas: Array.isArray(json.americas) ? json.americas : [],
+        europe:   Array.isArray(json.europe)   ? json.europe   : [],
+        asia:     Array.isArray(json.asia)     ? json.asia     : [],
       }
+      setData(safe)
+    } catch (e: any) {
+      setError(e.message || 'Error')
     }
     setLoading(false)
   }
 
-  useEffect(() => { loadNews() }, [])
+  useEffect(() => { load() }, [])
 
-  const items = allNews[activeTab] || []
+  // items è sempre un array - mai undefined
+  const items: NewsItem[] = data[tab] || []
 
   return (
     <div className="space-y-4 p-3 fade-in">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div className="section-hdr">📰 Global Financial News</div>
-        <button onClick={loadNews} disabled={loading}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text4)' }}>
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} style={{ color: loading ? 'var(--orange)' : undefined }} />
+        <button onClick={load} disabled={loading}
+          style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          <RefreshCw size={14} style={{ color: loading ? 'var(--orange)' : 'var(--text4)', animation: loading ? 'spin 1s linear infinite' : 'none' }} />
         </button>
       </div>
 
       {error && (
-        <div style={{ padding: 12, background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 6, fontSize: 12, color: '#ef4444' }}>
-          ❌ {error} — <button onClick={loadNews} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Retry</button>
+        <div style={{ padding: 10, background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 6, fontSize: 12, color: '#ef4444', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          ❌ {error}
+          <button onClick={load} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: 12 }}>Retry</button>
         </div>
       )}
 
@@ -87,17 +86,16 @@ export default function NewsPage() {
             style={{
               padding: '6px 16px', borderRadius: 4, fontSize: 13, fontWeight: 600,
               cursor: 'pointer', border: 'none',
-              background: activeTab === key ? 'var(--orange)' : 'var(--surface)',
-              color: activeTab === key ? '#000' : 'var(--text3)',
+              background: tab === key ? 'var(--orange)' : 'var(--surface)',
+              color: tab === key ? '#000' : 'var(--text3)',
             }}>
             {emoji} {label}
-            {allNews[key]?.length > 0 && (
+            {data[key].length > 0 && (
               <span style={{
-                marginLeft: 6, fontSize: 10, fontWeight: 800,
-                borderRadius: 10, padding: '1px 5px',
-                background: activeTab === key ? 'rgba(0,0,0,0.2)' : 'rgba(249,115,22,0.15)',
-                color: activeTab === key ? '#000' : 'var(--orange)',
-              }}>{allNews[key].length}</span>
+                marginLeft: 6, fontSize: 10, fontWeight: 800, borderRadius: 10, padding: '1px 5px',
+                background: tab === key ? 'rgba(0,0,0,0.2)' : 'rgba(249,115,22,0.15)',
+                color: tab === key ? '#000' : 'var(--orange)',
+              }}>{data[key].length}</span>
             )}
           </button>
         ))}
@@ -110,39 +108,42 @@ export default function NewsPage() {
             <p style={{ fontSize: 13, color: 'var(--text4)' }}>Loading news...</p>
           </div>
         ) : items.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 48, color: 'var(--text4)' }}>
-            <p style={{ fontSize: 14, marginBottom: 12 }}>No news for this region.</p>
-            <button onClick={loadNews}
-              style={{ color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 13 }}>
-              🔄 Refresh
+          <div style={{ textAlign: 'center', padding: 48 }}>
+            <p style={{ fontSize: 14, color: 'var(--text4)', marginBottom: 12 }}>No news available.</p>
+            <button onClick={load} style={{ color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 13 }}>
+              🔄 Retry
             </button>
           </div>
-        ) : items.map((item, i) => (
-          <a key={i} href={item.link} target="_blank" rel="noopener noreferrer"
-            style={{
-              display: 'block', padding: '12px 16px',
-              background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
-              borderLeft: '3px solid var(--orange)',
-              borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(249,115,22,0.08)')}
-            onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)')}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <div style={{ flex: 1, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
-                {item.title}
-              </div>
-              <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 90 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', fontFamily: 'IBM Plex Sans Condensed' }}>
-                  {item.source}
+        ) : (
+          <>
+            {items.map((item, i) => (
+              <a key={i} href={item.link} target="_blank" rel="noopener noreferrer"
+                style={{
+                  display: 'block', padding: '12px 16px',
+                  background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
+                  borderLeft: '3px solid var(--orange)',
+                  borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                  textDecoration: 'none',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(249,115,22,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)')}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
+                    {item.title}
+                  </div>
+                  <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 90 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--orange)', fontFamily: 'IBM Plex Sans Condensed' }}>
+                      {item.source}
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 2 }}>
+                      {timeAgo(item.pubDate)}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 2 }}>
-                  {timeAgo(item.pubDate)}
-                </div>
-              </div>
-            </div>
-          </a>
-        ))}
+              </a>
+            ))}
+          </>
+        )}
       </div>
 
       <div style={{ fontSize: 10, color: 'var(--text4)', textAlign: 'center' }}>
