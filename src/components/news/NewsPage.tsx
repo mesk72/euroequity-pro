@@ -19,6 +19,43 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'asia',     label: 'Asia Pacific',  emoji: '🌏' },
 ]
 
+async function generateDailyReport(newsItems: NewsItem[]): Promise<string> {
+  const headlines = newsItems
+    .slice(0, 20)
+    .map(n => `- [${n.source}] ${n.title}`)
+    .join('\n')
+
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+
+  const prompt = `You are a senior financial analyst writing a professional daily market report.
+Today is ${today}.
+
+Based on these real news headlines from Yahoo Finance, Reuters, CNBC, Seeking Alpha and other financial sources, write a concise daily market report in English.
+
+HEADLINES:
+${headlines}
+
+Write a structured report with these sections:
+1. **Market Overview** (2-3 sentences summarizing the main market mood today)
+2. **Key Themes** (3-4 bullet points of the most important themes/events moving markets)
+3. **Sector Highlights** (which sectors are in focus and why)
+4. **Key Risks & Opportunities** (what to watch)
+
+Be factual, professional, and concise. Base your analysis ONLY on the provided headlines. Do not invent data.`
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+  const d = await response.json()
+  return d.content?.[0]?.text || 'Unable to generate report.'
+}
+
 const FEEDS: Record<Region, { name: string; url: string }[]> = {
   world: [
     { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
@@ -81,9 +118,12 @@ export default function NewsPage() {
     world: [], americas: [], europe: [], asia: []
   })
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<Region>('world')
+  const [tab, setTab] = useState<Region | 'report'>('world')
   const [lastUpdate, setLast] = useState('')
   const [countdown, setCountdown] = useState(900)
+  const [report, setReport] = useState('')
+  const [reportLoading, setReportLoading] = useState(false)
+  const [reportDate, setReportDate] = useState('')
 
   const load = async () => {
     setLoading(true)
@@ -130,6 +170,20 @@ export default function NewsPage() {
     return () => clearInterval(t)
   }, [])
 
+  const handleGenerateReport = async () => {
+    setReportLoading(true)
+    const allNews = [
+      ...data.world,
+      ...data.americas,
+      ...data.europe,
+      ...data.asia,
+    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+    const text = await generateDailyReport(allNews)
+    setReport(text)
+    setReportDate(new Date().toLocaleString('en-US'))
+    setReportLoading(false)
+  }
+
   useEffect(() => {
     const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1000)
     return () => clearInterval(t)
@@ -162,19 +216,69 @@ export default function NewsPage() {
               color: tab === key ? '#000' : 'var(--text3)',
             }}>
             {emoji} {label}
-            {data[key].length > 0 && (
+            {data[key as Region]?.length > 0 && (
               <span style={{
                 marginLeft: 5, fontSize: 10, fontWeight: 800, borderRadius: 10, padding: '1px 5px',
                 background: tab === key ? 'rgba(0,0,0,0.2)' : 'rgba(249,115,22,0.15)',
                 color: tab === key ? '#000' : 'var(--orange)',
-              }}>{data[key].length}</span>
+              }}>{data[key as Region].length}</span>
             )}
           </button>
         ))}
+        <button onClick={() => setTab('report')}
+          style={{
+            padding: '6px 14px', borderRadius: 4, fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', border: 'none',
+            background: tab === 'report' ? '#22c55e' : 'var(--surface)',
+            color: tab === 'report' ? '#000' : 'var(--text3)',
+          }}>
+          📋 Daily Report
+        </button>
       </div>
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', minHeight: 200 }}>
-        {loading ? (
+        {tab === 'report' ? (
+          <div style={{ padding: 20 }}>
+            {!report && !reportLoading && (
+              <div style={{ textAlign: 'center', padding: 32 }}>
+                <div style={{ fontSize: 14, color: 'var(--text3)', marginBottom: 16 }}>
+                  Generate an AI-powered daily market briefing based on today's headlines from Yahoo Finance, Reuters, CNBC and Seeking Alpha.
+                </div>
+                <button onClick={handleGenerateReport} disabled={loading}
+                  style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: '#22c55e', color: '#000' }}>
+                  📋 Generate Daily Report
+                </button>
+                <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 8 }}>
+                  Powered by Claude AI · Based on real headlines only
+                </div>
+              </div>
+            )}
+            {reportLoading && (
+              <div style={{ textAlign: 'center', padding: 48 }}>
+                <RefreshCw size={20} style={{ margin: '0 auto 10px', animation: 'spin 1s linear infinite', color: '#22c55e' }} />
+                <p style={{ fontSize: 13, color: 'var(--text4)' }}>Analyzing today's headlines...</p>
+              </div>
+            )}
+            {report && !reportLoading && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text4)' }}>Generated: {reportDate}</div>
+                  <button onClick={handleGenerateReport}
+                    style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer', border: '1px solid #22c55e', background: 'none', color: '#22c55e' }}>
+                    🔄 Refresh
+                  </button>
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                  {report.split('**').map((part, i) =>
+                    i % 2 === 1
+                      ? <strong key={i} style={{ color: 'var(--orange)' }}>{part}</strong>
+                      : <span key={i}>{part}</span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : loading ? (
           <div style={{ textAlign: 'center', padding: 48 }}>
             <RefreshCw size={20} style={{ margin: '0 auto 10px', animation: 'spin 1s linear infinite', color: 'var(--orange)' }} />
             <p style={{ fontSize: 13, color: 'var(--text4)' }}>Loading news...</p>
