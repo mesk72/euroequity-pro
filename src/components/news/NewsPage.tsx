@@ -204,7 +204,6 @@ export default function NewsPage() {
     let report = `**FORWARDALPHA DAILY MARKET BRIEFING**\n${today}\n\n`
 
     report += `**MARKET OVERVIEW**\n`
-    const worldHeadlines = data.world.slice(0, 3).map(n => n.title).join(' | ')
     report += `Global financial markets are being shaped by the following developments: ${data.world[0]?.title || 'markets in focus'}. `
     report += `Sentiment across regions reflects a mix of macro and micro drivers as investors digest the latest news flow.\n\n`
 
