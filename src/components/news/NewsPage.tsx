@@ -171,16 +171,25 @@ export default function NewsPage() {
   }, [])
 
   const handleGenerateReport = async () => {
-    setReportLoading(true)
     const allNews = [
       ...data.world,
       ...data.americas,
       ...data.europe,
       ...data.asia,
     ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-    const text = await generateDailyReport(allNews)
-    setReport(text)
-    setReportDate(new Date().toLocaleString('en-US'))
+    if (allNews.length === 0) {
+      setReport('No news available yet. Please wait for news to load and try again.')
+      setReportDate(new Date().toLocaleString('en-US'))
+      return
+    }
+    setReportLoading(true)
+    try {
+      const text = await generateDailyReport(allNews)
+      setReport(text)
+      setReportDate(new Date().toLocaleString('en-US'))
+    } catch (e: any) {
+      setReport('Error generating report: ' + (e.message || 'unknown error'))
+    }
     setReportLoading(false)
   }
 
