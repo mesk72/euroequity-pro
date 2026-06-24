@@ -2256,7 +2256,6 @@ export default function App() {
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         <button onClick={() => { setPage('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
-          {page === 'news' && <NewsPage />}
         <button onClick={() => { setPage('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
       </nav>
 
@@ -2369,6 +2368,7 @@ export default function App() {
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
             </div>
           )}
+          {page === 'news' && <NewsPage />}
         {page === 'myscreen' && (
             user
               ? <MyScreen userId={user!.id} onSelectStock={setDetailStock} />
