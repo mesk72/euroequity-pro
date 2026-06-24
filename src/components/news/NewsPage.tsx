@@ -19,22 +19,6 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'asia',     label: 'Asia Pacific',  emoji: '🌏' },
 ]
 
-async function generateDailyReport(newsItems: NewsItem[]): Promise<string> {
-  const headlines = newsItems
-    .slice(0, 20)
-    .map(n => `- [${n.source}] ${n.title}`)
-    .join('\n')
-
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-
-  const prompt = `You are a senior financial analyst writing a professional daily market report.
-Today is ${today}.
-
-Based on these real news headlines from Yahoo Finance, Reuters, CNBC, Seeking Alpha and other financial sources, write a concise daily market report in English.
-
-HEADLINES:
-${headlines}
-
 Write a structured report with these sections:
 1. **Market Overview** (2-3 sentences summarizing the main market mood today)
 2. **Key Themes** (3-4 bullet points of the most important themes/events moving markets)
