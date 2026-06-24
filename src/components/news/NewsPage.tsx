@@ -24,11 +24,9 @@ const FEEDS: Record<Region, { name: string; url: string }[]> = {
     { name: 'Reuters', url: 'https://feeds.feedburner.com/reuters/topNews' },
     { name: 'CNBC', url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html' },
     { name: 'MarketWatch', url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
-    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
   ],
   americas: [
     { name: 'CNBC Markets', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
-    { name: 'MarketWatch', url: 'https://feeds.marketwatch.com/marketwatch/marketpulse/' },
     { name: 'Reuters Business', url: 'https://feeds.feedburner.com/reuters/businessNews' },
     { name: 'Financial Post', url: 'https://financialpost.com/feed/' },
   ],
@@ -36,13 +34,11 @@ const FEEDS: Record<Region, { name: string; url: string }[]> = {
     { name: 'CNBC Europe', url: 'https://www.cnbc.com/id/19794221/device/rss/rss.html' },
     { name: 'Il Sole 24 Ore', url: 'https://www.ilsole24ore.com/rss/finanza.xml' },
     { name: 'Handelsblatt', url: 'https://www.handelsblatt.com/contentexport/feed/top-themen' },
-    { name: 'Reuters EU', url: 'https://feeds.feedburner.com/reuters/topNews' },
   ],
   asia: [
     { name: 'CNBC Asia', url: 'https://www.cnbc.com/id/19832390/device/rss/rss.html' },
     { name: 'NHK', url: 'https://www3.nhk.or.jp/rss/news/cat7.xml' },
     { name: 'SCMP', url: 'https://www.scmp.com/rss/92/feed' },
-    { name: 'Reuters Asia', url: 'https://feeds.feedburner.com/reuters/topNews' },
   ],
 }
 
@@ -50,7 +46,6 @@ function srcColor(s: string): string {
   if (s.includes('Reuters')) return '#ef4444'
   if (s.includes('CNBC')) return '#0ea5e9'
   if (s.includes('MarketWatch')) return '#2563eb'
-  if (s.includes('Yahoo')) return '#7c3aed'
   if (s.includes('Il Sole')) return '#ef4444'
   if (s.includes('Handelsblatt')) return '#f97316'
   if (s.includes('NHK')) return '#ec4899'
@@ -69,49 +64,53 @@ function timeAgo(d: string): string {
   return Math.floor(h / 24) + 'd ago'
 }
 
-async function fetchFeed(name: string, url: string): Promise<NewsItem[]> {
-  try {
-    const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url)
-    const r = await fetch(api)
-    if (!r.ok) return []
-    const d = await r.json()
-    if (d.status !== 'ok' || !Array.isArray(d.items)) return []
-    return d.items
-      .map((item: any) => ({
-        title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
-        link: item.link || '#',
-        pubDate: item.pubDate || new Date().toISOString(),
-        source: name,
-      }))
-      .filter((n: NewsItem) => n.title.length > 10)
-      .slice(0, 4)
-  } catch { return [] }
-}
-
 export default function NewsPage() {
   const [data, setData] = useState<Record<Region, NewsItem[]>>({
     world: [], americas: [], europe: [], asia: []
   })
   const [loading, setLoading] = useState(true)
+  const [debugLog, setDebugLog] = useState<string[]>([])
   const [tab, setTab] = useState<Region>('world')
   const [lastUpdate, setLast] = useState('')
   const [countdown, setCountdown] = useState(900)
 
   const load = async () => {
     setLoading(true)
+    const logs: string[] = []
     const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
+    
     for (const region of ['world', 'americas', 'europe', 'asia'] as Region[]) {
-      const all: NewsItem[] = []
       for (const { name, url } of FEEDS[region]) {
-        const items = await fetchFeed(name, url)
-        all.push(...items)
+        try {
+          const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url)
+          const r = await fetch(api)
+          const d = await r.json()
+          logs.push(`${name}: status=${d.status} items=${d.items?.length || 0}`)
+          if (d.status === 'ok' && Array.isArray(d.items)) {
+            const items: NewsItem[] = d.items
+              .map((item: any) => ({
+                title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
+                link: item.link || item.url || '#',
+                pubDate: item.pubDate || item.published || new Date().toISOString(),
+                source: name,
+              }))
+              .filter((n: NewsItem) => n.title.length > 10)
+              .slice(0, 5)
+            results[region].push(...items)
+          }
+        } catch (e: any) {
+          logs.push(`${name}: ERROR ${e.message}`)
+        }
       }
+      // Deduplica e ordina
       const seen = new Set<string>()
-      results[region] = all
+      results[region] = results[region]
         .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true })
         .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-        .slice(0, 25)
+        .slice(0, 20)
     }
+    
+    setDebugLog(logs)
     setData(results)
     setLast(new Date().toLocaleTimeString())
     setCountdown(900)
@@ -143,6 +142,13 @@ export default function NewsPage() {
           </button>
         </div>
       </div>
+
+      {/* Debug log - visibile temporaneamente */}
+      {debugLog.length > 0 && (
+        <div style={{ padding: 8, background: 'rgba(0,0,0,0.3)', borderRadius: 4, fontSize: 9, fontFamily: 'monospace', color: '#22c55e', maxHeight: 120, overflowY: 'auto' }}>
+          {debugLog.map((l, i) => <div key={i}>{l}</div>)}
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
         {REGIONS.map(({ key, label, emoji }) => (
@@ -199,9 +205,8 @@ export default function NewsPage() {
           </a>
         ))}
       </div>
-
       <div style={{ fontSize: 10, color: 'var(--text4)', textAlign: 'center' }}>
-        Reuters · CNBC · MarketWatch · Yahoo Finance · Il Sole 24 Ore · Handelsblatt · NHK · SCMP · Auto-refresh 15 min
+        Reuters · CNBC · MarketWatch · Il Sole 24 Ore · Handelsblatt · NHK · SCMP · Auto-refresh 15 min
       </div>
     </div>
   )
