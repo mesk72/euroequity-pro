@@ -2368,7 +2368,11 @@ export default function App() {
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
             </div>
           )}
-          {page === 'news' && <NewsPage />}
+          {page === 'news' && (
+            user
+              ? <NewsPage />
+              : <LoginGate onLogin={() => setShowAuth(true)} title="News" />
+          )}
         {page === 'myscreen' && (
             user
               ? <MyScreen userId={user!.id} onSelectStock={setDetailStock} />
