@@ -192,6 +192,13 @@ async function fetchTickerNews(
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items) || gd.items.length === 0) return []
+          // Filtro rigoroso: tutte le parole significative del nome devono essere nel titolo
+          const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited','de','et','und','of','and'])
+          const nameWords = t.company.split(' ')
+            .map((w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
+            .filter((w: string) => w.length >= 4 && !STOP.has(w.charAt(0).toUpperCase() + w.slice(1)))
+          const wordsToMatch = nameWords.slice(0, 3)
+
           return gd.items
             .map((item: any) => ({
               title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
@@ -208,8 +215,11 @@ async function fetchTickerNews(
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
               if (Date.now() - new Date(n.pubDate).getTime() > maxAge) return false
-              // Escludi solo TradingView
               if ((n.source || '').toLowerCase().includes('tradingview')) return false
+              if (wordsToMatch.length === 0) return false
+              const titleLower = n.title.toLowerCase()
+              const allMatch = wordsToMatch.every((w: string) => titleLower.includes(w))
+              if (!allMatch) return false
               const k = n.title.slice(0, 60).toLowerCase()
               if (seen[k]) return false
               seen[k] = true
