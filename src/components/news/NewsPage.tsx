@@ -188,7 +188,7 @@ async function fetchTickerNews(
         try {
           // Yahoo Finance RSS per yahooTicker specifico
           // Le notizie restituite sono GIA' specifiche per quel titolo
-          const gr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.yahooTicker || t.ticker) + '&company=' + encodeURIComponent(t.company || ''))
+          const gr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.yahooTicker || t.ticker) + '&company=' + encodeURIComponent(t.company || '') + '&exchange=' + encodeURIComponent(t.exchange || '') + '&yahooTicker=' + encodeURIComponent(t.yahooTicker || ''))
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items) || gd.items.length === 0) return []
