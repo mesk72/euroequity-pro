@@ -11,17 +11,17 @@ export async function GET(req: Request) {
   const region = searchParams.get('region') || 'americas'
 
   let exchanges: string[] = []
-  let limit = 50
+  let limit = 500
 
   if (region === 'americas') {
-    exchanges = ['US', 'TSX']
-    limit = 50
+    exchanges = ['US', 'TSX']  // Canada incluso in Americas
+    limit = 500
   } else if (region === 'europe') {
-    exchanges = ['PA', 'XETRA', 'MIL', 'MC', 'AS', 'BR', 'LSE', 'SWX', 'OM', 'OB', 'HE']
-    limit = 50
+    exchanges = ['PA', 'XETRA', 'MIL', 'MC', 'AS', 'BR', 'LSE', 'SWX', 'OM', 'OB', 'HE', 'IR', 'VI', 'CPSE']
+    limit = 600
   } else if (region === 'asia') {
-    exchanges = ['TSE', 'SEHK', 'ASX']
-    limit = 50
+    exchanges = ['TSE', 'SEHK', 'ASX']  // NO TSX - solo Asia Pacific
+    limit = 600
   }
 
   const { data: stocks } = await supabase
@@ -38,14 +38,14 @@ export async function GET(req: Request) {
     .from('stocks')
     .select('ticker, exchange, company')
     .in('exchange', exchanges)
-    .in('ticker', stocks.map((s: any) => s.ticker))
+    .in('ticker', (stocks as any[]).map((s: any) => s.ticker))
 
   const infoMap: Record<string, string> = {}
   for (const s of (stockInfo || [])) {
     if (s.company) infoMap[`${s.ticker}.${s.exchange}`] = s.company
   }
 
-  const tickers = stocks
+  const tickers = (stocks as any[])
     .map((s: any) => ({
       ticker: s.ticker,
       exchange: s.exchange,
