@@ -28,9 +28,11 @@ EX_MAP_APAC = {
     "TSE": "TSE", "TYO": "TSE", "XTKS": "TSE",
     "SEHK": "SEHK", "HKG": "SEHK", "XHKG": "SEHK",
     "ASX": "ASX", "XASX": "ASX",
+    # TSX/Canada escluso — Canada va nel weekly_us con tikr_us_latest.csv
 }
 
 TARGETS = {"TSE": 1000, "SEHK": 500, "ASX": 350}
+# TSX non incluso — Canada rankato con US nel weekly_us
 
 def parse_num(v):
     if v is None: return None
@@ -180,6 +182,9 @@ try:
         rows = sorted(by_ex[exchange], key=lambda x: x["mktcap"], reverse=True)[:target]
         tikr_rows.extend(rows)
         print(f" TIKR {exchange}: {len(rows)}/{len(by_ex[exchange])} (target={target})")
+    # Log Canada se presente nel CSV (viene ignorato)
+    if by_ex.get("TSX"):
+        print(f" TIKR TSX: ignorato ({len(by_ex['TSX'])} righe) — Canada va in tikr_us_latest.csv")
 
     print(f" TIKR APAC totale: {len(tikr_rows)}")
 except Exception as e:
