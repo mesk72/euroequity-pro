@@ -23,13 +23,13 @@ export async function GET(req: Request) {
 
   if (region === 'americas') {
     exchanges = ['US', 'TSX']
-    limit = 500
+    limit = 1500
   } else if (region === 'europe') {
     exchanges = ['PA', 'XETRA', 'MIL', 'MC', 'AS', 'BR', 'LSE', 'SWX', 'OM', 'OB', 'HE', 'IR', 'VI', 'CPSE']
-    limit = 600
+    limit = 1500
   } else if (region === 'asia') {
     exchanges = ['TSE', 'SEHK', 'ASX']
-    limit = 600
+    limit = 1500
   }
 
   // Prendi fundamentals con scores
