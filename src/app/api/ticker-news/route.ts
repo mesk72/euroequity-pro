@@ -87,6 +87,7 @@ export async function GET(req: Request) {
         valueScore: s.value_score,
         growthScore: s.growth_score,
         bestScore: s.combined_rank,
+        mktCap: s.mkt_cap ?? null,
       }
     })
     .filter(Boolean)
