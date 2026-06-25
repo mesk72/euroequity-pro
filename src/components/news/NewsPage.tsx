@@ -151,7 +151,7 @@ async function fetchRSS(name: string, url: string): Promise<NewsItem[]> {
         source: name,
       }))
       .filter((n: NewsItem) => n.title.length > 10)
-      .slice(0, 5)
+      .slice(0, 20)
   } catch { return [] }
 }
 
@@ -242,26 +242,15 @@ export default function NewsPage() {
     // Reset dati
     setData({ world: [], americas: [], europe: [], asia: [] })
 
-    // World: RSS feeds
-    const worldAll: NewsItem[] = []
-    for (const { name, url } of WORLD_FEEDS) {
-      const items = await fetchRSS(name, url)
-      worldAll.push(...items)
-    }
-
-    // Europe extra: fonti europee specifiche
-    const euExtra: NewsItem[] = []
-    for (const { name, url } of EUROPE_EXTRA_FEEDS) {
-      const items = await fetchRSS(name, url)
-      euExtra.push(...items)
-    }
-
-    // Asia extra: fonti asiatiche specifiche
-    const asiaExtra: NewsItem[] = []
-    for (const { name, url } of ASIA_EXTRA_FEEDS) {
-      const items = await fetchRSS(name, url)
-      asiaExtra.push(...items)
-    }
+    // World + EU extra + Asia extra in parallelo
+    const [worldResults, euResults, asiaResults] = await Promise.all([
+      Promise.all(WORLD_FEEDS.map(({ name, url }) => fetchRSS(name, url))),
+      Promise.all(EUROPE_EXTRA_FEEDS.map(({ name, url }) => fetchRSS(name, url))),
+      Promise.all(ASIA_EXTRA_FEEDS.map(({ name, url }) => fetchRSS(name, url))),
+    ])
+    const worldAll: NewsItem[] = worldResults.flat()
+    const euExtra: NewsItem[] = euResults.flat()
+    const asiaExtra: NewsItem[] = asiaResults.flat()
     const worldMaxAge = 24 * 60 * 60 * 1000
     const worldSeen: Record<string, boolean> = {}
     const worldNews = worldAll
