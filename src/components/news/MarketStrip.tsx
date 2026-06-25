@@ -4,38 +4,53 @@ import { useEffect, useRef, useState } from 'react'
 
 interface IndexQuote {
   name: string
-  symbol: string
   price: string
-  change: string
   changePct: string
   up: boolean
 }
 
-const INDICES = [
-  { name: 'DAX',          symbol: 'DAX',   exchange: 'INDEXEURO'     },
-  { name: 'CAC 40',       symbol: 'PX1',   exchange: 'INDEXEURO'     },
-  { name: 'FTSE MIB',     symbol: 'FTSEMIB', exchange: 'INDEXEURO'   },
-  { name: 'FTSE 100',     symbol: 'UKX',   exchange: 'INDEXFTSE'     },
-  { name: 'Euro Stoxx 50',symbol: 'SX5E',  exchange: 'INDEXSTOXX'    },
-  { name: 'Nikkei 225',   symbol: 'NI225', exchange: 'INDEXNIKKEI'   },
-  { name: 'Hang Seng',    symbol: 'HSI',   exchange: 'INDEXHANGSENG' },
-  { name: 'ASX 200',      symbol: 'AS51',  exchange: 'INDEXASX'      },
+// Google Finance ha un endpoint JSON non documentato ma pubblico
+// https://www.google.com/finance/quote/DAX:INDEXEURO
+// Usa l'API search di Google Finance che restituisce JSON
+const GOOGLE_INDICES = [
+  { name: 'DAX',            query: 'DAX:INDEXEURO'        },
+  { name: 'CAC 40',         query: 'PX1:INDEXEURO'        },
+  { name: 'FTSE MIB',       query: 'FTSEMIB:INDEXEURO'    },
+  { name: 'FTSE 100',       query: 'UKX:INDEXFTSE'        },
+  { name: 'Euro Stoxx 50',  query: 'SX5E:INDEXSTOXX'      },
+  { name: 'Nikkei 225',     query: 'NI225:INDEXNIKKEI'    },
+  { name: 'Hang Seng',      query: 'HSI:INDEXHANGSENG'    },
+  { name: 'ASX 200',        query: 'AS51:INDEXASX'        },
 ]
 
-async function fetchGoogleFinance(symbol: string, exchange: string): Promise<IndexQuote | null> {
+async function fetchGoogleIndex(query: string): Promise<{ price: string; changePct: string; up: boolean } | null> {
   try {
-    const url = `https://www.google.com/finance/quote/${symbol}:${exchange}`
-    const r = await fetch(url, { mode: 'no-cors' })
-    // no-cors non permette di leggere il body
-    return null
+    // Google Finance JSON endpoint - funziona dal browser
+    const url = 'https://www.google.com/finance/quote/' + query
+    const r = await fetch(url, {
+      headers: { 'Accept': 'text/html' },
+      mode: 'cors',
+    })
+    if (!r.ok) return null
+    const html = await r.text()
+    // Estrai prezzo e variazione dal HTML
+    const priceMatch = html.match(/data-last-price="([^"]+)"/)
+    const changeMatch = html.match(/data-last-price-change-percent="([^"]+)"/)
+    if (!priceMatch) return null
+    const price = parseFloat(priceMatch[1])
+    const changePct = changeMatch ? parseFloat(changeMatch[1]) * 100 : 0
+    return {
+      price: price.toLocaleString('en-US', { maximumFractionDigits: 0 }),
+      changePct: (changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%',
+      up: changePct >= 0,
+    }
   } catch { return null }
 }
 
 export default function MarketStrip() {
   const tvRef = useRef<HTMLDivElement>(null)
-  const [quotes, setQuotes] = useState<IndexQuote[]>([])
+  const [quotes, setQuotes] = useState<(IndexQuote | null)[]>([])
 
-  // TradingView strip per US, commodities, FX
   useEffect(() => {
     if (!tvRef.current) return
     tvRef.current.innerHTML = ''
@@ -64,47 +79,42 @@ export default function MarketStrip() {
     tvRef.current.appendChild(script)
   }, [])
 
-  // Fetch indici EU/Asia da nostra API proxy
   useEffect(() => {
     const load = async () => {
-      try {
-        const r = await fetch('/api/indices')
-        if (!r.ok) return
-        const d = await r.json()
-        setQuotes(d.quotes || [])
-      } catch {}
+      const results = await Promise.all(
+        GOOGLE_INDICES.map(async ({ name, query }) => {
+          const q = await fetchGoogleIndex(query)
+          if (!q) return null
+          return { name, ...q }
+        })
+      )
+      setQuotes(results)
     }
     load()
-    const t = setInterval(load, 60000) // ogni minuto
+    const t = setInterval(load, 60000)
     return () => clearInterval(t)
   }, [])
 
+  const validQuotes = quotes.filter(Boolean) as IndexQuote[]
+
   return (
     <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 4 }}>
-      {/* TradingView - US/Commodities/FX */}
       <div className="tradingview-widget-container" ref={tvRef}>
         <div className="tradingview-widget-container__widget" />
       </div>
-
-      {/* Indici EU/Asia da Google Finance */}
-      {quotes.length > 0 && (
-        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', padding: '4px 12px', background: 'rgba(0,0,0,0.2)' }}>
-          {quotes.map(q => (
-            <div key={q.symbol} style={{ flexShrink: 0, textAlign: 'center', minWidth: 80 }}>
+      {validQuotes.length > 0 && (
+        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', padding: '4px 12px', background: 'rgba(0,0,0,0.15)' }}>
+          {validQuotes.map((q, i) => (
+            <div key={i} style={{ flexShrink: 0, textAlign: 'center', minWidth: 75 }}>
               <div style={{ fontSize: 9, color: 'var(--text4)', fontWeight: 700 }}>{q.name}</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
-                {q.price}
-              </div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: q.up ? '#22c55e' : '#ef4444', fontFamily: 'IBM Plex Mono' }}>
-                {q.changePct}
-              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>{q.price}</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: q.up ? '#22c55e' : '#ef4444', fontFamily: 'IBM Plex Mono' }}>{q.changePct}</div>
             </div>
           ))}
         </div>
       )}
-
       <div style={{ fontSize: 9, color: 'var(--text4)', padding: '2px 8px 4px', textAlign: 'right' }}>
-        Powered by TradingView & Google Finance · live
+        TradingView (US/Commodities/FX) · Google Finance (EU/Asia) · live
       </div>
     </div>
   )
