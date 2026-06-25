@@ -6,7 +6,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-// Mappa exchange → suffisso Yahoo Finance
 const YAHOO_SUFFIX: Record<string, string> = {
   'PA': '.PA', 'XETRA': '.DE', 'MIL': '.MI', 'MC': '.MC',
   'AS': '.AS', 'BR': '.BR', 'LSE': '.L', 'SWX': '.SW',
@@ -33,21 +32,22 @@ export async function GET(req: Request) {
     limit = 600
   }
 
-  const { data: stocks } = await supabase
+  // Prendi fundamentals con scores
+  const { data: funds } = await supabase
     .from('fundamentals')
-    .select('ticker, exchange, mkt_cap')
+    .select('ticker, exchange, mkt_cap, value_score, growth_score, combined_rank')
     .in('exchange', exchanges)
     .not('mkt_cap', 'is', null)
     .order('mkt_cap', { ascending: false })
     .limit(limit)
 
-  if (!stocks || stocks.length === 0) return NextResponse.json({ tickers: [] })
+  if (!funds || funds.length === 0) return NextResponse.json({ tickers: [] })
 
   const { data: stockInfo } = await supabase
     .from('stocks')
     .select('ticker, exchange, company, yahoo_ticker')
     .in('exchange', exchanges)
-    .in('ticker', (stocks as any[]).map((s: any) => s.ticker))
+    .in('ticker', (funds as any[]).map((s: any) => s.ticker))
 
   const infoMap: Record<string, { company: string; yahoo_ticker: string | null }> = {}
   for (const s of (stockInfo || [])) {
@@ -57,11 +57,10 @@ export async function GET(req: Request) {
     }
   }
 
-  const tickers = (stocks as any[])
+  const tickers = (funds as any[])
     .map((s: any) => {
       const info = infoMap[`${s.ticker}.${s.exchange}`]
       if (!info) return null
-      // Usa yahoo_ticker se disponibile, altrimenti costruisci con suffisso
       const suffix = YAHOO_SUFFIX[s.exchange] || ''
       const yahooTicker = info.yahoo_ticker || (s.ticker + suffix)
       return {
@@ -69,6 +68,9 @@ export async function GET(req: Request) {
         exchange: s.exchange,
         company: info.company,
         yahooTicker,
+        valueScore: s.value_score,
+        growthScore: s.growth_score,
+        bestScore: s.combined_rank,
       }
     })
     .filter(Boolean)
