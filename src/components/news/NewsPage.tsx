@@ -77,18 +77,21 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'asia',     label: 'Asia Pacific',  emoji: '🌏' },
 ]
 
-const WORLD_FEEDS = [
-  // Feed confermati funzionanti via rss2json
-  { name: 'Yahoo Finance',  url: 'https://finance.yahoo.com/rss/topstories' },
+const WORLD_RSS_FEEDS = [
   { name: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml' },
   { name: 'Motley Fool',    url: 'https://www.fool.com/feeds/index.aspx' },
-  // Google News RSS - funziona via rss2json
-  { name: 'Google Markets', url: 'https://news.google.com/rss/search?q=stock+market+today+wall+street&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Close',   url: 'https://news.google.com/rss/search?q=market+close+open+index+stocks&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google PreMkt',  url: 'https://news.google.com/rss/search?q=premarket+futures+nasdaq+sp500+dow&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Asia',    url: 'https://news.google.com/rss/search?q=asia+markets+nikkei+hang+seng+close+today&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Europe',  url: 'https://news.google.com/rss/search?q=european+markets+DAX+CAC+FTSE+open+close&hl=en&gl=GB&ceid=GB:en' },
-  { name: 'Google Economy', url: 'https://news.google.com/rss/search?q=fed+ecb+interest+rate+inflation+economy&hl=en&gl=US&ceid=US:en' },
+]
+
+// Google News queries - fetchate via /api/yahoo-news proxy (server-side, no CORS)
+const GOOGLE_NEWS_QUERIES = [
+  { name: 'Google Markets', q: 'stock market today wall street close open' },
+  { name: 'Google PreMkt',  q: 'premarket futures nasdaq sp500 dow jones' },
+  { name: 'Google Asia',    q: 'asia markets nikkei hang seng asx close today' },
+  { name: 'Google Europe',  q: 'european markets DAX CAC FTSE open close today' },
+  { name: 'Google Fed',     q: 'fed ecb interest rate inflation central bank' },
+  { name: 'Google Earnings',q: 'earnings results revenue profit quarterly' },
+  { name: 'Google Oil',     q: 'oil price gold commodity market today' },
+  { name: 'Google Dollar',  q: 'dollar euro yen currency forex today' },
 ]
 
 const EUROPE_EXTRA_FEEDS = [
@@ -242,13 +245,28 @@ export default function NewsPage() {
     // Reset dati
     setData({ world: [], americas: [], europe: [], asia: [] })
 
-    // World + EU extra + Asia extra in parallelo
-    const [worldResults, euResults, asiaResults] = await Promise.all([
-      Promise.all(WORLD_FEEDS.map(({ name, url }) => fetchRSS(name, url))),
+    // World + EU extra + Asia extra + Google News in parallelo
+    const [worldRssResults, euResults, asiaResults, googleResults] = await Promise.all([
+      Promise.all(WORLD_RSS_FEEDS.map(({ name, url }) => fetchRSS(name, url))),
       Promise.all(EUROPE_EXTRA_FEEDS.map(({ name, url }) => fetchRSS(name, url))),
       Promise.all(ASIA_EXTRA_FEEDS.map(({ name, url }) => fetchRSS(name, url))),
+      // Google News via server proxy
+      Promise.all(GOOGLE_NEWS_QUERIES.map(async ({ name, q }) => {
+        try {
+          const url = 'https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=en&gl=US&ceid=US:en'
+          const r = await fetch('/api/yahoo-news?ticker=&company=&googleUrl=' + encodeURIComponent(url))
+          if (!r.ok) return [] as NewsItem[]
+          const d = await r.json()
+          return (d.items || []).map((i: any) => ({
+            title: i.title || '',
+            link: i.link || '#',
+            pubDate: i.pubDate || new Date().toISOString(),
+            source: name,
+          })) as NewsItem[]
+        } catch { return [] as NewsItem[] }
+      }))
     ])
-    const worldAll: NewsItem[] = worldResults.flat()
+    const worldAll: NewsItem[] = [...worldRssResults.flat(), ...googleResults.flat()]
     const euExtra: NewsItem[] = euResults.flat()
     const asiaExtra: NewsItem[] = asiaResults.flat()
     const worldMaxAge = 48 * 60 * 60 * 1000 // 48 ore
