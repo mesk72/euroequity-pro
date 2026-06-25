@@ -127,7 +127,8 @@ export async function POST(req: Request) {
     })
 
     const buffer = await Packer.toBuffer(doc)
-    return new NextResponse(buffer, {
+    const uint8 = new Uint8Array(buffer)
+    return new NextResponse(uint8, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'Content-Disposition': `attachment; filename="ForwardAlpha_Report_${new Date().toISOString().slice(0,10)}.docx"`,
