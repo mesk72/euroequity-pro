@@ -120,22 +120,35 @@ export async function GET(req: Request) {
   const word2 = nameWords[1] || allNameWords[1] || ''
   const yahooTickerClean = (yahooTicker || '').split('.')[0].toLowerCase()
 
+  // Parole generiche che da sole non identificano univocamente un titolo
+  const GENERIC_WORDS = new Set([
+    'semiconductor','manufacturing','international','technology','technologies',
+    'energy','financial','services','holdings','systems','solutions','capital',
+    'resources','communications','electric','electronics','industrial','industries',
+    'pharmaceutical','pharmaceuticals','biotech','biotechnology','healthcare',
+    'insurance','investment','investments','management','properties','development',
+    'construction','engineering','chemicals','materials','logistics','transport',
+  ])
+
+  // Se word1 o word2 sono parole generiche, il ticker Yahoo diventa obbligatorio
+  const word1IsGeneric = GENERIC_WORDS.has(word1)
+  const word2IsGeneric = GENERIC_WORDS.has(word2)
+  const nameIsAmbiguous = word1IsGeneric || word2IsGeneric
+
   const filtered = deduped.filter(i => {
     const src   = (i.source || '').toLowerCase()
     const title = (i.title || '').toLowerCase()
     // Escludi fonti problematiche
     if (src.includes('tradingview') || src.includes('investors business') ||
         src.includes('investing.com') || title.includes('tradingview')) return false
-    // Verifica: deve contenere almeno le prime 2 parole del nome OPPURE il ticker Yahoo
-    // Es. Tencent Holdings → titolo deve contenere "tencent" E "holding"
-    // oppure contenere "700.HK" o "0700"
-    if (word1) {
-      const hasWord1 = title.includes(word1)
-      const hasWord2 = !word2 || title.includes(word2)
-      const hasTicker = yahooTickerClean.length >= 2 && title.includes(yahooTickerClean)
-      // Deve avere (word1 AND word2) OPPURE ticker Yahoo
-      if (!(hasWord1 && hasWord2) && !hasTicker) return false
-    }
+    if (!word1) return true
+    const hasWord1  = title.includes(word1)
+    const hasWord2  = !word2 || title.includes(word2)
+    const hasTicker = yahooTickerClean.length >= 2 && title.includes(yahooTickerClean)
+    // Se il nome è ambiguo (parole generiche), il ticker Yahoo è obbligatorio
+    if (nameIsAmbiguous) return hasTicker
+    // Altrimenti: (word1 AND word2) OPPURE ticker Yahoo
+    if (!(hasWord1 && hasWord2) && !hasTicker) return false
     return true
   })
   return NextResponse.json({ items: filtered.slice(0, 15) })
