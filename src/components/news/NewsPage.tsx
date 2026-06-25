@@ -142,17 +142,19 @@ async function fetchTickerNews(
     const batchResults = await Promise.all(
       batch.map(async (t) => {
         try {
-          // Usa proxy server-side per bypassare CORS Yahoo Finance
+          // Yahoo Finance RSS per yahooTicker specifico
+          // Le notizie restituite sono GIA' specifiche per quel titolo
           const gr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.yahooTicker || t.ticker))
           if (!gr.ok) return []
           const gd = await gr.json()
-          if (!Array.isArray(gd.items)) return []
+          if (!Array.isArray(gd.items) || gd.items.length === 0) return []
           return gd.items
             .map((item: any) => ({
               title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
               link: item.link || '#',
               pubDate: item.pubDate || new Date().toISOString(),
               source: item.source || 'Yahoo Finance',
+              // Ticker e exchange SEMPRE da t — le notizie sono già filtrate per questo ticker
               ticker: t.ticker,
               exchange: t.exchange,
             }))
@@ -164,7 +166,7 @@ async function fetchTickerNews(
               seen[k] = true
               return true
             })
-            .slice(0, 3)
+            .slice(0, 2) // max 2 notizie per ticker per non dominare la lista
         } catch { return [] }
       })
     )
