@@ -95,5 +95,11 @@ export async function GET(req: Request) {
     return true
   })
 
-  return NextResponse.json({ items: deduped.slice(0, 8) })
+  // Escludi notizie TradingView che sono generiche e non informative
+  const filtered = deduped.filter(i => {
+    const src = (i.source || '').toLowerCase()
+    const title = (i.title || '').toLowerCase()
+    return !src.includes('tradingview') && !title.includes('tradingview')
+  })
+  return NextResponse.json({ items: filtered.slice(0, 8) })
 }
