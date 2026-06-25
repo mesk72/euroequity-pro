@@ -247,7 +247,7 @@ while True:
                 "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)", "in_universe": "eq.true",
                 "offset": str(offset), "limit": "1000"})
     data = r.json()
-    if not data: break
+    if not isinstance(data, list) or not data: break
     all_data.extend(data); offset += 1000
     if len(data) < 1000: break
 print(f"  Fundamentals: {len(all_data)}")
@@ -259,9 +259,8 @@ RANK_GROUPS = {
     "ITA": ["MIL"], "DEU": ["XETRA"], "FRA": ["PA"], "GBR": ["LSE"],
     "SWE": ["OM"],  "NOR": ["OB"],    "CHE": ["SWX"], "NLD": ["AS"],
     "BEL": ["BR"],  "FIN": ["HE"],    "ESP": ["MC"],  "DNK": ["CPSE"],
-    "POR": ["LS"],
 }
-NO_RANK = {"AT", "VI", "IR", "NGM", "AIM"}
+NO_RANK = {"AT", "VI", "IR", "NGM", "AIM", "LS"}  # LS = Portugal escluso
 
 def calc_ranks(group):
     ey_trail_g = [ey(d['pe_trailing']) for d in group if ey(d['pe_trailing']) is not None]
