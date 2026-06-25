@@ -41,20 +41,22 @@ function isEUOpen(): boolean {
   return utcTime >= 420 && utcTime <= 930
 }
 
-async function fetchFMP(symbols: string[]): Promise<any[]> {
+async function fetchFMP(symbols: string[]): Promise<{ data: any[], url: string, status: number, raw: string }> {
+  const syms = symbols.map(s => encodeURIComponent(s)).join(',')
+  const url = `https://financialmodelingprep.com/api/v3/quote/${syms}?apikey=${FMP_KEY}`
   try {
-    // FMP vuole i simboli separati da virgola nell'URL senza encode della virgola
-    const syms = symbols.map(s => encodeURIComponent(s)).join(',')
-    const url = `https://financialmodelingprep.com/api/v3/quote/${syms}?apikey=${FMP_KEY}`
     const r = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
       signal: AbortSignal.timeout(8000),
       cache: 'no-store',
     })
-    if (!r.ok) return []
-    const d = await r.json()
-    return Array.isArray(d) ? d : [{ _raw: JSON.stringify(d).slice(0, 200) }]
-  } catch (e: any) { return [{ _error: e.message }] }
+    const raw = await r.text()
+    let data = []
+    try { data = JSON.parse(raw); if (!Array.isArray(data)) data = [] } catch {}
+    return { data, url, status: r.status, raw: raw.slice(0, 300) }
+  } catch (e: any) {
+    return { data: [], url, status: 0, raw: e.message }
+  }
 }
 
 export async function GET() {
@@ -70,7 +72,8 @@ export async function GET() {
   }
 
   const symbols = toFetch.map(i => i.symbol)
-  const fmpData = await fetchFMP(symbols)
+  const fmpResult = await fetchFMP(symbols)
+  const fmpData = fmpResult.data
 
   const quotes = toFetch.map(idx => {
     const q = fmpData.find((d: any) => d.symbol === idx.symbol)
@@ -92,6 +95,9 @@ export async function GET() {
       utcHour: new Date().getUTCHours(),
       symbolsFetched: symbols,
       fmpCount: fmpData.length,
+      fmpStatus: fmpResult.status,
+      fmpUrl: fmpResult.url,
+      fmpRaw: fmpResult.raw,
     }
   })
 }
