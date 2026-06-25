@@ -3,7 +3,8 @@
 # Da eseguire ogni giorno alle 09:00 CET (dopo chiusura Asia)
 # Copre: TSE (Giappone), SEHK (Hong Kong), ASX (Australia)
 # REGOLE: vedere FORWARDALPHA_CONTEXT.md
-# - prezzi da prices_eod (chunk 20 ticker)
+# - prezzi scaricati da Leeway → scritti in prices_eod
+# - lettura prezzi da prices_eod in chunk da 20 ticker
 # - book_yield = 1/pb, PE negativi inclusi
 # - combined AP = TSE+SEHK+ASX
 # ============================================================
@@ -40,17 +41,17 @@ def pct_rank(vals, v):
     return round(below / len(vals) * 100)
 
 def ey(pe):
-    # PE negativi inclusi sempre
     if pe is None or pe == 0: return None
-    return 1.0 / pe
+    return 1.0 / pe  # PE negativi inclusi sempre
 
 def book_yield(pb):
-    # PB negativo → rank bassissimo, PB basso positivo → rank altissimo
     if pb is None or pb == 0: return None
-    return 1.0 / pb
+    return 1.0 / pb  # PB negativo → rank bassissimo
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 TODAY        = datetime.now().strftime("%Y-%m-%d")
 TODAY_DT     = datetime.now()
 
@@ -58,14 +59,20 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 
+# Suffissi Leeway per exchange APAC
+LEEWAY_SUFFIX = {
+    "TSE":  ".T",
+    "SEHK": ".HK",
+    "ASX":  ".AX",
+}
+
 start_time = time.time()
 print("=" * 60)
 print(f"FORWARDALPHA DAILY APAC LOAD — {TODAY}")
 print("=" * 60)
 
 # ── 1. CARICA UNIVERSO APAC DA stocks ───────────────────────
-# CORRETTO: leggi da stocks, NON paginare prices_eod
-print("\n[1/4] Caricamento universo APAC...")
+print("\n[1/5] Caricamento universo APAC...")
 all_stocks = []
 for exchange in ['TSE', 'SEHK', 'ASX']:
     offset = 0
@@ -78,20 +85,97 @@ for exchange in ['TSE', 'SEHK', 'ASX']:
         all_stocks.extend(batch)
         offset += 1000
         if len(batch) < 1000: break
-print(f"  Universo APAC: {len(all_stocks)} titoli")
 
+print(f"  Universo APAC: {len(all_stocks)} titoli")
 by_exchange = defaultdict(list)
 for s in all_stocks:
     by_exchange[s['exchange']].append(s['ticker'])
 
-# ── 2. PREZZI DA prices_eod IN CHUNK DA 20 ──────────────────
-# REGOLA: NON paginare tutta la tabella — chunk da 20 ticker
-print("\n[2/4] Lettura prezzi da prices_eod (chunk 20)...")
+# ── 2. SCARICA PREZZI EOD DA LEEWAY → prices_eod ────────────
+print("\n[2/5] Download prezzi EOD da Leeway...")
+ok_leeway = fail_leeway = 0
+price_buf = []
+
+# Prima trova la data dell'ultimo prezzo per ogni titolo
+print("  Lettura ultima data prezzi...")
+last_date_map = {}
+for exchange, tickers in by_exchange.items():
+    CHUNK = 20
+    for i in range(0, len(tickers), CHUNK):
+        chunk = tickers[i:i+CHUNK]
+        ticker_filter = ','.join(chunk)
+        r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+            params={"select": "ticker,exchange,date",
+                    "exchange": f"eq.{exchange}",
+                    "ticker": f"in.({ticker_filter})",
+                    "order": "ticker,date.desc",
+                    "limit": str(len(chunk) * 2)})  # 2 righe per ticker max
+        batch = r.json()
+        if isinstance(batch, list):
+            seen = set()
+            for d in batch:
+                key = (d['ticker'], d['exchange'])
+                if key not in seen:
+                    last_date_map[key] = d['date']
+                    seen.add(key)
+        time.sleep(0.01)
+
+# Scarica prezzi da Leeway per ogni titolo
+for exchange, tickers in by_exchange.items():
+    suffix = LEEWAY_SUFFIX.get(exchange, '')
+    print(f"  {exchange}: downloading {len(tickers)} ticker...")
+    for ticker in tickers:
+        key = (ticker, exchange)
+        last = last_date_map.get(key, "2021-01-01")
+        if last >= TODAY:
+            ok_leeway += 1
+            continue
+        start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+        leeway_ticker = ticker + suffix
+        url = f"{LEEWAY_BASE}/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
+        try:
+            r = requests.get(url, timeout=10)
+            if r.status_code != 200:
+                fail_leeway += 1
+                continue
+            data = r.json()
+            if not isinstance(data, list) or not data:
+                fail_leeway += 1
+                continue
+            for row in data:
+                adj = row.get('adjusted_close') or row.get('close')
+                if adj is None: continue
+                price_buf.append({
+                    "ticker": ticker,
+                    "exchange": exchange,
+                    "date": row['date'],
+                    "adj_close": float(adj),
+                })
+            ok_leeway += 1
+        except Exception as e:
+            fail_leeway += 1
+
+        if len(price_buf) >= 500:
+            requests.post(SUPABASE_URL + "/rest/v1/prices_eod",
+                          headers=headers_up, json=price_buf)
+            price_buf = []
+        time.sleep(0.05)
+
+    if (ok_leeway + fail_leeway) % 200 == 0:
+        print(f"    ok={ok_leeway} fail={fail_leeway}")
+
+if price_buf:
+    requests.post(SUPABASE_URL + "/rest/v1/prices_eod",
+                  headers=headers_up, json=price_buf)
+
+print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
+
+# ── 3. LEGGI PREZZI DA prices_eod IN CHUNK DA 20 ────────────
+print("\n[3/5] Lettura prezzi aggiornati da prices_eod...")
 CHUNK = 20
-all_ph = defaultdict(list)  # (ticker, exchange) → [{date, close}]
+all_ph = defaultdict(list)
 
 for exchange, tickers in by_exchange.items():
-    print(f"  {exchange}: {len(tickers)} ticker...")
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i+CHUNK]
         ticker_filter = ','.join(chunk)
@@ -115,8 +199,8 @@ for exchange, tickers in by_exchange.items():
 
 print(f"  Prezzi caricati per {len(all_ph)} titoli")
 
-# ── 3. MOMENTUM ─────────────────────────────────────────────
-print("\n[3/4] Calcolo momentum...")
+# ── 4. MOMENTUM ─────────────────────────────────────────────
+print("\n[4/5] Calcolo momentum...")
 ok = fail = 0
 mom_updates = []
 
@@ -125,7 +209,6 @@ for stock in all_stocks:
     exchange = stock['exchange']
     data     = all_ph.get((ticker, exchange), [])
 
-    if not data: fail += 1; continue
     if len(data) < 2: fail += 1; continue
 
     last_px   = data[0]['close']
@@ -145,7 +228,6 @@ for stock in all_stocks:
         "mom6m": mom_cal(182), "mom12m": mom_cal(365),
         "change1d": chg1d,
         "price": last_px,
-        "last_price_date": data[0]['date'],
     })
     ok += 1
 
@@ -155,10 +237,9 @@ for i in range(0, len(mom_updates), 100):
 print(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
-# ── 4. RANK APAC ─────────────────────────────────────────────
-print("\n[4/4] Ricalcolo rank APAC...")
+# ── 5. RANK APAC ─────────────────────────────────────────────
+print("\n[5/5] Ricalcolo rank APAC...")
 
-# Carica fundamentals per APAC
 all_data = []
 offset = 0
 while True:
@@ -172,21 +253,17 @@ while True:
     offset += 1000
     if len(data) < 1000: break
 
-print(f"  Fundamentals caricati: {len(all_data)}")
+print(f"  Fundamentals: {len(all_data)}")
 
-# Mappa mom1w/mom1m
 mom1w_map = {(d['ticker'], d['exchange']): d.get('mom1w') for d in all_data}
 mom1m_map = {(d['ticker'], d['exchange']): d.get('mom1m') for d in all_data}
 
 def calc_ranks(group):
-    # Value inputs
     ey_trail_g = [ey(d['pe_trailing']) for d in group if ey(d['pe_trailing']) is not None]
     ey_fwd_g   = [ey(d['pe_forward'])  for d in group if ey(d['pe_forward'])  is not None]
-    by_g       = [book_yield(d['pb'])   for d in group if book_yield(d['pb']) is not None]
-
-    # Growth inputs
-    eps_g_vals = [d['eps_growth'] for d in group if d['eps_growth'] is not None]
-    rev_g_vals = [d['rev_growth'] for d in group if d['rev_growth'] is not None]
+    by_g       = [book_yield(d['pb'])   for d in group if book_yield(d['pb'])  is not None]
+    eps_g_vals = [d['eps_growth']       for d in group if d['eps_growth']      is not None]
+    rev_g_vals = [d['rev_growth']       for d in group if d['rev_growth']      is not None]
     mom6_adj_g  = []
     mom12_adj_g = []
     for d in group:
@@ -201,33 +278,24 @@ def calc_ranks(group):
         key  = (d['ticker'], d['exchange'])
         m6   = d.get('mom6m');  m12 = d.get('mom12m')
         m1w  = mom1w_map.get(key); m1m = mom1m_map.get(key)
-
-        # Value ranks
         ey_t = ey(d.get('pe_trailing')); r_eyt = pct_rank(ey_trail_g, ey_t) if ey_t is not None else None
         ey_f = ey(d.get('pe_forward'));  r_eyf = pct_rank(ey_fwd_g,   ey_f) if ey_f is not None else None
         by_v = book_yield(d.get('pb'));  r_pb  = pct_rank(by_g,       by_v) if by_v is not None else None
-
-        # Growth ranks
         r_epsg = pct_rank(eps_g_vals, d.get('eps_growth')) if d.get('eps_growth') is not None else None
         r_revg = pct_rank(rev_g_vals, d.get('rev_growth')) if d.get('rev_growth') is not None else None
         mom6_adj  = (m6  - m1w) if m6  is not None and m1w is not None else None
         mom12_adj = (m12 - m1m) if m12 is not None and m1m is not None else None
         r_m6  = pct_rank(mom6_adj_g,  mom6_adj)  if mom6_adj  is not None else None
         r_m12 = pct_rank(mom12_adj_g, mom12_adj) if mom12_adj is not None else None
-
-        pre.append({
-            "ticker": d['ticker'], "exchange": d['exchange'],
-            "r_eyt": r_eyt, "r_eyf": r_eyf, "r_pb": r_pb,
-            "r_epsg": r_epsg, "r_revg": r_revg,
-            "r_m6": r_m6, "r_m12": r_m12,
-        })
+        pre.append({"ticker": d['ticker'], "exchange": d['exchange'],
+                    "r_eyt": r_eyt, "r_eyf": r_eyf, "r_pb": r_pb,
+                    "r_epsg": r_epsg, "r_revg": r_revg,
+                    "r_m6": r_m6, "r_m12": r_m12})
 
     val_sums = [sum(x for x in [p['r_eyt'], p['r_eyf'], p['r_pb']] if x is not None)
-                for p in pre
-                if len([x for x in [p['r_eyt'], p['r_eyf'], p['r_pb']] if x is not None]) >= 2]
+                for p in pre if len([x for x in [p['r_eyt'], p['r_eyf'], p['r_pb']] if x is not None]) >= 2]
     gr_sums  = [sum(x for x in [p['r_epsg'], p['r_revg'], p['r_m6'], p['r_m12']] if x is not None)
-                for p in pre
-                if len([x for x in [p['r_epsg'], p['r_revg'], p['r_m6'], p['r_m12']] if x is not None]) >= 3]
+                for p in pre if len([x for x in [p['r_epsg'], p['r_revg'], p['r_m6'], p['r_m12']] if x is not None]) >= 3]
 
     results = []
     for p in pre:
@@ -244,7 +312,7 @@ def calc_ranks(group):
         })
     return results
 
-# Rank per paese (JPN, HKG, AUS separati)
+# Rank per paese separati
 APAC_GROUPS = {"JPN": ["TSE"], "HKG": ["SEHK"], "AUS": ["ASX"]}
 rank_updates = []
 for country, exchanges in APAC_GROUPS.items():
@@ -261,7 +329,7 @@ for i in range(0, len(rank_updates), 100):
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print(f"  Rank paese: {ok}/{len(rank_updates)}")
 
-# Combined rank APAC = TSE+SEHK+ASX insieme (no TSX)
+# Combined APAC = TSE+SEHK+ASX insieme
 requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
     headers={**headers_up, "Prefer": "return=minimal"},
     params={"exchange": "in.(TSE,SEHK,ASX)"},
@@ -287,15 +355,13 @@ ok_rank = ok
 end_time = time.time()
 log_entry = {
     "run_date": TODAY, "market": "APAC",
-    "prices_updated": ok_momentum,  # aggiornamenti momentum = prezzi letti
-    "prices_failed": fail,
+    "prices_updated": ok_leeway, "prices_failed": fail_leeway,
     "last_price_date": TODAY,
-    "momentum_updated": ok_momentum,
-    "rank_updated": ok_rank,
+    "momentum_updated": ok_momentum, "rank_updated": ok_rank,
     "duration_seconds": int(end_time - start_time),
 }
 requests.post(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_up, json=[log_entry])
-print(f"\nLog: momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
+print(f"\nLog: leeway={ok_leeway} fail={fail_leeway} momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
 print("\n" + "=" * 60)
 print("DAILY APAC LOAD COMPLETATO")
 print("=" * 60)
