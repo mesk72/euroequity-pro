@@ -14,50 +14,66 @@ const YAHOO_SUFFIX: Record<string, string> = {
   'ASX': '.AX', 'TSX': '.TO',
 }
 
+async function fetchAll(exchanges: string[], limit: number) {
+  // Supabase ha limite 1000 per query - facciamo più query
+  const all: any[] = []
+  const pageSize = 1000
+  let offset = 0
+  while (all.length < limit) {
+    const { data } = await supabase
+      .from('fundamentals')
+      .select('ticker, exchange, mkt_cap, value_score, growth_score, combined_rank')
+      .in('exchange', exchanges)
+      .not('mkt_cap', 'is', null)
+      .order('mkt_cap', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+    if (!data || data.length === 0) break
+    all.push(...data)
+    if (data.length < pageSize) break
+    offset += pageSize
+  }
+  return all.slice(0, limit)
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const region = searchParams.get('region') || 'americas'
 
   let exchanges: string[] = []
-  let limit = 500
+  let limit = 1500
 
   if (region === 'americas') {
     exchanges = ['US', 'TSX']
-    limit = 1500
   } else if (region === 'europe') {
     exchanges = ['PA', 'XETRA', 'MIL', 'MC', 'AS', 'BR', 'LSE', 'SWX', 'OM', 'OB', 'HE', 'IR', 'VI', 'CPSE']
-    limit = 1500
   } else if (region === 'asia') {
     exchanges = ['TSE', 'SEHK', 'ASX']
-    limit = 1500
   }
 
-  // Prendi fundamentals con scores
-  const { data: funds } = await supabase
-    .from('fundamentals')
-    .select('ticker, exchange, mkt_cap, value_score, growth_score, combined_rank')
-    .in('exchange', exchanges)
-    .not('mkt_cap', 'is', null)
-    .order('mkt_cap', { ascending: false })
-    .limit(limit)
+  const funds = await fetchAll(exchanges, limit)
+  if (funds.length === 0) return NextResponse.json({ tickers: [] })
 
-  if (!funds || funds.length === 0) return NextResponse.json({ tickers: [] })
-
-  const { data: stockInfo } = await supabase
-    .from('stocks')
-    .select('ticker, exchange, company, yahoo_ticker')
-    .in('exchange', exchanges)
-    .in('ticker', (funds as any[]).map((s: any) => s.ticker))
+  // Prendi info stocks in batch da 1000
+  const allInfo: any[] = []
+  const tickers = funds.map((s: any) => s.ticker)
+  for (let i = 0; i < tickers.length; i += 1000) {
+    const { data } = await supabase
+      .from('stocks')
+      .select('ticker, exchange, company, yahoo_ticker')
+      .in('exchange', exchanges)
+      .in('ticker', tickers.slice(i, i + 1000))
+    if (data) allInfo.push(...data)
+  }
 
   const infoMap: Record<string, { company: string; yahoo_ticker: string | null }> = {}
-  for (const s of (stockInfo || [])) {
+  for (const s of allInfo) {
     if (s.company) infoMap[`${s.ticker}.${s.exchange}`] = {
       company: s.company,
       yahoo_ticker: s.yahoo_ticker || null,
     }
   }
 
-  const tickers = (funds as any[])
+  const result = funds
     .map((s: any) => {
       const info = infoMap[`${s.ticker}.${s.exchange}`]
       if (!info) return null
@@ -75,5 +91,5 @@ export async function GET(req: Request) {
     })
     .filter(Boolean)
 
-  return NextResponse.json({ tickers })
+  return NextResponse.json({ tickers: result })
 }
