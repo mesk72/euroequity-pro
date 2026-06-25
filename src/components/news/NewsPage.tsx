@@ -78,6 +78,8 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
 ]
 
 const WORLD_RSS_FEEDS = [
+  { name: 'Yahoo Finance',  url: 'https://finance.yahoo.com/rss/topstories' },
+  { name: 'Yahoo Markets',  url: 'https://finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US' },
   { name: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml' },
   { name: 'Motley Fool',    url: 'https://www.fool.com/feeds/index.aspx' },
 ]
@@ -98,6 +100,8 @@ const GOOGLE_NEWS_QUERIES = [
   { name: 'Google Forex',     q: 'dollar euro yen pound forex currency market' },
   { name: 'Google Tech',      q: 'nvidia apple microsoft meta alphabet stock today' },
   { name: 'Google Banks',     q: 'jpmorgan goldman sachs bank financial stock' },
+  { name: 'Google Morning',   q: 'morning brief stock market outlook today' },
+  { name: 'Google Brief',     q: 'market wrap recap brief investing stocks' },
 ]
 
 const EUROPE_EXTRA_FEEDS = [
