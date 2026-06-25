@@ -127,23 +127,27 @@ async function fetchRSS(name: string, url: string): Promise<NewsItem[]> {
 
 async function fetchTickerNews(region: string): Promise<NewsItem[]> {
   try {
-    // 1. Prendi lista ticker dal DB
     const r = await fetch('/api/ticker-news?region=' + region)
     if (!r.ok) return []
     const d = await r.json()
     const tickers: { ticker: string; exchange: string; company: string }[] = d.tickers || []
     if (tickers.length === 0) return []
 
-    // 2. Costruisci query Google News per gruppi di 10 company names
     const allNews: NewsItem[] = []
-    const chunkSize = 10
+    const chunkSize = 8
+    const maxAge = 3 * 24 * 60 * 60 * 1000 // 3 giorni max
 
-    for (let i = 0; i < Math.min(tickers.length, 50) && allNews.length < 40; i += chunkSize) {
+    for (let i = 0; i < Math.min(tickers.length, 100) && allNews.length < 50; i += chunkSize) {
       const chunk = tickers.slice(i, i + chunkSize)
-      const query = chunk.map(t => '"' + t.company.split(' ').slice(0, 2).join(' ') + '"').join(' OR ')
-      const lang = 'en'
-      const geo = region === 'americas' ? 'US' : region === 'asia' ? 'US' : 'US'
-      const googleUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query + ' stock OR earnings OR shares') + '&hl=' + lang + '&gl=' + geo + '&ceid=' + geo + ':' + lang
+
+      // Query con company names esatti tra virgolette
+      const query = chunk.map(t => {
+        const words = t.company.replace(/[,\.]/g, '').split(' ').filter((w: string) => w.length > 2)
+        return '"' + words.slice(0, 3).join(' ') + '"'
+      }).join(' OR ')
+
+      const geo = region === 'americas' ? 'US' : 'US'
+      const googleUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query + ' (stock OR shares OR earnings OR results)') + '&hl=en&gl=' + geo + '&ceid=' + geo + ':en'
 
       try {
         const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(googleUrl)
@@ -156,17 +160,33 @@ async function fetchTickerNews(region: string): Promise<NewsItem[]> {
           const title = (item.title || '').replace(/<[^>]+>/g, '').trim()
           if (title.length < 10) continue
 
-          // Trova a quale ticker corrisponde la notizia
+          // Filtro notizie recenti
+          const pubDate = item.pubDate || new Date().toISOString()
+          if (Date.now() - new Date(pubDate).getTime() > maxAge) continue
+
+          // Match rigoroso: company name completo (prime 2 parole) deve essere nel titolo
           const titleLower = title.toLowerCase()
-          const matchedTicker = chunk.find(t =>
-            titleLower.includes(t.company.split(' ')[0].toLowerCase()) ||
-            titleLower.includes(t.ticker.toLowerCase())
-          )
+          let matchedTicker: typeof chunk[0] | undefined
+
+          for (const t of chunk) {
+            const words = t.company.split(' ').filter((w: string) => w.length > 3)
+            const firstWord = words[0]?.toLowerCase() || ''
+            const secondWord = words[1]?.toLowerCase() || ''
+            // Match solo se almeno le prime 2 parole significative sono nel titolo
+            const match1 = firstWord && titleLower.includes(firstWord)
+            const match2 = secondWord ? titleLower.includes(secondWord) : true
+            // Oppure ticker esatto (solo per ticker brevi tipo AAPL, MSFT)
+            const tickerMatch = t.ticker.length <= 5 && titleLower.includes(' ' + t.ticker.toLowerCase() + ' ')
+            if ((match1 && match2) || tickerMatch) {
+              matchedTicker = t
+              break
+            }
+          }
 
           allNews.push({
             title,
             link: item.link || '#',
-            pubDate: item.pubDate || new Date().toISOString(),
+            pubDate,
             source: item.source || 'Google News',
             ticker: matchedTicker?.ticker,
             exchange: matchedTicker?.exchange,
@@ -175,10 +195,15 @@ async function fetchTickerNews(region: string): Promise<NewsItem[]> {
       } catch {}
     }
 
-    // Deduplica
+    // Deduplica e filtra per recenza
     const seen: Record<string, boolean> = {}
     return allNews
-      .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (seen[k]) return false; seen[k] = true; return true })
+      .filter(n => {
+        const k = n.title.slice(0, 60).toLowerCase()
+        if (seen[k]) return false
+        seen[k] = true
+        return true
+      })
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
       .slice(0, 40)
   } catch { return [] }
