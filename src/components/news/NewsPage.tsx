@@ -86,6 +86,12 @@ const WORLD_FEEDS = [
   { name: 'MarketWatch',    url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse' },
   { name: 'Motley Fool',    url: 'https://www.fool.com/feeds/index.aspx' },
   { name: 'Barrons',        url: 'https://www.barrons.com/real-time/feed/rss/markets' },
+  // Google News RSS - query specifiche per mercati
+  { name: 'Google News',    url: 'https://news.google.com/rss/search?q=stock+market+today&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Markets', url: 'https://news.google.com/rss/search?q=market+close+open+index&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Asia',    url: 'https://news.google.com/rss/search?q=asia+markets+nikkei+hang+seng&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Europe',  url: 'https://news.google.com/rss/search?q=european+markets+DAX+CAC+FTSE&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google US',      url: 'https://news.google.com/rss/search?q=wall+street+nasdaq+sp500+premarket&hl=en&gl=US&ceid=US:en' },
 ]
 
 function srcColor(s: string): string {
@@ -231,7 +237,7 @@ export default function NewsPage() {
     const worldNews = worldAll
       .filter(n => { const k = n.title.slice(0, 100).toLowerCase(); if (worldSeen[k]) return false; worldSeen[k] = true; return true })
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-      .slice(0, 25)
+      .slice(0, 50)
     setData(prev => ({ ...prev, world: worldNews }))
     setLoading(false) // Mostra subito world, le regioni caricano in background
 
