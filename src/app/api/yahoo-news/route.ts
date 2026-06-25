@@ -26,6 +26,25 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const ticker = searchParams.get('ticker')
   const company = searchParams.get('company') || ''
+  const googleUrl = searchParams.get('googleUrl') || ''
+
+  // Modalità Google News diretto - per Global feed
+  if (googleUrl && !ticker) {
+    try {
+      const r = await fetch(googleUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+        signal: AbortSignal.timeout(5000),
+        next: { revalidate: 900 },
+      })
+      if (!r.ok) return NextResponse.json({ items: [] })
+      const xml = await r.text()
+      const items = parseXML(xml).map(i => ({ ...i, source: i.source || 'Google News' }))
+      return NextResponse.json({ items: items.slice(0, 20) })
+    } catch {
+      return NextResponse.json({ items: [] })
+    }
+  }
+
   if (!ticker) return NextResponse.json({ items: [] })
 
   const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
