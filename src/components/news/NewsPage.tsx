@@ -78,17 +78,22 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
 ]
 
 const WORLD_FEEDS = [
+  // US / Global
   { name: 'Yahoo Finance',  url: 'https://finance.yahoo.com/rss/topstories' },
   { name: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml' },
   { name: 'CNBC Markets',   url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
   { name: 'CNBC World',     url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html' },
   { name: 'MarketWatch',    url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse' },
-  { name: 'Google Markets', url: 'https://news.google.com/rss/search?q=stock+market+today+close+open&hl=en&gl=US&ceid=US:en' },
+  { name: 'Reuters Biz',    url: 'https://feeds.reuters.com/reuters/businessNews' },
+  { name: 'FT Markets',     url: 'https://www.ft.com/markets?format=rss' },
+  { name: 'Bloomberg',      url: 'https://feeds.bloomberg.com/markets/news.rss' },
+  { name: 'WSJ Markets',    url: 'https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines' },
+  // Google News - mercati specifici
+  { name: 'Google Markets', url: 'https://news.google.com/rss/search?q=stock+market+today+wall+street&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Close',   url: 'https://news.google.com/rss/search?q=market+close+stock+index+today&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google PreMkt',  url: 'https://news.google.com/rss/search?q=premarket+futures+nasdaq+sp500&hl=en&gl=US&ceid=US:en' },
   { name: 'Google Asia',    url: 'https://news.google.com/rss/search?q=asia+markets+nikkei+hang+seng+close&hl=en&gl=US&ceid=US:en' },
   { name: 'Google Europe',  url: 'https://news.google.com/rss/search?q=european+markets+DAX+CAC+FTSE+open&hl=en&gl=GB&ceid=GB:en' },
-  { name: 'Google US',      url: 'https://news.google.com/rss/search?q=wall+street+nasdaq+sp500+premarket+futures&hl=en&gl=US&ceid=US:en' },
-  { name: 'FT Markets',     url: 'https://www.ft.com/markets?format=rss' },
-  { name: 'Reuters Biz',    url: 'https://feeds.reuters.com/reuters/businessNews' },
 ]
 
 const EUROPE_EXTRA_FEEDS = [
@@ -267,7 +272,7 @@ export default function NewsPage() {
     const worldNews = worldAll
       .filter(n => {
         if (Date.now() - new Date(n.pubDate).getTime() > worldMaxAge) return false
-        const k = n.title.slice(0, 100).toLowerCase()
+        const k = n.title.slice(0, 500).toLowerCase()
         if (worldSeen[k]) return false
         worldSeen[k] = true
         return true
@@ -294,7 +299,7 @@ export default function NewsPage() {
             const filtered = extraItems.filter(n => Date.now() - new Date(n.pubDate).getTime() < maxAge)
             const merged = [...(prev[region] || []), ...filtered]
               .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-              .slice(0, 100)
+              .slice(0, 500)
             return { ...prev, [region]: merged }
           })
         }
@@ -302,7 +307,7 @@ export default function NewsPage() {
           setData(prev => {
             const merged = [...(prev[region] || []), ...batch]
               .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-              .slice(0, 100)
+              .slice(0, 500)
             return { ...prev, [region]: merged }
           })
         })
