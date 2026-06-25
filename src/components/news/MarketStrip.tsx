@@ -9,22 +9,10 @@ interface Quote {
   up: boolean
 }
 
-const INDICES = [
-  { name: 'DAX',           symbol: '%5EGDAXI' },
-  { name: 'CAC 40',        symbol: '%5EFCHI'  },
-  { name: 'FTSE MIB',      symbol: 'FTSEMIB.MI' },
-  { name: 'FTSE 100',      symbol: '%5EFTSE'  },
-  { name: 'Euro Stoxx 50', symbol: '%5ESTOXX50E' },
-  { name: 'Nikkei 225',    symbol: '%5EN225'  },
-  { name: 'Hang Seng',     symbol: '%5EHSI'   },
-  { name: 'ASX 200',       symbol: '%5EAXJO'  },
-]
-
 export default function MarketStrip() {
   const tvRef = useRef<HTMLDivElement>(null)
   const [quotes, setQuotes] = useState<Quote[]>([])
 
-  // TradingView - US/Commodities/FX
   useEffect(() => {
     if (!tvRef.current) return
     tvRef.current.innerHTML = ''
@@ -53,37 +41,13 @@ export default function MarketStrip() {
     tvRef.current.appendChild(script)
   }, [])
 
-  // Yahoo Finance dal browser - EU/Asia indices
   useEffect(() => {
     const load = async () => {
       try {
-        const syms = INDICES.map(i => i.symbol).join(',')
-        const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=regularMarketPrice,regularMarketChangePercent`
-        const r = await fetch(url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0',
-            'Accept': 'application/json',
-          },
-          mode: 'cors',
-        })
+        const r = await fetch('/api/indices', { cache: 'no-store' })
         if (!r.ok) return
         const d = await r.json()
-        const results = d?.quoteResponse?.result || []
-        const q: Quote[] = INDICES.map(idx => {
-          const decoded = decodeURIComponent(idx.symbol)
-          const found = results.find((r: any) =>
-            r.symbol === decoded || r.symbol === idx.symbol.replace(/%5E/g, '^')
-          )
-          if (!found) return null
-          const pct = found.regularMarketChangePercent
-          return {
-            name: idx.name,
-            price: found.regularMarketPrice?.toLocaleString('en-US', { maximumFractionDigits: 0 }) || '-',
-            changePct: pct != null ? (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%' : '-',
-            up: pct >= 0,
-          }
-        }).filter(Boolean) as Quote[]
-        if (q.length > 0) setQuotes(q)
+        if (d.quotes?.length > 0) setQuotes(d.quotes)
       } catch {}
     }
     load()
@@ -108,7 +72,7 @@ export default function MarketStrip() {
         </div>
       )}
       <div style={{ fontSize: 9, color: 'var(--text4)', padding: '2px 8px 4px', textAlign: 'right' }}>
-        TradingView (US/Commodities/FX) · Yahoo Finance (EU/Asia indices) · live
+        TradingView (US/Commodities/FX) · Yahoo Finance (EU/Asia) · updates every minute
       </div>
     </div>
   )
