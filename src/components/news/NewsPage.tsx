@@ -315,10 +315,10 @@ export default function NewsPage() {
         line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       }
       // Link articolo
-      if (n.link) line += '\n  📰 Article → ' + n.link
+      if (n.link) line += '\n  📰 Read article → ' + n.link
       // Link pagina ForwardAlpha
       if (n.ticker && n.exchange) {
-        line += '\n  📊 ForwardAlpha → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+        line += '\n  📊 Stock page → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
       }
       return line
     }
