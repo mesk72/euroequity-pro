@@ -251,7 +251,7 @@ export default function NewsPage() {
     const worldAll: NewsItem[] = worldResults.flat()
     const euExtra: NewsItem[] = euResults.flat()
     const asiaExtra: NewsItem[] = asiaResults.flat()
-    const worldMaxAge = 24 * 60 * 60 * 1000
+    const worldMaxAge = 48 * 60 * 60 * 1000 // 48 ore
     const worldSeen: Record<string, boolean> = {}
     const worldNews = worldAll
       .filter(n => {
