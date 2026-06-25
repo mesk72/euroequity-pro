@@ -11,6 +11,7 @@ interface NewsItem {
   source: string
   ticker?: string
   exchange?: string
+  company?: string
 }
 
 interface IndexData {
@@ -148,25 +149,36 @@ async function fetchTickerNews(
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items) || gd.items.length === 0) return []
+          // Parole chiave del company name per filtro
+          const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited'])
+          const companyWords = t.company.split(' ')
+            .filter((w: string) => w.length > 3 && !STOP.has(w))
+            .slice(0, 3)
+            .map((w: string) => w.toLowerCase())
+
           return gd.items
             .map((item: any) => ({
               title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
               link: item.link || '#',
               pubDate: item.pubDate || new Date().toISOString(),
               source: item.source || 'Yahoo Finance',
-              // Ticker e exchange SEMPRE da t — le notizie sono già filtrate per questo ticker
               ticker: t.ticker,
               exchange: t.exchange,
+              company: t.company,
             }))
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
               if (Date.now() - new Date(n.pubDate).getTime() > maxAge) return false
+              // Verifica che almeno una parola chiave del company sia nel titolo
+              const titleLower = n.title.toLowerCase()
+              const hasCompany = companyWords.length === 0 || companyWords.some((w: string) => titleLower.includes(w))
+              if (!hasCompany) return false
               const k = n.title.slice(0, 60).toLowerCase()
               if (seen[k]) return false
               seen[k] = true
               return true
             })
-            .slice(0, 2) // max 2 notizie per ticker per non dominare la lista
+            .slice(0, 2)
         } catch { return [] }
       })
     )
@@ -279,13 +291,8 @@ export default function NewsPage() {
     let txt = '**FORWARDALPHA DAILY MARKET BRIEFING**\n'
     txt += today + ' · ' + time + '\n\n'
 
-    txt += '**MARKET INDICES — as of ' + time + '**\n'
-    const equityIdx = idxData.filter(i => !['Gold','Oil WTI','EUR/USD','USD/JPY'].includes(i.name))
-    const cmdIdx    = idxData.filter(i => ['Gold','Oil WTI','EUR/USD','USD/JPY'].includes(i.name))
-    equityIdx.forEach(i => { txt += '  ' + fmtIdx(i) + '\n' })
-    txt += '\n_Commodities & FX_\n'
-    cmdIdx.forEach(i => { txt += '  ' + fmtIdx(i) + '\n' })
-    txt += '\n'
+    txt += '**LIVE MARKET DATA**\n'
+    txt += 'For real-time indices, commodities and FX see the ticker bar at the top of this page (S&P 500, Nasdaq, DAX, FTSE 100, Nikkei, Hang Seng, Gold, Oil, EUR/USD).\n\n'
 
     txt += '**KEY THEMES**\n'
     themes.forEach(t => { txt += '• ' + t + '\n' })
@@ -293,17 +300,23 @@ export default function NewsPage() {
 
     if (data.americas.length > 0) {
       txt += '**NORTH AMERICA**\n'
-      data.americas.slice(0, 5).forEach(n => { txt += '• [' + n.source + ']' + (n.ticker ? ' ' + n.ticker : '') + ' ' + n.title + '\n' })
+      data.americas.slice(0, 6).forEach(n => {
+        txt += '• ' + (n.ticker ? '[' + n.ticker + '] ' : '') + n.title + (n.link ? ' → ' + n.link : '') + '\n'
+      })
       txt += '\n'
     }
     if (data.europe.length > 0) {
       txt += '**EUROPE**\n'
-      data.europe.slice(0, 5).forEach(n => { txt += '• [' + n.source + ']' + (n.ticker ? ' ' + n.ticker : '') + ' ' + n.title + '\n' })
+      data.europe.slice(0, 6).forEach(n => {
+        txt += '• ' + (n.ticker ? '[' + n.ticker + '] ' : '') + n.title + (n.link ? ' → ' + n.link : '') + '\n'
+      })
       txt += '\n'
     }
     if (data.asia.length > 0) {
       txt += '**ASIA PACIFIC**\n'
-      data.asia.slice(0, 5).forEach(n => { txt += '• [' + n.source + ']' + (n.ticker ? ' ' + n.ticker : '') + ' ' + n.title + '\n' })
+      data.asia.slice(0, 6).forEach(n => {
+        txt += '• ' + (n.ticker ? '[' + n.ticker + '] ' : '') + n.title + (n.link ? ' → ' + n.link : '') + '\n'
+      })
       txt += '\n'
     }
 
