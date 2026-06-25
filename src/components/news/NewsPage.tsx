@@ -78,9 +78,14 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
 ]
 
 const WORLD_FEEDS = [
-  { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
-  { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
-  { name: 'Motley Fool',   url: 'https://www.fool.com/feeds/index.aspx' },
+  { name: 'Yahoo Finance',  url: 'https://finance.yahoo.com/rss/topstories' },
+  { name: 'Yahoo Markets',  url: 'https://finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US' },
+  { name: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml' },
+  { name: 'CNBC Markets',   url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
+  { name: 'CNBC World',     url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html' },
+  { name: 'MarketWatch',    url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse' },
+  { name: 'Motley Fool',    url: 'https://www.fool.com/feeds/index.aspx' },
+  { name: 'Barrons',        url: 'https://www.barrons.com/real-time/feed/rss/markets' },
 ]
 
 function srcColor(s: string): string {
@@ -224,7 +229,7 @@ export default function NewsPage() {
     }
     const worldSeen: Record<string, boolean> = {}
     const worldNews = worldAll
-      .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (worldSeen[k]) return false; worldSeen[k] = true; return true })
+      .filter(n => { const k = n.title.slice(0, 100).toLowerCase(); if (worldSeen[k]) return false; worldSeen[k] = true; return true })
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
       .slice(0, 25)
     setData(prev => ({ ...prev, world: worldNews }))
@@ -243,7 +248,7 @@ export default function NewsPage() {
           setData(prev => {
             const merged = [...(prev[region] || []), ...batch]
               .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-              .slice(0, 50)
+              .slice(0, 100)
             return { ...prev, [region]: merged }
           })
         })
