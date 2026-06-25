@@ -72,10 +72,14 @@ export async function GET(req: Request) {
   // EU/Asia: usa prime 2 parole company name
   if (company || yahooTicker) {
     try {
+      // Tutti i mercati: usa prime 2 parole significative del nome
+      // Per US aggiungi anche yahooTicker nella query per maggiore precisione
       const isUS = exchange === 'US' || exchange === 'TSX'
-      const query = isUS && yahooTicker
-        ? yahooTicker + ' stock'
-        : company.split(' ').filter((w: string) => w.length > 2 && !STOP.has(w)).slice(0, 2).join(' ') + ' stock OR earnings'
+      const nameQ = company.split(' ').filter((w: string) => w.length > 2 && !STOP.has(w)).slice(0, 2).join(' ')
+      const query = isUS && yahooTicker && nameQ
+        ? nameQ + ' ' + yahooTicker + ' stock'
+        : nameQ ? nameQ + ' stock OR earnings'
+        : yahooTicker + ' stock'
       const gl = isUS ? 'US' : 'GB'
       const googleUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en&gl=${gl}&ceid=${gl}:en`
       const r = await fetch(googleUrl, {
