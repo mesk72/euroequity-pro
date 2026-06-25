@@ -87,7 +87,7 @@ export default function MarketStrip() {
       } catch {}
     }
     load()
-    const t = setInterval(load, 60000)
+    const t = setInterval(load, 900000) // ogni 15 minuti
     return () => clearInterval(t)
   }, [])
 
