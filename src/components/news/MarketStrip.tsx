@@ -23,6 +23,7 @@ export default function MarketStrip() {
         { proName: 'INDEX:SX5E',    title: 'Euro Stoxx 50' },
         { proName: 'INDEX:SXXP',    title: 'Stoxx 600'     },
         { proName: 'INDEX:NI225',   title: 'Nikkei 225'    },
+        { proName: 'INDEX:HSI',     title: 'Hang Seng'     },
         { proName: 'INDEX:XJO',     title: 'ASX 200'       },
         { proName: 'TVC:GOLD',      title: 'Gold'          },
         { proName: 'TVC:USOIL',     title: 'Oil WTI'       },
