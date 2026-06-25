@@ -78,22 +78,17 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
 ]
 
 const WORLD_FEEDS = [
-  // US / Global
+  // Feed confermati funzionanti via rss2json
   { name: 'Yahoo Finance',  url: 'https://finance.yahoo.com/rss/topstories' },
   { name: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml' },
-  { name: 'CNBC Markets',   url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
-  { name: 'CNBC World',     url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html' },
-  { name: 'MarketWatch',    url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse' },
-  { name: 'Reuters Biz',    url: 'https://feeds.reuters.com/reuters/businessNews' },
-  { name: 'FT Markets',     url: 'https://www.ft.com/markets?format=rss' },
-  { name: 'Bloomberg',      url: 'https://feeds.bloomberg.com/markets/news.rss' },
-  { name: 'WSJ Markets',    url: 'https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines' },
-  // Google News - mercati specifici
+  { name: 'Motley Fool',    url: 'https://www.fool.com/feeds/index.aspx' },
+  // Google News RSS - funziona via rss2json
   { name: 'Google Markets', url: 'https://news.google.com/rss/search?q=stock+market+today+wall+street&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Close',   url: 'https://news.google.com/rss/search?q=market+close+stock+index+today&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google PreMkt',  url: 'https://news.google.com/rss/search?q=premarket+futures+nasdaq+sp500&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Asia',    url: 'https://news.google.com/rss/search?q=asia+markets+nikkei+hang+seng+close&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Europe',  url: 'https://news.google.com/rss/search?q=european+markets+DAX+CAC+FTSE+open&hl=en&gl=GB&ceid=GB:en' },
+  { name: 'Google Close',   url: 'https://news.google.com/rss/search?q=market+close+open+index+stocks&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google PreMkt',  url: 'https://news.google.com/rss/search?q=premarket+futures+nasdaq+sp500+dow&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Asia',    url: 'https://news.google.com/rss/search?q=asia+markets+nikkei+hang+seng+close+today&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Europe',  url: 'https://news.google.com/rss/search?q=european+markets+DAX+CAC+FTSE+open+close&hl=en&gl=GB&ceid=GB:en' },
+  { name: 'Google Economy', url: 'https://news.google.com/rss/search?q=fed+ecb+interest+rate+inflation+economy&hl=en&gl=US&ceid=US:en' },
 ]
 
 const EUROPE_EXTRA_FEEDS = [
@@ -370,15 +365,14 @@ export default function NewsPage() {
     themes.forEach(t => { txt += '• ' + t + '\n' })
     txt += '\n'
 
+    const now24h = Date.now() - 24 * 60 * 60 * 1000
     const fmtNewsItem = (n: NewsItem) => {
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
-      // Scores ForwardAlpha
       if (n.valueScore != null) {
         line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       }
-      // Link articolo e stock page
       if (n.link) line += '\n  📰 ' + n.link
       if (n.ticker && n.exchange) {
         line += '\n  📊 ' + n.ticker + ' → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
@@ -386,19 +380,29 @@ export default function NewsPage() {
       return line
     }
 
-    if (data.americas.length > 0) {
-      txt += '**NORTH AMERICA**\n'
-      data.americas.slice(0, 6).forEach(n => { txt += fmtNewsItem(n) + '\n' })
+    // Filtra ultime 24h e ordina per market cap (bestScore come proxy)
+    const filterTop = (items: NewsItem[]) => items
+      .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
+      .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+      .slice(0, 10)
+
+    const amNews = filterTop(data.americas)
+    const euNews = filterTop(data.europe)
+    const apNews = filterTop(data.asia)
+
+    if (amNews.length > 0) {
+      txt += '**NORTH AMERICA — Top stories by market cap**\n'
+      amNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
-    if (data.europe.length > 0) {
-      txt += '**EUROPE**\n'
-      data.europe.slice(0, 6).forEach(n => { txt += fmtNewsItem(n) + '\n' })
+    if (euNews.length > 0) {
+      txt += '**EUROPE — Top stories by market cap**\n'
+      euNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
-    if (data.asia.length > 0) {
-      txt += '**ASIA PACIFIC**\n'
-      data.asia.slice(0, 6).forEach(n => { txt += fmtNewsItem(n) + '\n' })
+    if (apNews.length > 0) {
+      txt += '**ASIA PACIFIC — Top stories by market cap**\n'
+      apNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
 
