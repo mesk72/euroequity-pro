@@ -134,20 +134,19 @@ async function fetchTickerNews(region: string): Promise<NewsItem[]> {
     if (tickers.length === 0) return []
 
     const allNews: NewsItem[] = []
-    const chunkSize = 8
-    const maxAge = 3 * 24 * 60 * 60 * 1000 // 3 giorni max
+    const chunkSize = 15
+    const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 giorni
 
-    for (let i = 0; i < Math.min(tickers.length, 100) && allNews.length < 50; i += chunkSize) {
+    for (let i = 0; i < Math.min(tickers.length, 200) && allNews.length < 60; i += chunkSize) {
       const chunk = tickers.slice(i, i + chunkSize)
 
-      // Query con company names esatti tra virgolette
+      // Query: prima parola significativa del company name
       const query = chunk.map(t => {
-        const words = t.company.replace(/[,\.]/g, '').split(' ').filter((w: string) => w.length > 2)
-        return '"' + words.slice(0, 3).join(' ') + '"'
+        const words = t.company.split(' ').filter((w: string) => w.length > 2 && !['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE'].includes(w))
+        return '"' + (words[0] || t.company.split(' ')[0]) + '"'
       }).join(' OR ')
 
-      const geo = region === 'americas' ? 'US' : 'US'
-      const googleUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query + ' (stock OR shares OR earnings OR results)') + '&hl=en&gl=' + geo + '&ceid=' + geo + ':en'
+      const googleUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query + ' stock OR shares OR earnings') + '&hl=en&gl=US&ceid=US:en'
 
       try {
         const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(googleUrl)
@@ -159,27 +158,19 @@ async function fetchTickerNews(region: string): Promise<NewsItem[]> {
         for (const item of gd.items) {
           const title = (item.title || '').replace(/<[^>]+>/g, '').trim()
           if (title.length < 10) continue
-
-          // Filtro notizie recenti
           const pubDate = item.pubDate || new Date().toISOString()
           if (Date.now() - new Date(pubDate).getTime() > maxAge) continue
 
-          // Match rigoroso: company name completo (prime 2 parole) deve essere nel titolo
+          // Match: prima parola significativa nel titolo
           const titleLower = title.toLowerCase()
           let matchedTicker: typeof chunk[0] | undefined
-
           for (const t of chunk) {
-            const words = t.company.split(' ').filter((w: string) => w.length > 3)
-            const firstWord = words[0]?.toLowerCase() || ''
-            const secondWord = words[1]?.toLowerCase() || ''
-            // Match solo se almeno le prime 2 parole significative sono nel titolo
-            const match1 = firstWord && titleLower.includes(firstWord)
-            const match2 = secondWord ? titleLower.includes(secondWord) : true
-            // Oppure ticker esatto (solo per ticker brevi tipo AAPL, MSFT)
-            const tickerMatch = t.ticker.length <= 5 && titleLower.includes(' ' + t.ticker.toLowerCase() + ' ')
-            if ((match1 && match2) || tickerMatch) {
-              matchedTicker = t
-              break
+            const words = t.company.split(' ').filter((w: string) => w.length > 3 && !['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE'].includes(w))
+            const key = (words[0] || t.company.split(' ')[0]).toLowerCase()
+            if (key && titleLower.includes(key)) { matchedTicker = t; break }
+            // Ticker esatto nel titolo
+            if (t.ticker.length <= 5 && new RegExp('\b' + t.ticker + '\b', 'i').test(title)) {
+              matchedTicker = t; break
             }
           }
 
@@ -195,17 +186,11 @@ async function fetchTickerNews(region: string): Promise<NewsItem[]> {
       } catch {}
     }
 
-    // Deduplica e filtra per recenza
     const seen: Record<string, boolean> = {}
     return allNews
-      .filter(n => {
-        const k = n.title.slice(0, 60).toLowerCase()
-        if (seen[k]) return false
-        seen[k] = true
-        return true
-      })
+      .filter(n => { const k = n.title.slice(0, 60).toLowerCase(); if (seen[k]) return false; seen[k] = true; return true })
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-      .slice(0, 40)
+      .slice(0, 50)
   } catch { return [] }
 }
 
