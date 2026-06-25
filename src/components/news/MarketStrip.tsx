@@ -13,9 +13,9 @@ export default function MarketStrip() {
     script.async = true
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: 'FOREXCOM:SPXUSD',  title: 'S&P 500'        },
-        { proName: 'FOREXCOM:NSXUSD',  title: 'Nasdaq 100'     },
-        { proName: 'FOREXCOM:DJI',     title: 'Dow Jones'      },
+        { proName: 'SP:SPX',          title: 'S&P 500'        },
+        { proName: 'NASDAQ:NDX',       title: 'Nasdaq 100'     },
+        { proName: 'DJ:DJI',           title: 'Dow Jones'      },
         { proName: 'ICMARKETS:UK100',  title: 'FTSE 100'       },
         { proName: 'INDEX:DAX',        title: 'DAX'            },
         { proName: 'INDEX:CAC40',      title: 'CAC 40'         },
