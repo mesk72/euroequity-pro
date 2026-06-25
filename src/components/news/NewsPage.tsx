@@ -484,21 +484,35 @@ export default function NewsPage() {
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
                   {report.split('\n').map((line, li) => {
-                    // Evidenzia **testo** in arancione
+                    if (line.trim() === '') return <div key={li} style={{ height: 8 }} />
+                    // Linea con link articolo (📰 https://...)
+                    const articleMatch = line.match(/^\s*📰\s*(https?:\/\/\S+)/)
+                    if (articleMatch) {
+                      return <div key={li} style={{ marginLeft: 24, fontSize: 11 }}>
+                        <span style={{ color: 'var(--text4)' }}>📰 </span>
+                        <a href={articleMatch[1]} target="_blank" rel="noopener noreferrer"
+                          style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: 11 }}>Read article</a>
+                      </div>
+                    }
+                    // Linea stock page (📊 TICKER → https://...)
+                    const stockMatch = line.match(/^\s*📊\s*([A-Z0-9]+)\s*→\s*(https?:\/\/\S+)/)
+                    if (stockMatch) {
+                      return <div key={li} style={{ marginLeft: 24, fontSize: 11 }}>
+                        <span style={{ color: 'var(--text4)' }}>📊 </span>
+                        <a href={stockMatch[2]} target="_blank" rel="noopener noreferrer"
+                          style={{ color: 'var(--orange)', textDecoration: 'underline', fontWeight: 700, fontSize: 11 }}>
+                          {stockMatch[1]} — Stock page
+                        </a>
+                      </div>
+                    }
+                    // Linee normali con **bold**
                     const parts = line.split('**')
                     const rendered = parts.map((part, i) =>
                       i % 2 === 1
                         ? <strong key={i} style={{ color: 'var(--orange)' }}>{part}</strong>
-                        : (() => {
-                            // Trasforma → URL in link cliccabili
-                            const urlMatch = part.match(/(.*?)→\s*(https?:\/\/\S+)(.*)/)
-                            if (urlMatch) {
-                              return <span key={i}>{urlMatch[1]}<a href={urlMatch[2]} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline', wordBreak: 'break-all' }}>Read article</a>{urlMatch[3]}</span>
-                            }
-                            return <span key={i}>{part}</span>
-                          })()
+                        : <span key={i}>{part}</span>
                     )
-                    return <div key={li} style={{ marginBottom: line === '' ? 8 : 2 }}>{rendered}</div>
+                    return <div key={li} style={{ marginBottom: 2 }}>{rendered}</div>
                   })}
                 </div>
               </div>
