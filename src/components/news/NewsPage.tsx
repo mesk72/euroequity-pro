@@ -152,16 +152,13 @@ async function fetchTickerNews(
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items) || gd.items.length === 0) return []
-          // Filtro RIGOROSO: prima il ticker Yahoo, poi verifica nome azienda nel titolo
+          // Filtro RIGOROSO: tutte le parole significative del nome devono essere nel titolo
           const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited','de','et','und','of','and'])
-          // Prendi le parole significative del nome (minimo 4 caratteri, non stopword)
           const nameWords = t.company.split(' ')
             .map((w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
             .filter((w: string) => w.length >= 4 && !STOP.has(w.charAt(0).toUpperCase() + w.slice(1)))
-
-          // La prima parola significativa del nome è il filtro principale
-          const primaryWord = nameWords[0] || ''
-          const secondWord = nameWords[1] || ''
+          // Usa tutte le parole significative (es. "Innovent" E "Biologics")
+          const wordsToMatch = nameWords.slice(0, 3)
 
           return gd.items
             .map((item: any) => ({
@@ -179,16 +176,11 @@ async function fetchTickerNews(
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
               if (Date.now() - new Date(n.pubDate).getTime() > maxAge) return false
+              if (wordsToMatch.length === 0) return false
               const titleLower = n.title.toLowerCase()
-              // REGOLA: la prima parola significativa del nome DEVE essere nel titolo
-              // E se esiste una seconda parola, anche quella deve esserci
-              // Questo evita che "Wise" matchi "WSE" o "Innovation Partners" matchi "1801.HK"
-              if (!primaryWord || primaryWord.length < 4) return false
-              if (!titleLower.includes(primaryWord)) return false
-              if (secondWord.length >= 4 && !titleLower.includes(secondWord)) {
-                // Se la seconda parola non c'è, accetta solo se la prima è molto specifica (>6 chars)
-                if (primaryWord.length <= 6) return false
-              }
+              // TUTTE le parole significative devono essere nel titolo
+              const allMatch = wordsToMatch.every((w: string) => titleLower.includes(w))
+              if (!allMatch) return false
               const k = n.title.slice(0, 60).toLowerCase()
               if (seen[k]) return false
               seen[k] = true
