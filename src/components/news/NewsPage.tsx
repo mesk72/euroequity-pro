@@ -79,19 +79,34 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
 
 const WORLD_FEEDS = [
   { name: 'Yahoo Finance',  url: 'https://finance.yahoo.com/rss/topstories' },
-  { name: 'Yahoo Markets',  url: 'https://finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US' },
   { name: 'Seeking Alpha',  url: 'https://seekingalpha.com/market_currents.xml' },
   { name: 'CNBC Markets',   url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
   { name: 'CNBC World',     url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html' },
   { name: 'MarketWatch',    url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse' },
-  { name: 'Motley Fool',    url: 'https://www.fool.com/feeds/index.aspx' },
-  { name: 'Barrons',        url: 'https://www.barrons.com/real-time/feed/rss/markets' },
-  // Google News RSS - query specifiche per mercati
-  { name: 'Google News',    url: 'https://news.google.com/rss/search?q=stock+market+today&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Markets', url: 'https://news.google.com/rss/search?q=market+close+open+index&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Asia',    url: 'https://news.google.com/rss/search?q=asia+markets+nikkei+hang+seng&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google Europe',  url: 'https://news.google.com/rss/search?q=european+markets+DAX+CAC+FTSE&hl=en&gl=US&ceid=US:en' },
-  { name: 'Google US',      url: 'https://news.google.com/rss/search?q=wall+street+nasdaq+sp500+premarket&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Markets', url: 'https://news.google.com/rss/search?q=stock+market+today+close+open&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Asia',    url: 'https://news.google.com/rss/search?q=asia+markets+nikkei+hang+seng+close&hl=en&gl=US&ceid=US:en' },
+  { name: 'Google Europe',  url: 'https://news.google.com/rss/search?q=european+markets+DAX+CAC+FTSE+open&hl=en&gl=GB&ceid=GB:en' },
+  { name: 'Google US',      url: 'https://news.google.com/rss/search?q=wall+street+nasdaq+sp500+premarket+futures&hl=en&gl=US&ceid=US:en' },
+  { name: 'FT Markets',     url: 'https://www.ft.com/markets?format=rss' },
+  { name: 'Reuters Biz',    url: 'https://feeds.reuters.com/reuters/businessNews' },
+]
+
+const EUROPE_EXTRA_FEEDS = [
+  { name: 'FT Europe',      url: 'https://www.ft.com/europe?format=rss' },
+  { name: 'Il Sole 24 Ore', url: 'https://www.ilsole24ore.com/rss/mercati.xml' },
+  { name: 'Handelsblatt',   url: 'https://www.handelsblatt.com/contentexport/feed/finanzen' },
+  { name: 'Google EU Mkt',  url: 'https://news.google.com/rss/search?q=borsa+europea+mercati+azionari&hl=it&gl=IT&ceid=IT:it' },
+  { name: 'Les Echos',      url: 'https://www.lesechos.fr/rss/rss_finance.xml' },
+  { name: 'Google DAX',     url: 'https://news.google.com/rss/search?q=DAX+Frankfurt+Boerse+aktien&hl=de&gl=DE&ceid=DE:de' },
+]
+
+const ASIA_EXTRA_FEEDS = [
+  { name: 'SCMP Markets',   url: 'https://www.scmp.com/rss/92/feed' },
+  { name: 'Japan Times',    url: 'https://www.japantimes.co.jp/feed/business/' },
+  { name: 'NHK Economy',    url: 'https://www3.nhk.or.jp/rss/news/cat7.xml' },
+  { name: 'Google Nikkei',  url: 'https://news.google.com/rss/search?q=nikkei+tokyo+stock+exchange&hl=en&gl=JP&ceid=JP:en' },
+  { name: 'Google HK',      url: 'https://news.google.com/rss/search?q=hang+seng+hong+kong+market&hl=en&gl=HK&ceid=HK:en' },
+  { name: 'Google ASX',     url: 'https://news.google.com/rss/search?q=ASX+australia+stock+market&hl=en&gl=AU&ceid=AU:en' },
 ]
 
 function srcColor(s: string): string {
@@ -233,6 +248,20 @@ export default function NewsPage() {
       const items = await fetchRSS(name, url)
       worldAll.push(...items)
     }
+
+    // Europe extra: fonti europee specifiche
+    const euExtra: NewsItem[] = []
+    for (const { name, url } of EUROPE_EXTRA_FEEDS) {
+      const items = await fetchRSS(name, url)
+      euExtra.push(...items)
+    }
+
+    // Asia extra: fonti asiatiche specifiche
+    const asiaExtra: NewsItem[] = []
+    for (const { name, url } of ASIA_EXTRA_FEEDS) {
+      const items = await fetchRSS(name, url)
+      asiaExtra.push(...items)
+    }
     const worldSeen: Record<string, boolean> = {}
     const worldNews = worldAll
       .filter(n => { const k = n.title.slice(0, 100).toLowerCase(); if (worldSeen[k]) return false; worldSeen[k] = true; return true })
@@ -250,6 +279,18 @@ export default function NewsPage() {
         const td = await tr.json()
             const tickers = (td.tickers || []).slice(0, maxT[region])
         if (tickers.length === 0) return
+        // Aggiungi feed extra per europa e asia
+        const extraItems = region === 'europe' ? euExtra : region === 'asia' ? asiaExtra : []
+        if (extraItems.length > 0) {
+          setData(prev => {
+            const maxAge = 24 * 60 * 60 * 1000
+            const filtered = extraItems.filter(n => Date.now() - new Date(n.pubDate).getTime() < maxAge)
+            const merged = [...(prev[region] || []), ...filtered]
+              .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+              .slice(0, 100)
+            return { ...prev, [region]: merged }
+          })
+        }
         await fetchTickerNews(region, tickers, (batch) => {
           setData(prev => {
             const merged = [...(prev[region] || []), ...batch]
