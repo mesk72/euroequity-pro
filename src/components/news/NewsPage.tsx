@@ -152,12 +152,14 @@ async function fetchTickerNews(
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items) || gd.items.length === 0) return []
-          // Parole chiave del company name per filtro
-          const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited'])
-          const companyWords = t.company.split(' ')
+          // Filtro rigoroso: la notizia deve menzionare il nome società
+          const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited','de','et','und'])
+          const companyWords = t.company.split(/[\s\-&]+/)
             .filter((w: string) => w.length > 3 && !STOP.has(w))
-            .slice(0, 3)
-            .map((w: string) => w.toLowerCase())
+            .slice(0, 2)
+            .map((w: string) => w.toLowerCase().replace(/[^a-z0-9]/g, ''))
+          // Anche il ticker Yahoo come fallback
+          const tickerClean = (t.yahooTicker || t.ticker).split('.')[0].toLowerCase()
 
           return gd.items
             .map((item: any) => ({
@@ -175,10 +177,13 @@ async function fetchTickerNews(
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
               if (Date.now() - new Date(n.pubDate).getTime() > maxAge) return false
-              // Verifica che almeno una parola chiave del company sia nel titolo
-              const titleLower = n.title.toLowerCase()
-              const hasCompany = companyWords.length === 0 || companyWords.some((w: string) => titleLower.includes(w))
-              if (!hasCompany) return false
+              const titleLower = n.title.toLowerCase().replace(/[^a-z0-9\s]/g, '')
+              // Deve contenere ALMENO la prima parola significativa del nome
+              const firstWord = companyWords[0] || ''
+              const hasName = firstWord.length > 3 && titleLower.includes(firstWord)
+              // OPPURE il ticker esatto (solo se > 3 caratteri per evitare falsi positivi)
+              const hasTicker = tickerClean.length > 3 && titleLower.includes(tickerClean)
+              if (!hasName && !hasTicker) return false
               const k = n.title.slice(0, 60).toLowerCase()
               if (seen[k]) return false
               seen[k] = true
@@ -422,12 +427,24 @@ export default function NewsPage() {
                     🔄 Refresh
                   </button>
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>
-                  {report.split('**').map((part, i) =>
-                    i % 2 === 1
-                      ? <strong key={i} style={{ color: 'var(--orange)' }}>{part}</strong>
-                      : <span key={i}>{part}</span>
-                  )}
+                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
+                  {report.split('\n').map((line, li) => {
+                    // Evidenzia **testo** in arancione
+                    const parts = line.split('**')
+                    const rendered = parts.map((part, i) =>
+                      i % 2 === 1
+                        ? <strong key={i} style={{ color: 'var(--orange)' }}>{part}</strong>
+                        : (() => {
+                            // Trasforma → URL in link cliccabili
+                            const urlMatch = part.match(/(.*?)→\s*(https?:\/\/\S+)(.*)/)
+                            if (urlMatch) {
+                              return <span key={i}>{urlMatch[1]}<a href={urlMatch[2]} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline', wordBreak: 'break-all' }}>Read article</a>{urlMatch[3]}</span>
+                            }
+                            return <span key={i}>{part}</span>
+                          })()
+                    )
+                    return <div key={li} style={{ marginBottom: line === '' ? 8 : 2 }}>{rendered}</div>
+                  })}
                 </div>
               </div>
             )}
