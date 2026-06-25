@@ -262,9 +262,16 @@ export default function NewsPage() {
       const items = await fetchRSS(name, url)
       asiaExtra.push(...items)
     }
+    const worldMaxAge = 24 * 60 * 60 * 1000
     const worldSeen: Record<string, boolean> = {}
     const worldNews = worldAll
-      .filter(n => { const k = n.title.slice(0, 100).toLowerCase(); if (worldSeen[k]) return false; worldSeen[k] = true; return true })
+      .filter(n => {
+        if (Date.now() - new Date(n.pubDate).getTime() > worldMaxAge) return false
+        const k = n.title.slice(0, 100).toLowerCase()
+        if (worldSeen[k]) return false
+        worldSeen[k] = true
+        return true
+      })
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
       .slice(0, 50)
     setData(prev => ({ ...prev, world: worldNews }))
