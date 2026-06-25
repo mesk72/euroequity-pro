@@ -9,35 +9,82 @@ interface Quote {
   up: boolean
 }
 
-const INDICES = [
-  { name: 'DAX',           sym: '%5EGDAXI'   },
-  { name: 'CAC 40',        sym: '%5EFCHI'    },
-  { name: 'FTSE MIB',      sym: 'FTSEMIB.MI' },
-  { name: 'FTSE 100',      sym: '%5EFTSE'    },
-  { name: 'Euro Stoxx 50', sym: '%5ESTOXX50E'},
-  { name: 'Nikkei 225',    sym: '%5EN225'    },
-  { name: 'Hang Seng',     sym: '%5EHSI'     },
-  { name: 'ASX 200',       sym: '%5EAXJO'    },
+const EU_INDICES = [
+  { name: 'DAX',           sym: '%5EGDAXI'    },
+  { name: 'CAC 40',        sym: '%5EFCHI'     },
+  { name: 'FTSE 100',      sym: '%5EFTSE'     },
+  { name: 'Euro Stoxx 50', sym: '%5ESTOXX50E' },
+  { name: 'FTSE MIB',      sym: 'FTSEMIB.MI'  },
 ]
 
-async function fetchIndexPrice(sym: string): Promise<{ price: number; changePct: number } | null> {
+const ASIA_INDICES = [
+  { name: 'Nikkei 225', sym: '%5EN225' },
+  { name: 'Hang Seng',  sym: '%5EHSI'  },
+  { name: 'ASX 200',    sym: '%5EAXJO' },
+]
+
+function isAsiaOpen(): boolean {
+  const d = new Date()
+  if (d.getUTCDay() === 0 || d.getUTCDay() === 6) return false
+  const t = d.getUTCHours() * 60 + d.getUTCMinutes()
+  return t >= 0 && t <= 480
+}
+
+function isEUOpen(): boolean {
+  const d = new Date()
+  if (d.getUTCDay() === 0 || d.getUTCDay() === 6) return false
+  const t = d.getUTCHours() * 60 + d.getUTCMinutes()
+  return t >= 420 && t <= 930
+}
+
+async function fetchIndexPrice(sym: string, name: string): Promise<Quote | null> {
   try {
-    // Usa rss2json per bypassare CORS - stessa tecnica delle notizie
-    const yahooUrl = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=' + sym + '&region=US&lang=en-US'
-    const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(yahooUrl)
+    // Usa rss2json per fare il proxy del feed Yahoo Finance
+    // rss2json supporta anche JSON endpoint - usiamo Yahoo Finance summary
+    const yahooUrl = `https://finance.yahoo.com/quote/${sym}/`
+    const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + 
+      encodeURIComponent(`https://feeds.finance.yahoo.com/rss/2.0/headline?s=${sym}&region=US&lang=en-US`)
+    
     const r = await fetch(api)
     if (!r.ok) return null
     const d = await r.json()
-    // Il feed RSS di Yahoo Finance include il prezzo nel titolo o description
-    // es: "DAX 18,234.56 +1.23%"
-    if (d.status === 'ok' && d.feed) {
-      const title = d.feed.title || ''
-      // Prova a estrarre prezzo dalla descrizione del feed
-      const desc = d.feed.description || ''
-      const priceMatch = (title + ' ' + desc).match(/([\d,]+\.?\d*)\s*([\+\-]\d+\.?\d*%?)/)
-      if (priceMatch) {
-        const price = parseFloat(priceMatch[1].replace(/,/g, ''))
-        return { price, changePct: 0 }
+    
+    // Il feed RSS non ha prezzi - usa il feed.description o feed.title
+    // che Yahoo include nel channel metadata
+    const feedDesc = d?.feed?.description || ''
+    const feedTitle = d?.feed?.title || ''
+    
+    // Cerca pattern prezzo nei metadati del feed
+    const text = feedTitle + ' ' + feedDesc
+    const priceMatch = text.match(/([\d,]+\.[\d]{2})/)
+    const pctMatch = text.match(/([+-]?\d+\.?\d*)%/)
+    
+    if (priceMatch) {
+      const price = parseFloat(priceMatch[1].replace(/,/g, ''))
+      const pct = pctMatch ? parseFloat(pctMatch[1]) : 0
+      return {
+        name,
+        price: price.toLocaleString('en-US', { maximumFractionDigits: 0 }),
+        changePct: (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%',
+        up: pct >= 0,
+      }
+    }
+    
+    // Fallback: cerca nei titoli delle notizie il prezzo
+    const items = d?.items || []
+    for (const item of items.slice(0, 3)) {
+      const t = (item.title || '') + ' ' + (item.description || '')
+      const pm = t.match(/([\d,]+\.[\d]{2})/)
+      const cm = t.match(/([+-]?\d+\.?\d*)%/)
+      if (pm) {
+        const price = parseFloat(pm[1].replace(/,/g, ''))
+        const pct = cm ? parseFloat(cm[1]) : 0
+        return {
+          name,
+          price: price.toLocaleString('en-US', { maximumFractionDigits: 0 }),
+          changePct: (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%',
+          up: pct >= 0,
+        }
       }
     }
     return null
@@ -76,18 +123,20 @@ export default function MarketStrip() {
     tvRef.current.appendChild(script)
   }, [])
 
-  // Fetch prezzi indici via /api/indices (server-side proxy)
   useEffect(() => {
     const load = async () => {
-      try {
-        const r = await fetch('/api/indices', { cache: 'no-store' })
-        if (!r.ok) return
-        const d = await r.json()
-        if (d.quotes?.length > 0) setQuotes(d.quotes)
-      } catch {}
+      const toFetch = [
+        ...(isEUOpen() ? EU_INDICES : []),
+        ...(isAsiaOpen() ? ASIA_INDICES : []),
+      ]
+      if (toFetch.length === 0) return
+      const results = await Promise.all(
+        toFetch.map(({ sym, name }) => fetchIndexPrice(sym, name))
+      )
+      setQuotes(results.filter(Boolean) as Quote[])
     }
     load()
-    const t = setInterval(load, 900000) // ogni 15 minuti
+    const t = setInterval(load, 900000) // 15 minuti
     return () => clearInterval(t)
   }, [])
 
@@ -108,7 +157,7 @@ export default function MarketStrip() {
         </div>
       )}
       <div style={{ fontSize: 9, color: 'var(--text4)', padding: '2px 8px 4px', textAlign: 'right' }}>
-        TradingView (US/Commodities/FX) · Yahoo Finance (EU/Asia) · updates every minute
+        TradingView (US/Commodities/FX) · Yahoo Finance (EU/Asia) · live
       </div>
     </div>
   )
