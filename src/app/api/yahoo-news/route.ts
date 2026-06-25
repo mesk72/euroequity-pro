@@ -19,7 +19,7 @@ function parseXML(xml: string): { title: string; link: string; pubDate: string; 
       items.push({ title, link, pubDate: date || new Date().toISOString(), source: src || 'Yahoo Finance' })
     }
   }
-  return items.slice(0, 5)
+  return items.slice(0, 10)
 }
 
 export async function GET(req: Request) {
@@ -101,5 +101,5 @@ export async function GET(req: Request) {
     const title = (i.title || '').toLowerCase()
     return !src.includes('tradingview') && !title.includes('tradingview')
   })
-  return NextResponse.json({ items: filtered.slice(0, 8) })
+  return NextResponse.json({ items: filtered.slice(0, 15) })
 }
