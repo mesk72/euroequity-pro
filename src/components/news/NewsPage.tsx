@@ -191,19 +191,22 @@ export default function NewsPage() {
 
   const load = async () => {
     setLoading(true)
-    const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
+    // Reset dati
+    setData({ world: [], americas: [], europe: [], asia: [] })
 
-    // World: RSS
+    // World: RSS feeds
     const worldAll: NewsItem[] = []
     for (const { name, url } of WORLD_FEEDS) {
       const items = await fetchRSS(name, url)
       worldAll.push(...items)
     }
     const worldSeen: Record<string, boolean> = {}
-    results.world = worldAll
+    const worldNews = worldAll
       .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (worldSeen[k]) return false; worldSeen[k] = true; return true })
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
       .slice(0, 25)
+    setData(prev => ({ ...prev, world: worldNews }))
+    setLoading(false) // Mostra subito world, le regioni caricano in background
 
     // Regioni: carica ticker dal DB poi scarica news progressivamente
     const maxT: Record<string, number> = { americas: 500, europe: 600, asia: 600 }
@@ -225,10 +228,8 @@ export default function NewsPage() {
       } catch {}
     }))
 
-    setData(results)
     setLast(new Date().toLocaleTimeString())
     setCountdown(900)
-    setLoading(false)
   }
 
   const generateReport = async () => {
