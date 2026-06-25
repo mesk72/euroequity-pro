@@ -18,4 +18,5 @@ jobs:
       - name: Run Weekly US
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
         run: python weekly_us.py
