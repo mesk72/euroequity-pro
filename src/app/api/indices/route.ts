@@ -43,7 +43,7 @@ function isEUOpen(): boolean {
 
 async function fetchFMP(symbols: string[]): Promise<{ data: any[], url: string, status: number, raw: string }> {
   const syms = symbols.map(s => encodeURIComponent(s)).join(',')
-  const url = `https://financialmodelingprep.com/api/v3/quote/${syms}?apikey=${FMP_KEY}`
+  const url = `https://financialmodelingprep.com/api/v4/batch-pre-post-market?symbols=${syms}&apikey=${FMP_KEY}`
   try {
     const r = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
