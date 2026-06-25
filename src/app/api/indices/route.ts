@@ -53,8 +53,8 @@ async function fetchFMP(symbols: string[]): Promise<any[]> {
     })
     if (!r.ok) return []
     const d = await r.json()
-    return Array.isArray(d) ? d : []
-  } catch { return [] }
+    return Array.isArray(d) ? d : [{ _raw: JSON.stringify(d).slice(0, 200) }]
+  } catch (e: any) { return [{ _error: e.message }] }
 }
 
 export async function GET() {
