@@ -1,0 +1,23 @@
+name: Daily APAC Update
+
+on:
+  schedule:
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  update-apac:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests pandas numpy
+      - name: Run APAC daily load
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python daily_apac.py
