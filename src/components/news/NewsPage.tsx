@@ -84,14 +84,20 @@ const WORLD_RSS_FEEDS = [
 
 // Google News queries - fetchate via /api/yahoo-news proxy (server-side, no CORS)
 const GOOGLE_NEWS_QUERIES = [
-  { name: 'Google Markets', q: 'stock market today wall street close open' },
-  { name: 'Google PreMkt',  q: 'premarket futures nasdaq sp500 dow jones' },
-  { name: 'Google Asia',    q: 'asia markets nikkei hang seng asx close today' },
-  { name: 'Google Europe',  q: 'european markets DAX CAC FTSE open close today' },
-  { name: 'Google Fed',     q: 'fed ecb interest rate inflation central bank' },
-  { name: 'Google Earnings',q: 'earnings results revenue profit quarterly' },
-  { name: 'Google Oil',     q: 'oil price gold commodity market today' },
-  { name: 'Google Dollar',  q: 'dollar euro yen currency forex today' },
+  { name: 'Google Wall St',   q: 'wall street stock market today close open' },
+  { name: 'Google PreMkt',    q: 'premarket futures nasdaq sp500 dow jones morning' },
+  { name: 'Google Mkt Close', q: 'stock market close today performance recap' },
+  { name: 'Google Mkt Open',  q: 'stock market open today rally gains losses' },
+  { name: 'Google Asia Mkt',  q: 'asia markets nikkei hang seng asx close today' },
+  { name: 'Google Asia Cmmt', q: 'asia market commentary overnight session wrap' },
+  { name: 'Google EU Mkt',    q: 'european markets DAX CAC FTSE open close today' },
+  { name: 'Google EU Cmmt',   q: 'europe market commentary stocks bonds open' },
+  { name: 'Google Fed',       q: 'fed ecb interest rate inflation central bank policy' },
+  { name: 'Google Earnings',  q: 'earnings results revenue profit beat miss quarterly' },
+  { name: 'Google Oil Gold',  q: 'oil gold commodity price today crude brent' },
+  { name: 'Google Forex',     q: 'dollar euro yen pound forex currency market' },
+  { name: 'Google Tech',      q: 'nvidia apple microsoft meta alphabet stock today' },
+  { name: 'Google Banks',     q: 'jpmorgan goldman sachs bank financial stock' },
 ]
 
 const EUROPE_EXTRA_FEEDS = [
@@ -238,6 +244,7 @@ export default function NewsPage() {
   const [report, setReport] = useState('')
   const [reportDate, setReportDate] = useState('')
   const [reportLoading, setReportLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [indices, setIndices] = useState<IndexData[]>([])
 
   const load = async () => {
@@ -387,11 +394,20 @@ export default function NewsPage() {
       return line
     }
 
-    // Filtra ultime 24h e ordina per market cap (bestScore come proxy)
-    const filterTop = (items: NewsItem[]) => items
-      .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
-      .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
-      .slice(0, 10)
+    // Filtra ultime 24h, ordina per mktcap (bestScore), max 1 notizia per ticker, top 10
+    const filterTop = (items: NewsItem[]) => {
+      const seen = new Set<string>()
+      return items
+        .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
+        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+        .filter(n => {
+          if (!n.ticker) return false
+          if (seen.has(n.ticker)) return false
+          seen.add(n.ticker)
+          return true
+        })
+        .slice(0, 10)
+    }
 
     const amNews = filterTop(data.americas)
     const euNews = filterTop(data.europe)
@@ -509,7 +525,15 @@ ${body}
   }
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
-  const items: NewsItem[] = tab !== 'report' ? (data[tab as Region] || []) : []
+  const allItems: NewsItem[] = tab !== 'report' ? (data[tab as Region] || []) : []
+  const items: NewsItem[] = searchQuery.trim()
+    ? allItems.filter(n => {
+        const q = searchQuery.toLowerCase()
+        return (n.ticker || '').toLowerCase().includes(q) ||
+               (n.company || '').toLowerCase().includes(q) ||
+               n.title.toLowerCase().includes(q)
+      })
+    : allItems
 
   return (
     <div className="space-y-4 p-3 fade-in">
@@ -554,6 +578,28 @@ ${body}
           📋 Daily Report
         </button>
       </div>
+
+      {tab !== 'report' && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            type="text"
+            placeholder="🔍 Search by ticker or company... (e.g. MU, Nvidia)"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            style={{
+              flex: 1, padding: '6px 12px', borderRadius: 4, fontSize: 12,
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              color: 'var(--text)', outline: 'none',
+            }}
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')}
+              style={{ padding: '4px 8px', borderRadius: 4, fontSize: 11, cursor: 'pointer', border: 'none', background: 'var(--surface)', color: 'var(--text4)' }}>
+              ✕
+            </button>
+          )}
+        </div>
+      )}
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', minHeight: 200 }}>
         {tab === 'report' ? (
