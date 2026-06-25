@@ -13,16 +13,16 @@ export default function MarketStrip() {
     script.async = true
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: 'NYSE:SPY',         title: 'S&P 500'        },
         { proName: 'NASDAQ:QQQ',       title: 'Nasdaq 100'     },
+        { proName: 'NYSE:SPY',         title: 'S&P 500'        },
         { proName: 'NYSE:DIA',         title: 'Dow Jones'      },
         { proName: 'ICMARKETS:UK100',  title: 'FTSE 100 (fut.)'},
         { proName: 'INDEX:DAX',        title: 'DAX'            },
         { proName: 'INDEX:CAC40',      title: 'CAC 40'         },
         { proName: 'INDEX:FTSEMIB',    title: 'FTSE MIB'       },
         { proName: 'INDEX:SX5E',       title: 'Euro Stoxx 50'  },
-        { proName: 'INDEX:NKY',        title: 'Nikkei 225'     },
-        { proName: 'INDEX:HSI',        title: 'Hang Seng'      },
+        { proName: 'OSAKA:NK225',      title: 'Nikkei 225'     },
+        { proName: 'HKEX:HSI',         title: 'Hang Seng'      },
         { proName: 'ASX:XJO',          title: 'ASX 200'        },
         { proName: 'TVC:GOLD',         title: 'Gold'           },
         { proName: 'TVC:USOIL',        title: 'Oil WTI'        },
