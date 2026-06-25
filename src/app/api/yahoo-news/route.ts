@@ -26,6 +26,8 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const ticker = searchParams.get('ticker')
   const company = searchParams.get('company') || ''
+  const exchange = searchParams.get('exchange') || ''
+  const yahooTicker = searchParams.get('yahooTicker') || ticker || ''
   const googleUrl = searchParams.get('googleUrl') || ''
 
   // Modalità Google News diretto - per Global feed
@@ -65,14 +67,17 @@ export async function GET(req: Request) {
     }
   } catch {}
 
-  // 2. Google News RSS - cerca per nome azienda
-  if (company) {
+  // 2. Google News RSS - stessa logica della stock page
+  // US: usa yahooTicker (es. AAPL stock) — più preciso
+  // EU/Asia: usa prime 2 parole company name
+  if (company || yahooTicker) {
     try {
-      const nameWords = company.split(' ')
-        .filter((w: string) => w.length > 2 && !STOP.has(w))
-        .slice(0, 3).join(' ')
-      const query = nameWords + ' stock OR earnings'
-      const googleUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en&gl=US&ceid=US:en`
+      const isUS = exchange === 'US' || exchange === 'TSX'
+      const query = isUS && yahooTicker
+        ? yahooTicker + ' stock'
+        : company.split(' ').filter((w: string) => w.length > 2 && !STOP.has(w)).slice(0, 2).join(' ') + ' stock OR earnings'
+      const gl = isUS ? 'US' : 'GB'
+      const googleUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en&gl=${gl}&ceid=${gl}:en`
       const r = await fetch(googleUrl, {
         headers: { 'User-Agent': UA },
         signal: AbortSignal.timeout(5000),
@@ -95,11 +100,28 @@ export async function GET(req: Request) {
     return true
   })
 
-  // Escludi notizie TradingView che sono generiche e non informative
+  // Filtri finali
+  const STOP2 = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co',
+    'The','Holdings','International','Global','Company','Corporation','Limited'])
+  const nameWords = company.split(' ')
+    .map((w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
+    .filter((w: string) => w.length >= 4 && !STOP2.has(w.charAt(0).toUpperCase() + w.slice(1)))
+  const primaryWord = nameWords[0] || ''
+  const yahooTickerClean = (yahooTicker || '').split('.')[0].toLowerCase()
+
   const filtered = deduped.filter(i => {
     const src = (i.source || '').toLowerCase()
     const title = (i.title || '').toLowerCase()
-    return !src.includes('tradingview') && !title.includes('tradingview')
+    // Escludi TradingView, Investors Business Daily, Investing.com (troppi falsi positivi)
+    if (src.includes('tradingview') || src.includes('investors business') || 
+        src.includes('investing.com') || title.includes('tradingview')) return false
+    // Verifica che il nome azienda o ticker Yahoo sia nel titolo
+    if (primaryWord && primaryWord.length >= 4) {
+      const hasName = title.includes(primaryWord)
+      const hasTicker = yahooTickerClean.length >= 2 && title.includes(yahooTickerClean)
+      if (!hasName && !hasTicker) return false
+    }
+    return true
   })
   return NextResponse.json({ items: filtered.slice(0, 15) })
 }
