@@ -403,8 +403,9 @@ export default function NewsPage() {
       return line
     }
 
-    // Filtra ultime 24h, ordina per mktcap (bestScore), max 1 notizia per ticker, top 10
-    const filterTop = (items: NewsItem[]) => {
+    // Filtra 24h, ordina per mktcap (bestScore DESC = proxy mktcap), max 1 per ticker
+    // Americas: top 100 mktcap, Europe: top 50, Asia: top 50
+    const filterMktCap = (items: NewsItem[], topN: number) => {
       const seen = new Set<string>()
       return items
         .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
@@ -415,12 +416,12 @@ export default function NewsPage() {
           seen.add(n.ticker)
           return true
         })
-        .slice(0, 10)
+        .slice(0, topN)
     }
 
-    const amNews = filterTop(data.americas)
-    const euNews = filterTop(data.europe)
-    const apNews = filterTop(data.asia)
+    const amNews = filterMktCap(data.americas, 10)
+    const euNews = filterMktCap(data.europe,   10)
+    const apNews = filterMktCap(data.asia,     10)
 
     if (amNews.length > 0) {
       txt += '**NORTH AMERICA — Top stories by market cap**\n'
@@ -759,6 +760,79 @@ ${body}
             <button onClick={load} style={{ color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 12 }}>
               🔄 Retry
             </button>
+          </div>
+        ) : tab === 'reportbest' ? (
+          <div style={{ padding: 20 }}>
+            {!reportBest && !reportBestLoading && (
+              <div style={{ textAlign: 'center', padding: 32 }}>
+                <div style={{ fontSize: 14, color: 'var(--text3)', marginBottom: 16 }}>
+                  Top stories ranked by ForwardAlpha Best Score — last 24h.
+                </div>
+                <button onClick={generateReportBest}
+                  style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700,
+                    cursor: 'pointer', border: 'none', background: 'var(--orange)', color: '#000' }}>
+                  ⭐ Generate Best Score Report
+                </button>
+              </div>
+            )}
+            {reportBestLoading && (
+              <div style={{ textAlign: 'center', padding: 48 }}>
+                <RefreshCw size={20} style={{ margin: '0 auto 10px', animation: 'spin 1s linear infinite', color: 'var(--orange)' }} />
+                <p style={{ fontSize: 13, color: 'var(--text4)' }}>Building Best Score Report...</p>
+              </div>
+            )}
+            {reportBest && !reportBestLoading && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text4)' }}>Generated: {reportBestDate}</div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={generateReportBest}
+                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer',
+                        border: '1px solid var(--orange)', background: 'none', color: 'var(--orange)' }}>
+                      🔄 Refresh
+                    </button>
+                    <button onClick={() => downloadReport(reportBest)}
+                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer',
+                        border: '1px solid #3b82f6', background: 'none', color: '#3b82f6' }}>
+                      📄 Download HTML
+                    </button>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
+                  {reportBest.split('\n').map((line, li) => {
+                    if (line.trim() === '') return <div key={li} style={{ height: 8 }} />
+                    const articleMatch = line.match(/^\s*📰\s*(https?:\/\/\S+)/)
+                    if (articleMatch) {
+                      return <div key={li} style={{ marginLeft: 24, fontSize: 11 }}>
+                        <span style={{ color: 'var(--text4)' }}>📰 </span>
+                        <a href={articleMatch[1]} target="_blank" rel="noopener noreferrer"
+                          style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: 11 }}>Read article</a>
+                      </div>
+                    }
+                    const stockMatch = line.match(/^\s*📊\s*(\S+)\s*→\s*(https?:\/\/\S+)/)
+                    if (stockMatch) {
+                      return <div key={li} style={{ marginLeft: 24, fontSize: 11, marginTop: 2 }}>
+                        <a href={stockMatch[2]} target="_blank" rel="noopener noreferrer"
+                          style={{ color: 'var(--orange)', textDecoration: 'none', fontWeight: 700, fontSize: 11 }}>
+                          📊 {stockMatch[1]} →
+                        </a>
+                      </div>
+                    }
+                    if (line.startsWith('**') && line.endsWith('**')) {
+                      return <div key={li} style={{ fontWeight: 700, color: 'var(--orange)',
+                        fontSize: 12, marginTop: 16, marginBottom: 6,
+                        borderBottom: '1px solid rgba(249,115,22,0.3)', paddingBottom: 4 }}>
+                        {line.replace(/\*\*/g, '')}
+                      </div>
+                    }
+                    if (line.startsWith('━')) {
+                      return <div key={li} style={{ color: 'rgba(255,255,255,0.1)', fontSize: 10 }}>{line}</div>
+                    }
+                    return <div key={li} style={{ marginBottom: 4 }}>{line}</div>
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           items.map((item, i) => (
