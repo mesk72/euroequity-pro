@@ -179,7 +179,7 @@ async function fetchTickerNews(
 
   // Processa ticker in batch da 20 in parallelo
   // Usa Yahoo Finance RSS per singolo ticker - funziona con rss2json
-  const batchSize = 20
+  const batchSize = 50
   for (let i = 0; i < tickers.length; i += batchSize) {
     const batch = tickers.slice(i, i + batchSize)
 
@@ -192,14 +192,6 @@ async function fetchTickerNews(
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items) || gd.items.length === 0) return []
-          // Filtro RIGOROSO: tutte le parole significative del nome devono essere nel titolo
-          const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited','de','et','und','of','and'])
-          const nameWords = t.company.split(' ')
-            .map((w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
-            .filter((w: string) => w.length >= 4 && !STOP.has(w.charAt(0).toUpperCase() + w.slice(1)))
-          // Usa tutte le parole significative (es. "Innovent" E "Biologics")
-          const wordsToMatch = nameWords.slice(0, 3)
-
           return gd.items
             .map((item: any) => ({
               title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
@@ -216,17 +208,14 @@ async function fetchTickerNews(
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
               if (Date.now() - new Date(n.pubDate).getTime() > maxAge) return false
-              if (wordsToMatch.length === 0) return false
-              const titleLower = n.title.toLowerCase()
-              // TUTTE le parole significative devono essere nel titolo
-              const allMatch = wordsToMatch.every((w: string) => titleLower.includes(w))
-              if (!allMatch) return false
+              // Escludi solo TradingView
+              if ((n.source || '').toLowerCase().includes('tradingview')) return false
               const k = n.title.slice(0, 60).toLowerCase()
               if (seen[k]) return false
               seen[k] = true
               return true
             })
-            .slice(0, 2)
+            .slice(0, 3)
         } catch { return [] }
       })
     )
@@ -286,7 +275,7 @@ export default function NewsPage() {
     const worldNews = worldAll
       .filter(n => {
         if (Date.now() - new Date(n.pubDate).getTime() > worldMaxAge) return false
-        const k = n.title.slice(0, 500).toLowerCase()
+        const k = n.title.toLowerCase()
         if (worldSeen[k]) return false
         worldSeen[k] = true
         return true
@@ -313,7 +302,7 @@ export default function NewsPage() {
             const filtered = extraItems.filter(n => Date.now() - new Date(n.pubDate).getTime() < maxAge)
             const merged = [...(prev[region] || []), ...filtered]
               .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-              .slice(0, 500)
+              
             return { ...prev, [region]: merged }
           })
         }
@@ -321,7 +310,7 @@ export default function NewsPage() {
           setData(prev => {
             const merged = [...(prev[region] || []), ...batch]
               .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-              .slice(0, 500)
+              
             return { ...prev, [region]: merged }
           })
         })
