@@ -21,7 +21,7 @@ export default function MarketStrip() {
         { proName: 'INDEX:CAC40',      title: 'CAC 40'            },
         { proName: 'INDEX:FTSEMIB',    title: 'FTSE MIB'          },
         { proName: 'INDEX:SX5E',       title: 'Euro Stoxx 50'     },
-        { proName: 'EUREX:FESX1!',     title: 'Euro Stoxx 50 (fut.)' },
+        { proName: 'INDEX:SXXP',       title: 'Stoxx 600'            },
         { proName: 'INDEX:NKY',        title: 'Nikkei 225'     },
         { proName: 'INDEX:HSI',        title: 'Hang Seng'      },
         { proName: 'ASX:XJO',          title: 'ASX 200'        },
