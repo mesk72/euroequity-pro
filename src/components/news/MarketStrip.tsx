@@ -21,7 +21,7 @@ export default function MarketStrip() {
         { proName: 'INDEX:CAC40',      title: 'CAC 40'            },
         { proName: 'INDEX:FTSEMIB',    title: 'FTSE MIB'          },
         { proName: 'INDEX:SX5E',       title: 'Euro Stoxx 50'     },
-        { proName: 'INDEX:SXXP',       title: 'Stoxx 600'         },
+        { proName: 'EUREX:FESX1!',     title: 'Euro Stoxx 50 (fut.)' },
         { proName: 'INDEX:NKY',        title: 'Nikkei 225'     },
         { proName: 'INDEX:HSI',        title: 'Hang Seng'      },
         { proName: 'ASX:XJO',          title: 'ASX 200'        },
@@ -48,7 +48,7 @@ export default function MarketStrip() {
         <div className="tradingview-widget-container__widget" />
       </div>
       <div style={{ fontSize: 9, color: 'var(--text4)', padding: '2px 8px 4px', textAlign: 'right' }}>
-        Prices powered by TradingView · S&P 500, Nasdaq, Dow, FTSE 100 = futures (live 24/7) · EU/Asia indices = real-time · delayed 15-20 min
+        Prices powered by TradingView · S&P, Nasdaq, Dow, FTSE 100, Euro Stoxx 50 = futures live 24/7 · DAX/CAC/MIB/Nikkei/HSI/ASX = real-time · 15-20 min delay
       </div>
     </div>
   )
