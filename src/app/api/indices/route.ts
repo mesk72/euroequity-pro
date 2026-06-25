@@ -9,11 +9,11 @@ const ASIA_INDICES = [
 ]
 
 const EU_INDICES = [
-  { name: 'DAX',           symbol: '^GDAXI'    },
-  { name: 'CAC 40',        symbol: '^FCHI'     },
-  { name: 'FTSE MIB',      symbol: 'FTSEMIB.MI'},
-  { name: 'FTSE 100',      symbol: '^FTSE'     },
-  { name: 'Euro Stoxx 50', symbol: '^STOXX50E' },
+  { name: 'DAX',           symbol: '^GDAXI'   },
+  { name: 'CAC 40',        symbol: '^FCHI'    },
+  { name: 'FTSE MIB',      symbol: '^FTSEMIB' },
+  { name: 'FTSE 100',      symbol: '^FTSE'    },
+  { name: 'Euro Stoxx 50', symbol: '^STOXX50E'},
 ]
 
 function isWeekday(): boolean {
@@ -43,14 +43,17 @@ function isEUOpen(): boolean {
 
 async function fetchFMP(symbols: string[]): Promise<any[]> {
   try {
-    const syms = symbols.join(',')
-    const url = `https://financialmodelingprep.com/api/v3/quote/${encodeURIComponent(syms)}?apikey=${FMP_KEY}`
+    // FMP vuole i simboli separati da virgola nell'URL senza encode della virgola
+    const syms = symbols.map(s => encodeURIComponent(s)).join(',')
+    const url = `https://financialmodelingprep.com/api/v3/quote/${syms}?apikey=${FMP_KEY}`
     const r = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
       signal: AbortSignal.timeout(8000),
       cache: 'no-store',
     })
     if (!r.ok) return []
-    return await r.json()
+    const d = await r.json()
+    return Array.isArray(d) ? d : []
   } catch { return [] }
 }
 
