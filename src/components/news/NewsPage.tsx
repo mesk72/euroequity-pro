@@ -152,14 +152,16 @@ async function fetchTickerNews(
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items) || gd.items.length === 0) return []
-          // Filtro rigoroso: la notizia deve menzionare il nome società
-          const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited','de','et','und'])
-          const companyWords = t.company.split(/[\s\-&]+/)
-            .filter((w: string) => w.length > 3 && !STOP.has(w))
-            .slice(0, 2)
-            .map((w: string) => w.toLowerCase().replace(/[^a-z0-9]/g, ''))
-          // Anche il ticker Yahoo come fallback
-          const tickerClean = (t.yahooTicker || t.ticker).split('.')[0].toLowerCase()
+          // Filtro RIGOROSO: prima il ticker Yahoo, poi verifica nome azienda nel titolo
+          const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company','Corporation','Limited','de','et','und','of','and'])
+          // Prendi le parole significative del nome (minimo 4 caratteri, non stopword)
+          const nameWords = t.company.split(' ')
+            .map((w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
+            .filter((w: string) => w.length >= 4 && !STOP.has(w.charAt(0).toUpperCase() + w.slice(1)))
+
+          // La prima parola significativa del nome è il filtro principale
+          const primaryWord = nameWords[0] || ''
+          const secondWord = nameWords[1] || ''
 
           return gd.items
             .map((item: any) => ({
@@ -177,13 +179,16 @@ async function fetchTickerNews(
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
               if (Date.now() - new Date(n.pubDate).getTime() > maxAge) return false
-              const titleLower = n.title.toLowerCase().replace(/[^a-z0-9\s]/g, '')
-              // Deve contenere ALMENO la prima parola significativa del nome
-              const firstWord = companyWords[0] || ''
-              const hasName = firstWord.length > 3 && titleLower.includes(firstWord)
-              // OPPURE il ticker esatto (solo se > 3 caratteri per evitare falsi positivi)
-              const hasTicker = tickerClean.length > 3 && titleLower.includes(tickerClean)
-              if (!hasName && !hasTicker) return false
+              const titleLower = n.title.toLowerCase()
+              // REGOLA: la prima parola significativa del nome DEVE essere nel titolo
+              // E se esiste una seconda parola, anche quella deve esserci
+              // Questo evita che "Wise" matchi "WSE" o "Innovation Partners" matchi "1801.HK"
+              if (!primaryWord || primaryWord.length < 4) return false
+              if (!titleLower.includes(primaryWord)) return false
+              if (secondWord.length >= 4 && !titleLower.includes(secondWord)) {
+                // Se la seconda parola non c'è, accetta solo se la prima è molto specifica (>6 chars)
+                if (primaryWord.length <= 6) return false
+              }
               const k = n.title.slice(0, 60).toLowerCase()
               if (seen[k]) return false
               seen[k] = true
@@ -309,25 +314,31 @@ export default function NewsPage() {
     themes.forEach(t => { txt += '• ' + t + '\n' })
     txt += '\n'
 
+    const fmtNewsItem = (n: NewsItem) => {
+      let line = '• '
+      if (n.ticker) line += '[' + n.ticker + '] '
+      line += n.title
+      // Aggiungi scores ForwardAlpha se disponibili
+      if (n.valueScore != null) {
+        line += ' | FA: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      }
+      if (n.link) line += ' → ' + n.link
+      return line
+    }
+
     if (data.americas.length > 0) {
       txt += '**NORTH AMERICA**\n'
-      data.americas.slice(0, 6).forEach(n => {
-        txt += '• ' + (n.ticker ? '[' + n.ticker + '] ' : '') + n.title + (n.link ? ' → ' + n.link : '') + '\n'
-      })
+      data.americas.slice(0, 6).forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
     if (data.europe.length > 0) {
       txt += '**EUROPE**\n'
-      data.europe.slice(0, 6).forEach(n => {
-        txt += '• ' + (n.ticker ? '[' + n.ticker + '] ' : '') + n.title + (n.link ? ' → ' + n.link : '') + '\n'
-      })
+      data.europe.slice(0, 6).forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
     if (data.asia.length > 0) {
       txt += '**ASIA PACIFIC**\n'
-      data.asia.slice(0, 6).forEach(n => {
-        txt += '• ' + (n.ticker ? '[' + n.ticker + '] ' : '') + n.title + (n.link ? ' → ' + n.link : '') + '\n'
-      })
+      data.asia.slice(0, 6).forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
 
