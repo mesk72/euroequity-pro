@@ -16,21 +16,28 @@ const EU_INDICES = [
   { name: 'Euro Stoxx 50', symbol: '^STOXX50E' },
 ]
 
+function isWeekday(): boolean {
+  const day = new Date().getUTCDay()
+  return day >= 1 && day <= 5 // Mon-Fri
+}
+
 function isAsiaOpen(): boolean {
+  if (!isWeekday()) return false
   const now = new Date()
   const utcH = now.getUTCHours()
   const utcM = now.getUTCMinutes()
   const utcTime = utcH * 60 + utcM
-  // Asia: 00:00 - 08:00 UTC (Tokyo 09:00-17:00 JST, HK 09:30-16:00 HKT)
+  // Tokyo 00:00-06:00 UTC, HK 01:30-08:00 UTC, ASX 00:00-06:00 UTC
   return utcTime >= 0 && utcTime <= 480
 }
 
 function isEUOpen(): boolean {
+  if (!isWeekday()) return false
   const now = new Date()
   const utcH = now.getUTCHours()
   const utcM = now.getUTCMinutes()
   const utcTime = utcH * 60 + utcM
-  // EU: 07:00 - 15:30 UTC (09:00-17:30 CET)
+  // EU: 07:00 - 15:30 UTC (09:00-17:30 CET / 08:00-16:30 UTC in estate)
   return utcTime >= 420 && utcTime <= 930
 }
 
