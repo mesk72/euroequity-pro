@@ -13,17 +13,17 @@ export default function MarketStrip() {
     script.async = true
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: 'NASDAQ:QQQ',       title: 'Nasdaq 100'     },
-        { proName: 'AMEX:SPY',         title: 'S&P 500'        },
-        { proName: 'AMEX:DIA',         title: 'Dow Jones'      },
-        { proName: 'ICMARKETS:UK100',  title: 'FTSE 100 (fut.)'},
-        { proName: 'INDEX:DAX',        title: 'DAX'            },
-        { proName: 'INDEX:CAC40',      title: 'CAC 40'         },
-        { proName: 'INDEX:FTSEMIB',    title: 'FTSE MIB'       },
-        { proName: 'INDEX:SX5E',       title: 'Euro Stoxx 50'  },
-        { proName: 'CAPITALCOM:JP225', title: 'Nikkei 225'     },
-        { proName: 'CAPITALCOM:HK50',  title: 'Hang Seng'      },
-        { proName: 'ASX:XJO',          title: 'ASX 200'        },
+        { proName: 'CAPITALCOM:US500',  title: 'S&P 500'        },
+        { proName: 'CAPITALCOM:US100',  title: 'Nasdaq 100'     },
+        { proName: 'CAPITALCOM:US30',   title: 'Dow Jones'      },
+        { proName: 'CAPITALCOM:UK100',  title: 'FTSE 100'       },
+        { proName: 'CAPITALCOM:DE40',   title: 'DAX'            },
+        { proName: 'CAPITALCOM:FR40',   title: 'CAC 40'         },
+        { proName: 'CAPITALCOM:IT40',   title: 'FTSE MIB'       },
+        { proName: 'CAPITALCOM:EU50',   title: 'Euro Stoxx 50'  },
+        { proName: 'CAPITALCOM:JP225',  title: 'Nikkei 225'     },
+        { proName: 'CAPITALCOM:HK50',   title: 'Hang Seng'      },
+        { proName: 'CAPITALCOM:AUS200', title: 'ASX 200'        },
         { proName: 'TVC:GOLD',         title: 'Gold'           },
         { proName: 'TVC:USOIL',        title: 'Oil WTI'        },
         { proName: 'TVC:UKOIL',        title: 'Oil Brent'      },
@@ -47,7 +47,7 @@ export default function MarketStrip() {
         <div className="tradingview-widget-container__widget" />
       </div>
       <div style={{ fontSize: 9, color: 'var(--text4)', padding: '2px 8px 4px', textAlign: 'right' }}>
-        Prices powered by TradingView · S&P 500/Nasdaq/Dow = ETF (SPY/QQQ/DIA), live when US markets open · FTSE 100 = future · EU/Asia = real-time · 15-20 min delay
+        Prices powered by TradingView · All indices = CFD live 24/7 · Data may differ slightly from cash index
       </div>
     </div>
   )
