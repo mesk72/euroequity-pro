@@ -13,15 +13,14 @@ export default function MarketStrip() {
     script.async = true
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: 'FOREXCOM:SPXUSD',  title: 'S&P 500'        },
-        { proName: 'FOREXCOM:NSXUSD',  title: 'Nasdaq 100'     },
-        { proName: 'FOREXCOM:DJI',     title: 'Dow Jones'      },
+        { proName: 'NYSE:SPY',         title: 'S&P 500'        },
+        { proName: 'NASDAQ:QQQ',       title: 'Nasdaq 100'     },
+        { proName: 'NYSE:DIA',         title: 'Dow Jones'      },
         { proName: 'ICMARKETS:UK100',  title: 'FTSE 100 (fut.)'},
         { proName: 'INDEX:DAX',        title: 'DAX'            },
         { proName: 'INDEX:CAC40',      title: 'CAC 40'         },
         { proName: 'INDEX:FTSEMIB',    title: 'FTSE MIB'       },
         { proName: 'INDEX:SX5E',       title: 'Euro Stoxx 50'  },
-        { proName: 'INDEX:SXXP',       title: 'Stoxx 600'      },
         { proName: 'INDEX:NKY',        title: 'Nikkei 225'     },
         { proName: 'INDEX:HSI',        title: 'Hang Seng'      },
         { proName: 'ASX:XJO',          title: 'ASX 200'        },
@@ -48,7 +47,7 @@ export default function MarketStrip() {
         <div className="tradingview-widget-container__widget" />
       </div>
       <div style={{ fontSize: 9, color: 'var(--text4)', padding: '2px 8px 4px', textAlign: 'right' }}>
-        Prices powered by TradingView · S&P, Nasdaq, Dow, FTSE 100, Euro Stoxx 50 = futures live 24/7 · DAX/CAC/MIB/Nikkei/HSI/ASX = real-time · 15-20 min delay
+        Prices powered by TradingView · S&P 500/Nasdaq/Dow = ETF (SPY/QQQ/DIA), live when US markets open · FTSE 100 = future · EU/Asia = real-time · 15-20 min delay
       </div>
     </div>
   )
