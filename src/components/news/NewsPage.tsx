@@ -375,24 +375,31 @@ export default function NewsPage() {
           </div>
         ) : (
           items.map((item, i) => (
-            <a key={i} href={item.link} target="_blank" rel="noopener noreferrer"
-              style={{
+            <div key={i} style={{
                 display: 'block', padding: '12px 16px',
                 background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
                 borderLeft: '3px solid ' + srcColor(item.source),
                 borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                textDecoration: 'none',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(249,115,22,0.08)')}
-              onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)')}>
+              }}>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <div style={{ flex: 1, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{item.title}</div>
-                <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 85 }}>
+                <a href={item.link} target="_blank" rel="noopener noreferrer"
+                  style={{ flex: 1, fontSize: 13, color: 'var(--text)', lineHeight: 1.6, textDecoration: 'none' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text)')}>
+                  {item.title}
+                </a>
+                <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 90 }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: srcColor(item.source) }}>{item.source}</div>
                   <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 2 }}>{timeAgo(item.pubDate)}</div>
+                  {(item as any).ticker && (item as any).exchange && (
+                    <a href={'/stock/' + (item as any).ticker + '-' + (item as any).exchange}
+                      style={{ fontSize: 10, color: 'var(--orange)', fontWeight: 700, textDecoration: 'none', display: 'inline-block', marginTop: 3, padding: '1px 5px', border: '1px solid rgba(249,115,22,0.4)', borderRadius: 3 }}>
+                      {(item as any).ticker} ↗
+                    </a>
+                  )}
                 </div>
               </div>
-            </a>
+            </div>
           ))
         )}
       </div>
