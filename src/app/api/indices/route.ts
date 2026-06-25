@@ -63,15 +63,14 @@ export async function GET() {
   if (euOpen) toFetch.push(...EU_INDICES)
 
   if (toFetch.length === 0) {
-    // Fuori orario - restituisce ultimo prezzo senza chiamate API
-    return NextResponse.json({ quotes: [], marketsClosed: true })
+    return NextResponse.json({ quotes: [], debug: 'markets closed', utcHour: new Date().getUTCHours() })
   }
 
   const symbols = toFetch.map(i => i.symbol)
-  const data = await fetchFMP(symbols)
+  const fmpData = await fetchFMP(symbols)
 
   const quotes = toFetch.map(idx => {
-    const q = data.find((d: any) => d.symbol === idx.symbol)
+    const q = fmpData.find((d: any) => d.symbol === idx.symbol)
     if (!q) return null
     const pct = q.changesPercentage || 0
     return {
@@ -82,5 +81,14 @@ export async function GET() {
     }
   }).filter(Boolean)
 
-  return NextResponse.json({ quotes })
+  return NextResponse.json({
+    quotes,
+    debug: {
+      asiaOpen,
+      euOpen,
+      utcHour: new Date().getUTCHours(),
+      symbolsFetched: symbols,
+      fmpCount: fmpData.length,
+    }
+  })
 }
