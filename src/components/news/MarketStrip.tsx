@@ -17,7 +17,7 @@ export default function MarketStrip() {
         { proName: 'FOREXCOM:NSXUSD',  title: 'Nasdaq 100' },
         { proName: 'FOREXCOM:DJI',     title: 'Dow Jones'  },
         { proName: 'INDEX:DAX',        title: 'DAX'        },
-        { proName: 'CAPITALCOM:UK100', title: 'FTSE 100'   },
+        { proName: 'ICMARKETS:UK100',  title: 'FTSE 100'   },
         { proName: 'INDEX:CAC40',      title: 'CAC 40'     },
         { proName: 'INDEX:FTSEMIB',    title: 'FTSE MIB'   },
         { proName: 'INDEX:NKY',        title: 'Nikkei 225' },
