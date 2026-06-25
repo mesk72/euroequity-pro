@@ -135,7 +135,7 @@ async function fetchTickerNews(
   onBatch: (news: NewsItem[]) => void
 ): Promise<void> {
   const seen: Record<string, boolean> = {}
-  const maxAge = 7 * 24 * 60 * 60 * 1000
+  const maxAge = 18 * 60 * 60 * 1000 // 18 ore
 
   // Processa ticker in batch da 20 in parallelo
   // Usa Yahoo Finance RSS per singolo ticker - funziona con rss2json
