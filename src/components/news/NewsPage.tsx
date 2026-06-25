@@ -12,6 +12,9 @@ interface NewsItem {
   ticker?: string
   exchange?: string
   company?: string
+  valueScore?: number
+  growthScore?: number
+  bestScore?: number
 }
 
 interface IndexData {
@@ -128,7 +131,7 @@ async function fetchRSS(name: string, url: string): Promise<NewsItem[]> {
 
 async function fetchTickerNews(
   region: string,
-  tickers: { ticker: string; exchange: string; company: string; yahooTicker: string }[],
+  tickers: { ticker: string; exchange: string; company: string; yahooTicker: string; valueScore?: number; growthScore?: number; bestScore?: number }[],
   onBatch: (news: NewsItem[]) => void
 ): Promise<void> {
   const seen: Record<string, boolean> = {}
@@ -165,6 +168,9 @@ async function fetchTickerNews(
               ticker: t.ticker,
               exchange: t.exchange,
               company: t.company,
+              valueScore: t.valueScore,
+              growthScore: t.growthScore,
+              bestScore: t.bestScore,
             }))
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
@@ -447,12 +453,22 @@ export default function NewsPage() {
               borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
             }}>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <a href={item.link} target="_blank" rel="noopener noreferrer"
-                  style={{ flex: 1, fontSize: 13, color: 'var(--text)', lineHeight: 1.6, textDecoration: 'none' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text)')}>
-                  {item.title}
-                </a>
+                <div style={{ flex: 1 }}>
+                  <a href={item.link} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, textDecoration: 'none', display: 'block' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text)')}>
+                    {item.title}
+                  </a>
+                  {item.ticker && item.valueScore != null && (
+                    <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center' }}>
+                      <span style={{ fontSize: 9, color: 'var(--text4)' }}>ForwardAlpha:</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#3b82f6' }}>Val {item.valueScore}</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#22c55e' }}>Grw {item.growthScore}</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--orange)' }}>Best {item.bestScore}</span>
+                    </div>
+                  )}
+                </div>
                 <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 90 }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: srcColor(item.source) }}>{item.source}</div>
                   <div style={{ fontSize: 10, color: 'var(--text4)', marginTop: 2 }}>{timeAgo(item.pubDate)}</div>
