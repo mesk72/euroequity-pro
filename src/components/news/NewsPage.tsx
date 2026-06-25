@@ -103,6 +103,7 @@ const GOOGLE_NEWS_QUERIES = [
   { name: 'Google Morning',   q: 'morning brief stock market outlook today' },
   { name: 'Google Brief',     q: 'market wrap recap brief investing stocks' },
   { name: 'Futu Morning',     q: 'Futu morning brief market stock' },
+  { name: 'GuruFocus',        q: 'site:gurufocus.com market close today' },
 ]
 
 const EUROPE_EXTRA_FEEDS = [
