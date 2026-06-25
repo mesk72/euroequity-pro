@@ -6,15 +6,40 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const GOOGLE_NEWS = 'https://news.google.com/rss/search'
+// Domini finanziari affidabili - filtro anti-spam
+const FINANCE_DOMAINS = [
+  'reuters.com','bloomberg.com','cnbc.com','wsj.com','ft.com','marketwatch.com',
+  'seekingalpha.com','fool.com','yahoo.com','barrons.com','investing.com',
+  'financialtimes.com','economist.com','businessweek.com','forbes.com',
+  'thestreet.com','benzinga.com','zacks.com','morningstar.com','stockanalysis.com',
+  'ilsole24ore.com','handelsblatt.com','lesechos.fr','expansion.com','nzz.ch',
+  'scmp.com','japantimes.co.jp','nhk.or.jp','businesstimes.com.sg','nikkei.com',
+  'globeandmail.com','financialpost.com','bnnbloomberg.ca',
+]
 
-async function fetchGoogleNews(query: string, lang = 'en', geo = 'US'): Promise<any[]> {
+function isFinanceNews(link: string): boolean {
+  return FINANCE_DOMAINS.some(d => link.includes(d))
+}
+
+async function fetchGoogleNewsForTicker(
+  ticker: string,
+  company: string,
+  exchange: string
+): Promise<any[]> {
   try {
-    const url = `${GOOGLE_NEWS}?q=${encodeURIComponent(query)}&hl=${lang}&gl=${geo}&ceid=${geo}:${lang}`
+    // Query: nome azienda + ticker per notizie precise
+    const companyShort = company.split(' ').slice(0, 2).join(' ')
+    const query = `"${companyShort}" stock OR "${ticker}" stock OR "${company}" earnings`
+    const lang = ['TSE','SEHK'].includes(exchange) ? 'en' : 'en'
+    const geo = exchange === 'TSX' ? 'CA' :
+                ['TSE','SEHK','ASX'].includes(exchange) ? 'US' :
+                ['PA','MIL','XETRA','MC','AS','BR','LS','OM','OB','HE','SWX'].includes(exchange) ? 'US' : 'US'
+
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=${lang}&gl=${geo}&ceid=${geo}:${lang}`
     const r = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
-      signal: AbortSignal.timeout(8000),
-      next: { revalidate: 900 },
+      signal: AbortSignal.timeout(5000),
+      next: { revalidate: 1800 },
     })
     if (!r.ok) return []
     const xml = await r.text()
@@ -28,35 +53,42 @@ async function fetchGoogleNews(query: string, lang = 'en', geo = 'US'): Promise<
       const date  = block.match(/<pubDate>(.*?)<\/pubDate>/)?.[1]?.trim()
       const src   = block.match(/<source[^>]*>(.*?)<\/source>/)?.[1]?.trim()
       if (title && link && title.length > 10) {
-        items.push({ title, link, pubDate: date || new Date().toISOString(), source: src || 'Google News' })
+        items.push({
+          title,
+          link,
+          pubDate: date || new Date().toISOString(),
+          source: src || 'Google News',
+          ticker,
+          exchange,
+          company: companyShort,
+        })
       }
     }
-    return items.slice(0, 5)
+    // Filtra solo notizie finanziarie
+    return items.filter(n => isFinanceNews(n.link)).slice(0, 2)
   } catch { return [] }
 }
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const region = searchParams.get('region') || 'americas'
+  const limitParam = parseInt(searchParams.get('limit') || '0')
 
-  // Prendi top ticker per regione dal DB
   let exchanges: string[] = []
-  let limit = 300
-  let lang = 'en'
-  let geo = 'US'
+  let limit = 500
 
   if (region === 'americas') {
     exchanges = ['US', 'TSX']
-    limit = 300
+    limit = limitParam || 500
   } else if (region === 'europe') {
     exchanges = ['PA', 'XETRA', 'MIL', 'MC', 'AS', 'BR', 'LS', 'OM', 'OB', 'HE', 'SWX', 'IR', 'LSE', 'VI', 'CPSE']
-    limit = 200
+    limit = limitParam || 600
   } else if (region === 'asia') {
-    exchanges = ['TSE', 'SEHK', 'ASX', 'TSX']
-    limit = 200
+    exchanges = ['TSE', 'SEHK', 'ASX']
+    limit = limitParam || 600
   }
 
-  // Prendi top N titoli per mktCap
+  // Top ticker per mktCap con company name
   const { data: stocks } = await supabase
     .from('fundamentals')
     .select('ticker, exchange, mkt_cap')
@@ -66,54 +98,51 @@ export async function GET(req: Request) {
     .limit(limit)
 
   if (!stocks || stocks.length === 0) {
-    return NextResponse.json({ news: [], tickers: [] })
+    return NextResponse.json({ news: [] })
   }
 
-  // Prendi company names
-  const tickerList = stocks.map((s: any) => `${s.ticker}.${s.exchange}`)
   const { data: stockInfo } = await supabase
     .from('stocks')
-    .select('ticker, exchange, company, yahoo_ticker')
+    .select('ticker, exchange, company')
     .in('exchange', exchanges)
 
-  const infoMap: Record<string, any> = {}
+  const infoMap: Record<string, string> = {}
   for (const s of (stockInfo || [])) {
-    infoMap[`${s.ticker}.${s.exchange}`] = s
+    if (s.company) infoMap[`${s.ticker}.${s.exchange}`] = s.company
   }
 
-  // Costruisci gruppi da 20 ticker per query Google News
-  const groups: string[][] = []
-  const chunk = 20
-  for (let i = 0; i < Math.min(stocks.length, 100); i += chunk) {
-    groups.push(stocks.slice(i, i + chunk).map((s: any) => {
-      const info = infoMap[`${s.ticker}.${s.exchange}`]
-      return info?.yahoo_ticker || info?.company?.split(' ')[0] || s.ticker
+  // Filtra solo quelli con company name
+  const tickersWithName = stocks
+    .map((s: any) => ({
+      ticker: s.ticker,
+      exchange: s.exchange,
+      company: infoMap[`${s.ticker}.${s.exchange}`] || '',
     }))
+    .filter((s: any) => s.company.length > 0)
+    .slice(0, limit)
+
+  // Fetch news in parallelo a batch di 30 alla volta
+  const batchSize = 30
+  const allNews: any[] = []
+
+  for (let i = 0; i < tickersWithName.length && allNews.length < 60; i += batchSize) {
+    const batch = tickersWithName.slice(i, i + batchSize)
+    const batchNews = await Promise.all(
+      batch.map((s: any) => fetchGoogleNewsForTicker(s.ticker, s.company, s.exchange))
+    )
+    for (const news of batchNews) allNews.push(...news)
+    // Stop se abbiamo abbastanza notizie
+    if (allNews.length >= 60) break
   }
 
-  // Fetch news per ogni gruppo
-  const allNews: any[] = []
-  await Promise.all(groups.map(async (group) => {
-    const query = group.join(' OR ')
-    const news = await fetchGoogleNews(query, lang, geo)
-    allNews.push(...news)
-  }))
-
-  // Deduplica e ordina
+  // Deduplica per titolo
   const seen = new Set<string>()
   const deduped = allNews.filter(n => {
-    const k = n.title.slice(0, 50).toLowerCase()
+    const k = n.title.slice(0, 60).toLowerCase()
     if (seen.has(k)) return false
     seen.add(k)
     return true
   }).sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
 
-  return NextResponse.json({
-    news: deduped.slice(0, 50),
-    tickers: stocks.slice(0, 20).map((s: any) => ({
-      ticker: s.ticker,
-      exchange: s.exchange,
-      company: infoMap[`${s.ticker}.${s.exchange}`]?.company || s.ticker,
-    }))
-  })
+  return NextResponse.json({ news: deduped.slice(0, 50) })
 }
