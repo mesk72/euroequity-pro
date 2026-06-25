@@ -87,6 +87,55 @@ async function fetchFeed(name: string, url: string): Promise<NewsItem[]> {
   } catch { return [] }
 }
 
+interface IndexData {
+  name: string
+  symbol: string
+  price: number | null
+  changePct: number | null
+  time: string
+}
+
+const INDEX_LIST = [
+  { name: 'S&P 500',       symbol: '^spx'  },
+  { name: 'Nasdaq 100',    symbol: '^ndx'  },
+  { name: 'Dow Jones',     symbol: '^dji'  },
+  { name: 'DAX',           symbol: '^dax'  },
+  { name: 'FTSE 100',      symbol: '^ukx'  },
+  { name: 'CAC 40',        symbol: '^cac'  },
+  { name: 'FTSE MIB',      symbol: 'mib.i' },
+  { name: 'Euro Stoxx 50', symbol: '^sx5e' },
+  { name: 'Nikkei 225',    symbol: '^nkx'  },
+  { name: 'Hang Seng',     symbol: '^hsi'  },
+  { name: 'ASX 200',       symbol: '^axjo' },
+  { name: 'Gold',          symbol: 'gc.f'  },
+  { name: 'Oil WTI',       symbol: 'cl.f'  },
+  { name: 'EUR/USD',       symbol: 'eurusd'},
+  { name: 'USD/JPY',       symbol: 'usdjpy'},
+]
+
+async function fetchIndices(): Promise<IndexData[]> {
+  const results: IndexData[] = []
+  const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+  await Promise.all(INDEX_LIST.map(async ({ name, symbol }) => {
+    try {
+      const url = 'https://stooq.com/q/l/?s=' + symbol + '&f=sd2t2ohlcv&h&e=csv'
+      const r = await fetch(url)
+      if (!r.ok) { results.push({ name, symbol, price: null, changePct: null, time: now }); return }
+      const text = await r.text()
+      const lines = text.trim().split('\n')
+      if (lines.length < 2) { results.push({ name, symbol, price: null, changePct: null, time: now }); return }
+      const cols = lines[1].split(',')
+      const close = parseFloat(cols[4])
+      const open  = parseFloat(cols[3])
+      const pct   = open > 0 ? ((close - open) / open) * 100 : null
+      results.push({ name, symbol, price: isNaN(close) ? null : close, changePct: isNaN(pct as number) ? null : pct, time: now })
+    } catch {
+      results.push({ name, symbol, price: null, changePct: null, time: now })
+    }
+  }))
+  return INDEX_LIST.map(({ name, symbol }) => results.find(r => r.symbol === symbol) || { name, symbol, price: null, changePct: null, time: now })
+}
+
 const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
 
 export default function NewsPage() {
@@ -98,6 +147,7 @@ export default function NewsPage() {
   const [report, setReport] = useState('')
   const [reportDate, setReportDate] = useState('')
   const [reportLoading, setReportLoading] = useState(false)
+  const [indices, setIndices] = useState<IndexData[]>([])
 
   const load = async () => {
     setLoading(true)
@@ -125,8 +175,16 @@ export default function NewsPage() {
     setLoading(false)
   }
 
-  const generateReport = () => {
+  const generateReport = async () => {
     setReportLoading(true)
+
+    // Carica indici reali da Stooq
+    let idxData: IndexData[] = indices
+    try {
+      idxData = await fetchIndices()
+      setIndices(idxData)
+    } catch {}
+
     const allNews = [
       ...data.world, ...data.americas, ...data.europe, ...data.asia,
     ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
@@ -168,6 +226,23 @@ export default function NewsPage() {
     txt += today + ' · ' + time + '\n\n'
     txt += '**LIVE MARKET DATA**\n'
     txt += 'See the ticker strip above for real-time prices: S&P 500, Nasdaq, DAX, FTSE 100, CAC 40, FTSE MIB, Nikkei 225, Hang Seng, ASX 200, Gold, Oil WTI, EUR/USD, USD/JPY.\n\n'
+    // Formatta indici
+    const fmtIdx = (idx: IndexData) => {
+      const p = idx.price != null ? idx.price.toLocaleString('en-US', { maximumFractionDigits: 2 }) : 'N/A'
+      const c = idx.changePct != null ? (idx.changePct >= 0 ? '+' : '') + idx.changePct.toFixed(2) + '%' : 'N/A'
+      return idx.name + ': ' + p + ' (' + c + ')'
+    }
+    const updateTime = idxData[0]?.time || new Date().toLocaleTimeString()
+
+    txt += '**MARKET INDICES — as of ' + updateTime + '**\n'
+    txt += '\n_Equities_\n'
+    idxData.filter(i => !['Gold','Oil WTI','EUR/USD','USD/JPY'].includes(i.name))
+      .forEach(i => { txt += '  ' + fmtIdx(i) + '\n' })
+    txt += '\n_Commodities & FX_\n'
+    idxData.filter(i => ['Gold','Oil WTI','EUR/USD','USD/JPY'].includes(i.name))
+      .forEach(i => { txt += '  ' + fmtIdx(i) + '\n' })
+    txt += '\n'
+
     txt += '**KEY THEMES TODAY**\n'
     themes.slice(0, 5).forEach(t => { txt += '• ' + t + '\n' })
     txt += '\n'
