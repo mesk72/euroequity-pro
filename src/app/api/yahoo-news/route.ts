@@ -105,25 +105,36 @@ export async function GET(req: Request) {
   })
 
   // Filtri finali
+  // Parole significative del nome (escludi stop words)
   const STOP2 = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co',
-    'The','Holdings','International','Global','Company','Corporation','Limited'])
+    'The','Holdings','International','Global','Company','Corporation','Limited',
+    'de','et','und','of','and','AG','SPA','spa'])
   const nameWords = company.split(' ')
     .map((w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
-    .filter((w: string) => w.length >= 4 && !STOP2.has(w.charAt(0).toUpperCase() + w.slice(1)))
-  const primaryWord = nameWords[0] || ''
+    .filter((w: string) => w.length >= 3 && !STOP2.has(w.charAt(0).toUpperCase() + w.slice(1)))
+  // Prendi le prime 2 parole significative — es. "Tencent" + "Holdings" (anche se Holdings è stop, ma è usato per disambiguare)
+  const allNameWords = company.split(' ')
+    .map((w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
+    .filter((w: string) => w.length >= 3)
+  const word1 = nameWords[0] || allNameWords[0] || ''
+  const word2 = nameWords[1] || allNameWords[1] || ''
   const yahooTickerClean = (yahooTicker || '').split('.')[0].toLowerCase()
 
   const filtered = deduped.filter(i => {
-    const src = (i.source || '').toLowerCase()
+    const src   = (i.source || '').toLowerCase()
     const title = (i.title || '').toLowerCase()
-    // Escludi TradingView, Investors Business Daily, Investing.com (troppi falsi positivi)
-    if (src.includes('tradingview') || src.includes('investors business') || 
+    // Escludi fonti problematiche
+    if (src.includes('tradingview') || src.includes('investors business') ||
         src.includes('investing.com') || title.includes('tradingview')) return false
-    // Verifica che il nome azienda o ticker Yahoo sia nel titolo
-    if (primaryWord && primaryWord.length >= 4) {
-      const hasName = title.includes(primaryWord)
+    // Verifica: deve contenere almeno le prime 2 parole del nome OPPURE il ticker Yahoo
+    // Es. Tencent Holdings → titolo deve contenere "tencent" E "holding"
+    // oppure contenere "700.HK" o "0700"
+    if (word1) {
+      const hasWord1 = title.includes(word1)
+      const hasWord2 = !word2 || title.includes(word2)
       const hasTicker = yahooTickerClean.length >= 2 && title.includes(yahooTickerClean)
-      if (!hasName && !hasTicker) return false
+      // Deve avere (word1 AND word2) OPPURE ticker Yahoo
+      if (!(hasWord1 && hasWord2) && !hasTicker) return false
     }
     return true
   })
