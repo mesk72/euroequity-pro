@@ -358,46 +358,26 @@ export default function NewsPage() {
     return () => clearInterval(t)
   }, [])
 
-  const downloadWord = (reportText: string) => {
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-    // Costruisci HTML con link attivi per Word
-    const lines = reportText.split('\n')
-    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>ForwardAlpha Daily Report</title></head><body style="font-family:Calibri,sans-serif;font-size:11pt;line-height:1.6">'
-    html += '<h1 style="color:#f97316;font-size:18pt">ForwardAlpha Daily Market Briefing</h1>'
-    html += '<p style="color:#666;font-size:9pt">Generated: ' + today + '</p><hr>'
-
-    for (const line of lines) {
-      if (line.trim() === '') { html += '<br>'; continue }
-      // Sezioni in grassetto
-      if (line.startsWith('**') && line.endsWith('**')) {
-        html += '<h2 style="color:#f97316;font-size:13pt;margin-top:16pt">' + line.replace(/\*\*/g, '') + '</h2>'
-        continue
-      }
-      // Linea con ** inline
-      let processed = line
-        .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#f97316">$1</strong>')
-      // Trasforma URL in link cliccabili
-      processed = processed.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color:#2563eb">$1</a>')
-      // Bullet points
-      if (line.startsWith('•')) {
-        html += '<p style="margin:4pt 0 4pt 12pt">' + processed + '</p>'
-      } else if (line.startsWith('  📰') || line.startsWith('  📊')) {
-        html += '<p style="margin:2pt 0 2pt 24pt;font-size:9pt">' + processed + '</p>'
-      } else {
-        html += '<p style="margin:4pt 0">' + processed + '</p>'
-      }
+  const downloadWord = async (reportText: string) => {
+    try {
+      const res = await fetch('/api/report-docx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report: reportText }),
+      })
+      if (!res.ok) throw new Error('Failed to generate DOCX')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'ForwardAlpha_Report_' + new Date().toISOString().slice(0,10) + '.docx'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      alert('Error generating Word document. Please try again.')
     }
-    html += '</body></html>'
-
-    const blob = new Blob([html], { type: 'application/msword' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'ForwardAlpha_Daily_Report_' + new Date().toISOString().slice(0,10) + '.doc'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
   }
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
