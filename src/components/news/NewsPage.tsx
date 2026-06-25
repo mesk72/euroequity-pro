@@ -137,7 +137,8 @@ async function fetchTickerNews(region: string): Promise<NewsItem[]> {
     const chunkSize = 15
     const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 giorni
 
-    for (let i = 0; i < Math.min(tickers.length, 200) && allNews.length < 60; i += chunkSize) {
+    const maxTickers = region === 'americas' ? 500 : 600
+    for (let i = 0; i < Math.min(tickers.length, maxTickers) && allNews.length < 60; i += chunkSize) {
       const chunk = tickers.slice(i, i + chunkSize)
 
       // Query: prima parola significativa del company name
