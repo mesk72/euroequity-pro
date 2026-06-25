@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server'
 
 const ASIA_INDICES = [
-  { name: 'Nikkei 225', symbol: '^N225'  },
-  { name: 'Hang Seng',  symbol: '^HSI'   },
-  { name: 'ASX 200',    symbol: '^AXJO'  },
+  { name: 'Nikkei 225', symbol: '%5EN225'  },
+  { name: 'Hang Seng',  symbol: '%5EHSI'   },
+  { name: 'ASX 200',    symbol: '%5EAXJO'  },
 ]
 
 const EU_INDICES = [
-  { name: 'DAX',           symbol: '^GDAXI'    },
-  { name: 'CAC 40',        symbol: '^FCHI'     },
-  { name: 'FTSE MIB',      symbol: '^FTMIB'    },
-  { name: 'FTSE 100',      symbol: '^FTSE'     },
-  { name: 'Euro Stoxx 50', symbol: '^STOXX50E' },
+  { name: 'DAX',           symbol: '%5EGDAXI'    },
+  { name: 'CAC 40',        symbol: '%5EFCHI'     },
+  { name: 'FTSE 100',      symbol: '%5EFTSE'     },
+  { name: 'Euro Stoxx 50', symbol: '%5ESTOXX50E' },
 ]
 
 function isWeekday(): boolean {
@@ -28,50 +27,44 @@ function isEUOpen(): boolean {
   return t >= 420 && t <= 930
 }
 
-async function getYahooCrumb(): Promise<{ crumb: string; cookie: string } | null> {
+async function fetchIndexRSS(symbol: string, name: string): Promise<{ name: string; price: string; changePct: string; up: boolean } | null> {
   try {
-    const r = await fetch('https://finance.yahoo.com/', {
+    // Stesso approccio di /api/yahoo-news che funziona
+    const url = `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${symbol}&region=US&lang=en-US`
+    const r = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+        'Referer': 'https://finance.yahoo.com/',
       },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(6000),
       cache: 'no-store',
     })
-    const cookie = r.headers.get('set-cookie') || ''
-    const html = await r.text()
-    const crumbMatch = html.match(/"CrumbStore":\{"crumb":"([^"]+)"\}/) ||
-                       html.match(/crumb=([A-Za-z0-9._-]+)/)
-    if (!crumbMatch) return { crumb: '', cookie }
-    return { crumb: crumbMatch[1], cookie }
-  } catch { return null }
-}
-
-async function fetchQuotes(symbols: string[]): Promise<any[]> {
-  try {
-    // Prima ottieni crumb e cookie
-    const auth = await getYahooCrumb()
-    const syms = symbols.map(s => encodeURIComponent(s)).join(',')
-    const crumbParam = auth?.crumb ? `&crumb=${encodeURIComponent(auth.crumb)}` : ''
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=regularMarketPrice,regularMarketChangePercent${crumbParam}`
+    if (!r.ok) return null
+    const xml = await r.text()
     
-    const fetchHeaders: Record<string, string> = {
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'application/json',
-      'Referer': 'https://finance.yahoo.com/',
+    // Il feed RSS di Yahoo Finance ha il prezzo e variazione nel tag <title> del channel
+    // Formato tipico: "DAX (^GDAXI) 23,456.78 +1.23% : Index Data"
+    // Oppure nelle description degli item
+    const channelTitle = xml.match(/<channel>[\s\S]*?<title>([^<]+)<\/title>/)?.[1] || ''
+    const firstItem = xml.match(/<item>[\s\S]*?<title>([^<]+)<\/title>/)?.[1] || ''
+    
+    // Cerca numeri nel formato prezzo (es. 23,456.78 o 18234.56)
+    const combined = channelTitle + ' ' + firstItem
+    const priceMatch = combined.match(/([\d,]+\.\d{2})/)
+    const pctMatch = combined.match(/([+-]?\d+\.\d+)%/)
+    
+    if (!priceMatch) return null
+    const price = parseFloat(priceMatch[1].replace(/,/g, ''))
+    const pct = pctMatch ? parseFloat(pctMatch[1]) : 0
+    
+    return {
+      name,
+      price: price.toLocaleString('en-US', { maximumFractionDigits: 0 }),
+      changePct: (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%',
+      up: pct >= 0,
     }
-    if (auth?.cookie) fetchHeaders['Cookie'] = auth.cookie.split(';')[0]
-
-    const r = await fetch(url, {
-      headers: fetchHeaders,
-      signal: AbortSignal.timeout(10000),
-      cache: 'no-store',
-    })
-    if (!r.ok) return []
-    const d = await r.json()
-    return d?.quoteResponse?.result || []
-  } catch { return [] }
+  } catch { return null }
 }
 
 export async function GET() {
@@ -86,24 +79,14 @@ export async function GET() {
     return NextResponse.json({ quotes: [], debug: 'markets closed', utcHour: new Date().getUTCHours() })
   }
 
-  const symbols = toFetch.map(i => i.symbol)
-  const results = await fetchQuotes(symbols)
+  const results = await Promise.all(
+    toFetch.map(idx => fetchIndexRSS(idx.symbol, idx.name))
+  )
 
-  const quotes = toFetch.map(idx => {
-    const q = results.find((d: any) => d.symbol === idx.symbol)
-    if (!q) return null
-    const price = q.regularMarketPrice || 0
-    const pct = q.regularMarketChangePercent || 0
-    return {
-      name: idx.name,
-      price: price.toLocaleString('en-US', { maximumFractionDigits: 0 }),
-      changePct: (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%',
-      up: pct >= 0,
-    }
-  }).filter(Boolean)
+  const quotes = results.filter(Boolean)
 
   return NextResponse.json({
     quotes,
-    debug: { asiaOpen, euOpen, utcHour: new Date().getUTCHours(), count: results.length }
+    debug: { asiaOpen, euOpen, utcHour: new Date().getUTCHours(), count: quotes.length }
   })
 }
