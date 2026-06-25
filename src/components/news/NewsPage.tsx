@@ -314,11 +314,10 @@ export default function NewsPage() {
       if (n.valueScore != null) {
         line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       }
-      // Link articolo
-      if (n.link) line += '\n  📰 Read article → ' + n.link
-      // Link pagina ForwardAlpha
+      // Link articolo e stock page
+      if (n.link) line += '\n  📰 ' + n.link
       if (n.ticker && n.exchange) {
-        line += '\n  📊 Stock page → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+        line += '\n  📊 ' + n.ticker + ' → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
       }
       return line
     }
@@ -358,6 +357,48 @@ export default function NewsPage() {
     const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1000)
     return () => clearInterval(t)
   }, [])
+
+  const downloadWord = (reportText: string) => {
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    // Costruisci HTML con link attivi per Word
+    const lines = reportText.split('\n')
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>ForwardAlpha Daily Report</title></head><body style="font-family:Calibri,sans-serif;font-size:11pt;line-height:1.6">'
+    html += '<h1 style="color:#f97316;font-size:18pt">ForwardAlpha Daily Market Briefing</h1>'
+    html += '<p style="color:#666;font-size:9pt">Generated: ' + today + '</p><hr>'
+
+    for (const line of lines) {
+      if (line.trim() === '') { html += '<br>'; continue }
+      // Sezioni in grassetto
+      if (line.startsWith('**') && line.endsWith('**')) {
+        html += '<h2 style="color:#f97316;font-size:13pt;margin-top:16pt">' + line.replace(/\*\*/g, '') + '</h2>'
+        continue
+      }
+      // Linea con ** inline
+      let processed = line
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#f97316">$1</strong>')
+      // Trasforma URL in link cliccabili
+      processed = processed.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color:#2563eb">$1</a>')
+      // Bullet points
+      if (line.startsWith('•')) {
+        html += '<p style="margin:4pt 0 4pt 12pt">' + processed + '</p>'
+      } else if (line.startsWith('  📰') || line.startsWith('  📊')) {
+        html += '<p style="margin:2pt 0 2pt 24pt;font-size:9pt">' + processed + '</p>'
+      } else {
+        html += '<p style="margin:4pt 0">' + processed + '</p>'
+      }
+    }
+    html += '</body></html>'
+
+    const blob = new Blob([html], { type: 'application/msword' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'ForwardAlpha_Daily_Report_' + new Date().toISOString().slice(0,10) + '.doc'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const items: NewsItem[] = tab !== 'report' ? (data[tab as Region] || []) : []
@@ -430,10 +471,16 @@ export default function NewsPage() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <div style={{ fontSize: 11, color: 'var(--text4)' }}>Generated: {reportDate}</div>
-                  <button onClick={generateReport}
-                    style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer', border: '1px solid #22c55e', background: 'none', color: '#22c55e' }}>
-                    🔄 Refresh
-                  </button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={generateReport}
+                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer', border: '1px solid #22c55e', background: 'none', color: '#22c55e' }}>
+                      🔄 Refresh
+                    </button>
+                    <button onClick={() => downloadWord(report)}
+                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer', border: '1px solid #3b82f6', background: 'none', color: '#3b82f6' }}>
+                      📄 Download Word
+                    </button>
+                  </div>
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
                   {report.split('\n').map((line, li) => {
