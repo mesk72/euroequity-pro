@@ -13,24 +13,24 @@ export default function MarketStrip() {
     script.async = true
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500 Index' },
-        { proName: 'FOREXCOM:NSXUSD', title: 'Nasdaq 100' },
-        { proName: 'FOREXCOM:DJI',    title: 'Dow Jones' },
-        { proName: 'FOREXCOM:UKXGBP', title: 'FTSE 100' },
-        { proName: 'FOREXCOM:DEU40',  title: 'DAX' },
-        { proName: 'FOREXCOM:FRA40',  title: 'CAC 40' },
-        { proName: 'FOREXCOM:ITA40',  title: 'FTSE MIB' },
-        { proName: 'FOREXCOM:EU50',   title: 'Euro Stoxx 50' },
-        { proName: 'FOREXCOM:JPN225', title: 'Nikkei 225' },
-        { proName: 'FOREXCOM:HKG33',  title: 'Hang Seng' },
-        { proName: 'FOREXCOM:AUS200', title: 'ASX 200' },
-        { proName: 'COMEX:GC1!',      title: 'Gold' },
-        { proName: 'NYMEX:CL1!',      title: 'Oil WTI' },
-        { proName: 'NYMEX:NG1!',      title: 'Nat Gas' },
-        { proName: 'FX:EURUSD',       title: 'EUR/USD' },
-        { proName: 'FX:USDJPY',       title: 'USD/JPY' },
-        { proName: 'FX:GBPUSD',       title: 'GBP/USD' },
-        { proName: 'FX:USDCHF',       title: 'USD/CHF' },
+        { proName: 'NASDAQ:QQQ',      title: 'Nasdaq 100'    },
+        { proName: 'AMEX:SPY',        title: 'S&P 500'       },
+        { proName: 'AMEX:DIA',        title: 'Dow Jones'     },
+        { proName: 'ICMARKETS:UK100', title: 'FTSE 100'      },
+        { proName: 'INDEX:DAX',       title: 'DAX'           },
+        { proName: 'INDEX:CAC40',     title: 'CAC 40'        },
+        { proName: 'INDEX:FTSEMIB',   title: 'FTSE MIB'      },
+        { proName: 'INDEX:SX5E',      title: 'Euro Stoxx 50' },
+        { proName: 'INDEX:NKY',       title: 'Nikkei 225'    },
+        { proName: 'INDEX:HSI',       title: 'Hang Seng'     },
+        { proName: 'ASX:XJO',         title: 'ASX 200'       },
+        { proName: 'TVC:GOLD',        title: 'Gold'          },
+        { proName: 'TVC:USOIL',       title: 'Oil WTI'       },
+        { proName: 'TVC:UKOIL',       title: 'Oil Brent'     },
+        { proName: 'FX:EURUSD',       title: 'EUR/USD'       },
+        { proName: 'FX:USDJPY',       title: 'USD/JPY'       },
+        { proName: 'FX:GBPUSD',       title: 'GBP/USD'       },
+        { proName: 'FX:USDCHF',       title: 'USD/CHF'       },
       ],
       showSymbolLogo: false,
       isTransparent: true,
@@ -47,7 +47,7 @@ export default function MarketStrip() {
         <div className="tradingview-widget-container__widget" />
       </div>
       <div style={{ fontSize: 9, color: 'var(--text4)', padding: '2px 8px 4px', textAlign: 'right' }}>
-        CFD prices · live when markets open · powered by TradingView
+        Powered by TradingView · EU/Asia indices real-time · US = ETF (SPY/QQQ/DIA) · Gold/Oil/FX live
       </div>
     </div>
   )
