@@ -142,12 +142,11 @@ async function fetchTickerNews(
     const batchResults = await Promise.all(
       batch.map(async (t) => {
         try {
-          const yahooUrl = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=' + encodeURIComponent(t.ticker) + '&region=US&lang=en-US'
-          const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(yahooUrl)
-          const gr = await fetch(api)
+          // Usa proxy server-side per bypassare CORS Yahoo Finance
+          const gr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.ticker))
           if (!gr.ok) return []
           const gd = await gr.json()
-          if (gd.status !== 'ok' || !Array.isArray(gd.items)) return []
+          if (!Array.isArray(gd.items)) return []
           return gd.items
             .map((item: any) => ({
               title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
@@ -165,7 +164,7 @@ async function fetchTickerNews(
               seen[k] = true
               return true
             })
-            .slice(0, 3) // max 3 notizie per ticker
+            .slice(0, 3)
         } catch { return [] }
       })
     )
