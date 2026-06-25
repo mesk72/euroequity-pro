@@ -130,56 +130,50 @@ async function fetchTickerNews(
   tickers: { ticker: string; exchange: string; company: string }[],
   onBatch: (news: NewsItem[]) => void
 ): Promise<void> {
-  const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company'])
-  const getKey = (company: string) => {
-    const words = company.split(' ').filter((w: string) => w.length > 3 && !STOP.has(w))
-    return (words[0] || company.split(' ')[0]).toLowerCase()
-  }
-
-  const maxAge = 7 * 24 * 60 * 60 * 1000
-  const chunkSize = 10
   const seen: Record<string, boolean> = {}
+  const maxAge = 7 * 24 * 60 * 60 * 1000
 
-  // Processa in batch da 10, ogni batch aggiorna la UI
-  for (let i = 0; i < tickers.length; i += chunkSize) {
-    const chunk = tickers.slice(i, i + chunkSize)
-    const query = chunk.map(t => '"' + getKey(t.company) + '"').join(' OR ')
-    const googleUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query + ' stock OR earnings') + '&hl=en&gl=US&ceid=US:en'
-    const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(googleUrl)
+  // Processa ticker in batch da 20 in parallelo
+  // Usa Yahoo Finance RSS per singolo ticker - funziona con rss2json
+  const batchSize = 20
+  for (let i = 0; i < tickers.length; i += batchSize) {
+    const batch = tickers.slice(i, i + batchSize)
 
-    try {
-      const gr = await fetch(api)
-      if (!gr.ok) continue
-      const gd = await gr.json()
-      if (gd.status !== 'ok' || !Array.isArray(gd.items)) continue
+    const batchResults = await Promise.all(
+      batch.map(async (t) => {
+        try {
+          const yahooUrl = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=' + encodeURIComponent(t.ticker) + '&region=US&lang=en-US'
+          const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(yahooUrl)
+          const gr = await fetch(api)
+          if (!gr.ok) return []
+          const gd = await gr.json()
+          if (gd.status !== 'ok' || !Array.isArray(gd.items)) return []
+          return gd.items
+            .map((item: any) => ({
+              title: (item.title || '').replace(/<[^>]+>/g, '').trim(),
+              link: item.link || '#',
+              pubDate: item.pubDate || new Date().toISOString(),
+              source: item.source || 'Yahoo Finance',
+              ticker: t.ticker,
+              exchange: t.exchange,
+            }))
+            .filter((n: NewsItem) => {
+              if (n.title.length < 10) return false
+              if (Date.now() - new Date(n.pubDate).getTime() > maxAge) return false
+              const k = n.title.slice(0, 60).toLowerCase()
+              if (seen[k]) return false
+              seen[k] = true
+              return true
+            })
+            .slice(0, 3) // max 3 notizie per ticker
+        } catch { return [] }
+      })
+    )
 
-      const batchNews: NewsItem[] = []
-      for (const item of gd.items) {
-        const title = (item.title || '').replace(/<[^>]+>/g, '').trim()
-        if (title.length < 10) continue
-        const pubDate = item.pubDate || new Date().toISOString()
-        if (Date.now() - new Date(pubDate).getTime() > maxAge) continue
-        const k = title.slice(0, 60).toLowerCase()
-        if (seen[k]) continue
-        seen[k] = true
+    const batchNews: NewsItem[] = batchResults.flat()
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
 
-        const titleLower = title.toLowerCase()
-        let matchedTicker: typeof chunk[0] | undefined
-        for (const t of chunk) {
-          const key = getKey(t.company)
-          if (key.length > 3 && titleLower.includes(key)) { matchedTicker = t; break }
-          if (t.ticker.length <= 5 && new RegExp('\b' + t.ticker + '\b', 'i').test(title)) { matchedTicker = t; break }
-        }
-
-        batchNews.push({
-          title, link: item.link || '#', pubDate,
-          source: item.source || 'Google News',
-          ticker: matchedTicker?.ticker,
-          exchange: matchedTicker?.exchange,
-        })
-      }
-      if (batchNews.length > 0) onBatch(batchNews)
-    } catch {}
+    if (batchNews.length > 0) onBatch(batchNews)
   }
 }
 
