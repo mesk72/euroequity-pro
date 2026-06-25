@@ -127,7 +127,7 @@ async function fetchRSS(name: string, url: string): Promise<NewsItem[]> {
 
 async function fetchTickerNews(
   region: string,
-  tickers: { ticker: string; exchange: string; company: string }[],
+  tickers: { ticker: string; exchange: string; company: string; yahooTicker: string }[],
   onBatch: (news: NewsItem[]) => void
 ): Promise<void> {
   const seen: Record<string, boolean> = {}
@@ -143,7 +143,7 @@ async function fetchTickerNews(
       batch.map(async (t) => {
         try {
           // Usa proxy server-side per bypassare CORS Yahoo Finance
-          const gr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.ticker))
+          const gr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.yahooTicker || t.ticker))
           if (!gr.ok) return []
           const gd = await gr.json()
           if (!Array.isArray(gd.items)) return []
@@ -215,7 +215,7 @@ export default function NewsPage() {
         const tr = await fetch('/api/ticker-news?region=' + region)
         if (!tr.ok) return
         const td = await tr.json()
-        const tickers = (td.tickers || []).slice(0, maxT[region])
+            const tickers = (td.tickers || []).slice(0, maxT[region])
         if (tickers.length === 0) return
         await fetchTickerNews(region, tickers, (batch) => {
           setData(prev => {
