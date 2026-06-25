@@ -68,6 +68,7 @@ async function fetchIndices(): Promise<IndexData[]> {
 }
 
 type Region = 'world' | 'americas' | 'europe' | 'asia'
+type Tab = 'world' | 'americas' | 'europe' | 'asia' | 'report' | 'reportbest'
 type Tab = Region | 'report'
 
 const REGIONS: { key: Region; label: string; emoji: string }[] = [
@@ -249,6 +250,9 @@ export default function NewsPage() {
   const [report, setReport] = useState('')
   const [reportDate, setReportDate] = useState('')
   const [reportLoading, setReportLoading] = useState(false)
+  const [reportBest, setReportBest] = useState('')
+  const [reportBestDate, setReportBestDate] = useState('')
+  const [reportBestLoading, setReportBestLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [indices, setIndices] = useState<IndexData[]>([])
 
@@ -529,6 +533,64 @@ ${body}
     URL.revokeObjectURL(url)
   }
 
+  // Report Best Score — top titoli per bestScore con notizie ultime 24h
+  const generateReportBest = async () => {
+    setReportBestLoading(true)
+    const now24h = Date.now() - 24 * 60 * 60 * 1000
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    const time  = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+
+    const fmtNewsItem = (n: NewsItem) => {
+      let line = '• '
+      if (n.ticker) line += '[' + n.ticker + '] '
+      line += n.title
+      if (n.valueScore != null) line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      if (n.link) line += '\n  📰 ' + n.link
+      if (n.ticker && n.exchange) line += '\n  📊 https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+      return line
+    }
+
+    // Per ogni regione: filtra 24h, ordina per bestScore DESC, max 1 per ticker
+    const filterBest = (items: NewsItem[], topN: number) => {
+      const seen = new Set<string>()
+      return items
+        .filter(n => n.ticker && n.bestScore != null && new Date(n.pubDate).getTime() > now24h)
+        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+        .filter(n => { if (seen.has(n.ticker!)) return false; seen.add(n.ticker!); return true })
+        .slice(0, topN)
+    }
+
+    const amBest = filterBest(data.americas, 10)
+    const euBest = filterBest(data.europe,   10)
+    const apBest = filterBest(data.asia,     10)
+
+    let txt = `FORWARDALPHA — BEST SCORE REPORT\n${today} · ${time}\n\n`
+    txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+    txt += 'Top stories by Best Score — last 24h\n'
+    txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'
+
+    if (amBest.length > 0) {
+      txt += '**NORTH AMERICA — Best Score Leaders**\n'
+      amBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      txt += '\n'
+    }
+    if (euBest.length > 0) {
+      txt += '**EUROPE — Best Score Leaders**\n'
+      euBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      txt += '\n'
+    }
+    if (apBest.length > 0) {
+      txt += '**ASIA PACIFIC — Best Score Leaders**\n'
+      apBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      txt += '\n'
+    }
+
+    setReportBest(txt)
+    setReportBestDate(today + ' · ' + time)
+    setReportBestLoading(false)
+  }
+
+
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const allItems: NewsItem[] = tab !== 'report' ? (data[tab as Region] || []) : []
   const items: NewsItem[] = searchQuery.trim()
@@ -580,7 +642,16 @@ ${body}
             background: tab === 'report' ? '#22c55e' : 'var(--surface)',
             color: tab === 'report' ? '#000' : 'var(--text3)',
           }}>
-          📋 Daily Report
+          📋 Market Cap Report
+        </button>
+        <button onClick={() => setTab('reportbest')}
+          style={{
+            padding: '6px 14px', borderRadius: 4, fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', border: 'none',
+            background: tab === 'reportbest' ? 'var(--orange)' : 'var(--surface)',
+            color: tab === 'reportbest' ? '#000' : 'var(--text3)',
+          }}>
+          ⭐ Best Score Report
         </button>
       </div>
 
