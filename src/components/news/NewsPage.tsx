@@ -557,13 +557,22 @@ ${body}
       return line
     }
 
-    // Per ogni regione: filtra 24h, ordina per bestScore DESC, max 1 per ticker
+    // Per ogni regione: prendi la notizia più recente per ticker, ordina per bestScore DESC
     const filterBest = (items: NewsItem[], topN: number) => {
-      const seen = new Set<string>()
-      return items
-        .filter(n => n.ticker && n.bestScore != null && new Date(n.pubDate).getTime() > now24h)
-        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
-        .filter(n => { if (seen.has(n.ticker!)) return false; seen.add(n.ticker!); return true })
+      // Raggruppa per ticker, tieni la notizia più recente nelle 24h
+      const byTicker = new Map<string, NewsItem>()
+      for (const n of items) {
+        if (!n.ticker) continue
+        if (new Date(n.pubDate).getTime() <= now24h) continue
+        const key = n.ticker + '.' + n.exchange
+        const existing = byTicker.get(key)
+        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
+          byTicker.set(key, n)
+        }
+      }
+      // Ordina per bestScore DESC — titoli senza score vanno in fondo
+      return Array.from(byTicker.values())
+        .sort((a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1))
         .slice(0, topN)
     }
 
