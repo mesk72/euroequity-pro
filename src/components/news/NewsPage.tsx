@@ -125,70 +125,62 @@ async function fetchRSS(name: string, url: string): Promise<NewsItem[]> {
   } catch { return [] }
 }
 
-async function fetchTickerNews(region: string): Promise<NewsItem[]> {
-  try {
-    // Prendi top 50 ticker per regione
-    const r = await fetch('/api/ticker-news?region=' + region)
-    if (!r.ok) return []
-    const d = await r.json()
-    const tickers: { ticker: string; exchange: string; company: string }[] = (d.tickers || []).slice(0, 50)
-    if (tickers.length === 0) return []
+async function fetchTickerNews(
+  region: string,
+  tickers: { ticker: string; exchange: string; company: string }[],
+  onBatch: (news: NewsItem[]) => void
+): Promise<void> {
+  const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global','Company'])
+  const getKey = (company: string) => {
+    const words = company.split(' ').filter((w: string) => w.length > 3 && !STOP.has(w))
+    return (words[0] || company.split(' ')[0]).toLowerCase()
+  }
 
-    const STOP = ['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co','The','Holdings','International','Global']
-    const getKey = (t: typeof tickers[0]) => {
-      const words = t.company.split(' ').filter((w: string) => w.length > 2 && !STOP.includes(w))
-      return (words[0] || t.company.split(' ')[0]).toLowerCase()
-    }
+  const maxAge = 7 * 24 * 60 * 60 * 1000
+  const chunkSize = 10
+  const seen: Record<string, boolean> = {}
 
-    // Costruisci 5 query da 10 ticker ciascuna
-    const allNews: NewsItem[] = []
-    const chunkSize = 10
-    const maxAge = 7 * 24 * 60 * 60 * 1000
+  // Processa in batch da 10, ogni batch aggiorna la UI
+  for (let i = 0; i < tickers.length; i += chunkSize) {
+    const chunk = tickers.slice(i, i + chunkSize)
+    const query = chunk.map(t => '"' + getKey(t.company) + '"').join(' OR ')
+    const googleUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query + ' stock OR earnings') + '&hl=en&gl=US&ceid=US:en'
+    const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(googleUrl)
 
-    const fetches = []
-    for (let i = 0; i < tickers.length; i += chunkSize) {
-      const chunk = tickers.slice(i, i + chunkSize)
-      const query = chunk.map(t => {
-        const words = t.company.split(' ').filter((w: string) => w.length > 2 && !STOP.includes(w))
-        const key = words[0] || t.company.split(' ')[0]
-        return '"' + key + '"'
-      }).join(' OR ')
-      const googleUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query + ' stock OR earnings') + '&hl=en&gl=US&ceid=US:en'
-      const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(googleUrl)
-      fetches.push(fetch(api).then(r => r.json()).then(gd => ({ gd, chunk })).catch(() => ({ gd: null, chunk })))
-    }
+    try {
+      const gr = await fetch(api)
+      if (!gr.ok) continue
+      const gd = await gr.json()
+      if (gd.status !== 'ok' || !Array.isArray(gd.items)) continue
 
-    const results = await Promise.all(fetches)
-
-    for (const { gd, chunk } of results) {
-      if (!gd || gd.status !== 'ok' || !Array.isArray(gd.items)) continue
+      const batchNews: NewsItem[] = []
       for (const item of gd.items) {
         const title = (item.title || '').replace(/<[^>]+>/g, '').trim()
         if (title.length < 10) continue
         const pubDate = item.pubDate || new Date().toISOString()
         if (Date.now() - new Date(pubDate).getTime() > maxAge) continue
+        const k = title.slice(0, 60).toLowerCase()
+        if (seen[k]) continue
+        seen[k] = true
+
         const titleLower = title.toLowerCase()
         let matchedTicker: typeof chunk[0] | undefined
         for (const t of chunk) {
-          const key = getKey(t)
-          if (key && key.length > 3 && titleLower.includes(key)) { matchedTicker = t; break }
+          const key = getKey(t.company)
+          if (key.length > 3 && titleLower.includes(key)) { matchedTicker = t; break }
           if (t.ticker.length <= 5 && new RegExp('\b' + t.ticker + '\b', 'i').test(title)) { matchedTicker = t; break }
         }
-        allNews.push({
+
+        batchNews.push({
           title, link: item.link || '#', pubDate,
           source: item.source || 'Google News',
           ticker: matchedTicker?.ticker,
           exchange: matchedTicker?.exchange,
         })
       }
-    }
-
-    const seen: Record<string, boolean> = {}
-    return allNews
-      .filter(n => { const k = n.title.slice(0, 60).toLowerCase(); if (seen[k]) return false; seen[k] = true; return true })
-      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-      .slice(0, 50)
-  } catch { return [] }
+      if (batchNews.length > 0) onBatch(batchNews)
+    } catch {}
+  }
 }
 
 const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
@@ -220,15 +212,25 @@ export default function NewsPage() {
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
       .slice(0, 25)
 
-    // Regioni: ticker specifici via Google News
-    const [am, eu, ap] = await Promise.all([
-      fetchTickerNews('americas'),
-      fetchTickerNews('europe'),
-      fetchTickerNews('asia'),
-    ])
-    results.americas = am
-    results.europe   = eu
-    results.asia     = ap
+    // Regioni: carica ticker dal DB poi scarica news progressivamente
+    const maxT: Record<string, number> = { americas: 500, europe: 600, asia: 600 }
+    await Promise.all((['americas', 'europe', 'asia'] as Region[]).map(async region => {
+      try {
+        const tr = await fetch('/api/ticker-news?region=' + region)
+        if (!tr.ok) return
+        const td = await tr.json()
+        const tickers = (td.tickers || []).slice(0, maxT[region])
+        if (tickers.length === 0) return
+        await fetchTickerNews(region, tickers, (batch) => {
+          setData(prev => {
+            const merged = [...(prev[region] || []), ...batch]
+              .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+              .slice(0, 50)
+            return { ...prev, [region]: merged }
+          })
+        })
+      } catch {}
+    }))
 
     setData(results)
     setLast(new Date().toLocaleTimeString())
