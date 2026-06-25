@@ -21,30 +21,11 @@ const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'asia',     label: 'Asia Pacific',  emoji: '🌏' },
 ]
 
-const FEEDS: Record<Region, { name: string; url: string }[]> = {
-  world: [
-    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
-    { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
-    { name: 'Motley Fool', url: 'https://www.fool.com/feeds/index.aspx' },
-  ],
-  americas: [
-    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
-    { name: 'CNBC Earnings', url: 'https://www.cnbc.com/id/15839069/device/rss/rss.html' },
-    { name: 'CNBC Markets', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
-    { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
-  ],
-  europe: [
-    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
-    { name: 'Il Sole Mercati', url: 'https://www.ilsole24ore.com/rss/mercati.xml' },
-    { name: 'Handelsblatt', url: 'https://www.handelsblatt.com/contentexport/feed/finanzen' },
-  ],
-  asia: [
-    { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
-    { name: 'SCMP Markets', url: 'https://www.scmp.com/rss/92/feed' },
-    { name: 'Japan Times Biz', url: 'https://www.japantimes.co.jp/feed/business/' },
-    { name: 'NHK Economy', url: 'https://www3.nhk.or.jp/rss/news/cat7.xml' },
-  ],
-}
+const WORLD_FEEDS = [
+  { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/rss/topstories' },
+  { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
+  { name: 'Motley Fool', url: 'https://www.fool.com/feeds/index.aspx' },
+]
 
 function srcColor(s: string): string {
   if (s.includes('CNBC')) return '#0ea5e9'
@@ -154,23 +135,29 @@ export default function NewsPage() {
   const load = async () => {
     setLoading(true)
     const results: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [], asia: [] }
-    for (const region of ['world', 'americas', 'europe', 'asia'] as Region[]) {
-      const all: NewsItem[] = []
-      for (const { name, url } of FEEDS[region]) {
-        const items = await fetchFeed(name, url)
-        all.push(...items)
-      }
-      const seen: Record<string, boolean> = {}
-      results[region] = all
-        .filter(n => {
-          const k = n.title.slice(0, 50).toLowerCase()
-          if (seen[k]) return false
-          seen[k] = true
-          return true
-        })
-        .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-        .slice(0, 25)
+
+    // World: RSS feed come prima
+    const worldAll: NewsItem[] = []
+    for (const { name, url } of WORLD_FEEDS) {
+      const items = await fetchFeed(name, url)
+      worldAll.push(...items)
     }
+    const worldSeen: Record<string, boolean> = {}
+    results.world = worldAll
+      .filter(n => { const k = n.title.slice(0, 50).toLowerCase(); if (worldSeen[k]) return false; worldSeen[k] = true; return true })
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+      .slice(0, 25)
+
+    // Americas, Europe, Asia: news sui ticker specifici
+    await Promise.all((['americas', 'europe', 'asia'] as Region[]).map(async region => {
+      try {
+        const r = await fetch('/api/ticker-news?region=' + region)
+        if (!r.ok) return
+        const d = await r.json()
+        results[region] = (d.news || []).slice(0, 40)
+      } catch {}
+    }))
+
     setData(results)
     setLast(new Date().toLocaleTimeString())
     setCountdown(900)
