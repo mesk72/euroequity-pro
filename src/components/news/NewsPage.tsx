@@ -114,12 +114,14 @@ const INDEX_LIST = [
 ]
 
 async function fetchIndices(): Promise<IndexData[]> {
-  const results: IndexData[] = []
   const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+  const results: IndexData[] = []
+  // Usa corsproxy.io per bypassare CORS su Stooq
   await Promise.all(INDEX_LIST.map(async ({ name, symbol }) => {
     try {
-      const url = 'https://stooq.com/q/l/?s=' + symbol + '&f=sd2t2ohlcv&h&e=csv'
-      const r = await fetch(url)
+      const stooqUrl = 'https://stooq.com/q/l/?s=' + symbol + '&f=sd2t2ohlcv&h&e=csv'
+      const url = 'https://corsproxy.io/?' + encodeURIComponent(stooqUrl)
+      const r = await fetch(url, { signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined })
       if (!r.ok) { results.push({ name, symbol, price: null, changePct: null, time: now }); return }
       const text = await r.text()
       const lines = text.trim().split('\n')
@@ -224,8 +226,7 @@ export default function NewsPage() {
 
     let txt = '**FORWARDALPHA DAILY MARKET BRIEFING**\n'
     txt += today + ' · ' + time + '\n\n'
-    txt += '**LIVE MARKET DATA**\n'
-    txt += 'See the ticker strip above for real-time prices: S&P 500, Nasdaq, DAX, FTSE 100, CAC 40, FTSE MIB, Nikkei 225, Hang Seng, ASX 200, Gold, Oil WTI, EUR/USD, USD/JPY.\n\n'
+
     // Formatta indici
     const fmtIdx = (idx: IndexData) => {
       const p = idx.price != null ? idx.price.toLocaleString('en-US', { maximumFractionDigits: 2 }) : 'N/A'
