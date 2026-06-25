@@ -212,6 +212,7 @@ async function fetchTickerNews(
               valueScore: t.valueScore,
               growthScore: t.growthScore,
               bestScore: t.bestScore,
+              mktCap: t.mktCap ?? null,
             }))
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
@@ -404,17 +405,22 @@ export default function NewsPage() {
 
     // Filtra 24h, ordina per mktcap (bestScore DESC = proxy mktcap), max 1 per ticker
     // Americas: top 100 mktcap, Europe: top 50, Asia: top 50
+    // Market Cap Report: ordina per mktCap reale, non per score
     const filterMktCap = (items: NewsItem[], topN: number) => {
-      const seen = new Set<string>()
-      return items
-        .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
-        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
-        .filter(n => {
-          if (!n.ticker) return false
-          if (seen.has(n.ticker)) return false
-          seen.add(n.ticker)
-          return true
-        })
+      // Prima raggruppa per ticker e prendi la notizia più recente per ciascuno
+      const byTicker = new Map<string, NewsItem>()
+      for (const n of items) {
+        if (!n.ticker) continue
+        if (new Date(n.pubDate).getTime() <= now24h) continue
+        const key = n.ticker + '.' + n.exchange
+        const existing = byTicker.get(key)
+        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
+          byTicker.set(key, n)
+        }
+      }
+      // Ordina per mktCap DESC (i ticker arrivano già in ordine mktCap dall'API)
+      return Array.from(byTicker.values())
+        .sort((a, b) => (b.mktCap || 0) - (a.mktCap || 0))
         .slice(0, topN)
     }
 
