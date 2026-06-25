@@ -231,7 +231,7 @@ export default function NewsPage() {
     setLoading(false) // Mostra subito world, le regioni caricano in background
 
     // Regioni: carica ticker dal DB poi scarica news progressivamente
-    const maxT: Record<string, number> = { americas: 500, europe: 600, asia: 600 }
+    const maxT: Record<string, number> = { americas: 1500, europe: 1500, asia: 1500 }
     await Promise.all((['americas', 'europe', 'asia'] as Region[]).map(async region => {
       try {
         const tr = await fetch('/api/ticker-news?region=' + region)
