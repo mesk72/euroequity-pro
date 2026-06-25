@@ -318,11 +318,16 @@ export default function NewsPage() {
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
-      // Aggiungi scores ForwardAlpha se disponibili
+      // Scores ForwardAlpha
       if (n.valueScore != null) {
-        line += ' | FA: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+        line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       }
-      if (n.link) line += ' → ' + n.link
+      // Link articolo
+      if (n.link) line += '\n  📰 Article → ' + n.link
+      // Link pagina ForwardAlpha
+      if (n.ticker && n.exchange) {
+        line += '\n  📊 ForwardAlpha → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+      }
       return line
     }
 
