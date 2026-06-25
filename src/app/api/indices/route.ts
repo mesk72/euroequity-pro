@@ -38,15 +38,16 @@ function isEUOpen(): boolean {
   return t >= 420 && t <= 930
 }
 
-async function fetchBatch(symbols: string[]): Promise<any[]> {
+async function fetchBatch(symbols: string[]): Promise<{ data: any[], status: number, raw: string }> {
   try {
     const syms = symbols.map(s => encodeURIComponent(s)).join(',')
     const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}&fields=regularMarketPrice,regularMarketChangePercent`
     const r = await fetch(url, { headers: YAHOO_HEADERS, signal: AbortSignal.timeout(8000), cache: 'no-store' })
-    if (!r.ok) return []
-    const d = await r.json()
-    return d?.quoteResponse?.result || []
-  } catch { return [] }
+    const raw = await r.text()
+    let data: any[] = []
+    try { const j = JSON.parse(raw); data = j?.quoteResponse?.result || [] } catch {}
+    return { data, status: r.status, raw: raw.slice(0, 400) }
+  } catch (e: any) { return { data: [], status: 0, raw: e.message } }
 }
 
 async function fetchSingle(symbol: string): Promise<any | null> {
@@ -82,11 +83,12 @@ export async function GET() {
   const symbols = toFetch.map(i => i.symbol)
 
   // Prova batch prima
-  let results = await fetchBatch(symbols)
+  const batchResult = await fetchBatch(symbols)
+  let results = batchResult.data
 
   // Fallback: singole chiamate se batch fallisce
   if (results.length === 0) {
-    results = (await Promise.all(symbols.map(fetchSingle))).filter(Boolean)
+    results = (await Promise.all(symbols.map(fetchSingle))).filter(Boolean) as any[]
   }
 
   const quotes = toFetch.map(idx => {
@@ -104,6 +106,6 @@ export async function GET() {
 
   return NextResponse.json({
     quotes,
-    debug: { asiaOpen, euOpen, utcHour: new Date().getUTCHours(), count: results.length }
+    debug: { asiaOpen, euOpen, utcHour: new Date().getUTCHours(), count: results.length, batchStatus: batchResult.status, batchRaw: batchResult.raw }
   })
 }
