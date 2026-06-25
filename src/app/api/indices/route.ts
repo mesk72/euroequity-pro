@@ -11,54 +11,51 @@ const SYMBOLS = [
   { name: 'ASX 200',       symbol: '^AXJO'      },
 ]
 
-export const revalidate = 60
-
 export async function GET() {
   try {
-    const syms = SYMBOLS.map(s => encodeURIComponent(s.symbol)).join(',')
-    const url = 'https://query2.finance.yahoo.com/v8/finance/spark?symbols=' + syms + '&range=1d&interval=5m'
+    // Usa Yahoo Finance v11 con crumb - diverso da v7
+    const syms = SYMBOLS.map(s => encodeURIComponent(s.symbol)).join('%2C')
     
-    const r = await fetch(url, {
+    // Prima ottieni crumb
+    const crumbRes = await fetch('https://query2.finance.yahoo.com/v1/test/csrfToken', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://finance.yahoo.com/',
         'Accept': '*/*',
-        'Origin': 'https://finance.yahoo.com',
+        'Referer': 'https://finance.yahoo.com',
       },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(5000),
+    })
+    
+    // Prova endpoint alternativo - Yahoo Finance screener API
+    const url = `https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_gainers&count=1`
+    
+    // In realtà usa l'endpoint più semplice con cookie
+    const quoteUrl = `https://finance.yahoo.com/quote/${encodeURIComponent('^GDAXI')}/`
+    const pageRes = await fetch(quoteUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+      signal: AbortSignal.timeout(8000),
       cache: 'no-store',
     })
-
-    if (!r.ok) {
-      console.error('Yahoo spark error:', r.status, await r.text())
-      return NextResponse.json({ quotes: [] })
+    
+    if (!pageRes.ok) return NextResponse.json({ quotes: [], error: 'page ' + pageRes.status })
+    
+    const html = await pageRes.text()
+    
+    // Estrai dati da financeData JSON embedded nella pagina
+    const dataMatch = html.match(/root\.App\.main = (\{.*?\});/s) ||
+                      html.match(/"QuoteSummaryStore":\s*(\{[^}]+\})/s) ||
+                      html.match(/regularMarketPrice['":\s]+(\d+\.?\d*)/g)
+    
+    if (dataMatch) {
+      console.log('Found data:', dataMatch[0]?.slice(0, 200))
     }
-
-    const data = await r.json()
-    const spark = data?.spark?.result || []
-
-    const quotes = SYMBOLS.map(s => {
-      const found = spark.find((item: any) => item.symbol === s.symbol)
-      if (!found) return null
-      const resp = found.response?.[0]
-      if (!resp) return null
-      const closes = resp.indicators?.quote?.[0]?.close || []
-      const meta = resp.meta
-      const price = meta?.regularMarketPrice || closes[closes.length - 1]
-      const prevClose = meta?.chartPreviousClose || meta?.previousClose
-      if (!price) return null
-      const changePct = prevClose ? ((price - prevClose) / prevClose) * 100 : 0
-      return {
-        name: s.name,
-        price: price.toLocaleString('en-US', { maximumFractionDigits: 0 }),
-        changePct: (changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%',
-        up: changePct >= 0,
-      }
-    }).filter(Boolean)
-
-    return NextResponse.json({ quotes })
+    
+    return NextResponse.json({ quotes: [], debug: 'html length: ' + html.length })
   } catch (e: any) {
-    console.error('indices error:', e.message)
-    return NextResponse.json({ quotes: [] })
+    return NextResponse.json({ quotes: [], error: e.message })
   }
 }
