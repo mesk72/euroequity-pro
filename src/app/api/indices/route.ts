@@ -11,51 +11,50 @@ const SYMBOLS = [
   { name: 'ASX 200',       symbol: '^AXJO'      },
 ]
 
-export async function GET() {
+function parsePrice(xml: string): { price: number; changePct: number } | null {
   try {
-    // Usa Yahoo Finance v11 con crumb - diverso da v7
-    const syms = SYMBOLS.map(s => encodeURIComponent(s.symbol)).join('%2C')
-    
-    // Prima ottieni crumb
-    const crumbRes = await fetch('https://query2.finance.yahoo.com/v1/test/csrfToken', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': '*/*',
-        'Referer': 'https://finance.yahoo.com',
-      },
-      signal: AbortSignal.timeout(5000),
-    })
-    
-    // Prova endpoint alternativo - Yahoo Finance screener API
-    const url = `https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&lang=en-US&region=US&scrIds=day_gainers&count=1`
-    
-    // In realtà usa l'endpoint più semplice con cookie
-    const quoteUrl = `https://finance.yahoo.com/quote/${encodeURIComponent('^GDAXI')}/`
-    const pageRes = await fetch(quoteUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-      signal: AbortSignal.timeout(8000),
-      cache: 'no-store',
-    })
-    
-    if (!pageRes.ok) return NextResponse.json({ quotes: [], error: 'page ' + pageRes.status })
-    
-    const html = await pageRes.text()
-    
-    // Estrai dati da financeData JSON embedded nella pagina
-    const dataMatch = html.match(/root\.App\.main = (\{.*?\});/s) ||
-                      html.match(/"QuoteSummaryStore":\s*(\{[^}]+\})/s) ||
-                      html.match(/regularMarketPrice['":\s]+(\d+\.?\d*)/g)
-    
-    if (dataMatch) {
-      console.log('Found data:', dataMatch[0]?.slice(0, 200))
-    }
-    
-    return NextResponse.json({ quotes: [], debug: 'html length: ' + html.length })
-  } catch (e: any) {
-    return NextResponse.json({ quotes: [], error: e.message })
-  }
+    // Yahoo Finance RSS contiene il prezzo nel tag <title> del feed
+    // es: "DAX (^GDAXI) - 18,234.56 - 0.12%"
+    const titleMatch = xml.match(/<title>([^<]+)<\/title>/)
+    if (!titleMatch) return null
+    const title = titleMatch[1]
+    const nums = title.match(/([\d,]+\.?\d*)/)
+    if (!nums) return null
+    const price = parseFloat(nums[1].replace(/,/g, ''))
+    const pctMatch = title.match(/([\+\-]\d+\.?\d*)%/)
+    const pct = pctMatch ? parseFloat(pctMatch[1]) : 0
+    return { price, changePct: pct }
+  } catch { return null }
+}
+
+export async function GET() {
+  const quotes: any[] = []
+
+  await Promise.all(SYMBOLS.map(async ({ name, symbol }) => {
+    try {
+      const url = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=' +
+        encodeURIComponent(symbol) + '&region=US&lang=en-US'
+      const r = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+        },
+        signal: AbortSignal.timeout(5000),
+        cache: 'no-store',
+      })
+      if (!r.ok) return
+      const xml = await r.text()
+      // Il feed RSS ha il prezzo nella description del channel
+      // Cerca pattern "Price: 18,234.56" o simile
+      const priceMatch = xml.match(/regularMarketPrice[^>]*>([\d.]+)/) ||
+                         xml.match(/<description>([\d,]+\.?\d+)<\/description>/) ||
+                         xml.match(/Last Price[:\s]+([\d,]+\.?\d+)/)
+      if (priceMatch) {
+        const price = parseFloat(priceMatch[1].replace(/,/g, ''))
+        quotes.push({ name, price: price.toLocaleString('en-US', { maximumFractionDigits: 0 }), changePct: 'N/A', up: true })
+      }
+    } catch {}
+  }))
+
+  return NextResponse.json({ quotes })
 }
