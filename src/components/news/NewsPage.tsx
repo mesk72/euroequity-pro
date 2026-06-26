@@ -540,24 +540,35 @@ ${body}
     URL.revokeObjectURL(url)
   }
 
-  // Report Best Score — stessa struttura di generateReport ma ordina per bestScore
+  // Report Best Score
   const generateReportBest = async () => {
     setReportBestLoading(true)
-    const now24h = Date.now() - 24 * 60 * 60 * 1000
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-    const time  = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 
+    const allNews = [
+      ...data.world, ...data.americas, ...data.europe, ...data.asia,
+    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+
+    const today = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    })
+    const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+
+    const now24h = Date.now() - 24 * 60 * 60 * 1000
     const fmtNewsItem = (n: NewsItem) => {
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
-      if (n.bestScore != null) line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      if (n.valueScore != null) {
+        line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      }
       if (n.link) line += '\n  📰 ' + n.link
-      if (n.ticker && n.exchange) line += '\n  📊 https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+      if (n.ticker && n.exchange) {
+        line += '\n  📊 ' + n.ticker + ' → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+      }
       return line
     }
 
-    // IDENTICO a filterMktCap — solo ordina per bestScore invece di mktCap
+    // Identico a filterMktCap ma ordina per bestScore
     const filterBest = (items: NewsItem[], topN: number) => {
       const byTicker = new Map<string, NewsItem>()
       for (const n of items) {
@@ -574,39 +585,35 @@ ${body}
         .slice(0, topN)
     }
 
-    const amBest = filterBest(data.americas, 10)
-    const euBest = filterBest(data.europe,   10)
-    const apBest = filterBest(data.asia,     10)
+    const amNews = filterBest(data.americas, 10)
+    const euNews = filterBest(data.europe,   10)
+    const apNews = filterBest(data.asia,     10)
 
-    let txt = `FORWARDALPHA — BEST SCORE REPORT\n${today} · ${time}\n\n`
-    txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
-    txt += 'Top stories by Best Score — last 24h\n'
-    txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'
+    let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
+    txt += today + ' · ' + time + '\n\n'
 
-    if (amBest.length > 0) {
+    if (amNews.length > 0) {
       txt += '**NORTH AMERICA — Best Score Leaders**\n'
-      amBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      amNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    } else {
-      txt += '**NORTH AMERICA** — no news in last 24h\n\n'
     }
-    if (euBest.length > 0) {
+    if (euNews.length > 0) {
       txt += '**EUROPE — Best Score Leaders**\n'
-      euBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      euNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    } else {
-      txt += '**EUROPE** — no news in last 24h\n\n'
     }
-    if (apBest.length > 0) {
+    if (apNews.length > 0) {
       txt += '**ASIA PACIFIC — Best Score Leaders**\n'
-      apBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      apNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    } else {
-      txt += '**ASIA PACIFIC** — no news in last 24h\n\n'
     }
+
+    const sourcesSet: Record<string, boolean> = {}
+    allNews.forEach(n => { sourcesSet[n.source] = true })
+    txt += '_Sources: ' + Object.keys(sourcesSet).slice(0, 8).join(' · ') + '_'
 
     setReportBest(txt)
-    setReportBestDate(today + ' · ' + time)
+    setReportBestDate(new Date().toLocaleString('en-US'))
     setReportBestLoading(false)
   }
 
