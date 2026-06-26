@@ -62,7 +62,7 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 
 # Suffissi Leeway per exchange EU
 LEEWAY_SUFFIX = {
-    "MIL": ".MI", "XETRA": ".DE", "PA": ".PA", "AS": ".AS",
+    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA", "AS": ".AS",
     "MC": ".MC", "BR": ".BR", "LS": ".LS", "VI": ".VI",
     "HE": ".HE", "IR": ".IR", "AT": ".AT", "LSE": ".LSE",
     "AIM": ".AIM", "SWX": ".SW", "OM": ".ST", "NGM": ".ST",
@@ -355,12 +355,14 @@ for db_ticker, exchange, lt, name in EU_INDICES:
         if not data: continue
         # Ordina per data ASC per avere last e prev corretti
         data_sorted = sorted(data, key=lambda x: x["date"])
-        rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"], "close": d["adjusted_close"]}
-                for d in data_sorted if d.get("adjusted_close")]
+        rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"],
+                  "close": d.get("close") or d.get("adjusted_close")}
+                for d in data_sorted if d.get("close") or d.get("adjusted_close")]
         if rows:
             requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
-        price = float(data_sorted[-1]["adjusted_close"])
-        prev  = float(data_sorted[-2]["adjusted_close"]) if len(data_sorted) >= 2 else None
+        # Per gli indici usa 'close' — 'adjusted_close' è diviso per 1000
+        price = float(data_sorted[-1].get("close") or data_sorted[-1]["adjusted_close"])
+        prev  = float(data_sorted[-2].get("close") or data_sorted[-2]["adjusted_close"]) if len(data_sorted) >= 2 else None
         change1d = round((price / prev - 1) * 100, 2) if prev and prev != 0 else None
         if change1d is None:
             r_prev = requests.get(SUPABASE_URL + "/rest/v1/price_history", headers=headers_r,
