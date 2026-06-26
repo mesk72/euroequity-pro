@@ -15,16 +15,19 @@ def pct_rank(vals, v):
     return max(1, min(99, int(round(below / len(vals) * 100))))
 
 print("="*50)
-print("FIX COMBINED RANK — EU e APAC")
+print("FIX COMBINED RANK — EU, APAC, US+CA")
 print("="*50)
 
-for market, exchanges in [
-    ("EU",   ["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","LSE","AIM","SWX","OM","NGM","OB","CPSE"]),
-    ("APAC", ["TSE","SEHK","ASX"]),
-]:
+MARKETS = [
+    ("EU",    ["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","LSE","AIM","SWX","OM","NGM","OB","CPSE"]),
+    ("APAC",  ["TSE","SEHK","ASX"]),
+    ("US+CA", ["US","TSX"]),
+]
+
+for market, exchanges in MARKETS:
     print(f"\n{market}...")
 
-    # Leggo ticker in_universe=true da stocks per questo mercato
+    # Leggo in_universe da stocks
     in_universe_set = set()
     for exchange in exchanges:
         offset = 0
@@ -38,9 +41,9 @@ for market, exchanges in [
                 in_universe_set.add((d["ticker"], d["exchange"]))
             offset += 1000
             if len(batch) < 1000: break
-    print(f"  In universe da stocks: {len(in_universe_set)}")
+    print(f"  In universe: {len(in_universe_set)}")
 
-    # Leggo value_score e growth_score da fundamentals per questi exchange
+    # Leggo value_score e growth_score da fundamentals
     all_data = []
     for exchange in exchanges:
         offset = 0
@@ -55,23 +58,16 @@ for market, exchanges in [
             offset += 1000
             if len(batch) < 1000: break
 
-    print(f"  Fundamentals letti: {len(all_data)}")
-
-    # Filtra solo in_universe
+    # Filtra in_universe
     all_data = [d for d in all_data if (d["ticker"], d["exchange"]) in in_universe_set]
     print(f"  Filtrati in_universe: {len(all_data)}")
-
-    # Sample
-    sample = [d for d in all_data if d.get("value_score") is not None][:3]
-    for d in sample:
-        print(f"  SAMPLE {d['ticker']}/{d['exchange']}: val={d.get('value_score')} grw={d.get('growth_score')}")
 
     scored = [d for d in all_data
               if d.get("value_score") is not None and d.get("growth_score") is not None]
     print(f"  Con value+growth: {len(scored)}")
 
     if not scored:
-        print(f"  PROBLEMA: nessun titolo con value_score e growth_score — serve rieseguire weekly!")
+        print(f"  SKIP — nessun titolo con score")
         continue
 
     comb_arr = [d["value_score"] + d["growth_score"] for d in scored]
@@ -89,7 +85,7 @@ for market, exchanges in [
             ok += len(batch)
         else:
             fail += len(batch)
-            print(f"  ERR {r.status_code}: {r.text[:300]}")
+            print(f"  ERR {r.status_code}: {r.text[:200]}")
 
     print(f"  Scritti: ok={ok} fail={fail}")
 
