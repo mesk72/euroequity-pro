@@ -1,36 +1,43 @@
 import os, requests
 from datetime import datetime, timedelta
 
-LEEWAY_KEY  = os.environ.get("LEEWAY_KEY", "")
-LEEWAY_BASE = "https://api.leeway.tech/api/v1/public"
-TODAY       = datetime.now().strftime("%Y-%m-%d")
-FROM_5D     = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
+SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
+SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
+TODAY        = datetime.now().strftime("%Y-%m-%d")
+headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
 print("TODAY:", TODAY)
 print()
 
-# Test 285A.TSE e altri JP
-print("=== GIAPPONE ===")
-for lt in ["285A.TSE", "7203.TSE", "9984.TSE"]:
-    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
-    r = requests.get(url, timeout=10)
-    data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
-    if data:
-        data = sorted(data, key=lambda x: x["date"])
-        last = data[-1]
-        print(f"  {lt}: ultima data={last['date']} close={last.get('close')}")
-    else:
-        print(f"  {lt}: HTTP {r.status_code} — vuoto o errore")
+# Simulo esattamente quello che fa daily_apac per 285A
+ticker   = "285A"
+exchange = "TSE"
+lt       = ticker + ".TSE"
 
-print()
-print("=== AUSTRALIA (nuovo .AU) ===")
-for lt in ["BHP.AU", "CBA.AU", "CSL.AU"]:
-    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
-    r = requests.get(url, timeout=10)
-    data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
-    if data:
-        data = sorted(data, key=lambda x: x["date"])
-        last = data[-1]
-        print(f"  {lt}: ultima data={last['date']} close={last.get('close')}")
-    else:
-        print(f"  {lt}: HTTP {r.status_code} — vuoto o errore")
+# Step 1: leggi ultima data dal DB
+r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+    params={"select": "date", "ticker": "eq." + ticker,
+            "exchange": "eq." + exchange, "order": "date.desc", "limit": "1"})
+row = r.json()
+last = row[0]["date"] if isinstance(row, list) and row else "2021-01-01"
+print(f"Ultima data nel DB per {ticker}: {last}")
+print(f"last >= TODAY: {last >= TODAY} → {'SKIP' if last >= TODAY else 'SCARICA'}")
+
+if last >= TODAY:
+    print("SKIP — già aggiornato")
+else:
+    start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+    print(f"start_dt: {start_dt}")
+    
+    # Step 2: scarica da Leeway
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY
+    print(f"URL: {url}")
+    resp = requests.get(url, timeout=15)
+    print(f"HTTP: {resp.status_code}")
+    data_l = resp.json() if resp.status_code == 200 else []
+    print(f"Righe restituite: {len(data_l) if isinstance(data_l, list) else 'ERR'}")
+    if isinstance(data_l, list) and data_l:
+        for row2 in data_l:
+            print(f"  date={row2.get('date')} close={row2.get('close')} adj={row2.get('adjusted_close')}")
