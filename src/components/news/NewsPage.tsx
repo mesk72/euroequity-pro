@@ -568,12 +568,12 @@ ${body}
       return line
     }
 
-    // Identico a filterMktCap ma ordina per bestScore
+    // Identico a filterMktCap ma ordina per bestScore — NO filtro 24h
     const filterBest = (items: NewsItem[], topN: number) => {
       const byTicker = new Map<string, NewsItem>()
       for (const n of items) {
         if (!n.ticker) continue
-        if (new Date(n.pubDate).getTime() <= now24h) continue
+        // Nessun filtro 24h — prende tutto quello che c'è
         const key = n.ticker + '.' + n.exchange
         const existing = byTicker.get(key)
         if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
@@ -588,6 +588,14 @@ ${body}
     const amNews = filterBest(data.americas, 10)
     const euNews = filterBest(data.europe,   10)
     const apNews = filterBest(data.asia,     10)
+
+    // Debug: se ancora vuoto dopo aver tolto il filtro 24h, c'è un problema di caricamento
+    if (amNews.length === 0 && euNews.length === 0 && apNews.length === 0) {
+      setReportBest('⚠️ News not loaded yet. Please go to the Americas, Europe or Asia tabs first to load news, then come back and generate the report.')
+      setReportBestDate(new Date().toLocaleString('en-US'))
+      setReportBestLoading(false)
+      return
+    }
 
     let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
     txt += today + ' · ' + time + '\n\n'
@@ -793,17 +801,11 @@ ${body}
                 <div style={{ fontSize: 14, color: 'var(--text3)', marginBottom: 16 }}>
                   Top stories ranked by ForwardAlpha Best Score — last 24h.
                 </div>
-                {loading ? (
-                  <div style={{ fontSize: 12, color: 'var(--text4)', marginBottom: 12 }}>
-                    Loading news data... please wait.
-                  </div>
-                ) : (
-                  <button onClick={generateReportBest}
-                    style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700,
-                      cursor: 'pointer', border: 'none', background: 'var(--orange)', color: '#000' }}>
-                    ⭐ Generate Best Score Report
-                  </button>
-                )}
+                <button onClick={generateReportBest}
+                  style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700,
+                    cursor: 'pointer', border: 'none', background: 'var(--orange)', color: '#000' }}>
+                  ⭐ Generate Best Score Report
+                </button>
               </div>
             )}
             {reportBestLoading && (
