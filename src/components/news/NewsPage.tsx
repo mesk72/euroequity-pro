@@ -541,21 +541,65 @@ ${body}
   }
 
   // Report Best Score
-  const generateReportBest = async () => {
+    const generateReportBest = async () => {
     setReportBestLoading(true)
+
+    // Carica indici freschi
+    let idxData: IndexData[] = indices
+    try {
+      idxData = await fetchIndices()
+      setIndices(idxData)
+    } catch {}
+
+    const allNews = [
+      ...data.world, ...data.americas, ...data.europe, ...data.asia,
+    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
 
     const today = new Date().toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     })
     const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-    const now24h = Date.now() - 24 * 60 * 60 * 1000
 
+    const fmtIdx = (idx: IndexData) => {
+      const p = idx.price != null ? idx.price.toLocaleString('en-US', { maximumFractionDigits: 2 }) : 'N/A'
+      const c = idx.changePct != null ? (idx.changePct >= 0 ? '+' : '') + idx.changePct.toFixed(2) + '%' : 'N/A'
+      return idx.name + ': ' + p + ' (' + c + ')'
+    }
+
+    const allTitles = allNews.map(n => n.title.toLowerCase())
+    const themes: string[] = []
+    if (allTitles.some(t => t.includes('fed') || t.includes('federal reserve') || t.includes('interest rate')))
+      themes.push('Central bank policy in focus')
+    if (allTitles.some(t => t.includes('inflation') || t.includes('cpi')))
+      themes.push('Inflation dynamics influencing rate expectations')
+    if (allTitles.some(t => t.includes('earning') || t.includes('profit') || t.includes('revenue')))
+      themes.push('Corporate earnings season moving individual stocks')
+    if (allTitles.some(t => t.includes('oil') || t.includes('gold') || t.includes('commodit')))
+      themes.push('Commodity markets volatile')
+    if (allTitles.some(t => t.includes('china') || t.includes('trade') || t.includes('tariff')))
+      themes.push('Trade tensions weighing on global risk sentiment')
+    if (allTitles.some(t => t.includes('tech') || t.includes('ai') || t.includes('nvidia')))
+      themes.push('Technology and AI sector driving market leadership')
+    if (themes.length === 0)
+      themes.push('Markets digesting mixed macro signals')
+
+    let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
+    txt += today + ' · ' + time + '\n\n'
+
+    txt += '**LIVE MARKET DATA**\n'
+    txt += 'For real-time indices, commodities and FX see the ticker bar at the top of this page (S&P 500, Nasdaq, DAX, FTSE 100, Nikkei, Hang Seng, Gold, Oil, EUR/USD).\n\n'
+
+    txt += '**KEY THEMES**\n'
+    themes.forEach(t => { txt += '• ' + t + '\n' })
+    txt += '\n'
+
+    const now24h = Date.now() - 24 * 60 * 60 * 1000
     const fmtNewsItem = (n: NewsItem) => {
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
       if (n.valueScore != null) {
-        line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+        line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       }
       if (n.link) line += '\n  📰 ' + n.link
       if (n.ticker && n.exchange) {
@@ -564,85 +608,140 @@ ${body}
       return line
     }
 
-    // Carica top ticker per bestScore poi scarica notizie per ciascuno
-    const fetchBestNews = async (region: string, topN: number): Promise<NewsItem[]> => {
-      try {
-        // 1. Prendi top ticker per bestScore
-        const tr = await fetch('/api/ticker-news?region=' + region + '&sort=best')
-        if (!tr.ok) return []
-        const td = await tr.json()
-        const tickers = (td.tickers || []).slice(0, 200) // top 200 per best score
-
-        // 2. Per ogni ticker cerca notizie nelle ultime 24h
-        const results: NewsItem[] = []
-        const seenTickers = new Set<string>()
-
-        for (const t of tickers) {
-          if (results.length >= topN) break
-          if (seenTickers.has(t.ticker + '.' + t.exchange)) continue
-
-          try {
-            const nr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.yahooTicker || t.ticker) +
-              '&company=' + encodeURIComponent(t.company || '') +
-              '&exchange=' + encodeURIComponent(t.exchange || '') +
-              '&yahooTicker=' + encodeURIComponent(t.yahooTicker || ''))
-            if (!nr.ok) continue
-            const nd = await nr.json()
-            const items = (nd.items || []).filter((i: any) =>
-              new Date(i.pubDate).getTime() > now24h
-            )
-            if (items.length > 0) {
-              results.push({
-                title: items[0].title,
-                link: items[0].link,
-                pubDate: items[0].pubDate,
-                source: items[0].source || 'Yahoo Finance',
-                ticker: t.ticker,
-                exchange: t.exchange,
-                company: t.company,
-                valueScore: t.valueScore,
-                growthScore: t.growthScore,
-                bestScore: t.bestScore,
-                mktCap: t.mktCap,
-              })
-              seenTickers.add(t.ticker + '.' + t.exchange)
-            }
-          } catch { continue }
+    // Filtra 24h, ordina per mktcap (bestScore DESC = proxy mktcap), max 1 per ticker
+    // Americas: top 100 mktcap, Europe: top 50, Asia: top 50
+    // Market Cap Report: ordina per mktCap reale, non per score
+    const filterBest = (items: NewsItem[], topN: number) => {
+      // Prima raggruppa per ticker e prendi la notizia più recente per ciascuno
+      const byTicker = new Map<string, NewsItem>()
+      for (const n of items) {
+        if (!n.ticker) continue
+        if (new Date(n.pubDate).getTime() <= now24h) continue
+        const key = n.ticker + '.' + n.exchange
+        const existing = byTicker.get(key)
+        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
+          byTicker.set(key, n)
         }
-        return results
-      } catch { return [] }
+      }
+      // Ordina per mktCap DESC (i ticker arrivano già in ordine mktCap dall'API)
+      return Array.from(byTicker.values())
+        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+        .slice(0, topN)
     }
 
-    const [amNews, euNews, apNews] = await Promise.all([
-      fetchBestNews('americas', 10),
-      fetchBestNews('europe',   10),
-      fetchBestNews('asia',     10),
-    ])
-
-    let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
-    txt += today + ' · ' + time + '\n\n'
+    const amNews = filterBest(data.americas, 10)
+    const euNews = filterBest(data.europe,   10)
+    const apNews = filterBest(data.asia,     10)
 
     if (amNews.length > 0) {
       txt += '**NORTH AMERICA — Best Score Leaders**\n'
       amNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    } else { txt += '**NORTH AMERICA** — no recent news\n\n' }
-
+    }
     if (euNews.length > 0) {
       txt += '**EUROPE — Best Score Leaders**\n'
       euNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    } else { txt += '**EUROPE** — no recent news\n\n' }
-
+    }
     if (apNews.length > 0) {
       txt += '**ASIA PACIFIC — Best Score Leaders**\n'
       apNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    } else { txt += '**ASIA PACIFIC** — no recent news\n\n' }
+    }
+
+    const sourcesSet: Record<string, boolean> = {}
+    allNews.forEach(n => { sourcesSet[n.source] = true })
+    txt += '_Sources: ' + Object.keys(sourcesSet).slice(0, 8).join(' · ') + '_'
 
     setReportBest(txt)
     setReportBestDate(new Date().toLocaleString('en-US'))
     setReportBestLoading(false)
+  }
+
+  useEffect(() => {
+    load()
+    const t = setInterval(load, 900000)
+    return () => clearInterval(t)
+  }, [])
+
+  useEffect(() => {
+    const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  const downloadReport = (reportText: string) => {
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    const lines = reportText.split('\n')
+    let body = ''
+    for (const line of lines) {
+      if (line.trim() === '') { body += '<br>'; continue }
+      // Heading **TESTO**
+      if (line.startsWith('**') && line.endsWith('**')) {
+        body += '<h2>' + line.replace(/\*\*/g, '') + '</h2>'
+        continue
+      }
+      // Link articolo 📰 https://...
+      const aMatch = line.match(/^\s*📰\s*(https?:\/\/\S+)/)
+      if (aMatch) {
+        body += '<p class="link-row">📰 <a href="' + aMatch[1] + '" target="_blank">Read article</a></p>'
+        continue
+      }
+      // Stock page 📊 TICKER → https://...
+      const sMatch = line.match(/^\s*📊\s*([A-Z0-9\.]+)\s*→\s*(https?:\/\/\S+)/)
+      if (sMatch) {
+        body += '<p class="link-row">📊 <a href="' + sMatch[2] + '" target="_blank" class="stock-link">' + sMatch[1] + ' — Stock page</a></p>'
+        continue
+      }
+      // Bullet •
+      if (line.trim().startsWith('•')) {
+        const txt = line.trim().slice(1).trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        body += '<p class="bullet">• ' + txt + '</p>'
+        continue
+      }
+      // Riga normale con **bold**
+      const txt = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      body += '<p>' + txt + '</p>'
+    }
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForwardAlpha Daily Report</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; color: #111; line-height: 1.7; }
+  h1 { color: #f97316; font-size: 22px; margin-bottom: 4px; }
+  h2 { color: #f97316; font-size: 16px; margin-top: 24px; margin-bottom: 8px; border-bottom: 1px solid #f9731640; padding-bottom: 4px; }
+  p { margin: 4px 0; font-size: 14px; }
+  .bullet { margin-left: 12px; }
+  .link-row { margin-left: 24px; font-size: 13px; }
+  a { color: #2563eb; text-decoration: underline; }
+  .stock-link { color: #f97316; font-weight: 700; }
+  strong { color: #f97316; }
+  .meta { color: #666; font-size: 12px; margin-bottom: 16px; }
+  hr { border: none; border-top: 1px solid #eee; margin: 16px 0; }
+  .footer { color: #999; font-size: 11px; margin-top: 24px; font-style: italic; }
+</style>
+</head>
+<body>
+<h1>ForwardAlpha Daily Market Briefing</h1>
+<p class="meta">${today} · Generated at ${new Date().toLocaleTimeString()}</p>
+<hr>
+${body}
+<p class="footer">Generated by <a href="https://forwardalpha.pro">ForwardAlpha</a> — Global Equity Research</p>
+</body>
+</html>`
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'ForwardAlpha_Report_' + new Date().toISOString().slice(0,10) + '.html'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
