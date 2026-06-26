@@ -111,7 +111,8 @@ for exchange, tickers in by_exchange.items():
         if isinstance(batch, list):
             seen = set()
             for d in batch:
-                key = (d['ticker'], d['exchange'])
+                # exchange viene dal loop esterno, non dalla risposta Supabase
+                key = (d['ticker'], exchange)
                 if key not in seen:
                     last_date_map[key] = d['date']
                     seen.add(key)
