@@ -127,7 +127,7 @@ for exchange, tickers in by_exchange.items():
     print(f"  {exchange}: downloading {len(tickers)} ticker...")
     for ticker in tickers:
         key = (ticker, exchange)
-        last = last_date_map.get(key, "2024-01-01")
+        last = last_date_map.get(key, "2021-01-01")
         if last >= TODAY:
             ok_leeway += 1
             continue
