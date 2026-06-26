@@ -588,6 +588,35 @@ ${body}
     URL.revokeObjectURL(url)
   }
 
+  const renderLines = (txt: string) => txt.split('\n').map((line, i) => {
+    if (line.trim() === '') return <div key={i} style={{ height: 8 }} />
+    if (line.startsWith('**') && line.endsWith('**')) return (
+      <div key={i} style={{ fontWeight: 700, color: 'var(--orange)', fontSize: 12,
+        marginTop: 14, marginBottom: 4, borderBottom: '1px solid rgba(249,115,22,0.3)', paddingBottom: 3 }}>
+        {line.replace(/\*\*/g, '')}
+      </div>
+    )
+    const artMatch = line.match(/📰 Read article → (https?:\/\/\S+)/)
+    if (artMatch) return (
+      <div key={i} style={{ marginLeft: 16, marginTop: 2 }}>
+        <a href={artMatch[1]} target="_blank" rel="noopener noreferrer"
+          style={{ color: '#60a5fa', fontSize: 12, textDecoration: 'underline' }}>
+          📰 Read article
+        </a>
+      </div>
+    )
+    const stockMatch = line.match(/📊 View on ForwardAlpha → (https?:\/\/\S+)/)
+    if (stockMatch) return (
+      <div key={i} style={{ marginLeft: 16, marginTop: 2 }}>
+        <a href={stockMatch[1]} target="_blank" rel="noopener noreferrer"
+          style={{ color: 'var(--orange)', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+          📊 View on ForwardAlpha
+        </a>
+      </div>
+    )
+    return <div key={i} style={{ marginBottom: 2 }}>{line}</div>
+  })
+
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
   const items: NewsItem[] = searchQuery.trim()
@@ -708,8 +737,35 @@ ${body}
                     </button>
                   </div>
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>
-                  {reportBest}
+                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
+                  {(reportBest: string) => reportBest.split('\n').map((line, i) => {
+                  if (line.trim() === '') return <div key={i} style={{ height: 8 }} />
+                  if (line.startsWith('**') && line.endsWith('**')) return (
+                    <div key={i} style={{ fontWeight: 700, color: 'var(--orange)', fontSize: 12,
+                      marginTop: 14, marginBottom: 4, borderBottom: '1px solid rgba(249,115,22,0.3)', paddingBottom: 3 }}>
+                      {line.replace(/\*\*/g, '')}
+                    </div>
+                  )
+                  const artMatch = line.match(/📰 Read article → (https?:\/\/\S+)/)
+                  if (artMatch) return (
+                    <div key={i} style={{ marginLeft: 16, marginTop: 2 }}>
+                      <a href={artMatch[1]} target="_blank" rel="noopener noreferrer"
+                        style={{ color: '#60a5fa', fontSize: 12, textDecoration: 'underline' }}>
+                        📰 Read article
+                      </a>
+                    </div>
+                  )
+                  const stockMatch = line.match(/📊 View on ForwardAlpha → (https?:\/\/\S+)/)
+                  if (stockMatch) return (
+                    <div key={i} style={{ marginLeft: 16, marginTop: 2 }}>
+                      <a href={stockMatch[1]} target="_blank" rel="noopener noreferrer"
+                        style={{ color: 'var(--orange)', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+                        📊 View on ForwardAlpha
+                      </a>
+                    </div>
+                  )
+                  return <div key={i} style={{ marginBottom: 2 }}>{line}</div>
+                })(reportBest)}
                 </div>
               </div>
             )}
