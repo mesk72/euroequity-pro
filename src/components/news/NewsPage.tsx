@@ -579,20 +579,13 @@ ${body}
       return line
     }
 
-    // Identico a filterMktCap ma ordina per bestScore
+    // Per ogni regione: filtra 24h, ordina per bestScore DESC, max 1 per ticker
     const filterBest = (items: NewsItem[], topN: number) => {
-      const byTicker = new Map<string, NewsItem>()
-      for (const n of items) {
-        if (!n.ticker) continue
-        if (new Date(n.pubDate).getTime() <= now24h) continue
-        const key = n.ticker + '.' + n.exchange
-        const existing = byTicker.get(key)
-        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
-          byTicker.set(key, n)
-        }
-      }
-      return Array.from(byTicker.values())
-        .sort((a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1))
+      const seen = new Set<string>()
+      return items
+        .filter(n => n.ticker && n.bestScore != null && new Date(n.pubDate).getTime() > now24h)
+        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+        .filter(n => { if (seen.has(n.ticker!)) return false; seen.add(n.ticker!); return true })
         .slice(0, topN)
     }
 
@@ -625,6 +618,7 @@ ${body}
     setReportBestDate(today + ' · ' + time)
     setReportBestLoading(false)
   }
+
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
