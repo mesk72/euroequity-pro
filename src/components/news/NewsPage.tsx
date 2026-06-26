@@ -301,10 +301,28 @@ export default function NewsPage() {
     setData(prev => ({ ...prev, world: worldNews }))
     setLoading(false) // Mostra subito world, le regioni caricano in background
 
-    // Regioni: carica ticker dal DB poi scarica news progressivamente
+    // Regioni: prima legge da news_cache (pre-caricata ogni ora/3ore)
+    // Zero chiamate Yahoo per utente — scala a 1000+ utenti simultanei
     const maxT: Record<string, number> = { americas: 1500, europe: 1500, asia: 1500 }
     await Promise.all((['americas', 'europe', 'asia'] as Region[]).map(async region => {
       try {
+        // 1. Prova news_cache da Supabase
+        const cr = await fetch('/api/news-cache?region=' + region + '&limit=1500')
+        if (cr.ok) {
+          const cd = await cr.json()
+          const cachedItems: NewsItem[] = (cd.items || []).map((i: any) => ({
+            title: i.title, link: i.link, pubDate: i.pub_date,
+            source: i.source, ticker: i.ticker, exchange: i.exchange,
+            company: i.company, valueScore: i.value_score,
+            growthScore: i.growth_score, bestScore: i.best_score,
+            mktCap: i.mkt_cap,
+          }))
+          if (cachedItems.length > 0) {
+            setData(prev => ({ ...prev, [region]: cachedItems }))
+            return  // usa cache, non chiama Yahoo
+          }
+        }
+        // 2. Fallback: vecchio sistema se cache vuota
         const tr = await fetch('/api/ticker-news?region=' + region)
         if (!tr.ok) return
         const td = await tr.json()
