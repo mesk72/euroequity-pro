@@ -36,13 +36,13 @@ export async function GET(req: Request) {
       const r = await fetch(googleUrl, {
         headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
         signal: AbortSignal.timeout(5000),
-        next: { revalidate: 900 },
+        next: { revalidate: 1800 },
       })
       if (!r.ok) return NextResponse.json({ items: [] })
       const xml = await r.text()
       const items = parseXML(xml).map(i => ({ ...i, source: i.source || 'Google News' }))
       const gr = NextResponse.json({ items: items.slice(0, 20) })
-      gr.headers.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200')
+      gr.headers.set('Cache-Control', 'public, max-age=1800, stale-while-revalidate=3600')
       return gr
     } catch {
       return NextResponse.json({ items: [] })
@@ -155,6 +155,6 @@ export async function GET(req: Request) {
   })
   const response = NextResponse.json({ items: filtered.slice(0, 15) })
   // Cache 10 minuti su Vercel Edge — riduce chiamate a Yahoo e protegge da scraping
-  response.headers.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200')
+  response.headers.set('Cache-Control', 'public, max-age=1800, stale-while-revalidate=3600')
   return response
 }
