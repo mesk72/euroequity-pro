@@ -6,34 +6,29 @@ LEEWAY_BASE = "https://api.leeway.tech/api/v1/public"
 TODAY       = datetime.now().strftime("%Y-%m-%d")
 FROM_3D     = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
 
-print("TODAY:", TODAY)
-print()
-
 CANDIDATES = [
-    # FTSE MIB
-    ("FTSEMIB.MI",     "FTSE MIB"),
-    ("MIB.MI",         "FTSE MIB alt"),
-    ("FTSEMIB.XETRA",  "FTSE MIB alt2"),
-    # FTSE 100
-    ("FTSE.INDX",      "FTSE 100"),
-    ("UKX.INDX",       "FTSE 100 alt1"),
-    ("FTSE100.INDX",   "FTSE 100 alt2"),
-    ("FTSE.LSE",       "FTSE 100 alt3"),
-    ("ASX.LSE",        "FTSE 100 alt4"),
-    # OMX Helsinki
-    ("OMXHPI.INDX",    "OMX Helsinki"),
-    ("OMXH25.INDX",    "OMX Helsinki alt1"),
-    ("HEX.INDX",       "OMX Helsinki alt2"),
+    # FTSE MIB — tutti i formati possibili
+    ("I945.INDX",      "FTSE MIB I945"),
+    ("FMIB.INDX",      "FTSE MIB FMIB"),
+    ("FTSEMIB",        "FTSE MIB no suffix"),
+    ("MIB30.INDX",     "MIB30"),
+    ("FTSEMIB.BIT",    "FTSE MIB .BIT"),
+    ("FTSEMIB.MI",     "FTSE MIB .MI"),
+    ("IT40.INDX",      "IT40"),
+    ("FTMIB.MI",       "FTMIB.MI"),
+    # FTSE 100 — tutti i formati possibili
+    ("FTSE100",        "FTSE 100 no suffix"),
+    ("FTSE.UK",        "FTSE.UK"),
+    ("UKX.LSE",        "UKX.LSE"),
+    ("FTSE.GB",        "FTSE.GB"),
+    ("TASI.INDX",      "FTSE alt TASI"),
+    ("FTSEUK.INDX",    "FTSEUK.INDX"),
+    ("FTSEGB.INDX",    "FTSEGB.INDX"),
+    ("I010.INDX",      "FTSE I010"),
     # ISEQ
-    ("ISEQ.INDX",      "ISEQ"),
-    ("ISEQ20.INDX",    "ISEQ alt1"),
-    ("ISEQX.INDX",     "ISEQ alt2"),
-    # TSX
-    ("OSPTSX.INDX",    "TSX"),
-    ("SPTSX.INDX",     "TSX alt1"),
-    ("TSX.INDX",       "TSX alt2"),
-    ("GSPTSE.INDX",    "TSX alt3"),
-    ("TXCX.INDX",      "TSX alt4"),
+    ("ISEQX.INDX",     "ISEQ alt"),
+    ("ISE.INDX",       "ISE.INDX"),
+    ("ISEQ.IR",        "ISEQ.IR"),
 ]
 
 for lt, name in CANDIDATES:
