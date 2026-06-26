@@ -311,16 +311,16 @@ EU_INDICES = [
     ("AEX.INDX",   "AS",    "AEX",      "AEX"),
     ("IBEX.INDX",  "MC",    "IBEX",     "IBEX 35"),
     ("BFX.INDX",   "BR",    "BFX",      "BEL 20"),
-    ("FTSE.INDX",  "LSE",   "FTSE",     "FTSE 100"),
+    # ("FTSE.INDX", "LSE", "FTSE", "FTSE 100"),  # ticker Leeway da verificare
     ("SSMI.INDX",  "SWX",   "SMI",      "SMI"),
     ("OMXS30.INDX","OM",    "OMXS30",   "OMX Stockholm"),
     ("OMXC25.INDX","CPSE",  "C25",      "OMX Copenhagen"),
     ("ATX.INDX",   "VI",    "ATX",      "ATX"),
-    ("ISEQ.INDX",  "IR",    "IEX",      "ISEQ"),
+    # ("ISEQ.INDX", "IR", "IEX", "ISEQ"),  # ticker Leeway da verificare
     ("STOXX50E.INDX","EZ",  "SX5E",     "Euro Stoxx 50"),
     ("SXXP.INDX",  "EZ",    "SXXP",     "STOXX 600"),
     ("OMXH25.INDX", "HE",   "HEX",      "OMX Helsinki"),
-    ("FTSEMIB.MI", "MIL",   "MIB",      "FTSE MIB"),
+    # ("FTSEMIB.MI", "MIL", "MIB", "FTSE MIB"),  # ticker Leeway da verificare
     ("PSI20.INDX", "LS",    "PSI",      "PSI 20"),
 ]
 ok_idx = 0
