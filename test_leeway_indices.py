@@ -4,32 +4,27 @@ from datetime import datetime, timedelta
 LEEWAY_KEY  = os.environ.get("LEEWAY_KEY", "")
 LEEWAY_BASE = "https://api.leeway.tech/api/v1/public"
 TODAY       = datetime.now().strftime("%Y-%m-%d")
-FROM_5D     = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
+FROM_3D     = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
 
-print("TODAY:", TODAY)
-print()
-
-INDICES = [
-    ("FTSEMIB.MI",   "FTSE MIB"),
-    ("SSMI.INDX",    "SMI"),
-    ("ATX.INDX",     "ATX"),
-    ("GDAXI.INDX",   "DAX"),
-    ("FCHI.INDX",    "CAC 40"),
-    ("FTSE.INDX",    "FTSE 100"),
-    ("STOXX50E.INDX","Euro Stoxx 50"),
-]
-
-for lt, name in INDICES:
-    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
+print("=== FTSE MIB — formati alternativi ===")
+for lt in ["FTSEMIB.MI", "FTMIB.INDX", "FTSEMIB.INDX", "MIB.MI", "IT40.INDX"]:
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_3D + "&to=" + TODAY
     r = requests.get(url, timeout=10)
-    if r.status_code != 200:
-        print(f"  {name} ({lt}): HTTP {r.status_code}")
-        continue
-    data = r.json()
-    if not isinstance(data, list) or not data:
-        print(f"  {name} ({lt}): vuoto")
-        continue
-    data = sorted(data, key=lambda x: x["date"])
-    for row in data[-3:]:
-        print(f"  {name} ({lt}): date={row.get('date')} open={row.get('open')} close={row.get('close')} adj={row.get('adjusted_close')}")
-    print()
+    data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+    if data:
+        last = sorted(data, key=lambda x: x["date"])[-1]
+        print(f"  ✅ {lt}: date={last.get('date')} close={last.get('close')}")
+    else:
+        print(f"  ❌ {lt}: vuoto")
+
+print()
+print("=== FTSE 100 — formati alternativi ===")
+for lt in ["FTSE.INDX", "UKX.INDX", "FTSE100.INDX", "^FTSE.INDX", "FTSE.LSE"]:
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_3D + "&to=" + TODAY
+    r = requests.get(url, timeout=10)
+    data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+    if data:
+        last = sorted(data, key=lambda x: x["date"])[-1]
+        print(f"  ✅ {lt}: date={last.get('date')} close={last.get('close')}")
+    else:
+        print(f"  ❌ {lt}: vuoto")
