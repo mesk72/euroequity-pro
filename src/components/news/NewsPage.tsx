@@ -557,12 +557,16 @@ ${body}
       return line
     }
 
-    // Filtra 24h, ordina per bestScore DESC, max 1 per ticker
+    // Filtra 24h, ordina per bestScore DESC (null in fondo), max 1 per ticker
     const filterBest = (items: NewsItem[], topN: number) => {
       const seen = new Set<string>()
       return items
         .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
-        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+        .sort((a, b) => {
+          const bs_a = b.bestScore ?? -1
+          const bs_b = a.bestScore ?? -1
+          return bs_a - bs_b
+        })
         .filter(n => { if (seen.has(n.ticker!)) return false; seen.add(n.ticker!); return true })
         .slice(0, topN)
     }
