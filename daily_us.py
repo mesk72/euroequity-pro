@@ -104,9 +104,8 @@ for exchange, tickers in by_exchange.items():
             params={"select": "ticker,date",
                     "exchange": f"eq.{exchange}",
                     "ticker": f"in.({','.join(chunk)})",
-                    "date": "gte.2026-01-01",
                     "order": "ticker,date.desc",
-                    "limit": str(len(chunk) * 5)})
+                    "limit": str(len(chunk) * 3)})
         batch = r.json()
         if isinstance(batch, list):
             seen = set()
@@ -125,9 +124,14 @@ for exchange, tickers in by_exchange.items():
     print(f"  {exchange}: {len(tickers)} ticker...")
     for ticker in tickers:
         key  = (ticker, exchange)
-        last = last_date_map.get(key, "2021-01-01")
+        last = last_date_map.get(key, "2020-01-01")
         if last >= TODAY: ok_leeway += 1; continue
-        start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+        # Scarica massimo ultimi 30 giorni per evitare timeout Leeway
+        thirty_ago = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+        start_dt = max(
+            (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d"),
+            thirty_ago
+        )
         lt  = ticker + suffix
         url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
         try:
@@ -335,8 +339,9 @@ for db_ticker, exchange, lt, name in NA_INDICES:
                 for d in data if d.get("adjusted_close")]
         if rows:
             requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
-        price = data[-1]["adjusted_close"]
-        change1d = round((data[-1]["adjusted_close"]/data[-2]["adjusted_close"]-1)*100, 2) if len(data)>=2 else None
+        data_sorted = sorted(data, key=lambda x: x["date"])
+        price = data_sorted[-1]["adjusted_close"]
+        change1d = round((data_sorted[-1]["adjusted_close"]/data_sorted[-2]["adjusted_close"]-1)*100, 2) if len(data_sorted)>=2 else None
         requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
             params={"ticker": f"eq.{db_ticker}"},
             json={"price": price, "change1d": change1d, "date": data[-1]["date"]})
