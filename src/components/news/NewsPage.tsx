@@ -671,7 +671,7 @@ ${body}
         </button>
       </div>
 
-      {tab !== 'report' && (
+      {tab !== 'report' && tab !== 'reportbest' && (
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <input
             type="text"
