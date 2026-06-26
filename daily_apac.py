@@ -99,20 +99,26 @@ price_buf = []
 # Prima trova la data dell'ultimo prezzo per ogni titolo
 print("  Lettura ultima data prezzi...")
 last_date_map = {}
-print("  Lettura ultima data prezzi per ticker...")
 for exchange, tickers in by_exchange.items():
-    for ticker in tickers:
+    CHUNK = 20
+    for i in range(0, len(tickers), CHUNK):
+        chunk = tickers[i:i+CHUNK]
+        ticker_filter = ','.join(chunk)
         r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "date",
+            params={"select": "ticker,exchange,date",
                     "exchange": f"eq.{exchange}",
-                    "ticker": f"eq.{ticker}",
-                    "order": "date.desc",
-                    "limit": "1"})
+                    "ticker": f"in.({ticker_filter})",
+                    "order": "ticker,date.desc",
+                    "limit": str(len(chunk) * 2)})  # 2 righe per ticker max
         batch = r.json()
-        if isinstance(batch, list) and batch:
-            last_date_map[(ticker, exchange)] = batch[0]['date']
+        if isinstance(batch, list):
+            seen = set()
+            for d in batch:
+                key = (d['ticker'], d['exchange'])
+                if key not in seen:
+                    last_date_map[key] = d['date']
+                    seen.add(key)
         time.sleep(0.01)
-
 
 # Scarica prezzi da Leeway per ogni titolo
 for exchange, tickers in by_exchange.items():
@@ -225,7 +231,6 @@ for stock in all_stocks:
     })
     ok += 1
 
-# Usa PATCH per aggiornare solo i campi momentum — non tocca value/growth/combined
 for i in range(0, len(mom_updates), 100):
     requests.post(SUPABASE_URL + "/rest/v1/fundamentals",
                   headers=headers_up, json=mom_updates[i:i+100])
