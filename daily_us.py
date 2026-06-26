@@ -97,24 +97,18 @@ CHUNK = 20
 
 # Leggi ultima data prezzi
 last_date_map = {}
+print("  Lettura ultima data prezzi per ticker...")
 for exchange, tickers in by_exchange.items():
-    for i in range(0, len(tickers), CHUNK):
-        chunk = tickers[i:i+CHUNK]
+    for ticker in tickers:
         r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "ticker,date",
+            params={"select": "date",
                     "exchange": f"eq.{exchange}",
-                    "ticker": f"in.({','.join(chunk)})",
-                    "order": "ticker,date.desc",
-                    "limit": str(len(chunk) * 5)})
+                    "ticker": f"eq.{ticker}",
+                    "order": "date.desc",
+                    "limit": "1"})
         batch = r.json()
-        if isinstance(batch, list):
-            seen = set()
-            for d in batch:
-                # exchange viene dal loop esterno, non dalla risposta Supabase
-                key = (d['ticker'], exchange)
-                if key not in seen:
-                    last_date_map[key] = d['date']
-                    seen.add(key)
+        if isinstance(batch, list) and batch:
+            last_date_map[(ticker, exchange)] = batch[0]['date']
         time.sleep(0.01)
 
 ok_leeway = fail_leeway = 0
