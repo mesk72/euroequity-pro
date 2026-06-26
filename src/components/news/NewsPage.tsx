@@ -213,6 +213,7 @@ async function fetchTickerNews(
               valueScore: t.valueScore,
               growthScore: t.growthScore,
               bestScore: t.bestScore,
+              mktCap: t.mktCap ?? null,
             }))
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
@@ -394,11 +395,11 @@ export default function NewsPage() {
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
       if (n.valueScore != null) {
-        line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+        line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       }
-      if (n.link) line += '\n  📰 ' + n.link
+      if (n.link) line += '\n  📰 Read article → ' + n.link
       if (n.ticker && n.exchange) {
-        line += '\n  📊 ' + n.ticker + ' → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+        line += '\n  📊 View on ForwardAlpha → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
       }
       return line
     }
@@ -452,9 +453,9 @@ export default function NewsPage() {
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
-      if (n.valueScore != null) line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
-      if (n.link) line += '\n  📰 ' + n.link
-      if (n.ticker && n.exchange) line += '\n  📊 ' + n.ticker + ' → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+      if (n.valueScore != null) line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      if (n.link) line += '\n  📰 Read article → ' + n.link
+      if (n.ticker && n.exchange) line += '\n  📊 View on ForwardAlpha → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
       return line
     }
 
@@ -526,13 +527,13 @@ export default function NewsPage() {
       // Link articolo 📰 https://...
       const aMatch = line.match(/^\s*📰\s*(https?:\/\/\S+)/)
       if (aMatch) {
-        body += '<p class="link-row">📰 <a href="' + aMatch[1] + '" target="_blank">Read article</a></p>'
+        body += '<p class="link-row"><a href="' + aMatch[1] + '" target="_blank">📰 Read article</a></p>'
         continue
       }
       // Stock page 📊 TICKER → https://...
       const sMatch = line.match(/^\s*📊\s*([A-Z0-9\.]+)\s*→\s*(https?:\/\/\S+)/)
       if (sMatch) {
-        body += '<p class="link-row">📊 <a href="' + sMatch[2] + '" target="_blank" class="stock-link">' + sMatch[1] + ' — Stock page</a></p>'
+        body += '<p class="link-row"><a href="' + sMatch[2] + '" target="_blank" class="stock-link">📊 View on ForwardAlpha → ' + sMatch[1] + '</a></p>'
         continue
       }
       // Bullet •
