@@ -229,21 +229,19 @@ def calc_ranks(group):
     mom6_adj_g = []; mom12_adj_g = []
     for d in group:
         key = (d["ticker"], d["exchange"])
-        # USA SOLO mom_updates — nessun fallback al DB vecchio
-        m6  = mom6m_map.get(key)
-        m12 = mom12m_map.get(key)
-        m1w = mom1w_map.get(key)
-        m1m = mom1m_map.get(key)
+        m6  = mom6m_map.get(key, d.get("mom6m"))
+        m12 = mom12m_map.get(key, d.get("mom12m"))
+        m1w = mom1w_map.get(key, d.get("mom1w"))
+        m1m = mom1m_map.get(key, d.get("mom1m"))
         if m6  is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
         if m12 is not None and m1m is not None: mom12_adj_g.append(m12 - m1m)
     pre = []
     for d in group:
         key  = (d["ticker"], d["exchange"])
-        # USA SOLO mom_updates — nessun fallback al DB vecchio
-        m6   = mom6m_map.get(key)
-        m12  = mom12m_map.get(key)
-        m1w  = mom1w_map.get(key)
-        m1m  = mom1m_map.get(key)
+        m6   = mom6m_map.get(key, d.get("mom6m"))
+        m12  = mom12m_map.get(key, d.get("mom12m"))
+        m1w  = mom1w_map.get(key, d.get("mom1w"))
+        m1m  = mom1m_map.get(key, d.get("mom1m"))
         ey_t = ey(d.get("pe_trailing")); r_eyt = pct_rank(ey_trail_g, ey_t) if ey_t is not None else None
         ey_f = ey(d.get("pe_forward"));  r_eyf = pct_rank(ey_fwd_g,   ey_f) if ey_f is not None else None
         by_v = book_yield(d.get("pb"));  r_pb  = pct_rank(by_g,       by_v) if by_v is not None else None
