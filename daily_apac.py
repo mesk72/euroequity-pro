@@ -108,9 +108,8 @@ for exchange, tickers in by_exchange.items():
             params={"select": "ticker,date",
                     "exchange": f"eq.{exchange}",
                     "ticker": f"in.({ticker_filter})",
-                    "date": "gte.2026-01-01",
                     "order": "ticker,date.desc",
-                    "limit": str(len(chunk) * 5)})
+                    "limit": str(len(chunk) * 3)})
         batch = r.json()
         if isinstance(batch, list):
             seen = set()
@@ -128,11 +127,15 @@ for exchange, tickers in by_exchange.items():
     print(f"  {exchange}: downloading {len(tickers)} ticker...")
     for ticker in tickers:
         key = (ticker, exchange)
-        last = last_date_map.get(key, "2021-01-01")
+        last = last_date_map.get(key, "2020-01-01")
         if last >= TODAY:
             ok_leeway += 1
             continue
-        start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+        thirty_ago = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+        start_dt = max(
+            (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d"),
+            thirty_ago
+        )
         leeway_ticker = ticker + suffix
         url = f"{LEEWAY_BASE}/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
         try:
