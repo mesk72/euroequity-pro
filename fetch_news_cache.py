@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
-# ============================================================
 # FORWARDALPHA — FETCH NEWS CACHE
-# Da eseguire ogni ora via GitHub Actions
-# Scarica notizie per top 1500 ticker per regione
-# e le salva in Supabase tabella news_cache
-# Così gli utenti leggono da Supabase, non da Yahoo/Google
-# ============================================================
+# Scarica notizie per top ticker per regione e salva in Supabase news_cache
 
 import os, time, requests
 from datetime import datetime, timedelta
@@ -16,24 +11,22 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 
-TODAY = datetime.now().strftime("%Y-%m-%d")
 NOW   = datetime.now().isoformat()
 AGO24 = (datetime.now() - timedelta(hours=24)).isoformat()
 
-STOP = set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co',
+STOP = {'Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co',
     'The','Holdings','International','Global','Company','Corporation','Limited',
-    'de','et','und','of','and'])
+    'de','et','und','of','and'}
 
 YAHOO_SUFFIX = {
-    'PA':'.PA', 'XETRA':'.DE', 'MIL':'.MI', 'MC':'.MC',
-    'AS':'.AS', 'BR':'.BR', 'LSE':'.L', 'SWX':'.SW',
-    'OM':'.ST', 'OB':'.OL', 'HE':'.HE', 'IR':'.IR',
-    'VI':'.VI', 'CPSE':'.CO', 'TSE':'.T', 'SEHK':'.HK',
-    'ASX':'.AX', 'TSX':'.TO',
+    'PA':'.PA','XETRA':'.DE','MIL':'.MI','MC':'.MC','AS':'.AS',
+    'BR':'.BR','LSE':'.L','SWX':'.SW','OM':'.ST','OB':'.OL',
+    'HE':'.HE','IR':'.IR','VI':'.VI','CPSE':'.CO',
+    'TSE':'.T','SEHK':'.HK','ASX':'.AX','TSX':'.TO','US':''
 }
 
 REGIONS = {
-    'americas': ['US', 'TSX'],
+    'americas': ['US','TSX'],
     'europe':   ['PA','XETRA','MIL','MC','AS','BR','LSE','SWX','OM','OB','HE','IR','VI','CPSE'],
     'asia':     ['TSE','SEHK','ASX'],
 }
@@ -45,19 +38,18 @@ def parse_rss(xml_text):
     try:
         root = ET.fromstring(xml_text)
         for item in root.findall('.//item'):
-            title   = item.findtext('title','').strip()
-            link    = item.findtext('link','').strip()
-            pubdate = item.findtext('pubDate','').strip()
-            source  = item.findtext('source','').strip() or 'Yahoo Finance'
+            title  = (item.findtext('title') or '').strip()
+            link   = (item.findtext('link') or '').strip()
+            pubdate= (item.findtext('pubDate') or '').strip()
+            source = (item.findtext('source') or 'Yahoo Finance').strip()
             if title and len(title) > 10:
                 items.append({'title':title,'link':link,'pubDate':pubdate,'source':source})
     except: pass
     return items[:10]
 
-def fetch_news_for_ticker(ticker, exchange, company, yahoo_ticker):
+def fetch_ticker_news(ticker, exchange, company, yahoo_ticker):
     results = []
     UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-
     # Yahoo Finance RSS
     try:
         url = f"https://feeds.finance.yahoo.com/rss/2.0/headline?s={yahoo_ticker}&region=US&lang=en-US"
@@ -65,7 +57,6 @@ def fetch_news_for_ticker(ticker, exchange, company, yahoo_ticker):
         if r.status_code == 200:
             results.extend(parse_rss(r.text))
     except: pass
-
     # Google News RSS
     name_words = [w for w in company.split() if len(w)>2 and w not in STOP][:2]
     if name_words:
@@ -78,8 +69,7 @@ def fetch_news_for_ticker(ticker, exchange, company, yahoo_ticker):
             if r.status_code == 200:
                 results.extend(parse_rss(r.text))
         except: pass
-
-    # Deduplicazione
+    # Deduplica
     seen = set()
     deduped = []
     for item in results:
@@ -87,7 +77,6 @@ def fetch_news_for_ticker(ticker, exchange, company, yahoo_ticker):
         if k not in seen:
             seen.add(k)
             deduped.append(item)
-
     return deduped[:5]
 
 print("=" * 60)
@@ -97,55 +86,64 @@ print("=" * 60)
 # Pulisci notizie vecchie
 requests.delete(SUPABASE_URL + "/rest/v1/news_cache",
     headers={**headers_r, "Content-Type": "application/json"},
-    params={"pub_date": f"lt.{AGO24}"})
+    params={"fetched_at": f"lt.{AGO24}"})
 print("Notizie vecchie eliminate")
 
 for region, exchanges in REGIONS.items():
     print(f"\n{region.upper()}...")
 
-    # Leggi top 1500 ticker per mktcap
-    all_funds = []
+    # 1. Leggi ticker in_universe da stocks (NON da fundamentals)
+    in_universe = {}  # key: (ticker,exchange) -> True
     for exchange in exchanges:
         offset = 0
-        while len(all_funds) < 1500:
-            r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
-                params={"select": "ticker,exchange,mkt_cap,value_score,growth_score,combined_rank",
+        while True:
+            r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+                params={"select": "ticker,exchange,company,yahoo_ticker",
                         "exchange": f"eq.{exchange}", "in_universe": "eq.true",
-                        "order": "mkt_cap.desc.nullslast",
-                        "offset": str(offset), "limit": "1000"})
+                        "limit": "1000", "offset": str(offset)})
             batch = r.json()
             if not isinstance(batch, list) or not batch: break
-            all_funds.extend(batch)
+            for s in batch:
+                in_universe[(s['ticker'], s['exchange'])] = s
+            offset += 1000
+            if len(batch) < 1000: break
+    print(f"  In universe: {len(in_universe)} titoli")
+
+    # 2. Leggi fundamentals per score e mktcap
+    funds_map = {}
+    for exchange in exchanges:
+        offset = 0
+        while True:
+            r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
+                params={"select": "ticker,exchange,mkt_cap,value_score,growth_score,combined_rank",
+                        "exchange": f"eq.{exchange}",
+                        "limit": "1000", "offset": str(offset)})
+            batch = r.json()
+            if not isinstance(batch, list) or not batch: break
+            for f in batch:
+                key = (f['ticker'], f['exchange'])
+                if key in in_universe:
+                    funds_map[key] = f
             offset += 1000
             if len(batch) < 1000: break
 
-    # Leggi info stocks
-    tickers_list = [f['ticker'] for f in all_funds[:1500]]
-    stocks_map = {}
-    for i in range(0, len(tickers_list), 500):
-        chunk = tickers_list[i:i+500]
-        r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker,exchange,company,yahoo_ticker",
-                    "exchange": f"in.({chr(44).join(exchanges)})",
-                    "ticker": f"in.({chr(44).join(chunk)})",
-                    "limit": "500"})
-        for s in r.json() or []:
-            stocks_map[f"{s['ticker']}.{s['exchange']}"] = s
+    # 3. Ordina per mktcap, prendi top 1500
+    sorted_tickers = sorted(
+        [(k, v) for k, v in funds_map.items()],
+        key=lambda x: x[1].get('mkt_cap') or 0,
+        reverse=True
+    )[:1500]
+    print(f"  Top ticker: {len(sorted_tickers)}")
 
-    ok = fail = 0
+    ok = fail = news_count = 0
     news_buf = []
-    for fund in all_funds[:1500]:
-        ticker   = fund['ticker']
-        exchange = fund['exchange']
-        key      = f"{ticker}.{exchange}"
-        stock    = stocks_map.get(key)
-        if not stock: continue
 
-        suffix      = YAHOO_SUFFIX.get(exchange, '')
-        yahoo_ticker = stock.get('yahoo_ticker') or (ticker + suffix)
-        company      = stock.get('company','')
+    for (ticker, exchange), fund in sorted_tickers:
+        stock = in_universe.get((ticker, exchange), {})
+        company     = stock.get('company', '') or ''
+        yahoo_ticker = stock.get('yahoo_ticker') or (ticker + YAHOO_SUFFIX.get(exchange, ''))
 
-        news = fetch_news_for_ticker(ticker, exchange, company, yahoo_ticker)
+        news = fetch_ticker_news(ticker, exchange, company, yahoo_ticker)
         for n in news:
             news_buf.append({
                 "ticker":      ticker,
@@ -163,13 +161,15 @@ for region, exchanges in REGIONS.items():
                 "mkt_cap":     fund.get('mkt_cap'),
                 "fetched_at":  NOW,
             })
+            news_count += 1
 
         if len(news) > 0: ok += 1
         else: fail += 1
 
         if len(news_buf) >= 200:
-            requests.post(SUPABASE_URL + "/rest/v1/news_cache",
+            res = requests.post(SUPABASE_URL + "/rest/v1/news_cache",
                 headers=headers_up, json=news_buf)
+            print(f"    salvate {news_count} notizie... ({res.status_code})")
             news_buf = []
 
         time.sleep(0.1)
@@ -178,6 +178,6 @@ for region, exchanges in REGIONS.items():
         requests.post(SUPABASE_URL + "/rest/v1/news_cache",
             headers=headers_up, json=news_buf)
 
-    print(f"  ok={ok} fail={fail} notizie={ok*3}")
+    print(f"  ok={ok} fail={fail} notizie={news_count}")
 
 print("\nFetch news cache completato")
