@@ -272,10 +272,7 @@ for i in range(0, len(rank_updates), 100):
 print(f" Rank EU: {ok}/{len(rank_updates)}")
 
 # ── COMBINED EU ──────────────────────────────────────────────
-requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",
-    headers={**headers_up,"Prefer":"return=minimal"},
-    params={"exchange":"not.in.(US,TSX,TSE,SEHK,ASX)"},
-    json={"combined_rank": None})
+# combined_rank NON azzerato — aggiorna direttamente con merge-duplicates
 all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
 sum_arr    = [d["value_score"]+d["growth_score"] for d in all_scores]
 combined_updates = [{"ticker":d["ticker"],"exchange":d["exchange"],
