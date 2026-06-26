@@ -557,30 +557,26 @@ ${body}
       return line
     }
 
-    // Filtra 24h, ordina per bestScore DESC (null in fondo), max 1 per ticker
+    // Identico a filterMktCap ma ordina per bestScore
     const filterBest = (items: NewsItem[], topN: number) => {
-      const seen = new Set<string>()
-      return items
-        .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
-        .sort((a, b) => {
-          const bs_a = b.bestScore ?? -1
-          const bs_b = a.bestScore ?? -1
-          return bs_a - bs_b
-        })
-        .filter(n => { if (seen.has(n.ticker!)) return false; seen.add(n.ticker!); return true })
+      const byTicker = new Map<string, NewsItem>()
+      for (const n of items) {
+        if (!n.ticker) continue
+        if (new Date(n.pubDate).getTime() <= now24h) continue
+        const key = n.ticker + '.' + n.exchange
+        const existing = byTicker.get(key)
+        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
+          byTicker.set(key, n)
+        }
+      }
+      return Array.from(byTicker.values())
+        .sort((a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1))
         .slice(0, topN)
     }
 
     const amBest = filterBest(data.americas, 10)
     const euBest = filterBest(data.europe,   10)
     const apBest = filterBest(data.asia,     10)
-
-    // Debug: conta notizie con ticker nelle ultime 24h
-    const now24hCheck = Date.now() - 24 * 60 * 60 * 1000
-    const amWithTicker = data.americas.filter(n => n.ticker && new Date(n.pubDate).getTime() > now24hCheck).length
-    const euWithTicker = data.europe.filter(n => n.ticker && new Date(n.pubDate).getTime() > now24hCheck).length
-    const apWithTicker = data.asia.filter(n => n.ticker && new Date(n.pubDate).getTime() > now24hCheck).length
-    console.log('Best Score debug — notizie con ticker 24h:', {amWithTicker, euWithTicker, apWithTicker, amTotal: data.americas.length, euTotal: data.europe.length, apTotal: data.asia.length, amBest: amBest.length, euBest: euBest.length, apBest: apBest.length})
 
     let txt = `FORWARDALPHA — BEST SCORE REPORT\n${today} · ${time}\n\n`
     txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
