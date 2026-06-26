@@ -14,19 +14,24 @@ const YAHOO_SUFFIX: Record<string, string> = {
   'ASX': '.AX', 'TSX': '.TO',
 }
 
-async function fetchAll(exchanges: string[], limit: number) {
-  // Supabase ha limite 1000 per query - facciamo più query
+async function fetchAll(exchanges: string[], limit: number, sortBy: 'mkt_cap' | 'combined_rank' = 'mkt_cap') {
   const all: any[] = []
   const pageSize = 1000
   let offset = 0
   while (all.length < limit) {
-    const { data } = await supabase
+    let query = supabase
       .from('fundamentals')
       .select('ticker, exchange, mkt_cap, value_score, growth_score, combined_rank')
       .in('exchange', exchanges)
-      .not('mkt_cap', 'is', null)
-      .order('mkt_cap', { ascending: false })
+      .order(sortBy, { ascending: false, nullsFirst: false })
       .range(offset, offset + pageSize - 1)
+    // Per mktCap escludiamo i null, per bestScore no
+    if (sortBy === 'mkt_cap') {
+      query = query.not('mkt_cap', 'is', null)
+    } else {
+      query = query.not('combined_rank', 'is', null)
+    }
+    const { data } = await query
     if (!data || data.length === 0) break
     all.push(...data)
     if (data.length < pageSize) break
@@ -38,6 +43,7 @@ async function fetchAll(exchanges: string[], limit: number) {
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const region = searchParams.get('region') || 'americas'
+  const sortBy = (searchParams.get('sort') === 'best' ? 'combined_rank' : 'mkt_cap') as 'mkt_cap' | 'combined_rank'
 
   let exchanges: string[] = []
   let limit = 1500
@@ -50,7 +56,7 @@ export async function GET(req: Request) {
     exchanges = ['TSE', 'SEHK', 'ASX']
   }
 
-  const funds = await fetchAll(exchanges, limit)
+  const funds = await fetchAll(exchanges, limit, sortBy)
   if (funds.length === 0) return NextResponse.json({ tickers: [] })
 
   // Prendi info stocks in batch da 1000
