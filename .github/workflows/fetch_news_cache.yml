@@ -2,8 +2,7 @@ name: Fetch News Cache
 
 on:
   schedule:
-    - cron: '0 7 * * *'   # 08:00 CET — dopo chiusura Asia
-    - cron: '0 21 * * *'  # 22:00 CET — dopo chiusura US
+    - cron: '0 */3 * * *'  # ogni 3 ore = 8 volte al giorno
   workflow_dispatch:
 
 jobs:
