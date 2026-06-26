@@ -220,8 +220,13 @@ for stock in all_stocks:
     })
     ok += 1
 
-for i in range(0, len(mom_updates), 100):
-    requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
+for d in mom_updates:
+    requests.patch(
+        SUPABASE_URL + "/rest/v1/fundamentals",
+        headers={**headers_up, "Prefer": "return=minimal"},
+        params={"ticker": f"eq.{d['ticker']}", "exchange": f"eq.{d['exchange']}"},
+        json={k: v for k, v in d.items() if k not in ("ticker", "exchange")}
+    )
 print(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
@@ -325,9 +330,14 @@ if unranked:
     rank_updates.extend(calc_ranks(unranked))
 
 ok = 0
-for i in range(0, len(rank_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
+for d in rank_updates:
+    r = requests.patch(
+        SUPABASE_URL + "/rest/v1/fundamentals",
+        headers={**headers_up, "Prefer": "return=minimal"},
+        params={"ticker": f"eq.{d['ticker']}", "exchange": f"eq.{d['exchange']}"},
+        json={k: v for k, v in d.items() if k not in ("ticker", "exchange")}
+    )
+    if r.status_code in (200, 201, 204): ok += 1
 print(f"  Rank EU: {ok}/{len(rank_updates)}")
 
 # Combined rank — aggiorna direttamente senza azzerare prima
@@ -337,9 +347,14 @@ combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
                      "combined_rank": min(99, pct_rank(sum_arr_eu, d['value_score'] + d['growth_score']))}
                     for d in all_scores]
 ok = 0
-for i in range(0, len(combined_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
+for d in combined_updates:
+    r = requests.patch(
+        SUPABASE_URL + "/rest/v1/fundamentals",
+        headers={**headers_up, "Prefer": "return=minimal"},
+        params={"ticker": f"eq.{d['ticker']}", "exchange": f"eq.{d['exchange']}"},
+        json={"combined_rank": d["combined_rank"]}
+    )
+    if r.status_code in (200, 201, 204): ok += 1
 print(f"  Combined rank EU: {ok}/{len(combined_updates)}")
 ok_rank = ok
 
