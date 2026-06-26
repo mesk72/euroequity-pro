@@ -62,10 +62,10 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 
 # Suffissi Leeway per exchange EU
 LEEWAY_SUFFIX = {
-    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA", "AS": ".AS",
+    "MIL": ".MI", "XETRA": ".DE", "PA": ".PA", "AS": ".AS",
     "MC": ".MC", "BR": ".BR", "LS": ".LS", "VI": ".VI",
-    "HE": ".HE", "IR": ".IR", "AT": ".AT", "LSE": ".LSE",
-    "AIM": ".LSE", "SWX": ".SW", "OM": ".ST", "NGM": ".ST",
+    "HE": ".HE", "IR": ".IR", "AT": ".AT", "LSE": ".L",
+    "AIM": ".L", "SWX": ".SW", "OM": ".ST", "NGM": ".ST",
     "OB": ".OL", "CPSE": ".CO",
 }
 
@@ -115,11 +115,12 @@ for exchange, tickers in by_exchange.items():
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i+CHUNK]
         r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "ticker,exchange,date",
+            params={"select": "ticker,date",
                     "exchange": f"eq.{exchange}",
                     "ticker": f"in.({','.join(chunk)})",
+                    "date": "gte.2026-01-01",
                     "order": "ticker,date.desc",
-                    "limit": str(len(chunk) * 2)})
+                    "limit": str(len(chunk) * 5)})
         batch = r.json()
         if isinstance(batch, list):
             seen = set()
@@ -328,11 +329,7 @@ for i in range(0, len(rank_updates), 100):
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print(f"  Rank EU: {ok}/{len(rank_updates)}")
 
-# Combined rank EU
-requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-    headers={**headers_up, "Prefer": "return=minimal"},
-    params={"exchange": "not.in.(US,TSX,TSE,SEHK,ASX)"},
-    json={"combined_rank": None})
+# Combined rank — aggiorna direttamente senza azzerare prima
 all_scores = [d for d in rank_updates if d.get('value_score') is not None and d.get('growth_score') is not None]
 sum_arr_eu = [d['value_score'] + d['growth_score'] for d in all_scores]
 combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
