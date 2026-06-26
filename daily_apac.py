@@ -239,7 +239,7 @@ def calc_ranks(group):
     mom6_adj_g  = []
     mom12_adj_g = []
     for d in group:
-        key = (d['ticker'], exchange)
+        key = (d['ticker'], d['exchange'])  # CORRETTO
         m6  = d.get('mom6m');  m12 = d.get('mom12m')
         m1w = mom1w_map.get(key); m1m = mom1m_map.get(key)
         if m6  is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
