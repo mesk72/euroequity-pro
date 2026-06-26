@@ -68,7 +68,7 @@ async function fetchIndices(): Promise<IndexData[]> {
 }
 
 type Region = 'world' | 'americas' | 'europe' | 'asia'
-type Tab = Region | 'report'
+type Tab = Region | 'report' | 'reportbest'
 
 const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'world',    label: 'Global',        emoji: '🌐' },
@@ -249,6 +249,9 @@ export default function NewsPage() {
   const [report, setReport] = useState('')
   const [reportDate, setReportDate] = useState('')
   const [reportLoading, setReportLoading] = useState(false)
+  const [reportBest, setReportBest] = useState('')
+  const [reportBestDate, setReportBestDate] = useState('')
+  const [reportBestLoading, setReportBestLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [indices, setIndices] = useState<IndexData[]>([])
 
@@ -332,8 +335,8 @@ export default function NewsPage() {
     setCountdown(900)
   }
 
-  const generateReport = async () => {
-    setReportLoading(true)
+  const generateReportBest = async () => {
+    setReportBestLoading(true)
 
     // Carica indici freschi
     let idxData: IndexData[] = indices
@@ -374,7 +377,7 @@ export default function NewsPage() {
     if (themes.length === 0)
       themes.push('Markets digesting mixed macro signals')
 
-    let txt = '**FORWARDALPHA DAILY MARKET BRIEFING**\n'
+    let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
     txt += today + ' · ' + time + '\n\n'
 
     txt += '**LIVE MARKET DATA**\n'
@@ -399,37 +402,32 @@ export default function NewsPage() {
       return line
     }
 
-    // Filtra ultime 24h, ordina per mktcap (bestScore), max 1 notizia per ticker, top 10
-    const filterTop = (items: NewsItem[]) => {
+    // Best Score Report: ordina per bestScore DESC
+    const filterBest = (items: NewsItem[]) => {
       const seen = new Set<string>()
       return items
         .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
         .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
-        .filter(n => {
-          if (!n.ticker) return false
-          if (seen.has(n.ticker)) return false
-          seen.add(n.ticker)
-          return true
-        })
+        .filter(n => { if (seen.has(n.ticker!)) return false; seen.add(n.ticker!); return true })
         .slice(0, 10)
     }
 
-    const amNews = filterTop(data.americas)
-    const euNews = filterTop(data.europe)
-    const apNews = filterTop(data.asia)
+    const amNews = filterBest(data.americas)
+    const euNews = filterBest(data.europe)
+    const apNews = filterBest(data.asia)
 
     if (amNews.length > 0) {
-      txt += '**NORTH AMERICA — Top stories by market cap**\n'
+      txt += '**NORTH AMERICA — Best Score Leaders**\n'
       amNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
     if (euNews.length > 0) {
-      txt += '**EUROPE — Top stories by market cap**\n'
+      txt += '**EUROPE — Best Score Leaders**\n'
       euNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
     if (apNews.length > 0) {
-      txt += '**ASIA PACIFIC — Top stories by market cap**\n'
+      txt += '**ASIA PACIFIC — Best Score Leaders**\n'
       apNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
@@ -437,6 +435,65 @@ export default function NewsPage() {
     const sourcesSet: Record<string, boolean> = {}
     allNews.forEach(n => { sourcesSet[n.source] = true })
     txt += '_Sources: ' + Object.keys(sourcesSet).slice(0, 8).join(' · ') + '_'
+
+    setReportBest(txt)
+    setReportBestDate(new Date().toLocaleString('en-US'))
+    setReportBestLoading(false)
+  }
+
+  const generateReport = async () => {
+    setReportLoading(true)
+    const now24h = Date.now() - 24 * 60 * 60 * 1000
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+
+    const fmtNewsItem = (n: NewsItem) => {
+      let line = '• '
+      if (n.ticker) line += '[' + n.ticker + '] '
+      line += n.title
+      if (n.valueScore != null) line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      if (n.link) line += '\n  📰 ' + n.link
+      if (n.ticker && n.exchange) line += '\n  📊 ' + n.ticker + ' → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
+      return line
+    }
+
+    // Market Cap Report: ordina per mktCap DESC
+    const filterMktCap = (items: NewsItem[]) => {
+      const byTicker = new Map<string, NewsItem>()
+      for (const n of items) {
+        if (!n.ticker) continue
+        if (new Date(n.pubDate).getTime() <= now24h) continue
+        const key = n.ticker + '.' + n.exchange
+        const existing = byTicker.get(key)
+        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) byTicker.set(key, n)
+      }
+      return Array.from(byTicker.values())
+        .sort((a, b) => (b.mktCap || 0) - (a.mktCap || 0))
+        .slice(0, 10)
+    }
+
+    let txt = '**FORWARDALPHA MARKET CAP REPORT**\n'
+    txt += today + ' · ' + time + '\n\n'
+
+    const amNews = filterMktCap(data.americas)
+    const euNews = filterMktCap(data.europe)
+    const apNews = filterMktCap(data.asia)
+
+    if (amNews.length > 0) {
+      txt += '**NORTH AMERICA — Top 100 Market Cap**\n'
+      amNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      txt += '\n'
+    }
+    if (euNews.length > 0) {
+      txt += '**EUROPE — Top 50 Market Cap**\n'
+      euNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      txt += '\n'
+    }
+    if (apNews.length > 0) {
+      txt += '**ASIA PACIFIC — Top 50 Market Cap**\n'
+      apNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      txt += '\n'
+    }
 
     setReport(txt)
     setReportDate(new Date().toLocaleString('en-US'))
@@ -530,7 +587,7 @@ ${body}
   }
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
-  const allItems: NewsItem[] = tab !== 'report' ? (data[tab as Region] || []) : []
+  const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
   const items: NewsItem[] = searchQuery.trim()
     ? allItems.filter(n => {
         const q = searchQuery.toLowerCase()
@@ -573,6 +630,15 @@ ${body}
             )}
           </button>
         ))}
+        <button onClick={() => setTab('reportbest')}
+          style={{
+            padding: '6px 14px', borderRadius: 4, fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', border: 'none',
+            background: tab === 'reportbest' ? 'var(--orange)' : 'var(--surface)',
+            color: tab === 'reportbest' ? '#000' : 'var(--text3)',
+          }}>
+          ⭐ Best Score Report
+        </button>
         <button onClick={() => setTab('report')}
           style={{
             padding: '6px 14px', borderRadius: 4, fontSize: 13, fontWeight: 600,
@@ -580,11 +646,11 @@ ${body}
             background: tab === 'report' ? '#22c55e' : 'var(--surface)',
             color: tab === 'report' ? '#000' : 'var(--text3)',
           }}>
-          📋 Daily Report
+          📋 Market Cap Report
         </button>
       </div>
 
-      {tab !== 'report' && (
+      {tab !== 'report' && tab !== 'reportbest' && (
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <input
             type="text"
@@ -607,7 +673,46 @@ ${body}
       )}
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', minHeight: 200 }}>
-        {tab === 'report' ? (
+        {tab === 'reportbest' ? (
+          <div style={{ padding: 20 }}>
+            {!reportBest && !reportBestLoading && (
+              <div style={{ textAlign: 'center', padding: 32 }}>
+                <button onClick={generateReportBest}
+                  style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700,
+                    cursor: 'pointer', border: 'none', background: 'var(--orange)', color: '#000' }}>
+                  ⭐ Generate Best Score Report
+                </button>
+              </div>
+            )}
+            {reportBestLoading && (
+              <div style={{ textAlign: 'center', padding: 48 }}>
+                <p style={{ fontSize: 13, color: 'var(--text4)' }}>Generating Best Score Report...</p>
+              </div>
+            )}
+            {reportBest && !reportBestLoading && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text4)' }}>{reportBestDate}</div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={generateReportBest}
+                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer',
+                        border: '1px solid var(--orange)', background: 'none', color: 'var(--orange)' }}>
+                      🔄 Refresh
+                    </button>
+                    <button onClick={() => downloadReport(reportBest)}
+                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer',
+                        border: '1px solid #3b82f6', background: 'none', color: '#3b82f6' }}>
+                      📄 Download
+                    </button>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>
+                  {reportBest}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : tab === 'report' ? (
           <div style={{ padding: 20 }}>
             {!report && !reportLoading && (
               <div style={{ textAlign: 'center', padding: 32 }}>
