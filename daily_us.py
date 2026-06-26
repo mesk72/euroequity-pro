@@ -101,11 +101,12 @@ for exchange, tickers in by_exchange.items():
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i+CHUNK]
         r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "ticker,exchange,date",
+            params={"select": "ticker,date",
                     "exchange": f"eq.{exchange}",
                     "ticker": f"in.({','.join(chunk)})",
+                    "date": "gte.2026-01-01",
                     "order": "ticker,date.desc",
-                    "limit": str(len(chunk) * 2)})
+                    "limit": str(len(chunk) * 5)})
         batch = r.json()
         if isinstance(batch, list):
             seen = set()
