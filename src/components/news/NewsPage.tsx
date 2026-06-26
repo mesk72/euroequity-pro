@@ -738,34 +738,7 @@ ${body}
                   </div>
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
-                  {(reportBest: string) => reportBest.split('\n').map((line, i) => {
-                  if (line.trim() === '') return <div key={i} style={{ height: 8 }} />
-                  if (line.startsWith('**') && line.endsWith('**')) return (
-                    <div key={i} style={{ fontWeight: 700, color: 'var(--orange)', fontSize: 12,
-                      marginTop: 14, marginBottom: 4, borderBottom: '1px solid rgba(249,115,22,0.3)', paddingBottom: 3 }}>
-                      {line.replace(/\*\*/g, '')}
-                    </div>
-                  )
-                  const artMatch = line.match(/📰 Read article → (https?:\/\/\S+)/)
-                  if (artMatch) return (
-                    <div key={i} style={{ marginLeft: 16, marginTop: 2 }}>
-                      <a href={artMatch[1]} target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#60a5fa', fontSize: 12, textDecoration: 'underline' }}>
-                        📰 Read article
-                      </a>
-                    </div>
-                  )
-                  const stockMatch = line.match(/📊 View on ForwardAlpha → (https?:\/\/\S+)/)
-                  if (stockMatch) return (
-                    <div key={i} style={{ marginLeft: 16, marginTop: 2 }}>
-                      <a href={stockMatch[1]} target="_blank" rel="noopener noreferrer"
-                        style={{ color: 'var(--orange)', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
-                        📊 View on ForwardAlpha
-                      </a>
-                    </div>
-                  )
-                  return <div key={i} style={{ marginBottom: 2 }}>{line}</div>
-                })(reportBest)}
+                  {renderLines(reportBest)}
                 </div>
               </div>
             )}
@@ -805,37 +778,7 @@ ${body}
                   </div>
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
-                  {report.split('\n').map((line, li) => {
-                    if (line.trim() === '') return <div key={li} style={{ height: 8 }} />
-                    // Linea con link articolo (📰 https://...)
-                    const articleMatch = line.match(/^\s*📰\s*(https?:\/\/\S+)/)
-                    if (articleMatch) {
-                      return <div key={li} style={{ marginLeft: 24, fontSize: 11 }}>
-                        <span style={{ color: 'var(--text4)' }}>📰 </span>
-                        <a href={articleMatch[1]} target="_blank" rel="noopener noreferrer"
-                          style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: 11 }}>Read article</a>
-                      </div>
-                    }
-                    // Linea stock page (📊 TICKER → https://...)
-                    const stockMatch = line.match(/^\s*📊\s*([A-Z0-9]+)\s*→\s*(https?:\/\/\S+)/)
-                    if (stockMatch) {
-                      return <div key={li} style={{ marginLeft: 24, fontSize: 11 }}>
-                        <span style={{ color: 'var(--text4)' }}>📊 </span>
-                        <a href={stockMatch[2]} target="_blank" rel="noopener noreferrer"
-                          style={{ color: 'var(--orange)', textDecoration: 'underline', fontWeight: 700, fontSize: 11 }}>
-                          {stockMatch[1]} — Stock page
-                        </a>
-                      </div>
-                    }
-                    // Linee normali con **bold**
-                    const parts = line.split('**')
-                    const rendered = parts.map((part, i) =>
-                      i % 2 === 1
-                        ? <strong key={i} style={{ color: 'var(--orange)' }}>{part}</strong>
-                        : <span key={i}>{part}</span>
-                    )
-                    return <div key={li} style={{ marginBottom: 2 }}>{rendered}</div>
-                  })}
+                  {renderLines(report)}
                 </div>
               </div>
             )}
