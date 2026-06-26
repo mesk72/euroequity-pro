@@ -668,9 +668,7 @@ ${body}
     const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1000)
     return () => clearInterval(t)
   }, [])
-  }
 
-  }
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
   const items: NewsItem[] = searchQuery.trim()
