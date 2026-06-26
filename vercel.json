@@ -4,5 +4,29 @@
       "path": "/api/cron/update-live",
       "schedule": "30 16 * * 1-5"
     }
+  ],
+  "headers": [
+    {
+      "source": "/api/yahoo-news(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=600, stale-while-revalidate=1200"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/api/ticker-news(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=600"
+        }
+      ]
+    }
   ]
 }
