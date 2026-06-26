@@ -568,12 +568,12 @@ ${body}
       return line
     }
 
-    // Identico a filterMktCap ma ordina per bestScore — NO filtro 24h
+    // COPIA ESATTA di filterMktCap — solo ordina per bestScore invece di mktCap
     const filterBest = (items: NewsItem[], topN: number) => {
       const byTicker = new Map<string, NewsItem>()
       for (const n of items) {
         if (!n.ticker) continue
-        // Nessun filtro 24h — prende tutto quello che c'è
+        if (new Date(n.pubDate).getTime() <= now24h) continue
         const key = n.ticker + '.' + n.exchange
         const existing = byTicker.get(key)
         if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
@@ -588,14 +588,6 @@ ${body}
     const amNews = filterBest(data.americas, 10)
     const euNews = filterBest(data.europe,   10)
     const apNews = filterBest(data.asia,     10)
-
-    // Debug: se ancora vuoto dopo aver tolto il filtro 24h, c'è un problema di caricamento
-    if (amNews.length === 0 && euNews.length === 0 && apNews.length === 0) {
-      setReportBest('⚠️ News not loaded yet. Please go to the Americas, Europe or Asia tabs first to load news, then come back and generate the report.')
-      setReportBestDate(new Date().toLocaleString('en-US'))
-      setReportBestLoading(false)
-      return
-    }
 
     let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
     txt += today + ' · ' + time + '\n\n'
