@@ -64,8 +64,8 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 LEEWAY_SUFFIX = {
     "MIL": ".MI", "XETRA": ".DE", "PA": ".PA", "AS": ".AS",
     "MC": ".MC", "BR": ".BR", "LS": ".LS", "VI": ".VI",
-    "HE": ".HE", "IR": ".IR", "AT": ".AT", "LSE": ".L",
-    "AIM": ".L", "SWX": ".SW", "OM": ".ST", "NGM": ".ST",
+    "HE": ".HE", "IR": ".IR", "AT": ".AT", "LSE": ".LSE",
+    "AIM": ".AIM", "SWX": ".SW", "OM": ".ST", "NGM": ".ST",
     "OB": ".OL", "CPSE": ".CO",
 }
 
