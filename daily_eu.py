@@ -343,36 +343,32 @@ EU_INDICES = [
     ("FTSEMIB.MI","MIL","MIB","FTSE MIB"), ("PSI20.INDX","LS","PSI","PSI 20"),
 ]
 ok_idx = 0
+# Scarica ultimi 12 mesi per ogni indice — usa close (non adjusted_close)
+FROM_12M = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
 for db_ticker, exchange, lt, name in EU_INDICES:
-    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={TODAY}&to={TODAY}"
+    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_12M}&to={TODAY}"
     try:
-        r = requests.get(url, timeout=10)
-        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
-        if not data:
-            ieri = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
-            r2 = requests.get(f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={ieri}&to={TODAY}", timeout=10)
-            data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
-        if not data: continue
-        # Ordina per data ASC per avere last e prev corretti
-        data_sorted = sorted(data, key=lambda x: x["date"])
+        r = requests.get(url, timeout=15)
+        if r.status_code != 200: print(f"  ERR {name}: HTTP {r.status_code}"); continue
+        data_raw = r.json()
+        if not isinstance(data_raw, list) or not data_raw:
+            print(f"  ERR {name}: no data"); continue
+        # Ordina per data ASC
+        data_sorted = sorted(data_raw, key=lambda x: x["date"])
+        # Usa CLOSE non adjusted_close per gli indici
         rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"],
-                  "close": d.get("close") or d.get("adjusted_close")}
-                for d in data_sorted if d.get("close") or d.get("adjusted_close")]
+                 "close": float(d["close"])}
+                for d in data_sorted if d.get("close") is not None]
         if rows:
             requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
-        # Per gli indici usa 'close' — 'adjusted_close' è diviso per 1000
-        price = float(data_sorted[-1].get("close") or data_sorted[-1]["adjusted_close"])
-        prev  = float(data_sorted[-2].get("close") or data_sorted[-2]["adjusted_close"]) if len(data_sorted) >= 2 else None
-        change1d = round((price / prev - 1) * 100, 2) if prev and prev != 0 else None
-        if change1d is None:
-            r_prev = requests.get(SUPABASE_URL + "/rest/v1/price_history", headers=headers_r,
-                params={"select":"close","ticker":f"eq.{db_ticker}","exchange":f"eq.{exchange}","order":"date.desc","limit":"2"})
-            prev_data = r_prev.json()
-            if len(prev_data) >= 2: change1d = round((price/prev_data[1]["close"]-1)*100, 2)
+        # Ultimo prezzo e variazione giornaliera
+        last  = float(data_sorted[-1]["close"])
+        prev  = float(data_sorted[-2]["close"]) if len(data_sorted) >= 2 else None
+        change1d = round((last / prev - 1) * 100, 2) if prev and prev != 0 else None
         requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
             params={"ticker": f"eq.{db_ticker}"},
-            json={"price": price, "change1d": change1d, "date": data[-1]["date"]})
-        print(f"  {name}: {price} ({change1d}%)")
+            json={"price": last, "change1d": change1d, "date": data_sorted[-1]["date"]})
+        print(f"  {name}: {last:,.2f} ({change1d:+.2f}%)")
         ok_idx += 1
     except Exception as e: print(f"  ERR {name}: {e}")
     time.sleep(0.2)
