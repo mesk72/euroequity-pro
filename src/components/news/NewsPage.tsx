@@ -580,6 +580,14 @@ ${body}
     const euBest = filterBest(data.europe,   10)
     const apBest = filterBest(data.asia,     10)
 
+    // Se non ci sono dati mostra messaggio utile
+    if (amBest.length === 0 && euBest.length === 0 && apBest.length === 0) {
+      setReportBest('No news available yet — news are still loading. Please wait a moment and try again.')
+      setReportBestDate(today + ' · ' + time)
+      setReportBestLoading(false)
+      return
+    }
+
     let txt = `FORWARDALPHA — BEST SCORE REPORT\n${today} · ${time}\n\n`
     txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
     txt += 'Top stories by Best Score — last 24h\n'
@@ -783,11 +791,17 @@ ${body}
                 <div style={{ fontSize: 14, color: 'var(--text3)', marginBottom: 16 }}>
                   Top stories ranked by ForwardAlpha Best Score — last 24h.
                 </div>
-                <button onClick={generateReportBest}
-                  style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700,
-                    cursor: 'pointer', border: 'none', background: 'var(--orange)', color: '#000' }}>
-                  ⭐ Generate Best Score Report
-                </button>
+                {loading ? (
+                  <div style={{ fontSize: 12, color: 'var(--text4)', marginBottom: 12 }}>
+                    Loading news data... please wait.
+                  </div>
+                ) : (
+                  <button onClick={generateReportBest}
+                    style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700,
+                      cursor: 'pointer', border: 'none', background: 'var(--orange)', color: '#000' }}>
+                    ⭐ Generate Best Score Report
+                  </button>
+                )}
               </div>
             )}
             {reportBestLoading && (
