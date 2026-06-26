@@ -12,10 +12,9 @@ interface NewsItem {
   ticker?: string
   exchange?: string
   company?: string
-  valueScore?: number | null
-  growthScore?: number | null
-  bestScore?: number | null
-  mktCap?: number | null
+  valueScore?: number
+  growthScore?: number
+  bestScore?: number
 }
 
 interface IndexData {
@@ -69,7 +68,8 @@ async function fetchIndices(): Promise<IndexData[]> {
 }
 
 type Region = 'world' | 'americas' | 'europe' | 'asia'
-type Tab = Region | 'report' | 'reportbest'
+type Tab = 'world' | 'americas' | 'europe' | 'asia' | 'report' | 'reportbest'
+type Tab = Region | 'report'
 
 const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'world',    label: 'Global',        emoji: '🌐' },
@@ -173,7 +173,7 @@ async function fetchRSS(name: string, url: string): Promise<NewsItem[]> {
 
 async function fetchTickerNews(
   region: string,
-  tickers: { ticker: string; exchange: string; company: string; yahooTicker: string; valueScore?: number; growthScore?: number; bestScore?: number; mktCap?: number | null }[],
+  tickers: { ticker: string; exchange: string; company: string; yahooTicker: string; valueScore?: number; growthScore?: number; bestScore?: number }[],
   onBatch: (news: NewsItem[]) => void
 ): Promise<void> {
   const seen: Record<string, boolean> = {}
@@ -213,7 +213,6 @@ async function fetchTickerNews(
               valueScore: t.valueScore,
               growthScore: t.growthScore,
               bestScore: t.bestScore,
-              mktCap: t.mktCap ?? null,
             }))
             .filter((n: NewsItem) => {
               if (n.title.length < 10) return false
@@ -301,35 +300,14 @@ export default function NewsPage() {
     setData(prev => ({ ...prev, world: worldNews }))
     setLoading(false) // Mostra subito world, le regioni caricano in background
 
-    // Regioni: legge da news_cache (pre-caricata ogni ora)
-    // Zero chiamate Yahoo per utente — scala a 1000+ utenti simultanei
+    // Regioni: carica ticker dal DB poi scarica news progressivamente
+    const maxT: Record<string, number> = { americas: 1500, europe: 1500, asia: 1500 }
     await Promise.all((['americas', 'europe', 'asia'] as Region[]).map(async region => {
       try {
-        const tr = await fetch('/api/news-cache?region=' + region + '&limit=500')
+        const tr = await fetch('/api/ticker-news?region=' + region)
         if (!tr.ok) return
         const td = await tr.json()
-        const cachedItems: NewsItem[] = (td.items || []).map((i: any) => ({
-          title:       i.title,
-          link:        i.link,
-          pubDate:     i.pub_date,
-          source:      i.source,
-          ticker:      i.ticker,
-          exchange:    i.exchange,
-          company:     i.company,
-          valueScore:  i.value_score,
-          growthScore: i.growth_score,
-          bestScore:   i.best_score,
-          mktCap:      i.mkt_cap,
-        }))
-        if (cachedItems.length > 0) {
-          setData(prev => ({ ...prev, [region]: cachedItems }))
-        }
-        // Fallback: se news_cache vuota usa il vecchio sistema
-        if (cachedItems.length === 0) {
-        const tr2 = await fetch('/api/ticker-news?region=' + region)
-        if (!tr2.ok) return
-        const td2 = await tr2.json()
-            const tickers = (td2.tickers || []).slice(0, 1500)
+            const tickers = (td.tickers || []).slice(0, maxT[region])
         if (tickers.length === 0) return
         // Aggiungi feed extra per europa e asia
         const extraItems = region === 'europe' ? euExtra : region === 'asia' ? asiaExtra : []
@@ -351,7 +329,6 @@ export default function NewsPage() {
             return { ...prev, [region]: merged }
           })
         })
-        }
       } catch {}
     }))
 
@@ -426,30 +403,24 @@ export default function NewsPage() {
       return line
     }
 
-    // Filtra 24h, ordina per mktcap (bestScore DESC = proxy mktcap), max 1 per ticker
-    // Americas: top 100 mktcap, Europe: top 50, Asia: top 50
-    // Market Cap Report: ordina per mktCap reale, non per score
-    const filterMktCap = (items: NewsItem[], topN: number) => {
-      // Prima raggruppa per ticker e prendi la notizia più recente per ciascuno
-      const byTicker = new Map<string, NewsItem>()
-      for (const n of items) {
-        if (!n.ticker) continue
-        if (new Date(n.pubDate).getTime() <= now24h) continue
-        const key = n.ticker + '.' + n.exchange
-        const existing = byTicker.get(key)
-        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
-          byTicker.set(key, n)
-        }
-      }
-      // Ordina per mktCap DESC (i ticker arrivano già in ordine mktCap dall'API)
-      return Array.from(byTicker.values())
-        .sort((a, b) => (b.mktCap || 0) - (a.mktCap || 0))
-        .slice(0, topN)
+    // Filtra ultime 24h, ordina per mktcap (bestScore), max 1 notizia per ticker, top 10
+    const filterTop = (items: NewsItem[]) => {
+      const seen = new Set<string>()
+      return items
+        .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
+        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+        .filter(n => {
+          if (!n.ticker) return false
+          if (seen.has(n.ticker)) return false
+          seen.add(n.ticker)
+          return true
+        })
+        .slice(0, 10)
     }
 
-    const amNews = filterMktCap(data.americas, 10)
-    const euNews = filterMktCap(data.europe,   10)
-    const apNews = filterMktCap(data.asia,     10)
+    const amNews = filterTop(data.americas)
+    const euNews = filterTop(data.europe)
+    const apNews = filterTop(data.asia)
 
     if (amNews.length > 0) {
       txt += '**NORTH AMERICA — Top stories by market cap**\n'
@@ -621,7 +592,7 @@ ${body}
 
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
-  const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
+  const allItems: NewsItem[] = tab !== 'report' ? (data[tab as Region] || []) : []
   const items: NewsItem[] = searchQuery.trim()
     ? allItems.filter(n => {
         const q = searchQuery.toLowerCase()
@@ -684,7 +655,7 @@ ${body}
         </button>
       </div>
 
-      {tab !== 'report' && tab !== 'reportbest' && (
+      {tab !== 'report' && (
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <input
             type="text"
@@ -788,79 +759,6 @@ ${body}
             <button onClick={load} style={{ color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 12 }}>
               🔄 Retry
             </button>
-          </div>
-        ) : tab === 'reportbest' ? (
-          <div style={{ padding: 20 }}>
-            {!reportBest && !reportBestLoading && (
-              <div style={{ textAlign: 'center', padding: 32 }}>
-                <div style={{ fontSize: 14, color: 'var(--text3)', marginBottom: 16 }}>
-                  Top stories ranked by ForwardAlpha Best Score — last 24h.
-                </div>
-                <button onClick={generateReportBest}
-                  style={{ padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 700,
-                    cursor: 'pointer', border: 'none', background: 'var(--orange)', color: '#000' }}>
-                  ⭐ Generate Best Score Report
-                </button>
-              </div>
-            )}
-            {reportBestLoading && (
-              <div style={{ textAlign: 'center', padding: 48 }}>
-                <RefreshCw size={20} style={{ margin: '0 auto 10px', animation: 'spin 1s linear infinite', color: 'var(--orange)' }} />
-                <p style={{ fontSize: 13, color: 'var(--text4)' }}>Building Best Score Report...</p>
-              </div>
-            )}
-            {reportBest && !reportBestLoading && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: 'var(--text4)' }}>Generated: {reportBestDate}</div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={generateReportBest}
-                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer',
-                        border: '1px solid var(--orange)', background: 'none', color: 'var(--orange)' }}>
-                      🔄 Refresh
-                    </button>
-                    <button onClick={() => downloadReport(reportBest)}
-                      style={{ padding: '4px 12px', borderRadius: 4, fontSize: 11, cursor: 'pointer',
-                        border: '1px solid #3b82f6', background: 'none', color: '#3b82f6' }}>
-                      📄 Download HTML
-                    </button>
-                  </div>
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.9 }}>
-                  {reportBest.split('\n').map((line, li) => {
-                    if (line.trim() === '') return <div key={li} style={{ height: 8 }} />
-                    const articleMatch = line.match(/^\s*📰\s*(https?:\/\/\S+)/)
-                    if (articleMatch) {
-                      return <div key={li} style={{ marginLeft: 24, fontSize: 11 }}>
-                        <span style={{ color: 'var(--text4)' }}>📰 </span>
-                        <a href={articleMatch[1]} target="_blank" rel="noopener noreferrer"
-                          style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: 11 }}>Read article</a>
-                      </div>
-                    }
-                    const stockMatch = line.match(/^\s*📊\s*(\S+)\s*→\s*(https?:\/\/\S+)/)
-                    if (stockMatch) {
-                      return <div key={li} style={{ marginLeft: 24, fontSize: 11, marginTop: 2 }}>
-                        <a href={stockMatch[2]} target="_blank" rel="noopener noreferrer"
-                          style={{ color: 'var(--orange)', textDecoration: 'none', fontWeight: 700, fontSize: 11 }}>
-                          📊 {stockMatch[1]} →
-                        </a>
-                      </div>
-                    }
-                    if (line.startsWith('**') && line.endsWith('**')) {
-                      return <div key={li} style={{ fontWeight: 700, color: 'var(--orange)',
-                        fontSize: 12, marginTop: 16, marginBottom: 6,
-                        borderBottom: '1px solid rgba(249,115,22,0.3)', paddingBottom: 4 }}>
-                        {line.replace(/\*\*/g, '')}
-                      </div>
-                    }
-                    if (line.startsWith('━')) {
-                      return <div key={li} style={{ color: 'rgba(255,255,255,0.1)', fontSize: 10 }}>{line}</div>
-                    }
-                    return <div key={li} style={{ marginBottom: 4 }}>{line}</div>
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           items.map((item, i) => (
