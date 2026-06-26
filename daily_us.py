@@ -305,33 +305,35 @@ ok_rank = ok
 # ── INDICI NORD AMERICA ──────────────────────────────────────
 print("\n  Aggiornamento indici Nord America...")
 NA_INDICES = [
-    ("^DJI","US","DJI","Dow Jones"), ("^GSPC","US","GSPC","S&P 500"),
-    ("^IXIC","US","IXIC","Nasdaq"), ("^GSPTSE","TSX","GSPTSE.INDX","TSX"),
+    ("GSPC.INDX",   "US",  "GSPC",    "S&P 500"),
+    ("IXIC.INDX",   "US",  "IXIC",    "Nasdaq"),
+    ("DJI.INDX",    "US",  "DJI",     "Dow Jones"),
+    ("OSPTSX.INDX", "TSX", "GSPTSE",  "TSX"),
 ]
 ok_idx = 0
+FROM_12M = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
 for db_ticker, exchange, lt, name in NA_INDICES:
-    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={TODAY}&to={TODAY}"
+    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_12M}&to={TODAY}"
     try:
-        r = requests.get(url, timeout=10)
-        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
-        if not data:
-            ieri = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
-            r2 = requests.get(f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={ieri}&to={TODAY}", timeout=10)
-            data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
-        if not data: continue
-        # Ordina per data ASC per avere last e prev corretti
-        data_sorted = sorted(data, key=lambda x: x["date"])
-        rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"], "close": d["adjusted_close"]}
-                for d in data_sorted if d.get("adjusted_close")]
+        r = requests.get(url, timeout=15)
+        if r.status_code != 200: print(f"  ERR {name}: HTTP {r.status_code}"); continue
+        data_raw = r.json()
+        if not isinstance(data_raw, list) or not data_raw:
+            print(f"  ERR {name}: no data"); continue
+        data_sorted = sorted(data_raw, key=lambda x: x["date"])
+        valid = [d for d in data_sorted if d.get("close") is not None and float(d["close"]) > 0]
+        if not valid: print(f"  ERR {name}: nessun close valido"); continue
+        rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"],
+                 "close": float(d["close"])} for d in valid]
         if rows:
             requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
-        price = float(data_sorted[-1]["adjusted_close"])
-        prev  = float(data_sorted[-2]["adjusted_close"]) if len(data_sorted) >= 2 else None
-        change1d = round((price / prev - 1) * 100, 2) if prev and prev != 0 else None
+        last  = float(valid[-1]["close"])
+        prev  = float(valid[-2]["close"]) if len(valid) >= 2 else None
+        change1d = round((last / prev - 1) * 100, 2) if prev and prev != 0 else None
         requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
             params={"ticker": f"eq.{db_ticker}"},
-            json={"price": price, "change1d": change1d, "date": data[-1]["date"]})
-        print(f"  {name}: {price} ({change1d}%)")
+            json={"price": last, "change1d": change1d, "date": valid[-1]["date"]})
+        print(f"  {name}: {last:,.2f} ({change1d:+.2f}%)")
         ok_idx += 1
     except Exception as e: print(f"  ERR {name}: {e}")
     time.sleep(0.2)
