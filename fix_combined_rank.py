@@ -15,19 +15,18 @@ def pct_rank(vals, v):
     return max(1, min(99, int(round(below / len(vals) * 100))))
 
 print("="*50)
-print("FIX COMBINED RANK — EU, APAC, US+CA")
+print("FIX COMBINED RANK — EU, APAC, US")
 print("="*50)
 
 MARKETS = [
-    ("EU",    ["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","LSE","AIM","SWX","OM","NGM","OB","CPSE"]),
-    ("APAC",  ["TSE","SEHK","ASX"]),
-    ("US+CA", ["US","TSX"]),
+    ("EU",   ["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","LSE","AIM","SWX","OM","NGM","OB","CPSE"]),
+    ("APAC", ["TSE","SEHK","ASX"]),
+    ("US",   ["US"]),
 ]
 
 for market, exchanges in MARKETS:
     print(f"\n{market}...")
 
-    # Leggo in_universe da stocks
     in_universe_set = set()
     for exchange in exchanges:
         offset = 0
@@ -43,7 +42,6 @@ for market, exchanges in MARKETS:
             if len(batch) < 1000: break
     print(f"  In universe: {len(in_universe_set)}")
 
-    # Leggo value_score e growth_score da fundamentals
     all_data = []
     for exchange in exchanges:
         offset = 0
@@ -58,7 +56,6 @@ for market, exchanges in MARKETS:
             offset += 1000
             if len(batch) < 1000: break
 
-    # Filtra in_universe
     all_data = [d for d in all_data if (d["ticker"], d["exchange"]) in in_universe_set]
     print(f"  Filtrati in_universe: {len(all_data)}")
 
