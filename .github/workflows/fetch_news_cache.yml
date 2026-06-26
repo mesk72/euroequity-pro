@@ -2,22 +2,32 @@ name: Fetch News Cache
 
 on:
   schedule:
-    - cron: '0 * * * *'  # ogni ora
+    - cron: '0 * * * *'    # ogni ora — top 200/50/50
+    - cron: '0 */3 * * *'  # ogni 3 ore — tutti i ticker
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'all = tutti i ticker, vuoto = solo top'
+        required: false
+        default: ''
 
 jobs:
   fetch-news:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install dependencies
-        run: pip install requests
-      - name: Fetch news cache
+      - run: pip install requests
+      - name: Fetch news (top ogni ora)
+        if: github.event.schedule == '0 * * * *' || github.event.inputs.mode == ''
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: python fetch_news_cache.py
+      - name: Fetch news (tutti ogni 3 ore)
+        if: github.event.schedule == '0 */3 * * *' || github.event.inputs.mode == 'all'
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python fetch_news_cache.py all
