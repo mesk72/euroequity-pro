@@ -11,7 +11,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=600, stale-while-revalidate=1200"
+          "value": "public, max-age=1800, stale-while-revalidate=3600"
         },
         {
           "key": "X-Robots-Tag",
@@ -24,7 +24,20 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=300, stale-while-revalidate=600"
+          "value": "public, max-age=1800, stale-while-revalidate=3600"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/api/indices(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=1800, stale-while-revalidate=3600"
         }
       ]
     }
