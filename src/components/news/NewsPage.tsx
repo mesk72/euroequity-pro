@@ -351,6 +351,7 @@ export default function NewsPage() {
             return { ...prev, [region]: merged }
           })
         })
+        }
       } catch {}
     }))
 
