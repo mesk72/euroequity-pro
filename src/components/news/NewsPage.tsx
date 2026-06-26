@@ -12,9 +12,10 @@ interface NewsItem {
   ticker?: string
   exchange?: string
   company?: string
-  valueScore?: number
-  growthScore?: number
-  bestScore?: number
+  valueScore?: number | null
+  growthScore?: number | null
+  bestScore?: number | null
+  mktCap?: number | null
 }
 
 interface IndexData {
