@@ -1,0 +1,20 @@
+name: Fix Combined Rank
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-rank:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run fix
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python fix_combined_rank.py
