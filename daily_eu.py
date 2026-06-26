@@ -237,8 +237,12 @@ while True:
     if len(data) < 1000: break
 print(f"  Fundamentals: {len(all_data)}")
 
-mom1w_map = {(d['ticker'], d['exchange']): d.get('mom1w') for d in all_data}
-mom1m_map = {(d['ticker'], d['exchange']): d.get('mom1m') for d in all_data}
+# USA mom_updates (calcolati sui prezzi aggiornati) non all_data (dati vecchi DB)
+mom1w_map = {(d['ticker'], d['exchange']): d.get('mom1w') for d in mom_updates}
+mom1m_map = {(d['ticker'], d['exchange']): d.get('mom1m') for d in mom_updates}
+# Aggiungi anche mom6m e mom12m aggiornati
+mom6m_map  = {(d['ticker'], d['exchange']): d.get('mom6m')  for d in mom_updates}
+mom12m_map = {(d['ticker'], d['exchange']): d.get('mom12m') for d in mom_updates}
 
 RANK_GROUPS = {
     "ITA": ["MIL"], "DEU": ["XETRA"], "FRA": ["PA"], "GBR": ["LSE"],
@@ -255,16 +259,21 @@ def calc_ranks(group):
     rev_g_vals = [d['rev_growth']       for d in group if d['rev_growth']      is not None]
     mom6_adj_g = []; mom12_adj_g = []
     for d in group:
-        key = (d['ticker'], d['exchange'])  # CORRETTO: usa d['exchange']
-        m6  = d.get('mom6m'); m12 = d.get('mom12m')
-        m1w = mom1w_map.get(key); m1m = mom1m_map.get(key)
+        key = (d['ticker'], d['exchange'])
+        # Usa valori aggiornati da mom_updates, non quelli vecchi di fundamentals
+        m6  = mom6m_map.get(key,  d.get('mom6m'))
+        m12 = mom12m_map.get(key, d.get('mom12m'))
+        m1w = mom1w_map.get(key)
+        m1m = mom1m_map.get(key)
         if m6  is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
         if m12 is not None and m1m is not None: mom12_adj_g.append(m12 - m1m)
     pre = []
     for d in group:
         key  = (d['ticker'], d['exchange'])
-        m6   = d.get('mom6m'); m12 = d.get('mom12m')
-        m1w  = mom1w_map.get(key); m1m = mom1m_map.get(key)
+        m6   = mom6m_map.get(key,  d.get('mom6m'))
+        m12  = mom12m_map.get(key, d.get('mom12m'))
+        m1w  = mom1w_map.get(key)
+        m1m  = mom1m_map.get(key)
         ey_t = ey(d.get('pe_trailing')); r_eyt = pct_rank(ey_trail_g, ey_t) if ey_t is not None else None
         ey_f = ey(d.get('pe_forward'));  r_eyf = pct_rank(ey_fwd_g,   ey_f) if ey_f is not None else None
         by_v = book_yield(d.get('pb'));  r_pb  = pct_rank(by_g,       by_v) if by_v is not None else None
