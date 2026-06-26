@@ -359,16 +359,18 @@ for db_ticker, exchange, lt, name in EU_INDICES:
         if not isinstance(data_raw, list) or not data_raw:
             print(f"  ERR {name}: no data"); continue
         # Ordina per data ASC
+        # Ordina per data ASC — FONDAMENTALE per evitare inversione last/prev
         data_sorted = sorted(data_raw, key=lambda x: x["date"])
-        # Usa CLOSE non adjusted_close per gli indici
+        # Usa SOLO close per gli indici — adjusted_close non ha senso
+        valid = [d for d in data_sorted if d.get("close") is not None and float(d["close"]) > 0]
+        if not valid: print(f"  ERR {name}: nessun close valido"); continue
         rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"],
                  "close": float(d["close"])}
-                for d in data_sorted if d.get("close") is not None]
+                for d in valid]
         if rows:
             requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
-        # Ultimo prezzo e variazione giornaliera
-        last  = float(data_sorted[-1]["close"])
-        prev  = float(data_sorted[-2]["close"]) if len(data_sorted) >= 2 else None
+        last  = float(valid[-1]["close"])
+        prev  = float(valid[-2]["close"]) if len(valid) >= 2 else None
         change1d = round((last / prev - 1) * 100, 2) if prev and prev != 0 else None
         requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
             params={"ticker": f"eq.{db_ticker}"},
