@@ -25,6 +25,13 @@ YAHOO_SUFFIX = {
     'TSE':'.T','SEHK':'.HK','ASX':'.AX','TSX':'.TO','US':''
 }
 
+# Top ticker per regione — aggiornati ogni ora
+REGION_LIMITS = {
+    'americas': 200,
+    'europe':   50,
+    'asia':     50,
+}
+
 REGIONS = {
     'americas': ['US','TSX'],
     'europe':   ['PA','XETRA','MIL','MC','AS','BR','LSE','SWX','OM','OB','HE','IR','VI','CPSE'],
@@ -132,7 +139,7 @@ for region, exchanges in REGIONS.items():
         [(k, v) for k, v in funds_map.items()],
         key=lambda x: x[1].get('mkt_cap') or 0,
         reverse=True
-    )[:1500]
+    )[:REGION_LIMITS.get(region, 200)]
     print(f"  Top ticker: {len(sorted_tickers)}")
 
     ok = fail = news_count = 0
