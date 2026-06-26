@@ -308,7 +308,7 @@ NA_INDICES = [
     ("GSPC.INDX",   "US",  "GSPC",    "S&P 500"),
     ("IXIC.INDX",   "US",  "IXIC",    "Nasdaq"),
     ("DJI.INDX",    "US",  "DJI",     "Dow Jones"),
-    ("OSPTSX.INDX", "TSX", "GSPTSE",  "TSX"),
+    ("GSPTSE.INDX", "TSX", "GSPTSE",  "TSX"),
 ]
 ok_idx = 0
 FROM_12M = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
