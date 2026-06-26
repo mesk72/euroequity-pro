@@ -1,5 +1,6 @@
 import os, requests, time
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -30,15 +31,10 @@ def leeway_ticker(ticker, exchange):
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
 print("TODAY:", TODAY)
-print("Carico universo dal DB...")
+print("Carico universo...")
 
-# Leggi tutti i ticker in_universe
 all_stocks = []
-for exchange_filter, label in [
-    ("not.in.(US,TSX,TSE,SEHK,ASX)", "EU"),
-    ("in.(US,TSX)", "US+CA"),
-    ("in.(TSE,SEHK,ASX)", "APAC"),
-]:
+for exchange_filter in ["not.in.(US,TSX,TSE,SEHK,ASX)", "in.(US,TSX)", "in.(TSE,SEHK,ASX)"]:
     offset = 0
     while True:
         r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
@@ -46,44 +42,39 @@ for exchange_filter, label in [
                     "exchange": exchange_filter, "limit": "1000", "offset": str(offset)})
         batch = r.json()
         if not isinstance(batch, list) or not batch: break
-        for s in batch: s["region"] = label
         all_stocks.extend(batch)
         offset += 1000
         if len(batch) < 1000: break
 
-print(f"Totale titoli: {len(all_stocks)}")
-print("Test Leeway in corso (campione 5 per exchange)...\n")
-
-# Testa 5 titoli per exchange per velocità
-from collections import defaultdict
-by_exchange = defaultdict(list)
-for s in all_stocks:
-    by_exchange[s["exchange"]].append(s)
+print(f"Totale: {len(all_stocks)} titoli")
+print("Test in corso...\n")
 
 empty = []
-ok_count = 0
-
-for exchange, stocks in sorted(by_exchange.items()):
-    sample = stocks[:10]  # testa primi 10 per exchange
-    empty_ex = []
-    for s in sample:
-        ticker = s["ticker"]
-        lt = leeway_ticker(ticker, exchange)
-        url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
+ok = 0
+for i, s in enumerate(all_stocks):
+    ticker   = s["ticker"]
+    exchange = s["exchange"]
+    lt = leeway_ticker(ticker, exchange)
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
+    try:
         r = requests.get(url, timeout=8)
         data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
         if data:
-            ok_count += 1
+            ok += 1
         else:
-            empty_ex.append((ticker, lt))
-        time.sleep(0.05)
-    
-    if empty_ex:
-        print(f"!! {exchange}: {len(empty_ex)}/{len(sample)} vuoti")
-        for t, lt in empty_ex:
-            print(f"   {t} → {lt}")
-    else:
-        last_date = sorted(data, key=lambda x: x["date"])[-1]["date"] if data else "?"
-        print(f"OK {exchange}: tutti ok (ultimo: {last_date})")
+            empty.append((exchange, ticker, lt))
+    except:
+        empty.append((exchange, ticker, lt + " [timeout]"))
+    if i % 500 == 0: print(f"  {i}/{len(all_stocks)} ok={ok} empty={len(empty)}")
+    time.sleep(0.05)
 
-print(f"\nOK: {ok_count} vuoti: {len(empty)}")
+print(f"\n=== RISULTATO ===")
+print(f"OK: {ok}  VUOTI: {len(empty)}")
+print()
+by_ex = defaultdict(list)
+for ex, tk, lt in empty:
+    by_ex[ex].append((tk, lt))
+for ex, items in sorted(by_ex.items()):
+    print(f"\n{ex} ({len(items)} vuoti):")
+    for tk, lt in items:
+        print(f"  {tk} → {lt}")
