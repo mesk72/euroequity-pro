@@ -12,7 +12,7 @@ print()
 
 # Test Australia — BHP, CBA, CSL
 print("=== AUSTRALIA (ASX) ===")
-for ticker, lt in [("BHP", "BHP.AX"), ("CBA", "CBA.AX"), ("CSL", "CSL.AX")]:
+for ticker, lt in [("BHP", "BHP.AU"), ("CBA", "CBA.AU"), ("CSL", "CSL.AU")]:
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
     r = requests.get(url, timeout=10)
     data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
