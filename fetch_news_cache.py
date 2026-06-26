@@ -149,7 +149,7 @@ for region, exchanges in REGIONS.items():
         [(k, v) for k, v in funds_map.items()],
         key=lambda x: x[1].get('mkt_cap') or 0,
         reverse=True
-    )[:len(sorted_tickers)]  # prende tutti, poi filtra sotto
+    )  # tutti i ticker, filtro sotto
 
     # TOP: primi N per mktcap (ogni ora)
     # REST: dal N+1 in poi (ogni 3 ore) — no duplicati
