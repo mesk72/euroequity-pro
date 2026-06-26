@@ -142,48 +142,49 @@ for region, exchanges in REGIONS.items():
     )[:REGION_LIMITS.get(region, 200)]
     print(f"  Top ticker: {len(sorted_tickers)}")
 
-    ok = fail = news_count = 0
-    news_buf = []
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    for (ticker, exchange), fund in sorted_tickers:
+    def process_ticker(args):
+        (ticker, exchange), fund = args
         stock = in_universe.get((ticker, exchange), {})
-        company     = stock.get('company', '') or ''
+        company      = stock.get('company', '') or ''
         yahoo_ticker = stock.get('yahoo_ticker') or (ticker + YAHOO_SUFFIX.get(exchange, ''))
-
         news = fetch_ticker_news(ticker, exchange, company, yahoo_ticker)
-        for n in news:
-            news_buf.append({
-                "ticker":      ticker,
-                "exchange":    exchange,
-                "region":      region,
-                "company":     company,
-                "yahoo_ticker": yahoo_ticker,
-                "title":       n['title'],
-                "link":        n['link'],
-                "pub_date":    n['pubDate'],
-                "source":      n['source'],
-                "value_score": fund.get('value_score'),
-                "growth_score":fund.get('growth_score'),
-                "best_score":  fund.get('combined_rank'),
-                "mkt_cap":     fund.get('mkt_cap'),
-                "fetched_at":  NOW,
-            })
-            news_count += 1
+        rows = [{
+            "ticker": ticker, "exchange": exchange, "region": region,
+            "company": company, "yahoo_ticker": yahoo_ticker,
+            "title": n['title'], "link": n['link'],
+            "pub_date": n['pubDate'], "source": n['source'],
+            "value_score": fund.get('value_score'),
+            "growth_score": fund.get('growth_score'),
+            "best_score": fund.get('combined_rank'),
+            "mkt_cap": fund.get('mkt_cap'),
+            "fetched_at": NOW,
+        } for n in news]
+        return rows
 
-        if len(news) > 0: ok += 1
-        else: fail += 1
+    ok = fail = news_count = 0
+    all_rows = []
 
-        if len(news_buf) >= 200:
-            res = requests.post(SUPABASE_URL + "/rest/v1/news_cache",
-                headers=headers_up, json=news_buf)
-            print(f"    salvate {news_count} notizie... ({res.status_code})")
-            news_buf = []
+    # 20 thread paralleli — riduce tempo da 45min a ~5min
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        futures = {executor.submit(process_ticker, item): item for item in sorted_tickers}
+        for future in as_completed(futures):
+            try:
+                rows = future.result()
+                if rows:
+                    all_rows.extend(rows)
+                    ok += 1
+                else:
+                    fail += 1
+            except:
+                fail += 1
 
-        time.sleep(0.1)
-
-    if news_buf:
-        requests.post(SUPABASE_URL + "/rest/v1/news_cache",
-            headers=headers_up, json=news_buf)
+    # Salva in batch
+    for i in range(0, len(all_rows), 200):
+        batch = all_rows[i:i+200]
+        requests.post(SUPABASE_URL + "/rest/v1/news_cache", headers=headers_up, json=batch)
+        news_count += len(batch)
 
     print(f"  ok={ok} fail={fail} notizie={news_count}")
 
