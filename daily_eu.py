@@ -125,7 +125,7 @@ for exchange, tickers in by_exchange.items():
         if isinstance(batch, list):
             seen = set()
             for d in batch:
-                key = (d['ticker'], d['exchange'])
+                key = (d['ticker'], exchange)
                 if key not in seen:
                     last_date_map[key] = d['date']
                     seen.add(key)
@@ -271,7 +271,7 @@ def calc_ranks(group):
     rev_g_vals = [d['rev_growth']       for d in group if d['rev_growth']      is not None]
     mom6_adj_g = []; mom12_adj_g = []
     for d in group:
-        key = (d['ticker'], d['exchange'])
+        key = (d['ticker'], exchange)
         m6  = d.get('mom6m'); m12 = d.get('mom12m')
         m1w = mom1w_map.get(key); m1m = mom1m_map.get(key)
         if m6  is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
