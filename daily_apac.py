@@ -329,11 +329,7 @@ for i in range(0, len(rank_updates), 100):
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print(f"  Rank paese: {ok}/{len(rank_updates)}")
 
-# Combined APAC = TSE+SEHK+ASX insieme
-requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-    headers={**headers_up, "Prefer": "return=minimal"},
-    params={"exchange": "in.(TSE,SEHK,ASX)"},
-    json={"combined_rank": None})
+# Combined rank — aggiorna direttamente senza azzerare prima
 
 all_scores = [d for d in rank_updates
               if d.get('value_score') is not None and d.get('growth_score') is not None]
