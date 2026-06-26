@@ -124,14 +124,9 @@ for exchange, tickers in by_exchange.items():
     print(f"  {exchange}: {len(tickers)} ticker...")
     for ticker in tickers:
         key  = (ticker, exchange)
-        last = last_date_map.get(key, "2020-01-01")
+        last = last_date_map.get(key, "2024-01-01")
         if last >= TODAY: ok_leeway += 1; continue
-        # Scarica massimo ultimi 30 giorni per evitare timeout Leeway
-        thirty_ago = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-        start_dt = max(
-            (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d"),
-            thirty_ago
-        )
+        start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
         lt  = ticker + suffix
         url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
         try:
