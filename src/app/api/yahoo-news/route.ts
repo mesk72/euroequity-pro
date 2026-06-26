@@ -41,7 +41,9 @@ export async function GET(req: Request) {
       if (!r.ok) return NextResponse.json({ items: [] })
       const xml = await r.text()
       const items = parseXML(xml).map(i => ({ ...i, source: i.source || 'Google News' }))
-      return NextResponse.json({ items: items.slice(0, 20) })
+      const gr = NextResponse.json({ items: items.slice(0, 20) })
+      gr.headers.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200')
+      return gr
     } catch {
       return NextResponse.json({ items: [] })
     }
@@ -151,5 +153,8 @@ export async function GET(req: Request) {
     if (!(hasWord1 && hasWord2) && !hasTicker) return false
     return true
   })
-  return NextResponse.json({ items: filtered.slice(0, 15) })
+  const response = NextResponse.json({ items: filtered.slice(0, 15) })
+  // Cache 10 minuti su Vercel Edge — riduce chiamate a Yahoo e protegge da scraping
+  response.headers.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200')
+  return response
 }
