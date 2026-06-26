@@ -53,6 +53,8 @@ async function fetchYahooQuotes(symbols: string[]): Promise<Record<string, any>>
   } catch { return {} }
 }
 
+export const revalidate = 60
+
 export async function GET() {
   const allSymbols = [
     ...SYMBOLS.indices.map(s => s.symbol),
