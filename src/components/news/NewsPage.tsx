@@ -173,7 +173,7 @@ async function fetchRSS(name: string, url: string): Promise<NewsItem[]> {
 
 async function fetchTickerNews(
   region: string,
-  tickers: { ticker: string; exchange: string; company: string; yahooTicker: string; valueScore?: number; growthScore?: number; bestScore?: number }[],
+  tickers: { ticker: string; exchange: string; company: string; yahooTicker: string; valueScore?: number; growthScore?: number; bestScore?: number; mktCap?: number | null }[],
   onBatch: (news: NewsItem[]) => void
 ): Promise<void> {
   const seen: Record<string, boolean> = {}
