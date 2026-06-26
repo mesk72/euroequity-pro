@@ -63,6 +63,8 @@ async function fetchYahoo(query: string): Promise<any[]> {
   } catch { return [] }
 }
 
+export const revalidate = 1800
+
 export async function GET() {
   const results: Record<string, any[]> = { world: [], americas: [], europe: [], asia: [] }
 
