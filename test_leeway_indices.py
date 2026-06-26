@@ -9,7 +9,6 @@ FROM_3D     = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
 print("TODAY:", TODAY)
 print()
 
-# Tutti gli indici EU + NA + APAC con formati alternativi
 ALL_INDICES = [
     # EU
     ("GDAXI.INDX",    "DAX"),
@@ -37,10 +36,6 @@ ALL_INDICES = [
     ("IXIC.INDX",     "Nasdaq"),
     ("DJI.INDX",      "Dow Jones"),
     ("OSPTSX.INDX",   "TSX"),
-    # APAC
-    ("N225.INDX",     "Nikkei 225"),
-    ("HSI.INDX",      "Hang Seng"),
-    ("AXJO.INDX",     "ASX 200"),
 ]
 
 for lt, name in ALL_INDICES:
@@ -49,6 +44,6 @@ for lt, name in ALL_INDICES:
     data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
     if data:
         last = sorted(data, key=lambda x: x["date"])[-1]
-        print(f"  ✅ {name} ({lt}): date={last.get('date')} close={last.get('close')}")
+        print(f"  OK {name} ({lt}): date={last.get('date')} close={last.get('close')}")
     else:
-        print(f"  ❌ {name} ({lt}): vuoto o errore HTTP {r.status_code}")
+        print(f"  !! {name} ({lt}): vuoto")
