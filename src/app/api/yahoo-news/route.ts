@@ -1,3 +1,5 @@
+export const revalidate = 1800
+
 import { NextResponse } from 'next/server'
 
 const STOP = new Set(['Inc','Ltd','Corp','Group','SA','AG','NV','PLC','SE','Co',
