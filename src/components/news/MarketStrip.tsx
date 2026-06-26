@@ -1,45 +1,55 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-const AMERICAS = [
-  { name: 'S&P 500',    url: 'https://finance.yahoo.com/quote/%5EGSPC/' },
-  { name: 'Nasdaq 100', url: 'https://finance.yahoo.com/quote/%5EIXIC/' },
-  { name: 'Dow Jones',  url: 'https://finance.yahoo.com/quote/%5EDJI/'  },
-  { name: 'TSX',        url: 'https://finance.yahoo.com/quote/%5EGSPTSE/'},
-]
+interface Quote {
+  name: string
+  price: string
+  changePct: string | null
+  up: boolean | null
+  region: string
+}
 
-const EUROPE = [
-  { name: 'DAX',           url: 'https://finance.yahoo.com/quote/%5EGDAXI/'    },
-  { name: 'CAC 40',        url: 'https://finance.yahoo.com/quote/%5EFCHI/'     },
-  { name: 'FTSE MIB',      url: 'https://finance.yahoo.com/quote/FTSEMIB.MI/'  },
-  { name: 'FTSE 100',      url: 'https://finance.yahoo.com/quote/%5EFTSE/'     },
-  { name: 'Euro Stoxx 50', url: 'https://finance.yahoo.com/quote/%5ESTOXX50E/' },
-]
+function IndexBar({ label, quotes, loading }: {
+  label: string
+  quotes: Quote[]
+  loading: boolean
+}) {
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', padding: '3px 8px',
+      borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <span style={{ fontSize: 9, color: 'var(--text4)', minWidth: 64 }}>{label}</span>
+      <span style={{ fontSize: 9, color: 'var(--text4)' }}>Loading...</span>
+    </div>
+  )
 
-const ASIA = [
-  { name: 'Nikkei 225', url: 'https://finance.yahoo.com/quote/%5EN225/' },
-  { name: 'Hang Seng',  url: 'https://finance.yahoo.com/quote/%5EHSI/'  },
-  { name: 'ASX 200',    url: 'https://finance.yahoo.com/quote/%5EAXJO/' },
-]
-
-function IndexBar({ label, indices }: { label: string; indices: { name: string; url: string }[] }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', padding: '3px 8px',
-      borderBottom: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto', flexWrap: 'nowrap', gap: 0 }}>
-      <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text4)', letterSpacing: '0.08em',
-        textTransform: 'uppercase', minWidth: 64, flexShrink: 0 }}>
+      borderBottom: '1px solid rgba(255,255,255,0.06)',
+      overflowX: 'auto', flexWrap: 'nowrap', gap: 0 }}>
+      <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text4)',
+        letterSpacing: '0.08em', textTransform: 'uppercase',
+        minWidth: 64, flexShrink: 0 }}>
         {label}
       </span>
-      {indices.map(idx => (
-        <a key={idx.name} href={idx.url} target="_blank" rel="noopener noreferrer"
-          style={{ fontSize: 10, fontWeight: 700, color: 'var(--text3)', textDecoration: 'none',
-            marginRight: 10, flexShrink: 0, padding: '1px 7px',
-            border: '1px solid var(--border)', borderRadius: 3 }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>
-          {idx.name} ↗
-        </a>
+      {quotes.map((q, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center',
+          gap: 4, marginRight: 16, flexShrink: 0 }}>
+          <span style={{ fontSize: 9, color: 'var(--text4)', fontWeight: 600 }}>
+            {q.name}
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 700,
+            color: 'var(--text)', fontFamily: 'IBM Plex Mono' }}>
+            {q.price}
+          </span>
+          {q.changePct && (
+            <span style={{ fontSize: 10, fontWeight: 600,
+              fontFamily: 'IBM Plex Mono',
+              color: q.up ? '#22c55e' : '#ef4444' }}>
+              {q.changePct}
+            </span>
+          )}
+        </div>
       ))}
     </div>
   )
@@ -47,7 +57,34 @@ function IndexBar({ label, indices }: { label: string; indices: { name: string; 
 
 export default function MarketStrip() {
   const tvRef = useRef<HTMLDivElement>(null)
+  const [quotes, setQuotes] = useState<{ americas: Quote[], europe: Quote[], asia: Quote[] }>({
+    americas: [], europe: [], asia: []
+  })
+  const [loading, setLoading] = useState(true)
 
+  // Carica indici da Leeway via /api/indices
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true)
+      try {
+        const r = await fetch('/api/indices', { cache: 'no-store' })
+        if (r.ok) {
+          const d = await r.json()
+          setQuotes({
+            americas: d.americas || [],
+            europe:   d.europe   || [],
+            asia:     d.asia     || [],
+          })
+        }
+      } catch {}
+      setLoading(false)
+    }
+    load()
+    const t = setInterval(load, 900000) // refresh ogni 15 min
+    return () => clearInterval(t)
+  }, [])
+
+  // TradingView — solo Commodities e FX
   useEffect(() => {
     if (!tvRef.current) return
     tvRef.current.innerHTML = ''
@@ -77,14 +114,14 @@ export default function MarketStrip() {
 
   return (
     <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 4 }}>
-      <IndexBar label="Americas" indices={AMERICAS} />
-      <IndexBar label="Europe"   indices={EUROPE}   />
-      <IndexBar label="Asia Pac" indices={ASIA}     />
+      <IndexBar label="Americas" quotes={quotes.americas} loading={loading} />
+      <IndexBar label="Europe"   quotes={quotes.europe}   loading={loading} />
+      <IndexBar label="Asia Pac" quotes={quotes.asia}     loading={loading} />
       <div className="tradingview-widget-container" ref={tvRef}>
         <div className="tradingview-widget-container__widget" />
       </div>
       <div style={{ fontSize: 8, color: 'var(--text4)', padding: '1px 8px 3px', textAlign: 'right' }}>
-        Indices via Yahoo Finance · Commodities &amp; FX via TradingView
+        Indices via Leeway · Commodities &amp; FX via TradingView
       </div>
     </div>
   )
