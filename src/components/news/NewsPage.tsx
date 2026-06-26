@@ -540,134 +540,62 @@ ${body}
     URL.revokeObjectURL(url)
   }
 
-  // Report Best Score
+  // Report Best Score — top titoli per bestScore con notizie ultime 24h
   const generateReportBest = async () => {
     setReportBestLoading(true)
-
-    // Carica indici freschi
-    let idxData: IndexData[] = indices
-    try {
-      idxData = await fetchIndices()
-      setIndices(idxData)
-    } catch {}
-
-    const allNews = [
-      ...data.world, ...data.americas, ...data.europe, ...data.asia,
-    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-
-    const today = new Date().toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    })
-    const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-
-    const fmtIdx = (idx: IndexData) => {
-      const p = idx.price != null ? idx.price.toLocaleString('en-US', { maximumFractionDigits: 2 }) : 'N/A'
-      const c = idx.changePct != null ? (idx.changePct >= 0 ? '+' : '') + idx.changePct.toFixed(2) + '%' : 'N/A'
-      return idx.name + ': ' + p + ' (' + c + ')'
-    }
-
-    const allTitles = allNews.map(n => n.title.toLowerCase())
-    const themes: string[] = []
-    if (allTitles.some(t => t.includes('fed') || t.includes('federal reserve') || t.includes('interest rate')))
-      themes.push('Central bank policy in focus')
-    if (allTitles.some(t => t.includes('inflation') || t.includes('cpi')))
-      themes.push('Inflation dynamics influencing rate expectations')
-    if (allTitles.some(t => t.includes('earning') || t.includes('profit') || t.includes('revenue')))
-      themes.push('Corporate earnings season moving individual stocks')
-    if (allTitles.some(t => t.includes('oil') || t.includes('gold') || t.includes('commodit')))
-      themes.push('Commodity markets volatile')
-    if (allTitles.some(t => t.includes('china') || t.includes('trade') || t.includes('tariff')))
-      themes.push('Trade tensions weighing on global risk sentiment')
-    if (allTitles.some(t => t.includes('tech') || t.includes('ai') || t.includes('nvidia')))
-      themes.push('Technology and AI sector driving market leadership')
-    if (themes.length === 0)
-      themes.push('Markets digesting mixed macro signals')
-
-    let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
-    txt += today + ' · ' + time + '\n\n'
-
-    txt += '**LIVE MARKET DATA**\n'
-    txt += 'For real-time indices, commodities and FX see the ticker bar at the top of this page (S&P 500, Nasdaq, DAX, FTSE 100, Nikkei, Hang Seng, Gold, Oil, EUR/USD).\n\n'
-
-    txt += '**KEY THEMES**\n'
-    themes.forEach(t => { txt += '• ' + t + '\n' })
-    txt += '\n'
-
     const now24h = Date.now() - 24 * 60 * 60 * 1000
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    const time  = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+
     const fmtNewsItem = (n: NewsItem) => {
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
-      if (n.valueScore != null) {
-        line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
-      }
+      if (n.valueScore != null) line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       if (n.link) line += '\n  📰 ' + n.link
-      if (n.ticker && n.exchange) {
-        line += '\n  📊 ' + n.ticker + ' → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
-      }
+      if (n.ticker && n.exchange) line += '\n  📊 https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
       return line
     }
 
-    // Filtra 24h, ordina per mktcap (bestScore DESC = proxy mktcap), max 1 per ticker
-    // Americas: top 100 mktcap, Europe: top 50, Asia: top 50
-    // Market Cap Report: ordina per mktCap reale, non per score
-    const filterMktCap = (items: NewsItem[], topN: number) => {
-      // Prima raggruppa per ticker e prendi la notizia più recente per ciascuno
-      const byTicker = new Map<string, NewsItem>()
-      for (const n of items) {
-        if (!n.ticker) continue
-        if (new Date(n.pubDate).getTime() <= now24h) continue
-        const key = n.ticker + '.' + n.exchange
-        const existing = byTicker.get(key)
-        if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
-          byTicker.set(key, n)
-        }
-      }
-      // Ordina per mktCap DESC (i ticker arrivano già in ordine mktCap dall'API)
-      return Array.from(byTicker.values())
+    // Filtra 24h, ordina per bestScore DESC, max 1 per ticker
+    const filterBest = (items: NewsItem[], topN: number) => {
+      const seen = new Set<string>()
+      return items
+        .filter(n => n.ticker && new Date(n.pubDate).getTime() > now24h)
         .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+        .filter(n => { if (seen.has(n.ticker!)) return false; seen.add(n.ticker!); return true })
         .slice(0, topN)
     }
 
-    const amNews = filterMktCap(data.americas, 10)
-    const euNews = filterMktCap(data.europe,   10)
-    const apNews = filterMktCap(data.asia,     10)
+    const amBest = filterBest(data.americas, 10)
+    const euBest = filterBest(data.europe,   10)
+    const apBest = filterBest(data.asia,     10)
 
-    if (amNews.length > 0) {
+    let txt = `FORWARDALPHA — BEST SCORE REPORT\n${today} · ${time}\n\n`
+    txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+    txt += 'Top stories by Best Score — last 24h\n'
+    txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'
+
+    if (amBest.length > 0) {
       txt += '**NORTH AMERICA — Best Score Leaders**\n'
-      amNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      amBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
-    if (euNews.length > 0) {
+    if (euBest.length > 0) {
       txt += '**EUROPE — Best Score Leaders**\n'
-      euNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      euBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
-    if (apNews.length > 0) {
+    if (apBest.length > 0) {
       txt += '**ASIA PACIFIC — Best Score Leaders**\n'
-      apNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
+      apBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
     }
-
-    const sourcesSet: Record<string, boolean> = {}
-    allNews.forEach(n => { sourcesSet[n.source] = true })
-    txt += '_Sources: ' + Object.keys(sourcesSet).slice(0, 8).join(' · ') + '_'
 
     setReportBest(txt)
-    setReportBestDate(new Date().toLocaleString('en-US'))
+    setReportBestDate(today + ' · ' + time)
     setReportBestLoading(false)
   }
-
-  useEffect(() => {
-    load()
-    const t = setInterval(load, 900000)
-    return () => clearInterval(t)
-  }, [])
-
-  useEffect(() => {
-    const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1000)
-    return () => clearInterval(t)
-  }, [])
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
