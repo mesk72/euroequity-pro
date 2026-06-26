@@ -1,0 +1,41 @@
+# ============================================================
+# FORWARDALPHA — Cloud Build config
+# Deploya automaticamente su Cloud Run
+# Comando: gcloud builds submit --config cloudbuild.yaml
+# ============================================================
+steps:
+  # Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/forwardalpha/runner:$BUILD_ID'
+      - '-f'
+      - 'Dockerfile.gcp'
+      - '.'
+
+  # Push su Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/forwardalpha/runner:$BUILD_ID'
+
+  # Deploy su Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'forwardalpha-runner'
+      - '--image=europe-west1-docker.pkg.dev/$PROJECT_ID/forwardalpha/runner:$BUILD_ID'
+      - '--region=europe-west1'
+      - '--platform=managed'
+      - '--no-allow-unauthenticated'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--timeout=3600'
+      - '--max-instances=3'
+      - '--set-secrets=SUPABASE_SERVICE_KEY=SUPABASE_SERVICE_KEY:latest,LEEWAY_KEY=LEEWAY_KEY:latest,CLOUD_SCHEDULER_SECRET=CLOUD_SCHEDULER_SECRET:latest'
+
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/forwardalpha/runner:$BUILD_ID'
