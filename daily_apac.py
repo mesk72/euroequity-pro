@@ -109,7 +109,7 @@ for exchange, tickers in by_exchange.items():
                     "exchange": f"eq.{exchange}",
                     "ticker": f"in.({ticker_filter})",
                     "order": "ticker,date.desc",
-                    "limit": str(len(chunk) * 3)})
+                    "limit": str(len(chunk) * 5)})
         batch = r.json()
         if isinstance(batch, list):
             seen = set()
