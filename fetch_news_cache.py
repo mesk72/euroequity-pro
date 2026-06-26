@@ -25,8 +25,8 @@ YAHOO_SUFFIX = {
     'TSE':'.T','SEHK':'.HK','ASX':'.AX','TSX':'.TO','US':''
 }
 
-# Top ticker per regione — aggiornati ogni ora
-REGION_LIMITS = {
+# Limiti ticker: TOP aggiornati ogni ora, REST ogni 3 ore
+TOP_LIMITS = {
     'americas': 200,
     'europe':   50,
     'asia':     50,
@@ -37,6 +37,10 @@ REGIONS = {
     'europe':   ['PA','XETRA','MIL','MC','AS','BR','LSE','SWX','OM','OB','HE','IR','VI','CPSE'],
     'asia':     ['TSE','SEHK','ASX'],
 }
+
+import sys
+# Se lanciato con argomento 'all' processa tutti i ticker, altrimenti solo top
+PROCESS_ALL = 'all' in sys.argv
 
 import xml.etree.ElementTree as ET
 
@@ -139,7 +143,17 @@ for region, exchanges in REGIONS.items():
         [(k, v) for k, v in funds_map.items()],
         key=lambda x: x[1].get('mkt_cap') or 0,
         reverse=True
-    )[:REGION_LIMITS.get(region, 200)]
+    )[:len(sorted_tickers)]  # prende tutti, poi filtra sotto
+
+    # Determina quanti processare: top sempre, rest solo se PROCESS_ALL
+    top_n = TOP_LIMITS.get(region, 200)
+    if PROCESS_ALL:
+        to_process = sorted_tickers  # tutti 1500
+        print(f"  Modalità FULL: {len(to_process)} ticker")
+    else:
+        to_process = sorted_tickers[:top_n]  # solo top
+        print(f"  Modalità TOP: {len(to_process)} ticker")
+    sorted_tickers = to_process
     print(f"  Top ticker: {len(sorted_tickers)}")
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
