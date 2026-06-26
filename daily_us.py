@@ -97,18 +97,23 @@ CHUNK = 20
 
 # Leggi ultima data prezzi
 last_date_map = {}
-print("  Lettura ultima data prezzi per ticker...")
 for exchange, tickers in by_exchange.items():
-    for ticker in tickers:
+    for i in range(0, len(tickers), CHUNK):
+        chunk = tickers[i:i+CHUNK]
         r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "date",
+            params={"select": "ticker,exchange,date",
                     "exchange": f"eq.{exchange}",
-                    "ticker": f"eq.{ticker}",
-                    "order": "date.desc",
-                    "limit": "1"})
+                    "ticker": f"in.({','.join(chunk)})",
+                    "order": "ticker,date.desc",
+                    "limit": str(len(chunk) * 2)})
         batch = r.json()
-        if isinstance(batch, list) and batch:
-            last_date_map[(ticker, exchange)] = batch[0]['date']
+        if isinstance(batch, list):
+            seen = set()
+            for d in batch:
+                key = (d['ticker'], d['exchange'])
+                if key not in seen:
+                    last_date_map[key] = d['date']
+                    seen.add(key)
         time.sleep(0.01)
 
 ok_leeway = fail_leeway = 0
@@ -204,8 +209,7 @@ for stock in all_stocks:
     ok += 1
 
 for i in range(0, len(mom_updates), 100):
-    requests.post(SUPABASE_URL + "/rest/v1/fundamentals",
-                  headers=headers_up, json=mom_updates[i:i+100])
+    requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
 print(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
@@ -238,7 +242,7 @@ def calc_ranks(group):
     rev_g_vals = [d['rev_growth']       for d in group if d['rev_growth']      is not None]
     mom6_adj_g = []; mom12_adj_g = []
     for d in group:
-        key = (d['ticker'], exchange)  # exchange dal loop esterno
+        key = (d['ticker'], d['exchange'])
         m6  = d.get('mom6m'); m12 = d.get('mom12m')
         m1w = mom1w_map.get(key); m1m = mom1m_map.get(key)
         if m6  is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
@@ -287,13 +291,15 @@ for country, exchanges in RANK_GROUPS.items():
 
 ok = 0
 for i in range(0, len(rank_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals",
-                      headers=headers_up, json=rank_updates[i:i+100])
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print(f"  Rank US+CA: {ok}/{len(rank_updates)}")
 
 # Combined rank NA = US+TSX insieme
-# combined_rank NON azzerato — aggiorna direttamente con merge-duplicates
+requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
+    headers={**headers_up, "Prefer": "return=minimal"},
+    params={"exchange": "in.(US,TSX)"},
+    json={"combined_rank": None})
 all_scores = [d for d in rank_updates if d.get('value_score') is not None and d.get('growth_score') is not None]
 comb_arr   = [d['value_score'] + d['growth_score'] for d in all_scores]
 combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
@@ -301,8 +307,7 @@ combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
                     for d in all_scores]
 ok = 0
 for i in range(0, len(combined_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals",
-                      headers=headers_up, json=combined_updates[i:i+100])
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
 print(f"  Combined rank NA (US+TSX): {ok}/{len(combined_updates)}")
 ok_rank = ok
@@ -328,9 +333,8 @@ for db_ticker, exchange, lt, name in NA_INDICES:
                 for d in data if d.get("adjusted_close")]
         if rows:
             requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
-        data_sorted = sorted(data, key=lambda x: x["date"])
-        price = data_sorted[-1]["adjusted_close"]
-        change1d = round((data_sorted[-1]["adjusted_close"]/data_sorted[-2]["adjusted_close"]-1)*100, 2) if len(data_sorted)>=2 else None
+        price = data[-1]["adjusted_close"]
+        change1d = round((data[-1]["adjusted_close"]/data[-2]["adjusted_close"]-1)*100, 2) if len(data)>=2 else None
         requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
             params={"ticker": f"eq.{db_ticker}"},
             json={"price": price, "change1d": change1d, "date": data[-1]["date"]})
