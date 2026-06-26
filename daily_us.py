@@ -229,8 +229,8 @@ def calc_ranks(group):
     for d in group:
         key = (d['ticker'], d['exchange'])
         # Usa valori aggiornati da mom_updates, non quelli vecchi di fundamentals
-        m6  = mom6m_map.get(key,  d.get('mom6m'))
-        m12 = mom12m_map.get(key, d.get('mom12m'))
+        m6  = mom6m_map.get(key)
+        m12 = mom12m_map.get(key)
         m1w = mom1w_map.get(key)
         m1m = mom1m_map.get(key)
         if m6  is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
@@ -238,8 +238,8 @@ def calc_ranks(group):
     pre = []
     for d in group:
         key  = (d['ticker'], d['exchange'])
-        m6   = mom6m_map.get(key,  d.get('mom6m'))
-        m12  = mom12m_map.get(key, d.get('mom12m'))
+        m6   = mom6m_map.get(key)
+        m12  = mom12m_map.get(key)
         m1w  = mom1w_map.get(key)
         m1m  = mom1m_map.get(key)
         ey_t = ey(d.get('pe_trailing')); r_eyt = pct_rank(ey_trail_g, ey_t) if ey_t is not None else None
