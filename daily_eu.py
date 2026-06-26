@@ -113,49 +113,44 @@ print("\n[2/5] Download prezzi EOD da Leeway...")
 CHUNK = 20
 ok_leeway = fail_leeway = 0
 price_buf = []
+print(f"  Scarico prezzi da Leeway per {{len(all_stocks)}} titoli...")
 for stock in all_stocks:
     ticker   = stock['ticker']
     exchange = stock['exchange']
-    # Stessa logica Yahoo: 1 query per ticker per trovare ultima data
+    # Leggi ultima data disponibile nel DB
     r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-        params={"select": "date,adj_close", "ticker": f"eq.{ticker}",
-                "exchange": f"eq.{exchange}", "order": "date.desc", "limit": "1"})
+        params={{"select": "date", "ticker": f"eq.{{ticker}}",
+                "exchange": f"eq.{{exchange}}", "order": "date.desc", "limit": "1"}})
     row = r.json()
-    last          = row[0]["date"]      if isinstance(row, list) and row else "2021-01-01"
-    last_close_db = row[0]["adj_close"] if isinstance(row, list) and row else None
+    last = row[0]["date"] if isinstance(row, list) and row else "2021-01-01"
     if last >= TODAY:
         ok_leeway += 1
         continue
     start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
     lt = leeway_ticker(ticker, exchange)
-    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
+    url = f"{{LEEWAY_BASE}}/historicalquotes/{{lt}}?apitoken={{LEEWAY_KEY}}&from={{start_dt}}&to={{TODAY}}"
     try:
         resp = requests.get(url, timeout=15)
-        if resp.status_code != 200:
-            fail_leeway += 1
-            continue
+        if resp.status_code != 200: fail_leeway += 1; continue
         data_l = resp.json()
-        if not isinstance(data_l, list) or not data_l:
-            fail_leeway += 1
-            continue
+        if not isinstance(data_l, list) or not data_l: fail_leeway += 1; continue
         for row2 in data_l:
             adj = row2.get('adjusted_close') or row2.get('close')
             if adj is None: continue
-            price_buf.append({
+            price_buf.append({{
                 "ticker": ticker, "exchange": exchange,
                 "date": row2['date'], "adj_close": float(adj),
-            })
+            }})
         ok_leeway += 1
-    except:
-        fail_leeway += 1
-
+    except: fail_leeway += 1
     if len(price_buf) >= 500:
         requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
         price_buf = []
     time.sleep(0.05)
-print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
+if price_buf:
+    requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+print(f"  Prezzi Leeway: ok={{ok_leeway}} fail={{fail_leeway}}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
-
 # ── 3. LEGGI PREZZI DA prices_eod (chunk 20) ────────────────
 print("\n[3/5] Lettura prezzi da prices_eod...")
 all_ph = defaultdict(list)
