@@ -541,7 +541,7 @@ ${body}
   }
 
   // Report Best Score
-    const generateReportBest = async () => {
+  const generateReportBest = async () => {
     setReportBestLoading(true)
 
     // Carica indici freschi
@@ -611,7 +611,7 @@ ${body}
     // Filtra 24h, ordina per mktcap (bestScore DESC = proxy mktcap), max 1 per ticker
     // Americas: top 100 mktcap, Europe: top 50, Asia: top 50
     // Market Cap Report: ordina per mktCap reale, non per score
-    const filterBest = (items: NewsItem[], topN: number) => {
+    const filterMktCap = (items: NewsItem[], topN: number) => {
       // Prima raggruppa per ticker e prendi la notizia più recente per ciascuno
       const byTicker = new Map<string, NewsItem>()
       for (const n of items) {
@@ -629,9 +629,9 @@ ${body}
         .slice(0, topN)
     }
 
-    const amNews = filterBest(data.americas, 10)
-    const euNews = filterBest(data.europe,   10)
-    const apNews = filterBest(data.asia,     10)
+    const amNews = filterMktCap(data.americas, 10)
+    const euNews = filterMktCap(data.europe,   10)
+    const apNews = filterMktCap(data.asia,     10)
 
     if (amNews.length > 0) {
       txt += '**NORTH AMERICA — Best Score Leaders**\n'
@@ -668,8 +668,7 @@ ${body}
     const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1000)
     return () => clearInterval(t)
   }, [])
-
-
+  }
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
