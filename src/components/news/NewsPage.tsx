@@ -575,6 +575,13 @@ ${body}
     const euBest = filterBest(data.europe,   10)
     const apBest = filterBest(data.asia,     10)
 
+    // Debug: conta notizie con ticker nelle ultime 24h
+    const now24hCheck = Date.now() - 24 * 60 * 60 * 1000
+    const amWithTicker = data.americas.filter(n => n.ticker && new Date(n.pubDate).getTime() > now24hCheck).length
+    const euWithTicker = data.europe.filter(n => n.ticker && new Date(n.pubDate).getTime() > now24hCheck).length
+    const apWithTicker = data.asia.filter(n => n.ticker && new Date(n.pubDate).getTime() > now24hCheck).length
+    console.log('Best Score debug — notizie con ticker 24h:', {amWithTicker, euWithTicker, apWithTicker, amTotal: data.americas.length, euTotal: data.europe.length, apTotal: data.asia.length, amBest: amBest.length, euBest: euBest.length, apBest: apBest.length})
+
     let txt = `FORWARDALPHA — BEST SCORE REPORT\n${today} · ${time}\n\n`
     txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
     txt += 'Top stories by Best Score — last 24h\n'
