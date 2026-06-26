@@ -43,7 +43,7 @@ def leeway_ticker(ticker, exchange):
     elif exchange == "SEHK":
         return ticker.zfill(4) + ".HK" # es. 0700.HK
     elif exchange == "ASX":
-        return ticker + ".AX"          # es. BHP.AX
+        return ticker + ".AU"          # es. BHP.AU
     return ticker
 
 start_time = time_module.time()
