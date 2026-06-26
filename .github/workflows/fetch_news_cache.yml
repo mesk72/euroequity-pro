@@ -2,13 +2,13 @@ name: Fetch News Cache
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # ogni 3 ore = 8 volte al giorno
+    - cron: '0 * * * *'  # ogni ora
   workflow_dispatch:
 
 jobs:
   fetch-news:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
