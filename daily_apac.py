@@ -58,12 +58,15 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 
 # Suffissi Leeway per exchange EU
 LEEWAY_SUFFIX = {
-    "TSE":  ".T",
-    "SEHK": ".HK",
-    "ASX":  ".AX",
+    "TSE":  ".TSE",   # es. 7203.TSE
+    "SEHK": ".HK",    # es. 0700.HK (zero-padded a 4 cifre)
+    "ASX":  ".AX",    # es. BHP.AX
 }
 
 def leeway_ticker(ticker, exchange):
+    if exchange == "SEHK":
+        # HK: zero-pad a 4 cifre es. 700 → 0700
+        return ticker.zfill(4) + ".HK"
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
 start_time = time_module.time()
