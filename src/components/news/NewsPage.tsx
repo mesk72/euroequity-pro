@@ -540,7 +540,7 @@ ${body}
     URL.revokeObjectURL(url)
   }
 
-  // Report Best Score — top titoli per bestScore con notizie ultime 24h
+  // Report Best Score — stessa struttura di generateReport ma ordina per bestScore
   const generateReportBest = async () => {
     setReportBestLoading(true)
     const now24h = Date.now() - 24 * 60 * 60 * 1000
@@ -551,19 +551,18 @@ ${body}
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
-      if (n.valueScore != null) line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      if (n.bestScore != null) line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       if (n.link) line += '\n  📰 ' + n.link
       if (n.ticker && n.exchange) line += '\n  📊 https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
       return line
     }
 
-    // Per ogni regione: prendi la notizia più recente per ticker, ordina per bestScore DESC
-    // Identica a filterMktCap ma ordina per bestScore invece di mktCap
+    // IDENTICO a filterMktCap — solo ordina per bestScore invece di mktCap
     const filterBest = (items: NewsItem[], topN: number) => {
       const byTicker = new Map<string, NewsItem>()
       for (const n of items) {
         if (!n.ticker) continue
-        // Nessun filtro 24h — stessa logica di filterMktCap
+        if (new Date(n.pubDate).getTime() <= now24h) continue
         const key = n.ticker + '.' + n.exchange
         const existing = byTicker.get(key)
         if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
@@ -571,7 +570,7 @@ ${body}
         }
       }
       return Array.from(byTicker.values())
-        .sort((a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1))
+        .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
         .slice(0, topN)
     }
 
@@ -588,23 +587,28 @@ ${body}
       txt += '**NORTH AMERICA — Best Score Leaders**\n'
       amBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
+    } else {
+      txt += '**NORTH AMERICA** — no news in last 24h\n\n'
     }
     if (euBest.length > 0) {
       txt += '**EUROPE — Best Score Leaders**\n'
       euBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
+    } else {
+      txt += '**EUROPE** — no news in last 24h\n\n'
     }
     if (apBest.length > 0) {
       txt += '**ASIA PACIFIC — Best Score Leaders**\n'
       apBest.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
+    } else {
+      txt += '**ASIA PACIFIC** — no news in last 24h\n\n'
     }
 
     setReportBest(txt)
     setReportBestDate(today + ' · ' + time)
     setReportBestLoading(false)
   }
-
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
   const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
