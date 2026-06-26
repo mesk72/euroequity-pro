@@ -555,7 +555,7 @@ ${body}
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
       if (n.valueScore != null) {
-        line += ' | ForwardAlpha: Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+        line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
       }
       if (n.link) line += '\n  📰 ' + n.link
       if (n.ticker && n.exchange) {
@@ -564,43 +564,60 @@ ${body}
       return line
     }
 
-    // Carica ticker ordinati per bestScore da API
-    const loadBestTickers = async (region: string) => {
+    // Carica top ticker per bestScore poi scarica notizie per ciascuno
+    const fetchBestNews = async (region: string, topN: number): Promise<NewsItem[]> => {
       try {
+        // 1. Prendi top ticker per bestScore
         const tr = await fetch('/api/ticker-news?region=' + region + '&sort=best')
         if (!tr.ok) return []
         const td = await tr.json()
-        return (td.tickers || []).slice(0, 1500)
+        const tickers = (td.tickers || []).slice(0, 200) // top 200 per best score
+
+        // 2. Per ogni ticker cerca notizie nelle ultime 24h
+        const results: NewsItem[] = []
+        const seenTickers = new Set<string>()
+
+        for (const t of tickers) {
+          if (results.length >= topN) break
+          if (seenTickers.has(t.ticker + '.' + t.exchange)) continue
+
+          try {
+            const nr = await fetch('/api/yahoo-news?ticker=' + encodeURIComponent(t.yahooTicker || t.ticker) +
+              '&company=' + encodeURIComponent(t.company || '') +
+              '&exchange=' + encodeURIComponent(t.exchange || '') +
+              '&yahooTicker=' + encodeURIComponent(t.yahooTicker || ''))
+            if (!nr.ok) continue
+            const nd = await nr.json()
+            const items = (nd.items || []).filter((i: any) =>
+              new Date(i.pubDate).getTime() > now24h
+            )
+            if (items.length > 0) {
+              results.push({
+                title: items[0].title,
+                link: items[0].link,
+                pubDate: items[0].pubDate,
+                source: items[0].source || 'Yahoo Finance',
+                ticker: t.ticker,
+                exchange: t.exchange,
+                company: t.company,
+                valueScore: t.valueScore,
+                growthScore: t.growthScore,
+                bestScore: t.bestScore,
+                mktCap: t.mktCap,
+              })
+              seenTickers.add(t.ticker + '.' + t.exchange)
+            }
+          } catch { continue }
+        }
+        return results
       } catch { return [] }
     }
 
-    const [amTickers, euTickers, apTickers] = await Promise.all([
-      loadBestTickers('americas'),
-      loadBestTickers('europe'),
-      loadBestTickers('asia'),
+    const [amNews, euNews, apNews] = await Promise.all([
+      fetchBestNews('americas', 10),
+      fetchBestNews('europe',   10),
+      fetchBestNews('asia',     10),
     ])
-
-    // Per ogni ticker prendi le notizie dalle ultime 24h già caricate in data
-    const getNewsForTicker = (ticker: string, exchange: string, allItems: NewsItem[]) => {
-      return allItems.filter(n =>
-        n.ticker === ticker && n.exchange === exchange &&
-        new Date(n.pubDate).getTime() > now24h
-      ).sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0]
-    }
-
-    const buildSection = (tickers: any[], allItems: NewsItem[], topN: number) => {
-      const results: NewsItem[] = []
-      for (const t of tickers) {
-        if (results.length >= topN) break
-        const n = getNewsForTicker(t.ticker, t.exchange, allItems)
-        if (n) results.push(n)
-      }
-      return results
-    }
-
-    const amNews = buildSection(amTickers, data.americas, 10)
-    const euNews = buildSection(euTickers, data.europe,   10)
-    const apNews = buildSection(apTickers, data.asia,     10)
 
     let txt = '**FORWARDALPHA BEST SCORE REPORT**\n'
     txt += today + ' · ' + time + '\n\n'
@@ -609,21 +626,19 @@ ${body}
       txt += '**NORTH AMERICA — Best Score Leaders**\n'
       amNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    }
+    } else { txt += '**NORTH AMERICA** — no recent news\n\n' }
+
     if (euNews.length > 0) {
       txt += '**EUROPE — Best Score Leaders**\n'
       euNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    }
+    } else { txt += '**EUROPE** — no recent news\n\n' }
+
     if (apNews.length > 0) {
       txt += '**ASIA PACIFIC — Best Score Leaders**\n'
       apNews.forEach(n => { txt += fmtNewsItem(n) + '\n' })
       txt += '\n'
-    }
-
-    const sourcesSet: Record<string, boolean> = {}
-    ;[...data.americas, ...data.europe, ...data.asia].forEach(n => { sourcesSet[n.source] = true })
-    txt += '_Sources: ' + Object.keys(sourcesSet).slice(0, 8).join(' · ') + '_'
+    } else { txt += '**ASIA PACIFIC** — no recent news\n\n' }
 
     setReportBest(txt)
     setReportBestDate(new Date().toLocaleString('en-US'))
