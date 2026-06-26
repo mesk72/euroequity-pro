@@ -314,12 +314,15 @@ for db_ticker, exchange, lt, name in NA_INDICES:
             r2 = requests.get(f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={ieri}&to={TODAY}", timeout=10)
             data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
         if not data: continue
+        # Ordina per data ASC per avere last e prev corretti
+        data_sorted = sorted(data, key=lambda x: x["date"])
         rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"], "close": d["adjusted_close"]}
-                for d in data if d.get("adjusted_close")]
+                for d in data_sorted if d.get("adjusted_close")]
         if rows:
             requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
-        price = data[-1]["adjusted_close"]
-        change1d = round((data[-1]["adjusted_close"]/data[-2]["adjusted_close"]-1)*100, 2) if len(data)>=2 else None
+        price = float(data_sorted[-1]["adjusted_close"])
+        prev  = float(data_sorted[-2]["adjusted_close"]) if len(data_sorted) >= 2 else None
+        change1d = round((price / prev - 1) * 100, 2) if prev and prev != 0 else None
         requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
             params={"ticker": f"eq.{db_ticker}"},
             json={"price": price, "change1d": change1d, "date": data[-1]["date"]})
