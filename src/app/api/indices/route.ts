@@ -67,6 +67,8 @@ async function fetchIndexRSS(symbol: string, name: string): Promise<{ name: stri
   } catch { return null }
 }
 
+export const revalidate = 900
+
 export async function GET() {
   const asiaOpen = isAsiaOpen()
   const euOpen = isEUOpen()
