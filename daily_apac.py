@@ -111,7 +111,7 @@ for stock in all_stocks:
     row = r.json()
     last          = row[0]["date"]      if isinstance(row, list) and row else "2021-01-01"
     last_close_db = row[0]["adj_close"] if isinstance(row, list) and row else None
-    if last >= YESTERDAY:
+    if last >= TODAY:
         ok_leeway += 1
         continue
     start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
