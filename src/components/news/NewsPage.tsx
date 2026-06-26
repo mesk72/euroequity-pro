@@ -608,7 +608,7 @@ ${body}
 
 
   const fmt = (s: number) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
-  const allItems: NewsItem[] = tab !== 'report' ? (data[tab as Region] || []) : []
+  const allItems: NewsItem[] = (tab !== 'report' && tab !== 'reportbest') ? (data[tab as Region] || []) : []
   const items: NewsItem[] = searchQuery.trim()
     ? allItems.filter(n => {
         const q = searchQuery.toLowerCase()
