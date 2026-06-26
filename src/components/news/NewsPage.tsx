@@ -68,8 +68,7 @@ async function fetchIndices(): Promise<IndexData[]> {
 }
 
 type Region = 'world' | 'americas' | 'europe' | 'asia'
-type Tab = 'world' | 'americas' | 'europe' | 'asia' | 'report' | 'reportbest'
-type Tab = Region | 'report'
+type Tab = Region | 'report' | 'reportbest'
 
 const REGIONS: { key: Region; label: string; emoji: string }[] = [
   { key: 'world',    label: 'Global',        emoji: '🌐' },
