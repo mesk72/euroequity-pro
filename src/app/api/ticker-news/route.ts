@@ -40,6 +40,8 @@ async function fetchAll(exchanges: string[], limit: number, sortBy: 'mkt_cap' | 
   return all.slice(0, limit)
 }
 
+export const revalidate = 1800 // cache 30 minuti su Vercel Edge
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const region = searchParams.get('region') || 'americas'
@@ -98,5 +100,7 @@ export async function GET(req: Request) {
     })
     .filter(Boolean)
 
-  return NextResponse.json({ tickers: result })
+  const response = NextResponse.json({ tickers: result })
+  response.headers.set('Cache-Control', 'public, s-maxage=1800, stale-while-revalidate=3600')
+  return response
 }
