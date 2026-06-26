@@ -319,7 +319,7 @@ EU_INDICES = [
     ("ISEQ.INDX",  "IR",    "IEX",      "ISEQ"),
     ("STOXX50E.INDX","EZ",  "SX5E",     "Euro Stoxx 50"),
     ("SXXP.INDX",  "EZ",    "SXXP",     "STOXX 600"),
-    ("OMXHPI.INDX","HE",    "HEX",      "OMX Helsinki"),
+    ("OMXH25.INDX", "HE",   "HEX",      "OMX Helsinki"),
     ("FTSEMIB.MI", "MIL",   "MIB",      "FTSE MIB"),
     ("PSI20.INDX", "LS",    "PSI",      "PSI 20"),
 ]
