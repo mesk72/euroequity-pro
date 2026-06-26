@@ -27,9 +27,15 @@ YAHOO_SUFFIX = {
 
 # Limiti ticker: TOP aggiornati ogni ora, REST ogni 3 ore
 TOP_LIMITS = {
-    'americas': 200,
-    'europe':   50,
-    'asia':     50,
+    'americas': 200,  # top 200 ogni ora, restanti 1300 ogni 3 ore
+    'europe':   50,   # top 50 ogni ora, restanti 1450 ogni 3 ore
+    'asia':     50,   # top 50 ogni ora, restanti 1450 ogni 3 ore
+}
+
+FULL_LIMITS = {
+    'americas': 1500,
+    'europe':   1500,
+    'asia':     1500,
 }
 
 REGIONS = {
@@ -145,11 +151,13 @@ for region, exchanges in REGIONS.items():
         reverse=True
     )[:len(sorted_tickers)]  # prende tutti, poi filtra sotto
 
-    # Determina quanti processare: top sempre, rest solo se PROCESS_ALL
-    top_n = TOP_LIMITS.get(region, 200)
+    # TOP: primi N per mktcap (ogni ora)
+    # REST: dal N+1 in poi (ogni 3 ore) — no duplicati
+    top_n  = TOP_LIMITS.get(region, 200)
+    full_n = FULL_LIMITS.get(region, 1500)
     if PROCESS_ALL:
-        to_process = sorted_tickers  # tutti 1500
-        print(f"  Modalità FULL: {len(to_process)} ticker")
+        to_process = sorted_tickers[top_n:full_n]  # solo i restanti
+        print(f"  Modalità REST: {len(to_process)} ticker (dal {top_n+1} al {full_n})")
     else:
         to_process = sorted_tickers[:top_n]  # solo top
         print(f"  Modalità TOP: {len(to_process)} ticker")
