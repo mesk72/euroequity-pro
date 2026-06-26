@@ -558,19 +558,18 @@ ${body}
     }
 
     // Per ogni regione: prendi la notizia più recente per ticker, ordina per bestScore DESC
+    // Identica a filterMktCap ma ordina per bestScore invece di mktCap
     const filterBest = (items: NewsItem[], topN: number) => {
-      // Raggruppa per ticker, tieni la notizia più recente nelle 24h
       const byTicker = new Map<string, NewsItem>()
       for (const n of items) {
         if (!n.ticker) continue
-        if (new Date(n.pubDate).getTime() <= now24h) continue
+        // Nessun filtro 24h — stessa logica di filterMktCap
         const key = n.ticker + '.' + n.exchange
         const existing = byTicker.get(key)
         if (!existing || new Date(n.pubDate) > new Date(existing.pubDate)) {
           byTicker.set(key, n)
         }
       }
-      // Ordina per bestScore DESC — titoli senza score vanno in fondo
       return Array.from(byTicker.values())
         .sort((a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1))
         .slice(0, topN)
@@ -579,14 +578,6 @@ ${body}
     const amBest = filterBest(data.americas, 10)
     const euBest = filterBest(data.europe,   10)
     const apBest = filterBest(data.asia,     10)
-
-    // Se non ci sono dati mostra messaggio utile
-    if (amBest.length === 0 && euBest.length === 0 && apBest.length === 0) {
-      setReportBest('No news available yet — news are still loading. Please wait a moment and try again.')
-      setReportBestDate(today + ' · ' + time)
-      setReportBestLoading(false)
-      return
-    }
 
     let txt = `FORWARDALPHA — BEST SCORE REPORT\n${today} · ${time}\n\n`
     txt += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
