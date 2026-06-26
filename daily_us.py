@@ -54,6 +54,7 @@ SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 TODAY        = datetime.now().strftime("%Y-%m-%d")
+YESTERDAY    = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
@@ -108,7 +109,7 @@ for stock in all_stocks:
     row = r.json()
     last          = row[0]["date"]      if isinstance(row, list) and row else "2021-01-01"
     last_close_db = row[0]["adj_close"] if isinstance(row, list) and row else None
-    if last >= TODAY:
+    if last >= YESTERDAY:
         ok_leeway += 1
         continue
     start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
