@@ -15,49 +15,63 @@ def pct_rank(vals, v):
     return max(1, min(99, int(round(below / len(vals) * 100))))
 
 print("="*50)
+print("FIX COMBINED RANK — EU e APAC")
+print("="*50)
 
-for market, ex_filter in [
-    ("EU",   "not.in.(US,TSX,TSE,SEHK,ASX)"),
-    ("APAC", "in.(TSE,SEHK,ASX)"),
+for market, exchanges in [
+    ("EU",   ["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","LSE","AIM","SWX","OM","NGM","OB","CPSE"]),
+    ("APAC", ["TSE","SEHK","ASX"]),
 ]:
     print(f"\n{market}...")
-    
-    # Step 1: quanti titoli in universe
-    r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
-        params={"select": "ticker,exchange,value_score,growth_score,combined_rank",
-                "exchange": ex_filter, "in_universe": "eq.true",
-                "limit": "5", "order": "value_score.desc.nullslast"})
-    sample = r.json()
-    print(f"  Sample top 5 by value_score:")
-    if isinstance(sample, list):
-        for d in sample:
-            print(f"    {d['ticker']}/{d['exchange']}: val={d.get('value_score')} grw={d.get('growth_score')} best={d.get('combined_rank')}")
-    else:
-        print(f"  ERR: {sample}")
-        continue
 
-    # Step 2: carica tutti
+    # Leggo ticker in_universe=true da stocks per questo mercato
+    in_universe_set = set()
+    for exchange in exchanges:
+        offset = 0
+        while True:
+            r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+                params={"select": "ticker,exchange", "exchange": f"eq.{exchange}",
+                        "in_universe": "eq.true", "limit": "1000", "offset": str(offset)})
+            batch = r.json()
+            if not isinstance(batch, list) or not batch: break
+            for d in batch:
+                in_universe_set.add((d["ticker"], d["exchange"]))
+            offset += 1000
+            if len(batch) < 1000: break
+    print(f"  In universe da stocks: {len(in_universe_set)}")
+
+    # Leggo value_score e growth_score da fundamentals per questi exchange
     all_data = []
-    offset = 0
-    while True:
-        r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
-            params={"select": "ticker,exchange,value_score,growth_score",
-                    "exchange": ex_filter, "in_universe": "eq.true",
-                    "offset": str(offset), "limit": "1000"})
-        batch = r.json()
-        if not isinstance(batch, list) or not batch: break
-        all_data.extend(batch)
-        offset += 1000
-        if len(batch) < 1000: break
-    print(f"  Totale: {len(all_data)}")
+    for exchange in exchanges:
+        offset = 0
+        while True:
+            r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
+                params={"select": "ticker,exchange,value_score,growth_score",
+                        "exchange": f"eq.{exchange}",
+                        "offset": str(offset), "limit": "1000"})
+            batch = r.json()
+            if not isinstance(batch, list) or not batch: break
+            all_data.extend(batch)
+            offset += 1000
+            if len(batch) < 1000: break
+
+    print(f"  Fundamentals letti: {len(all_data)}")
+
+    # Filtra solo in_universe
+    all_data = [d for d in all_data if (d["ticker"], d["exchange"]) in in_universe_set]
+    print(f"  Filtrati in_universe: {len(all_data)}")
+
+    # Sample
+    sample = [d for d in all_data if d.get("value_score") is not None][:3]
+    for d in sample:
+        print(f"  SAMPLE {d['ticker']}/{d['exchange']}: val={d.get('value_score')} grw={d.get('growth_score')}")
 
     scored = [d for d in all_data
               if d.get("value_score") is not None and d.get("growth_score") is not None]
-    print(f"  Con entrambi gli score: {len(scored)}")
+    print(f"  Con value+growth: {len(scored)}")
 
     if not scored:
-        print(f"  PROBLEMA: value_score e growth_score sono NULL nel DB!")
-        print(f"  Serve rieseguire weekly_{'eu' if market=='EU' else 'apac'}.py")
+        print(f"  PROBLEMA: nessun titolo con value_score e growth_score — serve rieseguire weekly!")
         continue
 
     comb_arr = [d["value_score"] + d["growth_score"] for d in scored]
@@ -71,10 +85,11 @@ for market, ex_filter in [
         batch = updates[i:i+100]
         r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals",
                           headers=headers_up, json=batch)
-        if r.status_code in (200, 201, 204): ok += len(batch)
+        if r.status_code in (200, 201, 204):
+            ok += len(batch)
         else:
             fail += len(batch)
-            print(f"  ERR {r.status_code}: {r.text[:200]}")
+            print(f"  ERR {r.status_code}: {r.text[:300]}")
 
     print(f"  Scritti: ok={ok} fail={fail}")
 
