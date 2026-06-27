@@ -1,6 +1,5 @@
 import os, requests
 from datetime import datetime, timedelta
-from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
@@ -11,44 +10,18 @@ TODAY        = datetime.now().strftime("%Y-%m-%d")
 FROM_5D      = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
 headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-# Suffissi FISSI per exchange — confermati dai test
-LEEWAY_SUFFIX = {
-    "MIL":  ".MI",
-    "XETRA":".XETRA",
-    "PA":   ".PA",
-    "AS":   ".AS",
-    "MC":   ".MC",
-    "BR":   ".BR",
-    "LS":   ".LS",
-    "VI":   ".VI",
-    "HE":   ".HE",
-    "IR":   ".IR",
-    "AT":   ".VI",
-    "LSE":  ".LSE",
-    "AIM":  ".AIM",
-    "SWX":  ".SW",
-    "OM":   ".ST",
-    "NGM":  ".ST",
-    "OB":   ".OL",
-    "CPSE": ".CO",
-    "US":   ".US",
-    "TSX":  ".TO",
-    "TSE":  ".TSE",
-    "SEHK": ".HK",
-    "ASX":  ".AU",
-}
-
 SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
     "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
 }
 
+LEEWAY_SUFFIX = {
+    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA",
+    "LSE": ".LSE", "US": ".US",
+}
+
 def leeway_ticker(ticker, exchange):
     if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
-    if exchange == "SEHK": return ticker.zfill(4) + ".HK"
-    if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
-    if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
-    if exchange == "BR":  return ticker.replace(".", "") + ".BR"
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
 def test_ticker(args):
@@ -67,39 +40,32 @@ def test_ticker(args):
 
 print("TODAY:", TODAY)
 
-# Carica TUTTI i titoli in universe con paginazione
-all_stocks = []
-offset = 0
-while True:
-    r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange", "in_universe": "eq.true",
-                "limit": "1000", "offset": str(offset)})
-    batch = r.json()
-    if not isinstance(batch, list) or not batch: break
-    all_stocks.extend(batch)
-    offset += 1000
-    if len(batch) < 1000: break
+EXCHANGES = ["US", "MIL", "XETRA", "PA", "LSE"]
 
-print(f"Totale: {len(all_stocks)} titoli")
-print("Test con 100 thread paralleli...")
+for exchange in EXCHANGES:
+    # Carica tutti i titoli in universe per questo exchange
+    stocks = []
+    offset = 0
+    while True:
+        r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+            params={"select": "ticker,exchange", "in_universe": "eq.true",
+                    "exchange": f"eq.{exchange}",
+                    "limit": "1000", "offset": str(offset)})
+        batch = r.json()
+        if not isinstance(batch, list) or not batch: break
+        stocks.extend(batch)
+        offset += 1000
+        if len(batch) < 1000: break
 
-empty = []; ok = 0
-with ThreadPoolExecutor(max_workers=100) as executor:
-    futures = {executor.submit(test_ticker, (s["ticker"], s["exchange"])): s for s in all_stocks}
-    done = 0
-    for future in as_completed(futures):
-        ticker, exchange, lt, has_data, date = future.result()
-        done += 1
-        if has_data: ok += 1
-        else: empty.append((exchange, ticker, lt))
-        if done % 1000 == 0: print(f"  {done}/{len(all_stocks)} ok={ok} empty={len(empty)}")
+    # Test tutti in parallelo
+    ok = []; empty = []
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        futures = {executor.submit(test_ticker, (s["ticker"], s["exchange"])): s for s in stocks}
+        for future in as_completed(futures):
+            ticker, ex, lt, has_data, date = future.result()
+            if has_data: ok.append((ticker, lt, date))
+            else: empty.append((ticker, lt))
 
-print(f"\n=== RISULTATO FINALE ===")
-print(f"OK: {ok}  VUOTI: {len(empty)}")
-by_ex = defaultdict(list)
-for ex, tk, lt in empty: by_ex[ex].append((tk, lt))
-for ex in sorted(by_ex.keys()):
-    items = by_ex[ex]
-    print(f"\n{ex} ({len(items)} vuoti):")
-    for tk, lt in items:
+    print(f"\n{exchange}: {len(stocks)} titoli — OK={len(ok)} VUOTI={len(empty)}")
+    for tk, lt in empty:
         print(f"  {tk} -> {lt}")
