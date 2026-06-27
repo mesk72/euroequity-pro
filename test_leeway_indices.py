@@ -49,12 +49,12 @@ for exchange in EXCHANGES:
         r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
             params={"select": "ticker,exchange", "in_universe": "eq.true",
                     "exchange": f"eq.{exchange}",
-                    "limit": "1000", "offset": str(offset)})
+                    "limit": "100", "offset": str(offset)})
         batch = r.json()
         if not isinstance(batch, list) or not batch: break
         stocks.extend(batch)
         offset += 1000
-        if len(batch) < 1000: break
+        break  # solo prima pagina
 
     # Test sequenziale — affidabile, no rate limit
     import time
@@ -63,7 +63,7 @@ for exchange in EXCHANGES:
         ticker, ex, lt, has_data, date = test_ticker((s["ticker"], s["exchange"]))
         if has_data: ok.append((ticker, lt, date))
         else: empty.append((ticker, lt))
-        time.sleep(0.05)
+        time.sleep(2)
 
     print(f"\n{exchange}: {len(stocks)} titoli — OK={len(ok)} VUOTI={len(empty)}")
     for tk, lt in empty:
