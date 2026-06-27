@@ -52,7 +52,7 @@ def test_exchange(exchange):
                 empty.append((ticker, lt))
         except:
             empty.append((ticker, lt))
-        time.sleep(2)
+        time.sleep(0.15)
 
     return exchange, len(stocks), ok, empty
 
