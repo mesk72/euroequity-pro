@@ -11,11 +11,11 @@ const SLUGS: string[] = ['BNP-PA', 'SHEL-LSE', 'ENR-XETRA', 'ABBN-SWX', 'ASML-AS
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://forwardalpha.pro'
 
-  const staticPages = ['', '/research', '/about', '/legal'].map(path => ({
+  const staticPages = ['', '/news', '/screens', '/research', '/about', '/legal'].map(path => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
-    priority: path === '' ? 1.0 : path === '/research' ? 0.9 : 0.7,
+    priority: path === '' ? 1.0 : path === '/news' ? 0.9 : path === '/screens' ? 0.9 : path === '/research' ? 0.8 : 0.7,
   }))
 
   const researchPages = SLUGS.map(slug => ({
