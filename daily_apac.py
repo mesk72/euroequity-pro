@@ -314,4 +314,30 @@ requests.post(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_up, json=[log
 print(f"\nLog: leeway={ok_prices} fail={fail_prices} momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
 print("\n" + "=" * 60)
 print("DAILY APAC LOAD COMPLETATO")
-print("=" * 60)
+print("=" * 60)SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE",
+    "ROG": "RO.SW",
+}
+
+LEEWAY_SUFFIX = {
+    "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
+    "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
+    "LS":   ".LS",    "VI":    ".VI",     "HE":   ".HE",
+    "IR":   ".IR",    "AT":    ".VI",
+    "LSE":  ".LSE",   "AIM":   ".AIM",   "SWX":  ".SW",
+    "OM":   ".ST",    "NGM":   ".ST",    "OB":   ".OL",
+    "CPSE": ".CO",
+    "US":   ".US",    "TSX":   ".TO",
+    "TSE":  ".TSE",   "ASX":   ".AU",
+}
+
+def leeway_ticker(ticker, exchange):
+    if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
+    if exchange == "SEHK": return ticker.zfill(4) + ".HK"
+    if exchange == "CPSE": return ticker.replace(" ", "-") + ".CO"
+    if exchange == "TSX":  return ticker.replace(".", "-") + ".TO"
+    if exchange == "BR":   return ticker.replace(".", "") + ".BR"
+    return ticker + LEEWAY_SUFFIX.get(exchange, "")
+
+
