@@ -1,4 +1,4 @@
-import os, requests
+import os, requests, time
 from datetime import datetime, timedelta
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
@@ -23,8 +23,7 @@ def leeway_ticker(ticker, exchange):
     if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
-def test_ticker(args):
-    ticker, exchange = args
+def test_ticker(ticker, exchange):
     lt = leeway_ticker(ticker, exchange)
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
     try:
@@ -32,39 +31,39 @@ def test_ticker(args):
         data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
         if data:
             last = sorted(data, key=lambda x: x["date"])[-1]
-            return (ticker, exchange, lt, True, last.get("date"))
-        return (ticker, exchange, lt, False, None)
+            return lt, True, last.get("date")
+        return lt, False, None
     except:
-        return (ticker, exchange, lt, False, None)
+        return lt, False, None
 
 print("TODAY:", TODAY)
 
 EXCHANGES = ["US", "MIL", "XETRA", "PA", "LSE"]
 
 for exchange in EXCHANGES:
-    # Carica tutti i titoli in universe per questo exchange
     stocks = []
     offset = 0
     while True:
         r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker,exchange", "in_universe": "eq.true",
+            params={"select": "ticker", "in_universe": "eq.true",
                     "exchange": f"eq.{exchange}",
-                    "limit": "100", "offset": str(offset)})
+                    "limit": "1000", "offset": str(offset)})
         batch = r.json()
         if not isinstance(batch, list) or not batch: break
         stocks.extend(batch)
         offset += 1000
-        break  # solo prima pagina
+        if len(batch) < 1000: break
 
-    # Test sequenziale — affidabile, no rate limit
-    import time
     ok = []; empty = []
-    for s in stocks:
-        ticker, ex, lt, has_data, date = test_ticker((s["ticker"], s["exchange"]))
-        if has_data: ok.append((ticker, lt, date))
-        else: empty.append((ticker, lt))
-        time.sleep(2)
+    print(f"\n{exchange}: {len(stocks)} titoli in test...")
+    for i, s in enumerate(stocks):
+        lt, has_data, date = test_ticker(s["ticker"], exchange)
+        if has_data: ok.append((s["ticker"], lt, date))
+        else: empty.append((s["ticker"], lt))
+        time.sleep(0.5)
+        if (i+1) % 100 == 0:
+            print(f"  {i+1}/{len(stocks)} ok={len(ok)} vuoti={len(empty)}")
 
-    print(f"\n{exchange}: {len(stocks)} titoli — OK={len(ok)} VUOTI={len(empty)}")
+    print(f"{exchange} FINALE: OK={len(ok)} VUOTI={len(empty)}")
     for tk, lt in empty:
         print(f"  {tk} -> {lt}")
