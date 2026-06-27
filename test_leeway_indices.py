@@ -1,5 +1,6 @@
 import os, requests
 from datetime import datetime, timedelta
+from collections import Counter
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -16,46 +17,35 @@ def test(lt):
         data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
         if data:
             last = sorted(data, key=lambda x: x["date"])[-1]
-            return (lt, last.get("date"), last.get("close"))
+            return last.get("date"), last.get("close")
     except: pass
-    return (lt, None, None)
+    return None, None
 
 print("TODAY:", TODAY)
 
-# Leggi i ticker numerici BR con tutti i campi
-print("\n=== Ticker numerici BR dal DB ===")
+# Leggi tutti gli exchange distinti per titoli US in universe
+print("\n=== Exchange distinti nel DB per titoli in universe ===")
 r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-    params={"select": "ticker,exchange,company,yahoo_ticker,isin",
-            "exchange": "eq.BR", "in_universe": "eq.true",
-            "ticker": "like.0*", "limit": "20"})
+    params={"select": "exchange", "in_universe": "eq.true", "limit": "5000"})
 data = r.json()
 if isinstance(data, list):
-    for d in data:
-        print(f"  ticker={d.get('ticker')} yahoo={d.get('yahoo_ticker')} isin={d.get('isin')} company={d.get('company')}")
+    counts = Counter(d["exchange"] for d in data)
+    for ex, cnt in sorted(counts.items(), key=lambda x: -x[1]):
+        print(f"  {ex}: {cnt}")
 
-# Test US con .NASDAQ e .NYSE
-print("\n=== US vuoti — test suffissi ===")
-US_VUOTI = ["BW", "KRG", "POST", "FE", "KEY", "UAL", "DOW", "EQR"]
-for t in US_VUOTI:
-    found = False
-    for suffix in [".US", ".NASDAQ", ".NYSE", ".NSDQ"]:
-        lt = t + suffix
-        r2 = test(lt)
-        if r2[1]:
-            print(f"  OK {lt}: {r2[1]}")
-            found = True
-            break
-    if not found:
-        print(f"  !! {t}: vuoto con tutti i suffissi")
-
-# Test OM spazio vs trattino
-print("\n=== OM Stoccolma ===")
-for name, dash, space in [
-    ("SCA B", "SCA-B.ST", "SCA B.ST"),
-    ("VOLV B", "VOLV-B.ST", "VOLV B.ST"),
-    ("HEXA B", "HEXA-B.ST", "HEXA B.ST"),
-]:
-    r1 = test(dash); r2 = test(space)
-    if r1[1]: print(f"  OK trattino {dash}: {r1[1]}")
-    elif r2[1]: print(f"  OK spazio {space}: {r2[1]}")
-    else: print(f"  !! {name}: vuoto")
+# Test OM spazio nel loop — come viene costruito il ticker
+print("\n=== OM: verifica ticker nel DB con spazio ===")
+r2 = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+    params={"select": "ticker,exchange", "exchange": "eq.OM",
+            "in_universe": "eq.true", "ticker": "like.% %", "limit": "10"})
+data2 = r2.json()
+if isinstance(data2, list):
+    for d in data2:
+        ticker = d["ticker"]
+        lt_space = ticker + ".ST"
+        lt_dash  = ticker.replace(" ", "-") + ".ST"
+        d1, c1 = test(lt_space)
+        d2, c2 = test(lt_dash)
+        print(f"  DB ticker='{ticker}'")
+        print(f"    spazio  {lt_space}: {'OK '+str(d1) if d1 else 'vuoto'}")
+        print(f"    trattino {lt_dash}: {'OK '+str(d2) if d2 else 'vuoto'}")
