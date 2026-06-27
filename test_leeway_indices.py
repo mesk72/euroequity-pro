@@ -1,5 +1,6 @@
 import os, requests
 from datetime import datetime, timedelta
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
@@ -10,14 +11,31 @@ TODAY        = datetime.now().strftime("%Y-%m-%d")
 FROM_5D      = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
 headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
+# Suffissi FISSI per exchange — confermati dai test
 LEEWAY_SUFFIX = {
-    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA",
-    "AS": ".AS", "MC": ".MC", "BR": ".BR",
-    "LS": ".LS", "VI": ".VI", "HE": ".HE",
-    "IR": ".IR", "AT": ".VI", "LSE": ".LSE",
-    "AIM": ".AIM", "SWX": ".SW", "OM": ".ST",
-    "NGM": ".ST", "OB": ".OL", "CPSE": ".CO",
-    "TSE": ".TSE", "ASX": ".AU",
+    "MIL":  ".MI",
+    "XETRA":".XETRA",
+    "PA":   ".PA",
+    "AS":   ".AS",
+    "MC":   ".MC",
+    "BR":   ".BR",
+    "LS":   ".LS",
+    "VI":   ".VI",
+    "HE":   ".HE",
+    "IR":   ".IR",
+    "AT":   ".VI",
+    "LSE":  ".LSE",
+    "AIM":  ".AIM",
+    "SWX":  ".SW",
+    "OM":   ".ST",
+    "NGM":  ".ST",
+    "OB":   ".OL",
+    "CPSE": ".CO",
+    "US":   ".US",
+    "TSX":  ".TO",
+    "TSE":  ".TSE",
+    "SEHK": ".HK",
+    "ASX":  ".AU",
 }
 
 SPECIAL_TICKERS = {
@@ -25,29 +43,20 @@ SPECIAL_TICKERS = {
     "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
 }
 
-def leeway_ticker(ticker, exchange, listing_exchange=None):
+def leeway_ticker(ticker, exchange):
     if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
     if exchange == "SEHK": return ticker.zfill(4) + ".HK"
     if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
     if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
     if exchange == "BR":  return ticker.replace(".", "") + ".BR"
-    # US: usa listing_exchange se disponibile
-    if exchange == "US":
-        if listing_exchange:
-            le = listing_exchange.upper()
-            if "NASDAQ" in le: return ticker + ".NASDAQ"
-            if "NYSE" in le and "ARCA" in le: return ticker + ".AMEX"
-            if "NYSE" in le: return ticker + ".NYSE"
-            if "AMEX" in le or "AMERICAN" in le: return ticker + ".AMEX"
-        return ticker + ".US"
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
 def test_ticker(args):
-    ticker, exchange, listing_exchange = args
-    lt = leeway_ticker(ticker, exchange, listing_exchange)
+    ticker, exchange = args
+    lt = leeway_ticker(ticker, exchange)
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
     try:
-        r = requests.get(url, timeout=8)
+        r = requests.get(url, timeout=10)
         data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
         if data:
             last = sorted(data, key=lambda x: x["date"])[-1]
@@ -58,32 +67,39 @@ def test_ticker(args):
 
 print("TODAY:", TODAY)
 
-# Carica tutti i campi stocks per capire dove è la borsa di quotazione
-r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-    params={"select": "*", "exchange": "eq.US", "in_universe": "eq.true", "limit": "3"})
-sample = r.json()
-if isinstance(sample, list) and sample:
-    print("Campi tabella stocks:", list(sample[0].keys()))
-    print("Esempio:", sample[0])
+# Carica TUTTI i titoli in universe con paginazione
+all_stocks = []
+offset = 0
+while True:
+    r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+        params={"select": "ticker,exchange", "in_universe": "eq.true",
+                "limit": "1000", "offset": str(offset)})
+    batch = r.json()
+    if not isinstance(batch, list) or not batch: break
+    all_stocks.extend(batch)
+    offset += 1000
+    if len(batch) < 1000: break
 
-# Test prime 50 per US, MIL, PA, XETRA
-for exchange in ["US", "MIL", "PA", "XETRA"]:
-    r2 = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "*", "exchange": f"eq.{exchange}",
-                "in_universe": "eq.true", "limit": "50"})
-    stocks = r2.json()
-    if not isinstance(stocks, list): continue
+print(f"Totale: {len(all_stocks)} titoli")
+print("Test con 100 thread paralleli...")
 
-    args = [(s["ticker"], exchange, s.get("listing_exchange") or s.get("market") or s.get("exchange_sub") or "") for s in stocks]
-    
-    ok = []; empty = []
-    with ThreadPoolExecutor(max_workers=20) as executor:
-        futures = {executor.submit(test_ticker, a): a for a in args}
-        for future in as_completed(futures):
-            ticker, ex, lt, has_data, date = future.result()
-            if has_data: ok.append((ticker, lt, date))
-            else: empty.append((ticker, lt))
+empty = []; ok = 0
+with ThreadPoolExecutor(max_workers=100) as executor:
+    futures = {executor.submit(test_ticker, (s["ticker"], s["exchange"])): s for s in all_stocks}
+    done = 0
+    for future in as_completed(futures):
+        ticker, exchange, lt, has_data, date = future.result()
+        done += 1
+        if has_data: ok += 1
+        else: empty.append((exchange, ticker, lt))
+        if done % 1000 == 0: print(f"  {done}/{len(all_stocks)} ok={ok} empty={len(empty)}")
 
-    print(f"\n{exchange}: OK={len(ok)} VUOTI={len(empty)}")
-    for t, lt in empty:
-        print(f"  !! {t} -> {lt}")
+print(f"\n=== RISULTATO FINALE ===")
+print(f"OK: {ok}  VUOTI: {len(empty)}")
+by_ex = defaultdict(list)
+for ex, tk, lt in empty: by_ex[ex].append((tk, lt))
+for ex in sorted(by_ex.keys()):
+    items = by_ex[ex]
+    print(f"\n{ex} ({len(items)} vuoti):")
+    for tk, lt in items:
+        print(f"  {tk} -> {lt}")
