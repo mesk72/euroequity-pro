@@ -20,29 +20,27 @@ def test(lt):
 print("TODAY:", TODAY)
 
 TESTS = [
-    # OB — Oslo
-    ("OB Oslo", ["EQNR.OL", "DNB.OL", "TEL.OL", "MOWI.OL", "YAR.OL"]),
+    # Vienna — AT vs VI suffisso
+    ("AT/VI Vienna", [
+        "OMV.AT", "OMV.VI", "VIG.AT", "VIG.VI",
+        "EBS.AT", "EBS.VI", "ANDR.AT", "ANDR.VI",
+        "POST.AT", "POST.VI", "RBI.AT", "RBI.VI",
+    ]),
 
-    # SWX — Zurigo (Roche era vuoto)
-    ("SWX Zurigo", ["ROG.SW", "RO.SW", "NESN.SW", "ABBN.SW", "NOVN.SW", "ZURN.SW", "LONN.SW"]),
+    # Zurigo SWX — Roche e altri
+    ("SWX Zurigo", [
+        "ROG.SW", "RO.SW", "ROG.SWX",
+        "NESN.SW", "ABBN.SW", "NOVN.SW",
+        "ZURN.SW", "LONN.SW", "GIVN.SW",
+        "SGSN.SW", "CFR.SW", "SLHN.SW",
+    ]),
 
-    # NGM — Stoccolma small cap
-    ("NGM Stoccolma", ["SOBI.ST", "CINT.ST", "BETS-B.ST", "BETS B.ST", "BETB.ST"]),
-
-    # AIM — Londra small cap
-    ("AIM London", ["BOO.AIM", "THRG.AIM", "KAPE.AIM", "GGP.AIM", "ABBY.AIM"]),
-
-    # AT — Vienna (verifica)
-    ("AT Vienna", ["OMV.AT", "VIG.AT", "EBS.AT", "ANDR.AT", "POST.AT"]),
-
-    # VI — Vienna (exchange diverso da AT?)
-    ("VI Vienna", ["OMV.VI", "VIG.VI", "EBS.VI", "ANDR.VI"]),
-
-    # PA — verifica titoli vuoti del test precedente
-    ("PA Parigi vuoti", ["AI.PA", "BN.PA", "ATO.PA", "AKE.PA", "ALFEN.PA"]),
-
-    # BR — verifica regola punto→nulla
-    ("BR punto nulla", ["AGFB.BR", "AGF.BR", "AGF-B.BR", "ARGX.BR", "ABI.BR"]),
+    # Oslo OB
+    ("OB Oslo", [
+        "EQNR.OL", "DNB.OL", "TEL.OL",
+        "MOWI.OL", "YAR.OL", "ORK.OL",
+        "NHY.OL", "SALM.OL", "SUBC.OL",
+    ]),
 ]
 
 for label, tickers in TESTS:
