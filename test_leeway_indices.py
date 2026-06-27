@@ -1,19 +1,61 @@
 import os, requests
-from collections import Counter
+from datetime import datetime, timedelta
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
+TODAY        = datetime.now().strftime("%Y-%m-%d")
+FROM_5D      = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
 headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-print("=== CONTEGGIO TITOLI IN UNIVERSE PER EXCHANGE ===")
+SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
+}
+LEEWAY_SUFFIX = {
+    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA",
+    "AS": ".AS", "MC": ".MC", "BR": ".BR",
+    "LS": ".LS", "VI": ".VI", "HE": ".HE",
+    "IR": ".IR", "AT": ".VI", "LSE": ".LSE",
+    "AIM": ".AIM", "SWX": ".SW", "OM": ".ST",
+    "NGM": ".ST", "OB": ".OL", "CPSE": ".CO",
+    "US": ".US", "TSX": ".TO",
+    "TSE": ".TSE", "ASX": ".AU",
+}
 
-# Leggi TUTTI i titoli in universe con paginazione
+def leeway_ticker(ticker, exchange):
+    if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
+    if exchange == "SEHK": return ticker.zfill(4) + ".HK"
+    if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
+    if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
+    if exchange == "BR":  return ticker.replace(".", "") + ".BR"
+    return ticker + LEEWAY_SUFFIX.get(exchange, "")
+
+def test_ticker(args):
+    ticker, exchange = args
+    lt = leeway_ticker(ticker, exchange)
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
+    try:
+        r = requests.get(url, timeout=8)
+        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        if data:
+            last = sorted(data, key=lambda x: x["date"])[-1]
+            return (ticker, exchange, lt, True, last.get("date"))
+        return (ticker, exchange, lt, False, None)
+    except:
+        return (ticker, exchange, lt, False, None)
+
+print("TODAY:", TODAY)
+
+# Carica TUTTI i titoli con paginazione corretta
 all_stocks = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange,yahoo_ticker",
-                "in_universe": "eq.true",
+        params={"select": "ticker,exchange", "in_universe": "eq.true",
                 "limit": "1000", "offset": str(offset)})
     batch = r.json()
     if not isinstance(batch, list) or not batch: break
@@ -21,34 +63,28 @@ while True:
     offset += 1000
     if len(batch) < 1000: break
 
-print(f"Totale in_universe=true: {len(all_stocks)}")
-counts = Counter(s["exchange"] for s in all_stocks)
-for ex, cnt in sorted(counts.items(), key=lambda x: -x[1]):
-    print(f"  {ex}: {cnt}")
+print(f"Totale titoli in universe: {len(all_stocks)}")
+print("Test con 50 thread paralleli...")
 
-# Raggruppamenti
-eu_ex = {"MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","AT","LSE","AIM","SWX","OM","NGM","OB","CPSE"}
-eu = sum(cnt for ex, cnt in counts.items() if ex in eu_ex)
-us = counts.get("US", 0)
-tsx = counts.get("TSX", 0)
-tse = counts.get("TSE", 0)
-sehk = counts.get("SEHK", 0)
-asx = counts.get("ASX", 0)
+empty = []; ok = 0
+with ThreadPoolExecutor(max_workers=50) as executor:
+    futures = {executor.submit(test_ticker, (s["ticker"], s["exchange"])): s for s in all_stocks}
+    done = 0
+    for future in as_completed(futures):
+        ticker, exchange, lt, has_data, date = future.result()
+        done += 1
+        if has_data: ok += 1
+        else: empty.append((exchange, ticker, lt))
+        if done % 1000 == 0: print(f"  {done}/{len(all_stocks)} ok={ok} empty={len(empty)}")
 
-print(f"\nRiepilogo:")
-print(f"  EU totale: {eu}")
-print(f"  US: {us}")
-print(f"  TSX (Canada): {tsx}")
-print(f"  TSE (Giappone): {tse}")
-print(f"  SEHK (HK): {sehk}")
-print(f"  ASX (Australia): {asx}")
-print(f"  APAC totale: {tse+sehk+asx}")
-
-# Verifica yahoo_ticker per titoli US
-us_stocks = [s for s in all_stocks if s["exchange"] == "US"]
-with_yahoo = [s for s in us_stocks if s.get("yahoo_ticker")]
-print(f"\nUS titoli: {len(us_stocks)}")
-print(f"US con yahoo_ticker: {len(with_yahoo)}")
-print(f"US senza yahoo_ticker: {len(us_stocks)-len(with_yahoo)}")
-if us_stocks:
-    print(f"Esempi: {[s['ticker'] for s in us_stocks[:10]]}")
+print(f"\n=== RISULTATO FINALE ===")
+print(f"OK: {ok}  VUOTI: {len(empty)}")
+by_ex = defaultdict(list)
+for ex, tk, lt in empty: by_ex[ex].append((tk, lt))
+for ex in sorted(by_ex.keys()):
+    items = by_ex[ex]
+    print(f"\n{ex} ({len(items)} vuoti):")
+    for tk, lt in items[:20]:
+        print(f"  {tk} -> {lt}")
+    if len(items) > 20:
+        print(f"  ... e altri {len(items)-20}")
