@@ -3,99 +3,74 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
-SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
-SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 TODAY        = datetime.now().strftime("%Y-%m-%d")
 FROM_5D      = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
-headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-# Suffissi da testare per ogni exchange
-# Formato: exchange -> lista di suffissi alternativi da provare
-SUFFIXES = {
-    "MIL":   [".MI", ".MIL", ".BIT"],
-    "XETRA": [".XETRA", ".DE", ".F"],
-    "PA":    [".PA", ".EUR"],
-    "AS":    [".AS", ".AMS"],
-    "MC":    [".MC", ".ES"],
-    "BR":    [".BR", ".BRU"],
-    "LS":    [".LS", ".LIS"],
-    "VI":    [".VI", ".VIE"],
-    "HE":    [".HE", ".HSE"],
-    "IR":    [".IR", ".ISE"],
-    "AT":    [".AT"],
-    "LSE":   [".LSE", ".L", ".LON"],
-    "AIM":   [".AIM", ".L"],
-    "SWX":   [".SW", ".SWX", ".VX"],
-    "OM":    [".ST", ".OM"],
-    "NGM":   [".ST", ".NGM"],
-    "OB":    [".OL", ".OB"],
-    "CPSE":  [".CO", ".CPH"],
-    "US":    [".US", ".NYSE", ".NASDAQ"],
-    "TSX":   [".TO", ".TSX"],
-    "TSE":   [".TSE", ".T", ".JP"],
-    "SEHK":  [".HK"],
-    "ASX":   [".AU", ".AX", ".ASX"],
-}
+def test(lt):
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
+    try:
+        r = requests.get(url, timeout=8)
+        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        if data:
+            last = sorted(data, key=lambda x: x["date"])[-1]
+            return (lt, last.get("date"), last.get("close"))
+    except: pass
+    return (lt, None, None)
 
-def test_ticker_formats(ticker, exchange):
-    suffixes = SUFFIXES.get(exchange, [])
-    for suffix in suffixes:
-        if exchange == "SEHK":
-            lt = ticker.zfill(4) + suffix
-        else:
-            lt = ticker + suffix
-        url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
-        try:
-            r = requests.get(url, timeout=8)
-            data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
-            if data:
-                last = sorted(data, key=lambda x: x["date"])[-1]
-                return (ticker, exchange, lt, last.get("date"), last.get("close"))
-        except: pass
-    return (ticker, exchange, None, None, None)
-
-# Carica primi 20 per ogni exchange
 print("TODAY:", TODAY)
-all_stocks = []
-for ex_filter in ["not.in.(US,TSX,TSE,SEHK,ASX)", "in.(US,TSX)", "in.(TSE,SEHK,ASX)"]:
-    r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange", "in_universe": "eq.true",
-                "exchange": ex_filter, "limit": "1000", "order": "exchange,ticker"})
-    batch = r.json()
-    if isinstance(batch, list):
-        from collections import defaultdict
-        by_ex = defaultdict(list)
-        for s in batch:
-            by_ex[s["exchange"]].append(s["ticker"])
-        for ex, tickers in by_ex.items():
-            for t in tickers[:20]:
-                all_stocks.append((t, ex))
+print()
 
-print(f"Testando {len(all_stocks)} titoli (20 per exchange)...")
+# Test formati alternativi per ogni problema identificato
+TESTS = [
+    # CPSE — spazi nel ticker
+    ("CPSE spazio→trattino", ["AMBU-B.CO", "AMBU B.CO", "AMBUB.CO", "CARL-B.CO", "COLO-B.CO", "AGF-B.CO", "ALK-B.CO"]),
+    
+    # TSX — doppio punto
+    ("TSX doppio punto", ["AD-UN.TO", "AD.UN.TO", "ADUN.TO", "ACO-X.TO", "ACO.X.TO", "AGF-B.TO", "AGF.B.TO"]),
+    
+    # LSE — punto finale
+    ("LSE punto finale", ["AO.LSE", "AO.L", "AOLTD.LSE", "AML.LSE", "AML.L", "ABF.LSE", "ABF.L"]),
+    
+    # AS — blue chip vuoti
+    ("AS blue chip", ["ASML.AS", "ADYEN.AS", "AKZA.AS", "ARCAD.AS", "APAM.AS", "ASM.AS"]),
+    
+    # MC — blue chip vuoti  
+    ("MC blue chip", ["BBVA.MC", "CABK.MC", "AENA.MC", "ANA.MC", "AMS.MC", "BKT.MC"]),
+    
+    # LS — blue chip vuoti
+    ("LS blue chip", ["EDP.LS", "BCP.LS", "CTT.LS", "NOS.LS", "SON.LS"]),
+    
+    # MIL — blue chip vuoti
+    ("MIL blue chip", ["A2A.MI", "BMPS.MI", "BPE.MI", "AMP.MI", "ARIS.MI"]),
+    
+    # IR — blue chip vuoti
+    ("IR blue chip", ["RYA.IR", "RYAIR.IR", "RY4C.IR", "GL9.IR", "KRZ.IR"]),
+    
+    # SEHK — zero padding varianti
+    ("SEHK padding", ["10.HK", "0010.HK", "100.HK", "0100.HK", "1088.HK", "01088.HK"]),
+    
+    # US — AAPL vuoto anomalo
+    ("US anomalia", ["AAPL.US", "AAPL.NASDAQ", "ABT.US", "ABM.US"]),
+    
+    # TSE — ticker 4 cifre vuoti
+    ("TSE 4 cifre", ["1414.TSE", "1605.TSE", "1801.TSE", "1332.TSE", "1662.TSE"]),
+    
+    # HE — blue chip vuoti
+    ("HE blue chip", ["ELISA.HE", "CTY1S.HE", "CAPMAN.HE", "ENENTO.HE"]),
+    
+    # BR — ticker normali vuoti
+    ("BR blue chip", ["ARGX.BR", "AGFB.BR", "AGF-B.BR", "ACKB.BR", "ABO.BR"]),
+    
+    # ASX — ticker alfanumerici
+    ("ASX special", ["AGL.AU", "ALD.AU", "ALQ.AU", "AFG.AU", "29M.AU", "A1M.AU"]),
+]
 
-results = []
-with ThreadPoolExecutor(max_workers=50) as executor:
-    futures = {executor.submit(test_ticker_formats, t, ex): (t, ex) for t, ex in all_stocks}
-    for future in as_completed(futures):
-        results.append(future.result())
-
-# Stampa risultati per exchange
-from collections import defaultdict
-by_ex = defaultdict(list)
-for ticker, exchange, lt, date, close in results:
-    by_ex[exchange].append((ticker, lt, date, close))
-
-for ex in sorted(by_ex.keys()):
-    items = by_ex[ex]
-    ok = [(t, lt, d, c) for t, lt, d, c in items if lt]
-    fail = [(t, lt, d, c) for t, lt, d, c in items if not lt]
-    print(f"\n{ex}: {len(ok)}/20 OK, {len(fail)} vuoti")
-    if fail:
-        for t, lt, d, c in fail:
-            print(f"  VUOTO: {t}")
-    if ok:
-        # Mostra suffisso che funziona
-        suffix_used = set(lt.replace(t, "") for t, lt, d, c in ok if lt)
-        print(f"  Suffisso OK: {suffix_used}")
-        print(f"  Ultima data: {ok[0][2]}")
+for label, tickers in TESTS:
+    print(f"\n=== {label} ===")
+    for lt in tickers:
+        result = test(lt)
+        if result[1]:
+            print(f"  OK {lt}: {result[1]} close={result[2]}")
+        else:
+            print(f"  !! {lt}: vuoto")
