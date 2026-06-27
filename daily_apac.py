@@ -320,6 +320,12 @@ print("=" * 60)SPECIAL_TICKERS = {
     "ROG": "RO.SW",
 }
 
+SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE",
+    "ROG": "RO.SW",
+}
+
 LEEWAY_SUFFIX = {
     "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
     "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
@@ -335,9 +341,9 @@ LEEWAY_SUFFIX = {
 def leeway_ticker(ticker, exchange):
     if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
     if exchange == "SEHK": return ticker.zfill(4) + ".HK"
-    if exchange == "CPSE": return ticker.replace(" ", "-") + ".CO"
-    if exchange == "TSX":  return ticker.replace(".", "-") + ".TO"
-    if exchange == "BR":   return ticker.replace(".", "") + ".BR"
+    if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
+    if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
+    if exchange == "BR":  return ticker.replace(".", "") + ".BR"
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
 
