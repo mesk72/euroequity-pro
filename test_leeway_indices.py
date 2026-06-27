@@ -1,6 +1,5 @@
 import os, requests, time
 from datetime import datetime, timedelta
-from multiprocessing import Pool
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -14,7 +13,6 @@ SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
     "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
 }
-
 LEEWAY_SUFFIX = {
     "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA", "LSE": ".LSE",
 }
@@ -23,7 +21,11 @@ def leeway_ticker(ticker, exchange):
     if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
-def test_exchange(exchange):
+print("TODAY:", TODAY)
+
+EXCHANGES = ["MIL", "XETRA", "PA", "LSE"]
+
+for exchange in EXCHANGES:
     stocks = []
     offset = 0
     while True:
@@ -43,8 +45,8 @@ def test_exchange(exchange):
         lt = leeway_ticker(ticker, exchange)
         url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
         try:
-            r = requests.get(url, timeout=10)
-            data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+            r2 = requests.get(url, timeout=10)
+            data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
             if data:
                 last = sorted(data, key=lambda x: x["date"])[-1]
                 ok.append((ticker, lt, last.get("date")))
@@ -54,20 +56,6 @@ def test_exchange(exchange):
             empty.append((ticker, lt))
         time.sleep(0.15)
 
-    return exchange, len(stocks), ok, empty
-
-if __name__ == "__main__":
-    print("TODAY:", TODAY)
-    EXCHANGES = ["MIL", "XETRA", "PA", "LSE"]
-    total_tickers = 109 + 186 + 200 + 375
-    print(f"Test {total_tickers} titoli in 4 processi paralleli con 2s sleep")
-    print(f"Stima: {375*2//60} minuti (LSE e la piu grande)")
-
-    with Pool(processes=4) as pool:
-        results = pool.map(test_exchange, EXCHANGES)
-
-    print("\n=== RISULTATI FINALI ===")
-    for exchange, total, ok, empty in results:
-        print(f"\n{exchange}: {total} titoli — OK={len(ok)} VUOTI={len(empty)}")
-        for tk, lt in empty:
-            print(f"  {tk} -> {lt}")
+    print(f"\n{exchange}: {len(stocks)} titoli — OK={len(ok)} VUOTI={len(empty)}")
+    for tk, lt in empty:
+        print(f"  {tk} -> {lt}")
