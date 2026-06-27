@@ -1,5 +1,7 @@
 import os, requests, time
 from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -8,6 +10,19 @@ SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 TODAY        = datetime.now().strftime("%Y-%m-%d")
 FROM_10D     = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
 headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
+
+# Rate limiter: max 7 req/sec
+_lock = threading.Lock()
+_last_call = [0.0]
+
+def rate_limited_get(url):
+    with _lock:
+        now = time.time()
+        elapsed = now - _last_call[0]
+        if elapsed < 1/7:
+            time.sleep(1/7 - elapsed)
+        _last_call[0] = time.time()
+    return requests.get(url, timeout=10)
 
 SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
@@ -29,41 +44,64 @@ def leeway_ticker(ticker, exchange):
     if exchange == "BR":  return ticker.replace(".", "") + ".BR"
     return ticker.rstrip(".") + LEEWAY_SUFFIX.get(exchange, "")
 
+def test_one(args):
+    ticker, exchange = args
+    lt = leeway_ticker(ticker, exchange)
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_10D + "&to=" + TODAY
+    try:
+        r = rate_limited_get(url)
+        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        if data:
+            last = sorted(data, key=lambda x: x["date"])[-1]
+            return ticker, exchange, lt, True, last.get("date")
+        return ticker, exchange, lt, False, None
+    except:
+        return ticker, exchange, lt, False, None
+
 print("TODAY:", TODAY, "FROM:", FROM_10D)
 
-# Senza US — troppo lento, lo testiamo separatamente
 EXCHANGES = [
     "AS","MC","BR","LS","VI","HE","IR",
     "SWX","OM","OB","CPSE",
     "TSX","TSE","SEHK","ASX",
 ]
 
+# Carica tutti i titoli
+all_stocks = []
 for exchange in EXCHANGES:
-    stocks = []
     offset = 0
     while True:
         r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker", "in_universe": "eq.true",
+            params={"select": "ticker,exchange", "in_universe": "eq.true",
                     "exchange": f"eq.{exchange}",
                     "limit": "1000", "offset": str(offset)})
         batch = r.json()
         if not isinstance(batch, list) or not batch: break
-        stocks.extend(batch)
+        all_stocks.extend([(s["ticker"], exchange) for s in batch])
         offset += 1000
         if len(batch) < 1000: break
 
-    ok = []; empty = []
-    for s in stocks:
-        lt = leeway_ticker(s["ticker"], exchange)
-        url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_10D + "&to=" + TODAY
-        try:
-            r2 = requests.get(url, timeout=10)
-            data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
-            if data: ok.append(lt)
-            else: empty.append((s["ticker"], lt))
-        except: empty.append((s["ticker"], lt))
-        time.sleep(0.15)
+print(f"Totale: {len(all_stocks)} titoli")
+print(f"Stima: {len(all_stocks)/7/60:.1f} minuti a 7 req/sec")
 
-    print(f"{exchange}: {len(stocks)} — OK={len(ok)} VUOTI={len(empty)}")
-    for tk, lt in empty:
+# Test con 7 thread — rispetta rate limit 7 req/sec
+results = []
+with ThreadPoolExecutor(max_workers=7) as executor:
+    results = list(executor.map(test_one, all_stocks))
+
+# Stampa vuoti per exchange
+from collections import defaultdict
+by_ex = defaultdict(list)
+ok = 0
+for ticker, exchange, lt, has_data, date in results:
+    if has_data: ok += 1
+    else: by_ex[exchange].append((ticker, lt))
+
+print(f"\n=== RISULTATO ===")
+print(f"OK: {ok}  VUOTI: {sum(len(v) for v in by_ex.values())}")
+for ex in EXCHANGES:
+    items = by_ex.get(ex, [])
+    total_ex = sum(1 for t, e, l, h, d in results if e == ex)
+    print(f"\n{ex}: {total_ex} — OK={total_ex-len(items)} VUOTI={len(items)}")
+    for tk, lt in items:
         print(f"  {tk} -> {lt}")
