@@ -64,7 +64,6 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
     "BA.": "BA.LSE", "NG.": "NG.LSE",
-    # Roche — ticker Leeway diverso da Bloomberg
     "ROG": "RO.SW",
 }
 
@@ -72,7 +71,7 @@ LEEWAY_SUFFIX = {
     "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
     "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
     "LS":   ".LS",    "VI":    ".VI",     "HE":   ".HE",
-    "IR":   ".IR",    "AT":    ".VI",     # AT usa .VI non .AT
+    "IR":   ".IR",    "AT":    ".VI",
     "LSE":  ".LSE",   "AIM":   ".AIM",   "SWX":  ".SW",
     "OM":   ".ST",    "NGM":   ".ST",    "OB":   ".OL",
     "CPSE": ".CO",
@@ -81,24 +80,12 @@ LEEWAY_SUFFIX = {
 }
 
 def leeway_ticker(ticker, exchange):
-    # Special cases
-    if ticker in SPECIAL_TICKERS:
-        return SPECIAL_TICKERS[ticker]
-    # SEHK: zero-pad a esattamente 4 cifre
-    if exchange == "SEHK":
-        return ticker.zfill(4) + ".HK"
-    # CPSE: spazio → trattino
-    if exchange == "CPSE":
-        return ticker.replace(" ", "-") + ".CO"
-    # TSX: punto interno → trattino
-    if exchange == "TSX":
-        return ticker.replace(".", "-") + ".TO"
-    # BR: punto → nulla (concatena)
-    if exchange == "BR":
-        return ticker.replace(".", "") + ".BR"
-    # Default
-    suffix = LEEWAY_SUFFIX.get(exchange, "")
-    return ticker + suffix
+    if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
+    if exchange == "SEHK": return ticker.zfill(4) + ".HK"
+    if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
+    if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
+    if exchange == "BR":  return ticker.replace(".", "") + ".BR"
+    return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
 
 start_time = time_module.time()
