@@ -1,6 +1,7 @@
 import os, requests, time
 from datetime import datetime, timedelta
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -30,51 +31,59 @@ def leeway_ticker(ticker, exchange):
     if exchange == "SEHK": return ticker.zfill(4) + ".HK"
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
-print("TODAY:", TODAY)
-print("Carico universo...")
-
-all_stocks = []
-for exchange_filter in ["not.in.(US,TSX,TSE,SEHK,ASX)", "in.(US,TSX)", "in.(TSE,SEHK,ASX)"]:
-    offset = 0
-    while True:
-        r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker,exchange", "in_universe": "eq.true",
-                    "exchange": exchange_filter, "limit": "1000", "offset": str(offset)})
-        batch = r.json()
-        if not isinstance(batch, list) or not batch: break
-        all_stocks.extend(batch)
-        offset += 1000
-        if len(batch) < 1000: break
-
-print(f"Totale: {len(all_stocks)} titoli")
-print("Test in corso...\n")
-
-empty = []
-ok = 0
-for i, s in enumerate(all_stocks):
-    ticker   = s["ticker"]
-    exchange = s["exchange"]
+def test_ticker(args):
+    ticker, exchange = args
     lt = leeway_ticker(ticker, exchange)
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5D + "&to=" + TODAY
     try:
         r = requests.get(url, timeout=8)
         data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
-        if data:
+        return (ticker, exchange, lt, len(data) > 0)
+    except:
+        return (ticker, exchange, lt, False)
+
+print("TODAY:", TODAY)
+print("Carico universo EU (no US/APAC per ora)...")
+
+all_stocks = []
+offset = 0
+while True:
+    r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+        params={"select": "ticker,exchange", "in_universe": "eq.true",
+                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)",
+                "limit": "1000", "offset": str(offset)})
+    batch = r.json()
+    if not isinstance(batch, list) or not batch: break
+    all_stocks.extend(batch)
+    offset += 1000
+    if len(batch) < 1000: break
+
+print(f"Totale EU: {len(all_stocks)} titoli")
+print("Test con 30 thread paralleli...")
+
+empty = []
+ok = 0
+args = [(s["ticker"], s["exchange"]) for s in all_stocks]
+
+with ThreadPoolExecutor(max_workers=30) as executor:
+    futures = {executor.submit(test_ticker, a): a for a in args}
+    done = 0
+    for future in as_completed(futures):
+        ticker, exchange, lt, has_data = future.result()
+        done += 1
+        if has_data:
             ok += 1
         else:
             empty.append((exchange, ticker, lt))
-    except:
-        empty.append((exchange, ticker, lt + " [timeout]"))
-    if i % 500 == 0: print(f"  {i}/{len(all_stocks)} ok={ok} empty={len(empty)}")
-    time.sleep(0.05)
+        if done % 200 == 0:
+            print(f"  {done}/{len(args)} ok={ok} empty={len(empty)}")
 
-print(f"\n=== RISULTATO ===")
+print(f"\n=== RISULTATO EU ===")
 print(f"OK: {ok}  VUOTI: {len(empty)}")
-print()
 by_ex = defaultdict(list)
 for ex, tk, lt in empty:
     by_ex[ex].append((tk, lt))
 for ex, items in sorted(by_ex.items()):
     print(f"\n{ex} ({len(items)} vuoti):")
     for tk, lt in items:
-        print(f"  {tk} → {lt}")
+        print(f"  {tk} -> {lt}")
