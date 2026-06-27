@@ -18,8 +18,7 @@ LEEWAY_SUFFIX = {
     "VI": ".VI", "HE": ".HE", "IR": ".IR", "AT": ".VI",
     "SWX": ".SW", "OM": ".ST", "NGM": ".ST", "OB": ".OL",
     "CPSE": ".CO", "AIM": ".AIM",
-    "US": ".US", "TSX": ".TO",
-    "TSE": ".TSE", "SEHK": ".HK", "ASX": ".AU",
+    "TSX": ".TO", "TSE": ".TSE", "SEHK": ".HK", "ASX": ".AU",
 }
 
 def leeway_ticker(ticker, exchange):
@@ -28,17 +27,15 @@ def leeway_ticker(ticker, exchange):
     if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
     if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
     if exchange == "BR":  return ticker.replace(".", "") + ".BR"
-    ticker_clean = ticker.rstrip(".")
-    return ticker_clean + LEEWAY_SUFFIX.get(exchange, "")
+    return ticker.rstrip(".") + LEEWAY_SUFFIX.get(exchange, "")
 
-print("TODAY:", TODAY)
-print("FROM:", FROM_10D)
+print("TODAY:", TODAY, "FROM:", FROM_10D)
 
+# Senza US — troppo lento, lo testiamo separatamente
 EXCHANGES = [
-    "AS", "MC", "BR", "LS", "VI", "HE", "IR",
-    "SWX", "OM", "OB", "CPSE", "AIM",
-    "US", "TSX",
-    "TSE", "SEHK", "ASX",
+    "AS","MC","BR","LS","VI","HE","IR",
+    "SWX","OM","OB","CPSE",
+    "TSX","TSE","SEHK","ASX",
 ]
 
 for exchange in EXCHANGES:
@@ -57,21 +54,16 @@ for exchange in EXCHANGES:
 
     ok = []; empty = []
     for s in stocks:
-        ticker = s["ticker"]
-        lt = leeway_ticker(ticker, exchange)
+        lt = leeway_ticker(s["ticker"], exchange)
         url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_10D + "&to=" + TODAY
         try:
             r2 = requests.get(url, timeout=10)
             data = r2.json() if r2.status_code == 200 and isinstance(r2.json(), list) else []
-            if data:
-                last = sorted(data, key=lambda x: x["date"])[-1]
-                ok.append((ticker, lt, last.get("date")))
-            else:
-                empty.append((ticker, lt))
-        except:
-            empty.append((ticker, lt))
+            if data: ok.append(lt)
+            else: empty.append((s["ticker"], lt))
+        except: empty.append((s["ticker"], lt))
         time.sleep(0.15)
 
-    print(f"\n{exchange}: {len(stocks)} titoli — OK={len(ok)} VUOTI={len(empty)}")
+    print(f"{exchange}: {len(stocks)} — OK={len(ok)} VUOTI={len(empty)}")
     for tk, lt in empty:
         print(f"  {tk} -> {lt}")
