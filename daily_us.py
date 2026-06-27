@@ -100,7 +100,7 @@ for exchange in ['US', 'TSX']:
     offset = 0
     while True:
         r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker,exchange", "in_universe": "eq.true",
+            params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
                     "exchange": f"eq.{exchange}", "offset": str(offset), "limit": "1000"})
         if not r.text or r.text == "[]": break
         try: data = r.json()
