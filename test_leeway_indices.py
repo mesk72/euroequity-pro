@@ -1,6 +1,5 @@
 import os, requests
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -57,14 +56,14 @@ for exchange in EXCHANGES:
         offset += 1000
         if len(batch) < 1000: break
 
-    # Test tutti in parallelo
+    # Test sequenziale — affidabile, no rate limit
+    import time
     ok = []; empty = []
-    with ThreadPoolExecutor(max_workers=50) as executor:
-        futures = {executor.submit(test_ticker, (s["ticker"], s["exchange"])): s for s in stocks}
-        for future in as_completed(futures):
-            ticker, ex, lt, has_data, date = future.result()
-            if has_data: ok.append((ticker, lt, date))
-            else: empty.append((ticker, lt))
+    for s in stocks:
+        ticker, ex, lt, has_data, date = test_ticker((s["ticker"], s["exchange"]))
+        if has_data: ok.append((ticker, lt, date))
+        else: empty.append((ticker, lt))
+        time.sleep(0.05)
 
     print(f"\n{exchange}: {len(stocks)} titoli — OK={len(ok)} VUOTI={len(empty)}")
     for tk, lt in empty:
