@@ -1,6 +1,6 @@
 import os, requests, time
 from datetime import datetime, timedelta
-from multiprocessing import Pool, Manager
+from multiprocessing import Pool
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -16,8 +16,7 @@ SPECIAL_TICKERS = {
 }
 
 LEEWAY_SUFFIX = {
-    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA",
-    "LSE": ".LSE", "US": ".US",
+    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA", "LSE": ".LSE",
 }
 
 def leeway_ticker(ticker, exchange):
@@ -25,8 +24,6 @@ def leeway_ticker(ticker, exchange):
     return ticker + LEEWAY_SUFFIX.get(exchange, "")
 
 def test_exchange(exchange):
-    """Testa tutti i titoli di un exchange con 2s di sleep"""
-    # Carica titoli
     stocks = []
     offset = 0
     while True:
@@ -61,10 +58,12 @@ def test_exchange(exchange):
 
 if __name__ == "__main__":
     print("TODAY:", TODAY)
-    EXCHANGES = ["US", "MIL", "XETRA", "PA", "LSE"]
-    print(f"Test 5 borse in parallelo con 2s sleep — stima {max(1967,375)*2//60} minuti")
+    EXCHANGES = ["MIL", "XETRA", "PA", "LSE"]
+    total_tickers = 109 + 186 + 200 + 375
+    print(f"Test {total_tickers} titoli in 4 processi paralleli con 2s sleep")
+    print(f"Stima: {375*2//60} minuti (LSE e la piu grande)")
 
-    with Pool(processes=5) as pool:
+    with Pool(processes=4) as pool:
         results = pool.map(test_exchange, EXCHANGES)
 
     print("\n=== RISULTATI FINALI ===")
