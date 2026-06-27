@@ -1,4 +1,4 @@
-import os, requests, time
+import os, requests
 from datetime import datetime, timedelta
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -18,7 +18,7 @@ LEEWAY_SUFFIX = {
     "AIM": ".AIM", "SWX": ".SW", "OM": ".ST", "NGM": ".ST",
     "OB": ".OL", "CPSE": ".CO",
     "US": ".US", "TSX": ".TO",
-    "TSE": ".TSE", "SEHK": ".HK", "ASX": ".AU",
+    "TSE": ".TSE", "ASX": ".AU",
 }
 
 SPECIAL_TICKERS = {
@@ -43,29 +43,36 @@ def test_ticker(args):
         return (ticker, exchange, lt, False)
 
 print("TODAY:", TODAY)
-print("Carico universo EU (no US/APAC per ora)...")
 
+# Carica TUTTI i titoli EU + US + APAC
 all_stocks = []
-offset = 0
-while True:
-    r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange", "in_universe": "eq.true",
-                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)",
-                "limit": "1000", "offset": str(offset)})
-    batch = r.json()
-    if not isinstance(batch, list) or not batch: break
-    all_stocks.extend(batch)
-    offset += 1000
-    if len(batch) < 1000: break
+for ex_filter, label in [
+    ("not.in.(US,TSX,TSE,SEHK,ASX)", "EU"),
+    ("in.(US,TSX)", "US+CA"),
+    ("in.(TSE,SEHK,ASX)", "APAC"),
+]:
+    offset = 0
+    count = 0
+    while True:
+        r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+            params={"select": "ticker,exchange", "in_universe": "eq.true",
+                    "exchange": ex_filter, "limit": "1000", "offset": str(offset)})
+        batch = r.json()
+        if not isinstance(batch, list) or not batch: break
+        all_stocks.extend(batch)
+        count += len(batch)
+        offset += 1000
+        if len(batch) < 1000: break
+    print(f"{label}: {count} titoli")
 
-print(f"Totale EU: {len(all_stocks)} titoli")
-print("Test con 30 thread paralleli...")
+print(f"Totale: {len(all_stocks)} titoli")
+print("Test con 50 thread paralleli...")
 
 empty = []
 ok = 0
 args = [(s["ticker"], s["exchange"]) for s in all_stocks]
 
-with ThreadPoolExecutor(max_workers=30) as executor:
+with ThreadPoolExecutor(max_workers=50) as executor:
     futures = {executor.submit(test_ticker, a): a for a in args}
     done = 0
     for future in as_completed(futures):
@@ -75,10 +82,10 @@ with ThreadPoolExecutor(max_workers=30) as executor:
             ok += 1
         else:
             empty.append((exchange, ticker, lt))
-        if done % 200 == 0:
+        if done % 500 == 0:
             print(f"  {done}/{len(args)} ok={ok} empty={len(empty)}")
 
-print(f"\n=== RISULTATO EU ===")
+print(f"\n=== RISULTATO ===")
 print(f"OK: {ok}  VUOTI: {len(empty)}")
 by_ex = defaultdict(list)
 for ex, tk, lt in empty:
