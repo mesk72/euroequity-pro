@@ -85,7 +85,7 @@ all_stocks = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange", "in_universe": "eq.true",
+        params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
                 "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
@@ -121,8 +121,17 @@ for stock in all_stocks:
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY
     try:
         resp = requests.get(url, timeout=15)
-        if resp.status_code != 200: fail_leeway += 1; continue
-        data_l = resp.json()
+        data_l = resp.json() if resp.status_code == 200 else []
+        # Fallback: usa yahoo_ticker se il ticker principale fallisce
+        if not isinstance(data_l, list) or not data_l:
+            yt = stock.get("yahoo_ticker", "")
+            if yt:
+                # Costruisci ticker Leeway dal yahoo_ticker rimuovendo suffisso Yahoo
+                yt_base = yt.split(".")[0] if "." in yt else yt
+                lt2 = leeway_ticker(yt_base, exchange)
+                if lt2 != lt:
+                    resp2 = requests.get(LEEWAY_BASE + "/historicalquotes/" + lt2 + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY, timeout=15)
+                    data_l = resp2.json() if resp2.status_code == 200 else []
         if not isinstance(data_l, list) or not data_l: fail_leeway += 1; continue
         for row2 in data_l:
             adj = row2.get("adjusted_close") or row2.get("close")
