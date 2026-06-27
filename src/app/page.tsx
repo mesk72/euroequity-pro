@@ -85,8 +85,33 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
     </div>
   )
   const color = value >= 70 ? '#22c55e' : value >= 40 ? '#f97316' : '#ef4444'
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'ForwardAlpha',
+    url: 'https://forwardalpha.pro',
+    description: 'Institutional-grade quantitative equity research covering 7,000+ global stocks.',
+    author: {
+      '@type': 'Person',
+      name: 'Andrea Meschini',
+      jobTitle: 'Portfolio Manager & Founder',
+      alumniOf: ['J.P. Morgan Asset Management', 'Zenit SGR'],
+    },
+    about: {
+      '@type': 'Thing',
+      name: 'Global Equity Research',
+      description: 'Value, Growth and Best Score ranking for stocks in Europe, US, Canada, Japan, Hong Kong and Australia.',
+    },
+  }
+
   return (
-    <div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div>
       <div className="flex justify-between items-center mb-1">
         <span className="text-[9px] text-muted uppercase tracking-wide">{label}</span>
         <span className="text-xs font-700 font-mono" style={{ color }}>{Math.round(value)}</span>
@@ -95,6 +120,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
         <div className="h-full rounded-full transition-all" style={{ width: `${value}%`, background: color }} />
       </div>
     </div>
+  </>
   )
 }
 
