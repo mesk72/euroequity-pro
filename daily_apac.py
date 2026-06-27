@@ -335,6 +335,11 @@ SPECIAL_TICKERS = {
     "ROG": "RO.SW",
 }
 
+SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
+}
+
 LEEWAY_SUFFIX = {
     "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
     "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
@@ -353,6 +358,7 @@ def leeway_ticker(ticker, exchange):
     if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
     if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
     if exchange == "BR":  return ticker.replace(".", "") + ".BR"
-    return ticker + LEEWAY_SUFFIX.get(exchange, "")
+    ticker_clean = ticker.rstrip(".")
+    return ticker_clean + LEEWAY_SUFFIX.get(exchange, "")
 
 
