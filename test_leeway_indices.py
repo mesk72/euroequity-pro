@@ -6,7 +6,7 @@ SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 TODAY        = datetime.now().strftime("%Y-%m-%d")
-FROM_5D      = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
+FROM_5D      = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
 headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
 SPECIAL_TICKERS = {
