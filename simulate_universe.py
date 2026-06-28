@@ -110,7 +110,7 @@ with_price = get_tickers_with_prices("US")
 print(f"  Ticker US con prezzi recenti: {len(with_price)}")
 eligible = sorted(
     [s for s in stocks if not is_excluded(s.get("company",""), s.get("sector",""))],
-    key=lambda s: s.get("mkt_cap") or 0, reverse=True)[:2000]
+    key=lambda s: s.get("mkt_cap") or 0, reverse=True)[:3000]
 no_price = [s["ticker"] for s in eligible if s["ticker"] not in with_price]
 print(f"US       eligible={len(eligible):>5} con_prezzo={len(eligible)-len(no_price):>5} senza_prezzo={len(no_price):>4}")
 if no_price:
