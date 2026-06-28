@@ -2158,11 +2158,11 @@ function AppContent() {
     const p = params.get("page")
     const s = params.get("sector")
     if (p) {
-      if (p === "northamerica") { setScrSectorUS(s || "All"); setScrSectorAP("All"); setPage("northamerica") }
-      else if (p === "nascreen") { setScrSectorUS(s || "All"); setScrSectorAP("All"); setPage("nascreen") }
-      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setScrSectorAP("All"); setPage("screener") }
-      else if (p === "asiapacific") { setScrSectorAP(s || "All"); setScrSectorUS("All"); setScrSector("All"); setPage("asiapacific") }
-      else { setScrSectorUS("All"); setScrSectorAP("All"); setScrSector("All"); setPage(p as Page) }
+      if (p === "northamerica") { setScrSectorUS(s || "All"); setScrSectorAP("All"); navigateTo("northamerica") }
+      else if (p === "nascreen") { setScrSectorUS(s || "All"); setScrSectorAP("All"); navigateTo("nascreen") }
+      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setScrSectorAP("All"); navigateTo("screener") }
+      else if (p === "asiapacific") { setScrSectorAP(s || "All"); setScrSectorUS("All"); setScrSector("All"); navigateTo("asiapacific") }
+      else { setScrSectorUS("All"); setScrSectorAP("All"); setScrSector("All"); navigateTo(p as Page) }
     } else {
       setScrSectorUS("All"); setScrSectorAP("All")
     }
@@ -2277,7 +2277,7 @@ function AppContent() {
             {expandedMenus.has(menu.id) && (
               <div className='ml-2 space-y-0.5'>
                 {menu.items.map((item, idx) => item.id ? (
-                  <button key={idx} onClick={() => { setPage(item.id as Page); setSidebar(false); toggleMenu(menu.id) }}
+                  <button key={idx} onClick={() => { navigateTo(item.id as Page); setSidebar(false); toggleMenu(menu.id) }}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded text-xs transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text'}`}>
                     {item.label}
                   </button>
@@ -2290,7 +2290,7 @@ function AppContent() {
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
         {singleMarkets.map((item, idx) => item.id ? (
-          <button key={idx} onClick={() => { setScrSectorUS("All"); setScrSector("All"); setScrSectorAP("All"); setPage(item.id as Page); setSidebar(false) }}
+          <button key={idx} onClick={() => { setScrSectorUS("All"); setScrSector("All"); setScrSectorAP("All"); navigateTo(item.id as Page); setSidebar(false) }}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === item.id ? 'bg-gold/15 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>
             {item.label}
           </button>
