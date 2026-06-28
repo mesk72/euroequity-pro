@@ -532,9 +532,11 @@ export default function NewsPage() {
 
   useEffect(() => {
     let isMounted = true
-    const controller = new AbortController()
+    let controller = new AbortController()
 
     const safeLoad = async () => {
+      controller = new AbortController()
+      isMounted = true
       try {
         await load(controller.signal, () => isMounted)
       } catch (e) {
@@ -547,10 +549,17 @@ export default function NewsPage() {
     safeLoad()
     const t = setInterval(safeLoad, 900000)
 
+    // Ricarica quando la pagina torna in focus (es. dopo back navigation)
+    const onFocus = () => {
+      if (isMounted) safeLoad()
+    }
+    window.addEventListener('focus', onFocus)
+
     return () => {
       isMounted = false
       controller.abort()
       clearInterval(t)
+      window.removeEventListener('focus', onFocus)
     }
   }, [pathname])
 
