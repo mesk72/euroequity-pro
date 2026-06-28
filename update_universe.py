@@ -9,7 +9,7 @@ headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "return=minimal"}
 
 EXCLUDE_NAMES = [
-    "ETF","FUND","TRUST","UCITS","ISHARES","VANGUARD","XTRACKERS",
+    "ETF","UCITS","ISHARES","VANGUARD","XTRACKERS",
     "LYXOR","AMUNDI ETF","INVESCO","SPDR","WISDOMTREE","VANECK",
     "BLACKROCK","INDEX FUND","TRACKER","WARRANT","CERTIFICATE",
     "ETP","ETC","STRUCTURED","NOTES","BOND FUND",
@@ -204,7 +204,7 @@ def get_eligible(exchange, min_cap=None, top_n=None):
     return result
 
 for ex in ["LSE","XETRA","PA","OM","SWX","MIL"]:
-    el = get_eligible(ex, min_cap=500)
+    el = get_eligible(ex, min_cap=400)
     for k,mc in el: new_universe.add(k)
     print(f"  {ex}: {len(el)} (>=500M)")
 
