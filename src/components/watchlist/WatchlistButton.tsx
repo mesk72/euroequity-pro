@@ -65,14 +65,14 @@ export default function WatchlistButton({ stock, userId }: Props) {
     e.stopPropagation()
     setShowMenu(false)
     setLoading(true)
-    // Verifica limite 50 per wallet
+    // Verifica limite 100 per wallet
     const { count } = await supabase
       .from('watchlist')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId!)
       .eq('wallet', walletIdx)
-    if ((count || 0) >= 50) {
-      toast.error(`${WALLET_NAMES[walletIdx]} is full (50 max)`)
+    if ((count || 0) >= 100) {
+      toast.error(`${WALLET_NAMES[walletIdx]} is full (100 max)`)
       setLoading(false)
       return
     }
