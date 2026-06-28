@@ -1042,3 +1042,307 @@ const navigateTo = (newPage: Page) => {
 Next.js 14 Router Cache non smonta i Client Components — li nasconde in memoria.
 `useEffect([], ...)` non scatta al ritorno dalla cache.
 L'unico modo sicuro per pagine con fetch pesanti è la navigazione nativa del browser.
+
+
+---
+
+## AGGIORNAMENTI SESSIONE 28 GIUGNO 2026 (PARTE 2)
+
+---
+
+## YAHOO FINANCE — DOWNLOAD PREZZI (sostituzione Leeway)
+
+### Motivo
+Leeway ha cancellato l'abbonamento per errore. Passiamo a Yahoo Finance
+tramite yfinance per i prezzi EOD.
+
+### Script creati
+- `daily_eu_yahoo.py` — aggiornamento giornaliero prezzi EU da Yahoo
+- `daily_us_yahoo.py` — aggiornamento giornaliero prezzi US+CA da Yahoo
+- `daily_apac_yahoo.py` — aggiornamento giornaliero prezzi APAC+KRX+SGX da Yahoo
+- `download_history_yahoo.py` — download storico 5 anni per tutti i mercati
+- `colab_upload_once.py` — upload iniziale file TIKR e fiscal_year_end su Supabase Storage
+
+### Suffissi Yahoo per exchange
+```python
+YAHOO_SUFFIX = {
+    "MIL": ".MI",  "XETRA": ".DE", "PA": ".PA",  "AS": ".AS",
+    "MC":  ".MC",  "BR":    ".BR", "LS": ".LS",  "VI": ".VI",
+    "HE":  ".HE",  "IR":    ".IR", "AT": ".VI",
+    "LSE": ".L",   "AIM":   ".L",  "SWX": ".SW",
+    "OM":  ".ST",  "NGM":   ".ST", "OB":  ".OL", "CPSE": ".CO",
+    "US":  "",     "TSX":   ".TO",
+    "TSE": ".T",   "SEHK":  ".HK", "ASX": ".AX",
+    "KRX": ".KS",  "SGX":   ".SI",
+}
+# Casi speciali:
+# ROG → ROG.SW, BP. → BP.L, RR. → RR.L, BT.A → BT-A.L
+# SEHK: zero-pad 4 cifre + .HK
+# TSE: numero + .T (rimuovi zeri iniziali)
+# KRX: rimuovi "A" iniziale + .KS
+# TSX: punto→trattino + .TO
+```
+
+### Schedule download Yahoo
+| Mercato | Orario download | Note |
+|---------|----------------|------|
+| APAC | 12:00 CET | Dopo chiusura Asia |
+| EU | 20:00 CET | Dopo chiusura Europa |
+| US/CA | 02:00 CET | Dopo chiusura USA |
+
+### Chunk e rate limit Yahoo
+- Chunk da 150 ticker per batch download
+- Sleep random 3-7 secondi tra chunk
+- threads=True per parallelismo interno yfinance
+- auto_adjust=True (Close = Adj Close)
+- Salva ogni 500 righe su Supabase
+
+---
+
+## SUPABASE STORAGE — FILE TIKR
+
+### Bucket: tikr-uploads
+File presenti:
+- `tikr_eu_latest.csv` — TIKR Europa (3414 righe, 629 KB)
+- `tikr_na_latest.csv` — TIKR Nord America US+CA (3000 righe, 698 KB)
+- `fiscal_year_end.csv` — Fiscal year end globale EU+US+CA+APAC (17.545 righe)
+
+### Aggiornamento futuro (senza Colab)
+1. Scarica nuovo TIKR da TIKR.com
+2. Rinomina file come sopra
+3. Carica su Supabase Storage sovrascrivendo
+4. Lancia Weekly EU Load + Weekly US Load da GitHub Actions
+
+### Colonne TIKR (nomi esatti nel file)
+```
+Ticker, Company Name, Primary Exchange, Country, Sector
+Last Price, Last Mkt Cap
+LTM P/E LTM               (= pe_trailing)
+LTM P/BVPS LTM            (= pb)
+Mean Fwd P/E NTM           (= pe_forward)
+EPS Normalized (FY 2025)   (= eps_fy0)
+Mean EPS Normalized (FY 2026) (= eps_fy1)
+Mean EPS Normalized (FY 2027) (= eps_fy2)
+Mean EPS Normalized (FY 2028) (= eps_fy3)
+Mean EPS (GAAP) (FY 2029)  (= eps_fy4)
+Mean EPS Normalized (FY 2030) (= eps_fy5)
+Rev (FY 2025)              (= rev_fy0)
+Mean Rev (FY 2026)         (= rev_fy1)
+Mean Rev (FY 2027)         (= rev_fy2)
+Mean Rev (FY 2028)         (= rev_fy3)
+```
+
+### Colonne fundamentals Supabase (nuove da aggiungere via SQL)
+```sql
+ALTER TABLE fundamentals 
+ADD COLUMN IF NOT EXISTS eps_fy4 FLOAT,  -- FY2029
+ADD COLUMN IF NOT EXISTS eps_fy5 FLOAT,  -- FY2030
+ADD COLUMN IF NOT EXISTS eps_cagr_3y FLOAT,
+ADD COLUMN IF NOT EXISTS implied_growth FLOAT,
+ADD COLUMN IF NOT EXISTS ke FLOAT,
+ADD COLUMN IF NOT EXISTS beta_local FLOAT,
+ADD COLUMN IF NOT EXISTS rf_rate FLOAT;
+```
+
+---
+
+## REVERSE DCF — IMPLEMENTAZIONE DEFINITIVA
+
+### Filosofia (Gemini + ChatGPT + Mauboussin)
+Non indovinare il prezzo futuro. Partire dal prezzo attuale per capire
+quali aspettative incorpora, poi decidere se sono troppo pessimistiche
+o ottimistiche.
+
+### Modello a due stadi
+- **Stage 1**: tasso di crescita g implicito per 10 anni (incognita)
+- **Stage 2**: crescita terminale gTV = 2.5% dal decimo anno in poi (fissa)
+
+### Input
+- **EPS_NTM** come base (non LTM) — il prezzo sconta il futuro
+  - Se EPS_NTM < 0 → fallback EPS_LTM
+  - Se anche LTM < 0 → modello non applicabile (N/A)
+- **Giappone TSE**: ESCLUSO — EPS GAAP non comparabile
+- **Ke** = Rf + Beta_locale × ERP
+  - ERP = 5.0% (standard globale)
+  - Beta: calcolato da noi su 5 anni mensili vs indice locale
+  - Rf: rendimento decennale del mercato
+
+### Anni EPS per confronto consensus
+Con FY2025-FY2030 disponibili:
+- Anno 1 (NTM): blend FY2026+FY2027 (calendarizzato)
+- Anno 2: FY2027
+- Anno 3: FY2028
+- eps_cagr_3y = CAGR da NTM a FY2028 (3 anni forward)
+- Confronto: g implicito vs eps_cagr_3y
+
+### Struttura corretta del modello (da Gemini)
+```
+Anno 0: EPS_NTM (base, dato noto)
+Anno 1: EPS_NTM (primo anno esplicito)
+Anno 2: consensus FY+2 (dato noto da TIKR)
+Anno 3: consensus FY+3 (dato noto da TIKR)
+Anno 4-10: crescita g implicita (incognita da trovare)
+Anno 10+: crescita terminale 2.5% (perpetua)
+```
+Quindi il reverse DCF trova il g che giustifica il prezzo
+partendo dall'anno 4, con anni 1-3 già noti da TIKR.
+
+### Algoritmo bisection (Python)
+```python
+def reverse_dcf(price, eps_ntm, ke, g_tv=0.025, years=10, tol=1e-6):
+    def dcf_price(g):
+        pv = 0
+        eps = eps_ntm
+        for t in range(1, years + 1):
+            if t > 1: eps = eps * (1 + g)
+            pv += eps / (1 + ke) ** t
+        tv = (eps * (1 + g_tv)) / (ke - g_tv)
+        pv += tv / (1 + ke) ** years
+        return pv
+    lo, hi = -0.50, 1.00
+    for _ in range(100):
+        mid = (lo + hi) / 2
+        if dcf_price(mid) > price: hi = mid
+        else: lo = mid
+        if (hi - lo) < tol: break
+    return round((lo + hi) / 2 * 100, 2)
+```
+
+### Forward DCF (calcola Fair Value dalla stima utente — JavaScript)
+```javascript
+function calculateUserFairValue(epsNtm, userGrowthRate, ke, gTV = 0.025) {
+    let pv = 0
+    let eps = epsNtm
+    for (let t = 1; t <= 10; t++) {
+        if (t > 1) eps = eps * (1 + userGrowthRate)
+        pv += eps / Math.pow(1 + ke, t)
+    }
+    const tv = (eps * (1 + gTV)) / (ke - gTV)
+    pv += tv / Math.pow(1 + ke, 10)
+    return Math.round(pv * 100) / 100
+}
+```
+
+### Risk-free rate per mercato
+```
+US, CA, HK → Treasury 10Y USA
+EU (€) → Bund 10Y
+ITA → BTP 10Y
+UK → Gilt 10Y
+CHE → Swiss Gov 10Y
+SWE → Swedish Gov 10Y
+NOR → Norwegian Gov 10Y
+DNK → Danish Gov 10Y
+AUS → ACGB 10Y
+KOR → KTB 10Y
+SGP → SGS 10Y
+JPN → JGB 10Y (~0.8%) — ma escluso dal modello
+```
+
+### Indici locali per Beta
+```
+MIL → DAX (GDAXI) o FTSE MIB
+XETRA → DAX (GDAXI)
+PA → CAC 40 (FCHI)
+LSE → FTSE 100
+US → S&P 500 (GSPC)
+TSX → S&P/TSX (GSPTSE)
+SEHK → Hang Seng (HSI)
+ASX → ASX 200 (AXJO)
+OM → OMX Stockholm (OMXS30)
+OB → OB All-Share
+CPSE → OMX Copenhagen (OMXC25)
+HE → OMX Helsinki (OMXH25)
+SWX → SMI (SSMI)
+MC → IBEX 35 (IBEX)
+AS → AEX
+KRX → KOSPI (KS11)
+SGX → STI
+```
+
+### UX sulla stock page
+1. **Dato passivo**: "Il prezzo attuale implica una crescita degli utili
+   dell'8,4% annuo per 10 anni (gTV=2.5%, Ke=9.2%)"
+2. **Consensus**: "Gli analisti stimano +12% annuo per i prossimi 2 anni"
+3. **Input utente**: slider "La tua stima decennale: [___]%"
+4. **Output**: "Con X% il modello calcola un valore teorico di Y €"
+
+### Disclaimer obbligatorio (MiFID II)
+"I dati e i modelli presentati hanno scopo puramente informativo ed
+educativo. Non costituiscono sollecitazione al pubblico risparmio o
+consulenza in materia di investimenti ai sensi del D.Lgs. 58/1998
+(TUF) e della Direttiva MiFID II."
+
+### Linguaggio da usare
+- ✅ "Il modello calcola", "La formula implica", "Il mercato prezza"
+- ✅ "Valore teorico superiore/inferiore al prezzo"
+- ✅ "Divergenza positiva/negativa"
+- ❌ "Sottovalutato/Sopravvalutato", "Compra/Vendi"
+
+---
+
+## NUOVO UNIVERSO — PARAMETRI DEFINITIVI (28/06/2026)
+
+### Europa (target ~2050 titoli)
+| Exchange | Criterio |
+|----------|----------|
+| LSE, XETRA, PA, OM, SWX, MIL | mkt_cap >= $500M + escludi ETF/fondi/settori 71-77 |
+| AS, MC, BR, HE, CPSE, OB | top 100 per mkt_cap + escludi ETF/fondi |
+| VI, IR, LS | tutti (escludi ETF/fondi) |
+| NGM, AIM | ESCLUSI dall'universo — non inclusi |
+
+### Nord America (target ~3000 titoli)
+| Exchange | Criterio |
+|----------|----------|
+| US | top 2500 per mkt_cap + escludi ETF/fondi/settori 71-77 |
+| TSX | top 500 per mkt_cap + escludi ETF/fondi |
+
+### Esclusioni ETF/fondi (EXCLUDE_NAMES)
+```python
+EXCLUDE_NAMES = [
+    "ETF","FUND","TRUST","UCITS","ISHARES","VANGUARD","XTRACKERS",
+    "LYXOR","AMUNDI ETF","INVESCO","SPDR","WISDOMTREE","VANECK",
+    "BLACKROCK","INDEX FUND","TRACKER","WARRANT","CERTIFICATE",
+    "ETP","ETC","STRUCTURED","NOTES","BOND FUND",
+]
+EXCLUDE_SECTORS = ["71","72","73","74","75","76","77"]
+```
+
+### Script di simulazione/aggiornamento
+- `simulate_universe.py` — verifica numeri senza toccare il DB
+- `fix_universe_anomalies.py` — rimuove ticker anomali BR/SEHK/TSE
+- Workflow: `simulate_universe.yml`, `fix_universe_anomalies.yml`
+
+---
+
+## BUG CRITICI RISOLTI (28/06/2026)
+
+1. **daily_us.py failure** — leggeva `in_universe` da `fundamentals`
+   (non esiste lì). Fix: usa `universe_keys` da `all_stocks` (stocks table)
+2. **daily_eu.py stesso bug** — fixato allo stesso modo
+3. **weekly_us.py** — leggeva da due file separati `tikr_us_latest.csv`
+   e `tikr_ca_latest.csv`. Fix: legge da file unico `tikr_na_latest.csv`
+   con distinzione US/TSX dalla colonna Primary Exchange
+4. **Colonne TIKR errate nei weekly** — nomi colonne aggiornati:
+   `LTM P/E LTM`, `LTM P/BVPS LTM`, `Mean Fwd P/E NTM`, `Rev (FY 2025)`
+5. **eps_fy4/eps_fy5 aggiunti** — FY2029 e FY2030 ora salvati su Supabase
+
+---
+
+## WORKFLOW GITHUB ACTIONS AGGIORNATI
+
+| Workflow | Schedule | Note |
+|----------|----------|------|
+| daily_eu.yml | `0 19 * * 1-5` | 21:00 CET — Leeway |
+| daily_eu_yahoo.yml | `0 19 * * 1-5` | 21:00 CET — Yahoo Finance |
+| daily_us.yml | separato | Leeway |
+| daily_us_yahoo.yml | `0 1 * * 2-6` | 02:00 CET — Yahoo Finance |
+| daily_apac.yml | `0 20 * * 1-5` | 22:00 CET — Leeway |
+| daily_apac_yahoo.yml | `0 11 * * 1-5` | 12:00 CET — Yahoo Finance |
+| weekly_eu.yml | `0 7 * * 0` | Domenica 08:00 CET |
+| weekly_us.yml | `0 7 * * 0` | Domenica 08:00 CET |
+| download_history_yahoo.yml | manuale | Storico 5 anni per mercato |
+| simulate_universe.yml | manuale | Verifica numeri universo |
+| check_prices_quality.yml | manuale | Verifica qualità prezzi |
+| check_yahoo_tickers.yml | manuale | Verifica yahoo_ticker nel DB |
+| fetch_news_cache.yml | `0 * * * *` | Ogni ora |
