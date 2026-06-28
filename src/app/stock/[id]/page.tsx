@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import WatchlistButton from '@/components/watchlist/WatchlistButton'
 import { computeScores } from '@/lib/ranking'
@@ -196,6 +196,12 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
 export default function StockPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const handleBack = () => {
+    const from = searchParams.get('from')
+    if (from) router.push(decodeURIComponent(from))
+    else router.back()
+  }
   const id = (params?.id as string) || ''
   const [ticker, exchangeCode] = id.split('-')
 
@@ -248,7 +254,7 @@ export default function StockPage() {
       <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
         fontFamily:'IBM Plex Sans, sans-serif', padding:40 }}>
         <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
-        <button onClick={() => router.back()}
+        <button onClick={handleBack}
           style={{ display:'flex', alignItems:'center', gap:8, color:'var(--orange)',
             background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
           <ArrowLeft size={16} /> Back
@@ -301,7 +307,7 @@ export default function StockPage() {
 
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
         padding:'0 24px', height:44, display:'flex', alignItems:'center', gap:16 }}>
-        <button onClick={() => router.back()}
+        <button onClick={handleBack}
           style={{ display:'flex', alignItems:'center', gap:6, color:'var(--text4)',
             background:'none', border:'none', cursor:'pointer', fontSize:13 }}>
           <ArrowLeft size={15} /> Back
