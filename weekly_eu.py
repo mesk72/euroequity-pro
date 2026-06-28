@@ -80,7 +80,7 @@ print("\n Legge fiscal year end...")
 fy_map = {}
 try:
     r_fy = requests.get(
-        f"{SUPABASE_URL}/storage/v1/object/public/tikr-uploads/fiscal_year_end.csv",
+        f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/fiscal_year_end.csv",
         headers=headers_r)
     reader = csv.DictReader(io.StringIO(r_fy.text))
     for row in reader:
@@ -125,7 +125,7 @@ print("\n Legge file TIKR EU...")
 tikr_rows = []
 try:
     r_tikr = requests.get(
-        f"{SUPABASE_URL}/storage/v1/object/public/tikr-uploads/tikr_eu_latest.csv",
+        f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_eu_latest.csv",
         headers=headers_r)
     reader = csv.DictReader(io.StringIO(r_tikr.text))
     for row in reader:
@@ -199,7 +199,7 @@ while True:
                 "exchange":"not.in.(US,TSX,TSE,SEHK,ASX)","in_universe":"eq.true",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
-    if not data: break
+    if not isinstance(data, list) or not data: break
     for d in data:
         mom_rank_map[(d["ticker"],d["exchange"])] = {
             "r_m6": d.get("rank_mom6_adj"), "r_m12": d.get("rank_mom12_adj")}
