@@ -678,7 +678,7 @@ ${body}
         <div className="section-hdr">📰 Global Financial News</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {lastUpdate && <span style={{ fontSize: 10, color: 'var(--text4)' }}>{lastUpdate} · {fmt(countdown)}</span>}
-          <button onClick={load} disabled={loading} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => load()} disabled={loading} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
             <RefreshCw size={14} style={{ color: loading ? 'var(--orange)' : 'var(--text4)', animation: loading ? 'spin 1s linear infinite' : 'none' }} />
           </button>
         </div>
