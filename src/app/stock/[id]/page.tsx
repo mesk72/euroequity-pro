@@ -264,7 +264,7 @@ export default function StockPage() {
       <div style={{ background:'var(--bg)', minHeight:'100vh', color:'var(--text)',
         fontFamily:'IBM Plex Sans, sans-serif', padding:40 }}>
         <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap');`}</style>
-        <button onClick={() => { const p = new URLSearchParams(window.location.search).get('from'); window.location.href = p ? '/?page='+p : '/' }}
+        <button onClick={() => { const p = router.back() }}
           style={{ display:'flex', alignItems:'center', gap:8, color:'var(--orange)',
             background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
           <ArrowLeft size={16} /> Back
@@ -317,7 +317,7 @@ export default function StockPage() {
 
       <div style={{ background:'var(--surface)', borderBottom:'2px solid var(--orange)',
         padding:'0 24px', height:44, display:'flex', alignItems:'center', gap:16 }}>
-        <button onClick={() => { const p = new URLSearchParams(window.location.search).get('from'); window.location.href = p ? '/?page='+p : '/' }}
+        <button onClick={() => { const p = router.back() }}
           style={{ display:'flex', alignItems:'center', gap:6, color:'var(--text4)',
             background:'none', border:'none', cursor:'pointer', fontSize:13 }}>
           <ArrowLeft size={15} /> Back
