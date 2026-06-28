@@ -959,3 +959,86 @@ sotto la completa ed esclusiva responsabilità dell'utente."
 3. Script Python reverse_dcf() nel weekly
 4. Componente React interattivo sulla stock page
 5. Disclaimer nella pagina /legal
+
+
+---
+
+## BACK NAVIGATION — SOLUZIONE DEFINITIVA (giugno 2026)
+
+### Problema
+Next.js 14 App Router usa una Router Cache aggressiva. Quando navighi da una pagina a `/stock/[id]` e torni indietro, il componente precedente può essere ripristinato dalla cache senza rimontarsi — causando spinner infiniti o stato congelato.
+
+### Soluzione per tipo di pagina
+
+**1. Homepage SPA (`/` con `?page=...`)**
+- La homepage NON usa `useState<Page>` — deriva `page` direttamente da `searchParams`
+- `const page = (searchParams.get('page') as Page) ?? 'dashboard'`
+- Per cambiare schermata: `router.replace('/?page=netherlands', { scroll: false })`
+- Quando si torna da `/stock/[id]` con `router.push('/?page=netherlands')`, la homepage legge l'URL e mostra automaticamente la schermata corretta
+- Il componente è wrappato in `<Suspense>` obbligatorio per `useSearchParams()`
+
+**2. Pagine con fetch pesanti al mount (`/news`)**
+- Usare `<a href>` nativo nei link ai titoli — NON `<Link>` di Next.js
+- Il Back usa `window.history.back()` — NON `router.push()` o `router.back()`
+- Motivo: `<a href>` fa hard navigation, il browser ricarica `/news` da zero al ritorno
+- `router.push('/news')` lascia il componente in cache congelato → spinner infinito
+- `router.refresh()` dopo `router.push()` causa freeze fatale in Next.js 14 — MAI usarli insieme
+
+**3. Pagine research (`/research/[slug]`)**
+- Usare `<Link href>` di Next.js nei link ai titoli
+- Il Back usa `router.back()` — funziona nativamente
+
+### Codice bottone Back in `/stock/[id]/page.tsx`
+```typescript
+const handleBack = () => {
+  const from = searchParams.get('from')
+  if (from) {
+    const decoded = decodeURIComponent(from)
+    // Per /news usa history.back() — evita freeze da Router Cache
+    if (decoded === '/news') {
+      window.history.back()
+    } else {
+      router.push(decoded)  // Per homepage SPA e altre pagine
+    }
+  } else {
+    window.history.back()
+  }
+}
+```
+
+### Codice link in NewsPage.tsx
+```typescript
+// USA <a href> NATIVO — non <Link> di Next.js
+<a href={'/stock/' + item.ticker + '-' + item.exchange}
+   style={{ ... }}>
+  {item.ticker} ↗
+</a>
+```
+
+### Codice homepage (page.tsx)
+```typescript
+// UNICA SORGENTE DI VERITA' — nessun useState per page
+const searchParams = useSearchParams()
+const page = (searchParams.get('page') as Page) ?? 'dashboard'
+
+const navigateTo = (newPage: Page) => {
+  if (newPage === 'dashboard') {
+    appRouter.replace('/', { scroll: false })
+  } else {
+    appRouter.replace(`/?page=${newPage}`, { scroll: false })
+  }
+}
+```
+
+### Regola generale
+| Tipo pagina | Link a stock | Back |
+|-------------|-------------|------|
+| Homepage SPA (`/?page=...`) | `router.push` con `?from=` | `router.push(from)` |
+| News (`/news`) | `<a href>` nativo | `window.history.back()` |
+| Research (`/research/...`) | `<Link href>` Next.js | `router.back()` |
+| MyScreen (dentro homepage) | `router.push` con `?from=` | `router.push(from)` |
+
+### Causa root
+Next.js 14 Router Cache non smonta i Client Components — li nasconde in memoria.
+`useEffect([], ...)` non scatta al ritorno dalla cache.
+L'unico modo sicuro per pagine con fetch pesanti è la navigazione nativa del browser.
