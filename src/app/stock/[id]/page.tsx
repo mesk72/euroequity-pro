@@ -200,9 +200,15 @@ export default function StockPage() {
   const handleBack = () => {
     const from = searchParams.get('from')
     if (from) {
-      router.push(decodeURIComponent(from))
+      const decoded = decodeURIComponent(from)
+      // Per /news usa history.back() — evita freeze da Router Cache di Next.js
+      if (decoded === '/news') {
+        window.history.back()
+      } else {
+        router.push(decoded)
+      }
     } else {
-      router.back()
+      window.history.back()
     }
   }
   const id = (params?.id as string) || ''
