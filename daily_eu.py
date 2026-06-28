@@ -39,14 +39,6 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 
-LEEWAY_SUFFIX = {
-    "MIL": ".MI", "XETRA": ".XETRA", "PA": ".PA", "AS": ".AS",
-    "MC": ".MC", "BR": ".BR", "LS": ".LS", "VI": ".VI",
-    "HE": ".HE", "IR": ".IR", "AT": ".AT", "LSE": ".LSE",
-    "AIM": ".AIM", "SWX": ".SW", "OM": ".ST", "NGM": ".ST",
-    "OB": ".OL", "CPSE": ".CO",
-}
-
 SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
     "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
@@ -227,14 +219,19 @@ print("  FX salvati")
 print("\n[5/5] Ricalcolo rank EU...")
 all_data = []
 offset = 0
+# in_universe vive in stocks non in fundamentals
+# Usa i ticker già caricati in all_stocks come filtro
+universe_keys = {(s["ticker"], s["exchange"]) for s in all_stocks}
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
         params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
-                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)", "in_universe": "eq.true",
+                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)",
                 "offset": str(offset), "limit": "1000"})
     data = r.json()
     if not isinstance(data, list) or not data: break
-    all_data.extend(data); offset += 1000
+    # Filtra solo i titoli in universe
+    all_data.extend([d for d in data if (d["ticker"], d["exchange"]) in universe_keys])
+    offset += 1000
     if len(data) < 1000: break
 print("  Fundamentals: " + str(len(all_data)))
 
@@ -248,8 +245,9 @@ RANK_GROUPS = {
     "ITA": ["MIL"], "DEU": ["XETRA"], "FRA": ["PA"], "GBR": ["LSE"],
     "SWE": ["OM"],  "NOR": ["OB"],    "CHE": ["SWX"], "NLD": ["AS"],
     "BEL": ["BR"],  "FIN": ["HE"],    "ESP": ["MC"],  "DNK": ["CPSE"],
+    "POR": ["LS"],
 }
-NO_RANK = {"AT", "VI", "IR", "NGM", "AIM", "LS"}
+NO_RANK = {"AT", "VI", "IR", "NGM", "AIM"}  # LS (Portogallo) ha rank proprio
 
 def calc_ranks(group):
     ey_trail_g = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
