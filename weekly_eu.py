@@ -135,17 +135,18 @@ try:
         tikr_rows.append({
             "ticker": ticker, "exchange": exchange,
             "company": row["Company Name"].strip(),
-            "pe_trailing": parse_num(row.get("Trailing P/Diluted EPS before Extra LTM","")),
-            "pe_forward":  parse_num(row.get("Mean Forward P/E NTM","")),
-            "pb":          parse_num(row.get("Trailing P/BVPS LTM","")),
+            "pe_trailing": parse_num(row.get("LTM P/E LTM","")),
+            "pe_forward":  parse_num(row.get("Mean Fwd P/E NTM","")),
+            "pb":          parse_num(row.get("LTM P/BVPS LTM","")),
             "eps_fy0": parse_num(row.get("EPS Normalized (FY 2025)","")),
             "eps_fy1": parse_num(row.get("Mean EPS Normalized (FY 2026)","")),
             "eps_fy2": parse_num(row.get("Mean EPS Normalized (FY 2027)","")),
             "eps_fy3": parse_num(row.get("Mean EPS Normalized (FY 2028)","")),
-            "rev_fy0": parse_num(row.get("Revenue (FY 2025)","")),
-            "rev_fy1": parse_num(row.get("Mean Revenue (FY 2026)","")),
-            "rev_fy2": parse_num(row.get("Mean Revenue (FY 2027)","")),
-            "rev_fy3": parse_num(row.get("Mean Revenue (FY 2028)","")),
+            "eps_fy4": parse_num(row.get("Mean EPS Normalized (FY 2030)","")),
+            "rev_fy0": parse_num(row.get("Rev (FY 2025)","")),
+            "rev_fy1": parse_num(row.get("Mean Rev (FY 2026)","")),
+            "rev_fy2": parse_num(row.get("Mean Rev (FY 2027)","")),
+            "rev_fy3": parse_num(row.get("Mean Rev (FY 2028)","")),
         })
     print(f" TIKR EU: {len(tikr_rows)} titoli")
 except Exception as e:
@@ -176,6 +177,7 @@ for r in tikr_rows:
         "pb": r["pb"],
         "eps_fy0": r["eps_fy0"], "eps_fy1": r["eps_fy1"],
         "eps_fy2": r["eps_fy2"], "eps_fy3": r["eps_fy3"],
+        "eps_fy4": r.get("eps_fy4"),
         "eps_growth": round(eps_growth,6) if eps_growth is not None else None,
         "rev_growth": round(rev_growth,6) if rev_growth is not None else None,
     })
