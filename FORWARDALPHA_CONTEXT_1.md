@@ -784,3 +784,178 @@ for ticker, exchange in [("ENI","MIL"),("SAP","XETRA"),("MC","PA")]:
 Il POST di mom_updates a fundamentals usa upsert ma la chiave
 primaria potrebbe non corrispondere — verificare che il PATCH/POST
 aggiorni effettivamente i record esistenti e non crei duplicati.
+
+
+---
+
+## REVERSE DCF — IMPLEMENTAZIONE COMPLETA
+
+### Filosofia (Expectations Investing — Mauboussin)
+Non indovinare il prezzo futuro. Partire dal prezzo attuale per capire quali
+aspettative incorpora, poi decidere se quelle aspettative sono troppo
+pessimistiche o ottimistiche.
+
+### Modello a due stadi
+- **Stage 1**: crescita g implicita per 10 anni (incognita da trovare)
+- **Stage 2**: crescita terminale gTV = 2.5% dal decimo anno in poi (fissata)
+
+### Input del modello
+- **EPS_NTM**: utile per azione next twelve months (calendarizzato da TIKR)
+  - Se EPS_NTM < 0 → fallback su EPS_LTM
+  - Se anche EPS_LTM < 0 → modello non applicabile (mostra N/A)
+- **Prezzo**: ultimo prezzo da Leeway (in valuta locale)
+- **Ke**: costo del capitale = Rf + Beta × ERP
+- **Beta**: calcolato da noi su 5 anni mensili vs indice locale (NON Beta Leeway)
+- **Rf**: rendimento decennale del mercato di riferimento
+- **ERP**: 5.0% (standard globale)
+- **gTV**: 2.5% (crescita terminale perpetua)
+- **Giappone TSE**: ESCLUSO — EPS GAAP non comparabile con EPS normalized
+
+### Indici di riferimento per Beta locale
+```
+MIL → FTSE MIB (FTSEMIB.MI)
+XETRA → DAX (GDAXI.INDX)
+PA → CAC 40 (FCHI.INDX)
+LSE → FTSE 100 (FTSE.INDX)
+US → S&P 500 (GSPC.INDX)
+TSX → S&P/TSX (GSPTSE.INDX)
+SEHK → Hang Seng (HSI.INDX)
+ASX → ASX 200 (AXJO.INDX)
+OM → OMX Stockholm (OMXS30.INDX)
+OB → OB All-Share (OB.INDX)
+CPSE → OMX Copenhagen (OMXC25.INDX)
+HE → OMX Helsinki (OMXH25.INDX)
+SWX → SMI (SSMI.INDX)
+MC → IBEX 35 (IBEX.INDX)
+AS → AEX (AEX.INDX)
+KRX → KOSPI
+SGX → STI
+```
+
+### Risk-free rate per mercato (da aggiornare mensilmente)
+```
+US, CA, HK → Treasury 10Y USA
+EU (€) → Bund 10Y (Germania)
+ITA → BTP 10Y (spread paese)
+UK → Gilt 10Y
+CHE → Swiss Gov 10Y
+SWE → Swedish Gov 10Y
+NOR → Norwegian Gov 10Y
+DNK → Danish Gov 10Y
+AUS → ACGB 10Y
+KOR → KTB 10Y
+SGP → SGS 10Y
+JPN → JGB 10Y (~0.8%) — ma TSE escluso dal modello
+```
+Fonte: FMP /stable/treasury o aggiornamento manuale mensile.
+
+### Algoritmo Reverse DCF (bisection method — Python)
+```python
+def reverse_dcf(price, eps_ntm, ke, g_tv=0.025, years=10, tol=1e-6):
+    """
+    Trova il tasso di crescita g implicito nel prezzo corrente.
+    Usa il metodo della bisezione.
+    """
+    def dcf_price(g):
+        pv = 0
+        eps = eps_ntm
+        for t in range(1, years + 1):
+            if t > 1:
+                eps = eps * (1 + g)
+            pv += eps / (1 + ke) ** t
+        # Terminal Value
+        tv = (eps * (1 + g_tv)) / (ke - g_tv)
+        pv += tv / (1 + ke) ** years
+        return pv
+
+    # Bisezione tra -50% e +100%
+    lo, hi = -0.50, 1.00
+    for _ in range(100):
+        mid = (lo + hi) / 2
+        if dcf_price(mid) > price:
+            hi = mid
+        else:
+            lo = mid
+        if (hi - lo) < tol:
+            break
+    return round((lo + hi) / 2 * 100, 2)  # restituisce % con 2 decimali
+```
+
+### Forward DCF (calcola Fair Value dalla stima utente — JavaScript)
+```javascript
+function calculateUserFairValue(epsNtm, userGrowthRate, ke, terminalGrowthRate = 0.025) {
+    let presentValue = 0;
+    let currentEps = epsNtm;
+
+    for (let t = 1; t <= 10; t++) {
+        if (t > 1) currentEps = currentEps * (1 + userGrowthRate);
+        presentValue += currentEps / Math.pow(1 + ke, t);
+    }
+
+    const terminalValue = (currentEps * (1 + terminalGrowthRate)) / (ke - terminalGrowthRate);
+    const discountedTV = terminalValue / Math.pow(1 + ke, 10);
+
+    return Math.round((presentValue + discountedTV) * 100) / 100;
+}
+```
+
+### UX sulla stock page
+**Layout a tre blocchi:**
+
+1. **Dato di mercato (passivo)**
+   - Prezzo attuale: X €
+   - Tasso di crescita implicito: **8,4%** annuo per 10 anni
+   - *(assumendo gTV=2.5%, Ke=9.2%, Beta=0.85)*
+   - Consensus analisti FY+1/FY+2: **+12%** annuo
+
+2. **Input utente (attivo)**
+   - Slider o campo: "La tua stima di crescita decennale: [ ___ % ]"
+
+3. **Output dinamico (feedback immediato)**
+   - "Con una crescita del X%, il modello calcola un valore teorico di Y €"
+   - Divergenza vs prezzo attuale: +Z% / -Z%
+
+### Copywriting (no investment advice)
+```
+"Per giustificare l'attuale prezzo di borsa, il modello matematico implica
+che gli utili debbano crescere in media dell'8,4% annuo per i prossimi
+10 anni (crescita terminale 2,5% dal decimo anno).
+
+Il consensus degli analisti stima una crescita media del 12% per i
+prossimi 2 anni.
+
+Inserisci la tua stima decennale per calcolare il valore teorico secondo
+il modello."
+```
+
+### Disclaimer obbligatorio
+```
+"I dati e i modelli presentati hanno scopo puramente informativo ed
+educativo. I risultati del Reverse Model sono frutto di calcoli matematici
+basati su dati pubblici e non costituiscono sollecitazione al pubblico
+risparmio o consulenza in materia di investimenti ai sensi del D.Lgs.
+58/1998 (TUF) e della Direttiva MiFID II. Ogni decisione operativa è
+sotto la completa ed esclusiva responsabilità dell'utente."
+```
+
+### Verbi da usare (no investment advice)
+- ✅ "Il modello calcola", "La formula implica", "Il mercato prezza"
+- ✅ "Valore teorico superiore/inferiore al prezzo attuale"
+- ✅ "Divergenza positiva/negativa"
+- ❌ "Sottovalutato/Sopravvalutato"
+- ❌ "Compra/Vendi"
+- ❌ "Il titolo è conveniente"
+
+### Colonne da aggiungere a Supabase (fundamentals)
+- `implied_growth` (calcolato dal daily con prezzi Leeway aggiornati)
+- `ke` (costo del capitale, calcolato dal weekly con beta locale)
+- `beta_local` (calcolato da noi su 5 anni mensili vs indice locale)
+- `rf_rate` (risk-free del mercato, aggiornato mensilmente)
+- `eps_cagr_3y` (CAGR consensus FY+1 → FY+3 da TIKR)
+
+### Priorità implementazione
+1. Calcolo beta locale (prezzi indici già in Supabase)
+2. Raccolta Rf rates per mercato (FMP o manuale)
+3. Script Python reverse_dcf() nel weekly
+4. Componente React interattivo sulla stock page
+5. Disclaimer nella pagina /legal
