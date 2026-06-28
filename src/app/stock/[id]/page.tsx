@@ -477,9 +477,7 @@ export default function StockPage() {
                 <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
                   letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)',
                   marginBottom:6 }}>Official Links</div>
-                <div style={{ fontSize:12, color:'var(--text3)', fontFamily:'IBM Plex Mono' }}>
-                  ISIN: {(stock as any).isin || "N/A"}
-                </div>
+
               </div>
               <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
                 {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
