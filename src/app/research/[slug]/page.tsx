@@ -171,7 +171,7 @@ export default function ResearchNotePage({ params }: Props) {
         display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}>
         <div style={{ textAlign:'center' }}>
           <p style={{ color:'#94a3b8' }}>Research note not found.</p>
-          <Link href="/research" style={{ color:'#f97316', textDecoration:'none' }}>← Back to Research</Link>
+          <button onClick={() => window.history.back()} style={{ color:'#f97316', background:'none', border:'none', cursor:'pointer', fontSize:14 }}>← Back</button>
         </div>
       </div>
     )
