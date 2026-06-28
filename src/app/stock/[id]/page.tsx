@@ -199,8 +199,18 @@ export default function StockPage() {
   const searchParams = useSearchParams()
   const handleBack = () => {
     const from = searchParams.get('from')
-    if (from) router.push(decodeURIComponent(from))
-    else router.back()
+    if (from) {
+      const decoded = decodeURIComponent(from)
+      // Per pagine separate (/news, /research) usa hard navigation
+      // Per la homepage SPA usa router.push che mantiene il client cache
+      if (decoded.startsWith('/?') || decoded === '/') {
+        router.push(decoded)
+      } else {
+        window.location.href = decoded
+      }
+    } else {
+      router.back()
+    }
   }
   const id = (params?.id as string) || ''
   const [ticker, exchangeCode] = id.split('-')
