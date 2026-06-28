@@ -142,7 +142,8 @@ try:
             "eps_fy1": parse_num(row.get("Mean EPS Normalized (FY 2026)","")),
             "eps_fy2": parse_num(row.get("Mean EPS Normalized (FY 2027)","")),
             "eps_fy3": parse_num(row.get("Mean EPS Normalized (FY 2028)","")),
-            "eps_fy4": parse_num(row.get("Mean EPS Normalized (FY 2030)","")),
+            "eps_fy4": parse_num(row.get("Mean EPS (GAAP) (FY 2029)","") or row.get("Mean EPS Normalized (FY 2029)","")),
+            "eps_fy5": parse_num(row.get("Mean EPS Normalized (FY 2030)","") or row.get("Mean EPS (GAAP) (FY 2030)","")),
             "rev_fy0": parse_num(row.get("Rev (FY 2025)","")),
             "rev_fy1": parse_num(row.get("Mean Rev (FY 2026)","")),
             "rev_fy2": parse_num(row.get("Mean Rev (FY 2027)","")),
@@ -178,6 +179,7 @@ for r in tikr_rows:
         "eps_fy0": r["eps_fy0"], "eps_fy1": r["eps_fy1"],
         "eps_fy2": r["eps_fy2"], "eps_fy3": r["eps_fy3"],
         "eps_fy4": r.get("eps_fy4"),
+        "eps_fy5": r.get("eps_fy5"),
         "eps_growth": round(eps_growth,6) if eps_growth is not None else None,
         "rev_growth": round(rev_growth,6) if rev_growth is not None else None,
     })
