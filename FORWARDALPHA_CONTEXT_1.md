@@ -694,3 +694,56 @@ e che vengano aggiunte `fy2027`, `fy2028`, `fy2029` con il prossimo TIKR.
 - Lars conferma copertura Leeway ma fondamentali probabilmente incompleti
 - Verificare con Lars copertura EPS estimates per NSE prima di integrare
 - Se integrata: exchange = NSE, suffix Leeway da confermare
+
+
+---
+
+## NUOVO TIKR — EPS/REVENUE FY2028/FY2029/FY2030
+
+### Dati disponibili nel nuovo TIKR (scaricato giugno 2026)
+- EU + NA (US+CA): già scaricati
+- APAC + Corea (KRX): da scaricare
+- Colonne EPS e Revenue: FY2026, FY2027, FY2028, FY2029, FY2030
+
+### Nuovi calcoli da implementare
+
+**1. EPS Growth 3 anni (consensus)**
+```python
+eps_cagr_3y = (eps_fy2029 / abs(eps_ntm)) ** (1/3) - 1
+# oppure da FY2027 a FY2030
+eps_cagr_3y = (eps_fy2030 / abs(eps_fy2027)) ** (1/3) - 1
+```
+
+**2. Reverse DCF — EPS growth implicito nel prezzo**
+```python
+# Ke = Risk Free Rate + Beta * ERP (CAPM)
+# Beta da Leeway (5 anni vs S&P500)
+# Risk Free = rendimento BTP 10Y o Treasury 10Y
+# ERP = 5% (assumption standard)
+Ke = rf + beta * erp
+
+# Gordon Growth Model inverso:
+# Prezzo = EPS_NTM / (Ke - g)  →  g = Ke - EPS_NTM/Prezzo
+implied_growth = Ke - (eps_ntm / price)
+
+# Confronto:
+# Se consensus_cagr_3y > implied_growth → titolo potenzialmente sottovalutato
+# Se consensus_cagr_3y < implied_growth → potenzialmente sopravvalutato
+```
+
+**3. Aggiunta al Growth Score o scheda titolo**
+- Mostrare `implied_growth` vs `eps_cagr_3y` sulla stock page
+- Possibile nuovo parametro nel rank: titoli dove consensus > implied
+
+### Colonne da aggiungere a Supabase (fundamentals)
+- `eps_fy2028`, `eps_fy2029`, `eps_fy2030`
+- `rev_fy2028`, `rev_fy2029`, `rev_fy2030`
+- `eps_cagr_3y` (calcolato dal weekly)
+- `implied_growth` (calcolato dal daily con prezzi aggiornati)
+- `beta` (da Leeway — già disponibile nel /fundamentals endpoint)
+
+### Calendarizzazione aggiornata
+Con FY2030 disponibile, gli anni fissi diventano:
+- fy0=FY2026, fy1=FY2027, fy2=FY2028, fy3=FY2029, fy4=FY2030
+- eps_ntm calcolato come prima (blend fy1/fy2)
+- eps_cagr_3y = CAGR da eps_ntm a fy4 (3 anni forward)
