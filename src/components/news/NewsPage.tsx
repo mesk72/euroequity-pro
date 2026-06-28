@@ -258,7 +258,8 @@ export default function NewsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [indices, setIndices] = useState<IndexData[]>([])
 
-  const load = async () => {
+  const load = async (signal?: AbortSignal, isMounted?: () => boolean) => {
+    if (isMounted && !isMounted()) return
     setLoading(true)
     // Reset dati
     setData({ world: [], americas: [], europe: [], asia: [] })
@@ -273,7 +274,7 @@ export default function NewsPage() {
       Promise.all(GOOGLE_NEWS_QUERIES.map(async ({ name, q }) => {
         try {
           const url = 'https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=en&gl=US&ceid=US:en'
-          const r = await fetch('/api/yahoo-news?ticker=&company=&googleUrl=' + encodeURIComponent(url))
+          const r = await fetch('/api/yahoo-news?ticker=&company=&googleUrl=' + encodeURIComponent(url), { cache: 'no-store' })
           if (!r.ok) return [] as NewsItem[]
           const d = await r.json()
           return (d.items || []).map((i: any) => ({
@@ -309,7 +310,7 @@ export default function NewsPage() {
     await Promise.all((['americas', 'europe', 'asia'] as Region[]).map(async region => {
       try {
         // 1. Prova news_cache da Supabase
-        const cr = await fetch('/api/news-cache?region=' + region + '&limit=1500')
+        const cr = await fetch('/api/news-cache?region=' + region + '&limit=1500', { cache: 'no-store' })
         if (cr.ok) {
           const cd = await cr.json()
           const cachedItems: NewsItem[] = (cd.items || []).map((i: any) => ({
@@ -325,7 +326,7 @@ export default function NewsPage() {
           }
         }
         // 2. Fallback: vecchio sistema se cache vuota
-        const tr = await fetch('/api/ticker-news?region=' + region)
+        const tr = await fetch('/api/ticker-news?region=' + region, { cache: 'no-store' })
         if (!tr.ok) return
         const td = await tr.json()
             const tickers = (td.tickers || []).slice(0, maxT[region])
@@ -528,9 +529,27 @@ export default function NewsPage() {
   }
 
   useEffect(() => {
-    load()
-    const t = setInterval(load, 900000)
-    return () => clearInterval(t)
+    let isMounted = true
+    const controller = new AbortController()
+
+    const safeLoad = async () => {
+      try {
+        await load(controller.signal, () => isMounted)
+      } catch (e) {
+        if ((e as any)?.name !== 'AbortError') console.error('News load error:', e)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    safeLoad()
+    const t = setInterval(safeLoad, 900000)
+
+    return () => {
+      isMounted = false
+      controller.abort()
+      clearInterval(t)
+    }
   }, [])
 
   useEffect(() => {
