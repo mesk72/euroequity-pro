@@ -846,7 +846,7 @@ ${body}
                     <Link href={'/stock/' + item.ticker + '-' + item.exchange + '?from=' + encodeURIComponent('/news')}
                       style={{ fontSize: 10, color: 'var(--orange)', fontWeight: 700, textDecoration: 'none', display: 'inline-block', marginTop: 3, padding: '1px 5px', border: '1px solid rgba(249,115,22,0.4)', borderRadius: 3 }}>
                       {item.ticker} ↗
-                    </a>
+                    </Link>
                   )}
                 </div>
               </div>
