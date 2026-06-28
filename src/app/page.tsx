@@ -346,7 +346,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
  const sColor = getSectorColor(s.sector)
  return (
  <div key={i}
- onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
+ onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}` }}
  className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5 active:bg-white/10">
  <div className="flex items-center justify-between mb-1">
  <div className="flex items-center gap-2">
@@ -440,7 +440,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
           {sorted.map((s, i) => (
             <tr
               key={`${s.ticker}.${s.exchange}.${i}`}
-              onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}${fromPage ? "?from="+fromPage : ""}` }}
+              onClick={() => { onSelect(s); window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}` }}
               className="cursor-pointer"
             >
               {COLUMNS.map((c, ci) => {
