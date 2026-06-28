@@ -835,7 +835,7 @@ ${body}
         ) : items.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 48 }}>
             <p style={{ fontSize: 13, color: 'var(--text4)', marginBottom: 12 }}>No news available.</p>
-            <button onClick={load} style={{ color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 12 }}>
+            <button onClick={() => load()} style={{ color: 'var(--orange)', background: 'none', border: '1px solid var(--orange)', borderRadius: 4, padding: '6px 16px', cursor: 'pointer', fontSize: 12 }}>
               🔄 Retry
             </button>
           </div>
