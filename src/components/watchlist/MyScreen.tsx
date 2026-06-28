@@ -165,7 +165,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                 borderColor: activeWallet === idx ? 'var(--orange)' : 'var(--border)'
               }}>
               {name}
-              <span className="ml-2 opacity-70">{count}/50</span>
+              <span className="ml-2 opacity-70">{count}/100</span>
             </button>
           )
         })}
@@ -348,7 +348,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
           </table>
         </div>
       )}
-      <div className="text-xs text-muted text-right">{50 - stocks.length} slots remaining in {WALLET_NAMES[activeWallet]}</div>
+      <div className="text-xs text-muted text-right">{100 - stocks.length} slots remaining in {WALLET_NAMES[activeWallet]}</div>
     </div>
   )
 }
