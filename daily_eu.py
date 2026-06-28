@@ -144,7 +144,7 @@ for stock in all_stocks:
     if len(price_buf) >= 500:
         requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
         price_buf = []
-    time.sleep(0.15)
+    time.sleep(0.5)
 if price_buf:
     requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
 print("  Prezzi Leeway: ok=" + str(ok_leeway) + " fail=" + str(fail_leeway))
