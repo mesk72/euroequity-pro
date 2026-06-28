@@ -9,7 +9,7 @@ headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "return=minimal"}
 
 EXCLUDE_NAMES = [
-    "ETF","UCITS","ISHARES","VANGUARD","XTRACKERS",
+    "ETF","FUND","UCITS","ISHARES","VANGUARD","XTRACKERS",
     "LYXOR","AMUNDI ETF","INVESCO","SPDR","WISDOMTREE","VANECK",
     "BLACKROCK","INDEX FUND","TRACKER","WARRANT","CERTIFICATE",
     "ETP","ETC","STRUCTURED","NOTES","BOND FUND",
