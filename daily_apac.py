@@ -129,11 +129,14 @@ for exchange, tickers in by_exchange.items():
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i+CHUNK]
         offset_p = 0
+        # Limita a ultimi 400 giorni — sufficiente per momentum 12 mesi
+        from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
         while True:
             rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
                 params={"select": "ticker,date,adj_close",
                         "exchange": "eq." + exchange,
                         "ticker": "in.(" + ",".join(chunk) + ")",
+                        "date": "gte." + from_400d,
                         "order": "ticker,date.desc",
                         "limit": "1000", "offset": str(offset_p)})
             batch = rp.json()
