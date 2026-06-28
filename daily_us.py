@@ -170,11 +170,13 @@ for exchange, tickers in by_exchange.items():
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i+CHUNK]
         offset_p = 0
+        from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
         while True:
             rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
                 params={"select": "ticker,date,adj_close",
                         "exchange": f"eq.{exchange}",
                         "ticker": f"in.({','.join(chunk)})",
+                        "date": f"gte.{from_400d}",
                         "order": "ticker,date.desc",
                         "limit": "1000", "offset": str(offset_p)})
             batch = rp.json()
