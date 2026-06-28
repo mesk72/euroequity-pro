@@ -595,11 +595,38 @@ EU totale: 1.904 | US: 1.967 | TSX: 387 | APAC: 1.850
 
 1. **FTSE MIB e FTSE 100**: chiedere a Lars il ticker corretto su Leeway
 2. **ISEQ**: ticker Leeway da verificare
-3. **daily_us combined rank**: verificare che includa TSX nella stessa distribuzione US
-4. **Dashboard APAC**: pagina non ancora creata (indici pronti in Supabase)
-5. **Growth/best score che non cambia**: verificare dopo il prossimo run daily con il fix filtro 400 giorni
-6. **Vercel build**: verificare dopo ogni modifica
-7. **Google Search Console**: richiedere reindicizzazione homepage dopo fix title
+3. **Dashboard APAC**: pagina non ancora creata (indici pronti in Supabase)
+4. **Growth/best score che non cambia**: verificare dopo il prossimo run daily con il fix filtro 400 giorni
+5. **Vercel build**: verificare dopo ogni modifica
+6. **Google Search Console**: richiedere reindicizzazione homepage dopo fix title
+
+## PROSSIMA SESSIONE — REBUILD UNIVERSI
+
+### TIKR già scaricati
+- EU + NA (US+CA): pronti da processare
+- APAC: da scaricare, aggiungere +500 Corea (KRX)
+
+### Universi target
+| Mercato | Exchange | Titoli target |
+|---------|----------|---------------|
+| Europa  | MIL/XETRA/PA/LSE/OM/SWX/OB/AS/MC/BR/CPSE/HE/VI/IR/LS | ~2.100 |
+| US      | US       | ~2.000 |
+| Canada  | TSX      | ~400 |
+| Giappone| TSE      | ~1.000 |
+| Hong Kong| SEHK    | ~500 |
+| Australia| ASX     | ~350 |
+| Corea   | KRX      | ~350-400 |
+
+### Da fare
+1. Applicare filtri esclusione (fondi, ETF, settori 71-77) a EU e US come già fatto per APAC
+2. Aggiungere KRX (Corea) — verificare suffix Leeway con Lars, rimuovere "A" iniziale dai ticker numerici
+3. Combined rank Nord America = US + TSX insieme (come AP = TSE+SEHK+ASX)
+   - Aggiornare weekly_us per calcolare combined NA su distribuzione unica US+TSX
+   - Screen Nord America aggregato nel frontend
+4. Nuovo screen Corea nel frontend
+5. Screen Asia Pacific aggiornato: JP+HK+AU+KR
+6. Modificare daily_us per includere KRX nei prezzi e momentum
+7. Modificare weekly per includere KRX nei rank
 
 ---
 
