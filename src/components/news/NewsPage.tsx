@@ -1,4 +1,5 @@
 'use client'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 import { useEffect, useState } from 'react'
@@ -245,6 +246,7 @@ const EMPTY: Record<Region, NewsItem[]> = { world: [], americas: [], europe: [],
 
 export default function NewsPage() {
   const [data, setData] = useState<Record<Region, NewsItem[]>>(EMPTY)
+  const pathname = usePathname()
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('world')
   const [lastUpdate, setLast] = useState('')
@@ -550,7 +552,7 @@ export default function NewsPage() {
       controller.abort()
       clearInterval(t)
     }
-  }, [])
+  }, [pathname])
 
   useEffect(() => {
     const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1000)
