@@ -1,0 +1,25 @@
+name: Download History Yahoo
+
+on:
+  workflow_dispatch:
+    inputs:
+      market:
+        description: 'Mercato (eu / us / apac / indices / all)'
+        required: true
+        default: 'eu'
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install yfinance requests pandas numpy
+      - name: Download history
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python download_history_yahoo.py ${{ github.event.inputs.market }}
