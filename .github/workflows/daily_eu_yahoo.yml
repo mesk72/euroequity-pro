@@ -1,0 +1,22 @@
+name: Daily EU Yahoo Finance
+
+on:
+  schedule:
+    - cron: '0 19 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  update-eu-yahoo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install yfinance requests pandas numpy
+      - name: Run EU daily Yahoo
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python daily_eu_yahoo.py
