@@ -110,14 +110,24 @@ print("\n Legge file TIKR US...")
 tikr_rows = []
 try:
     r_tikr = requests.get(
-        f"{SUPABASE_URL}/storage/v1/object/public/tikr-uploads/tikr_us_latest.csv",
+        f"{SUPABASE_URL}/storage/v1/object/public/tikr-uploads/tikr_na_latest.csv",
         headers=headers_r)
     reader = csv.DictReader(io.StringIO(r_tikr.text))
     for row in reader:
         ticker = row["Ticker"].strip()
         if not ticker: continue
+        # Determina exchange dalla colonna Exchange/Market del CSV
+        exch_raw = (row.get("Exchange","") or row.get("Market","") or "").strip().upper()
+        # Mappa borse TIKR → ForwardAlpha
+        if exch_raw in ("TSX","TSXV","TO","TSE"):
+            exchange = "TSX"
+        elif exch_raw in ("NYSE","NASDAQ","AMEX","OTC","PINK","NYSEARCA","BATS",""):
+            exchange = "US"
+        else:
+            # Fallback: Canada ha suffisso .TO o ticker con pattern canadese
+            exchange = "US"
         tikr_rows.append({
-            "ticker": ticker, "exchange": "US",
+            "ticker": ticker, "exchange": exchange,
             "pe_trailing": parse_num(row.get("Trailing P/Diluted EPS before Extra LTM","")),
             "pe_forward":  parse_num(row.get("Mean Forward P/E NTM","")),
             "pb":          parse_num(row.get("Trailing P/BVPS LTM","")),
@@ -130,39 +140,12 @@ try:
             "rev_fy2": parse_num(row.get("Mean Revenue (FY 2027)","")),
             "rev_fy3": parse_num(row.get("Mean Revenue (FY 2028)","")),
         })
-    print(f" TIKR US: {len(tikr_rows)}")
+    us_count = sum(1 for r in tikr_rows if r["exchange"] == "US")
+    ca_count = sum(1 for r in tikr_rows if r["exchange"] == "TSX")
+    print(f" TIKR NA: {len(tikr_rows)} totali (US={us_count} CA={ca_count})")
 except Exception as e:
-    print(f" Errore TIKR US: {e}"); exit()
+    print(f" Errore TIKR NA: {e}"); exit()
 
-# ── TIKR CANADA ──────────────────────────────────────────────
-print("\n Legge file TIKR Canada...")
-try:
-    r_ca = requests.get(
-        f"{SUPABASE_URL}/storage/v1/object/public/tikr-uploads/tikr_ca_latest.csv",
-        headers=headers_r)
-    reader = csv.DictReader(io.StringIO(r_ca.text))
-    ca_count = 0
-    for row in reader:
-        ticker = row["Ticker"].strip()
-        if not ticker: continue
-        tikr_rows.append({
-            "ticker": ticker, "exchange": "TSX",
-            "pe_trailing": parse_num(row.get("Trailing P/Diluted EPS before Extra LTM","")),
-            "pe_forward":  parse_num(row.get("Mean Forward P/E NTM","")),
-            "pb":          parse_num(row.get("Trailing P/BVPS LTM","")),
-            "eps_fy0": parse_num(row.get("EPS Normalized (FY 2025)","")),
-            "eps_fy1": parse_num(row.get("Mean EPS Normalized (FY 2026)","")),
-            "eps_fy2": parse_num(row.get("Mean EPS Normalized (FY 2027)","")),
-            "eps_fy3": parse_num(row.get("Mean EPS Normalized (FY 2028)","")),
-            "rev_fy0": parse_num(row.get("Revenue (FY 2025)","")),
-            "rev_fy1": parse_num(row.get("Mean Revenue (FY 2026)","")),
-            "rev_fy2": parse_num(row.get("Mean Revenue (FY 2027)","")),
-            "rev_fy3": parse_num(row.get("Mean Revenue (FY 2028)","")),
-        })
-        ca_count += 1
-    print(f" TIKR CA: {ca_count}")
-except Exception as e:
-    print(f" TIKR CA non trovato (continua solo US): {e}")
 
 print(f" Totale US+CA: {len(tikr_rows)}")
 
