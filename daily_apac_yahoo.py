@@ -1,0 +1,406 @@
+# ============================================================
+# FORWARDALPHA — DAILY APAC LOAD
+# Da eseguire ogni giorno alle 09:00 CET (dopo chiusura Asia)
+# Copre: TSE (Giappone), SEHK (Hong Kong), ASX (Australia)
+# ============================================================
+
+import os, math, time, time as time_module, requests
+from datetime import datetime, timedelta
+from collections import defaultdict
+
+def pct_rank(values, v):
+    if v is None: return None
+    try:
+        if math.isnan(float(v)): return None
+    except: return None
+    valid = [x for x in values if x is not None]
+    if not valid: return None
+    below = sum(1 for x in valid if x < v)
+    return int(round(below / len(valid) * 100))
+
+def ey(pe):
+    if pe is None or pe == 0: return None
+    return 1.0 / pe
+
+def book_yield(pb):
+    if pb is None or pb == 0: return None
+    return 1.0 / pb
+
+SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
+SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
+TODAY        = datetime.now().strftime("%Y-%m-%d")
+TODAY_DT     = datetime.now()
+
+headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
+headers_up = {**headers_r, "Content-Type": "application/json",
+              "Prefer": "resolution=merge-duplicates,return=minimal"}
+
+def leeway_ticker(ticker, exchange):
+    if exchange == "TSE":
+        return ticker + ".TSE"         # es. 7203.TSE
+    elif exchange == "SEHK":
+        return ticker.zfill(4) + ".HK" # es. 0700.HK
+    elif exchange == "ASX":
+        return ticker + ".AU"          # es. BHP.AU
+    return ticker
+
+start_time = time_module.time()
+print("=" * 60)
+print(f"FORWARDALPHA DAILY APAC LOAD — {TODAY}")
+print("=" * 60)
+
+# ── 1. CARICA UNIVERSO APAC ──────────────────────────────────
+print("\n[1/5] Caricamento universo APAC...")
+all_stocks = []
+offset = 0
+while True:
+    r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+        params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
+                "exchange": "in.(TSE,SEHK,ASX)",
+                "offset": str(offset), "limit": "1000"})
+    if not r.text or r.text == "[]": break
+    try: data = r.json()
+    except: break
+    if not data: break
+    all_stocks.extend(data)
+    offset += 1000
+    if len(data) < 1000: break
+print(f"  Universo APAC: {len(all_stocks)} titoli")
+
+by_exchange = defaultdict(list)
+for s in all_stocks:
+    by_exchange[s["exchange"]].append(s["ticker"])
+
+# ── 2. SCARICA PREZZI EOD DA YAHOO FINANCE ──────────────────
+print("\n[2/5] Download prezzi EOD da Yahoo Finance...")
+
+YAHOO_SUFFIX = {
+    "TSE":  "",    # Yahoo: 7203.T, 9984.T
+    "SEHK": ".HK", # Yahoo: 0700.HK
+    "ASX":  ".AX", # Yahoo: BHP.AX (non .AU!)
+    "KRX":  ".KS", # Yahoo: 005930.KS (Samsung)
+    "SGX":  ".SI", # Yahoo: D05.SI (DBS)
+}
+
+def yahoo_ticker(ticker, exchange):
+    if exchange == "SEHK": return ticker.zfill(4) + ".HK"
+    if exchange == "TSE":
+        # Tokyo: rimuovi zeri iniziali extra, aggiungi .T
+        return ticker.lstrip("0") + ".T" if ticker.isdigit() else ticker + ".T"
+    if exchange == "KRX": return ticker.lstrip("A") + ".KS"
+    if exchange == "SGX": return ticker + ".SI"
+    if exchange in ("TSX",): return ticker.replace(".", "-") + ".TO"
+    return ticker + YAHOO_SUFFIX.get(exchange, "")
+
+ok_yf = fail_yf = 0
+price_buf = []
+import random
+
+# Ultima data per titolo
+last_dates = {}
+for stock in all_stocks:
+    rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+        params={"select": "date", "ticker": "eq." + stock["ticker"],
+                "exchange": "eq." + stock["exchange"],
+                "order": "date.desc", "limit": "1"})
+    row = rp.json()
+    last_dates[(stock["ticker"], stock["exchange"])] = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
+
+# Download per exchange in chunk da 150
+for exchange, tickers in by_exchange.items():
+    CHUNK = 150
+    for i in range(0, len(tickers), CHUNK):
+        chunk = tickers[i:i+CHUNK]
+        stock_map = {s["ticker"]: s for s in all_stocks if s["exchange"] == exchange and s["ticker"] in chunk}
+        ytickers = []
+        ticker_map = {}
+        for tk in chunk:
+            if last_dates.get((tk, exchange), "") >= TODAY:
+                ok_yf += 1; continue
+            s = stock_map.get(tk, {})
+            yt = s.get("yahoo_ticker") or yahoo_ticker(tk, exchange)
+            ytickers.append(yt)
+            ticker_map[yt] = (tk, exchange)
+        if not ytickers: continue
+
+        start_dates = [last_dates.get((ticker_map[yt][0], exchange), "2020-01-01") for yt in ytickers]
+        start_dt = min(start_dates)
+        from datetime import datetime as dt2
+        start_dt = (dt2.strptime(start_dt, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+
+        try:
+            data_yf = yf.download(
+                tickers=" ".join(ytickers), start=start_dt, end=TODAY,
+                interval="1d", auto_adjust=True, progress=False, threads=True,
+            )
+            if data_yf.empty: fail_yf += len(ytickers); continue
+            closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]}) if len(ytickers)==1 else data_yf["Close"]
+            for yt in ytickers:
+                if yt not in closes.columns: fail_yf += 1; continue
+                tk, ex = ticker_map[yt]
+                last = last_dates.get((tk, ex), "2020-01-01")
+                for date_idx, price in closes[yt].dropna().items():
+                    date_str = date_idx.strftime("%Y-%m-%d")
+                    if date_str <= last: continue
+                    price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
+                ok_yf += 1
+        except Exception as e:
+            print(f"  Errore chunk {exchange} {i}: {e}")
+            fail_yf += len(ytickers)
+
+        if len(price_buf) >= 500:
+            requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+            price_buf = []
+        time.sleep(random.uniform(3.0, 7.0))
+
+if price_buf:
+    requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+print("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
+ok_prices = ok_yf; fail_prices = fail_yf
+
+# ── 3. LEGGI PREZZI DA prices_eod ────────────────────────────
+print("\n[3/5] Lettura prezzi da prices_eod...")
+CHUNK = 20
+all_ph = defaultdict(list)
+for exchange, tickers in by_exchange.items():
+    for i in range(0, len(tickers), CHUNK):
+        chunk = tickers[i:i+CHUNK]
+        offset_p = 0
+        # Limita a ultimi 400 giorni — sufficiente per momentum 12 mesi
+        from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
+        while True:
+            rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+                params={"select": "ticker,date,adj_close",
+                        "exchange": "eq." + exchange,
+                        "ticker": "in.(" + ",".join(chunk) + ")",
+                        "date": "gte." + from_400d,
+                        "order": "ticker,date.desc",
+                        "limit": "1000", "offset": str(offset_p)})
+            batch = rp.json()
+            if not isinstance(batch, list) or not batch: break
+            for d in batch:
+                if d["adj_close"] is not None:
+                    all_ph[(d["ticker"], exchange)].append(
+                        {"date": d["date"], "close": d["adj_close"]})
+            offset_p += 1000
+            if len(batch) < 1000: break
+        time.sleep(0.02)
+print(f"  Prezzi caricati: {len(all_ph)} titoli")
+
+# ── 4. MOMENTUM ──────────────────────────────────────────────
+print("\n[4/5] Calcolo momentum...")
+ok = fail = 0
+mom_updates = []
+for stock in all_stocks:
+    ticker = stock["ticker"]; exchange = stock["exchange"]
+    data = all_ph.get((ticker, exchange), [])
+    if len(data) < 2: fail += 1; continue
+    last_px   = data[0]["close"]
+    last_date = datetime.strptime(data[0]["date"], "%Y-%m-%d")
+    chg1d = round((data[0]["close"] / data[1]["close"] - 1) * 100, 4)
+
+    def mom_cal(days):
+        target  = last_date - timedelta(days=days)
+        closest = min(data, key=lambda x: abs((datetime.strptime(x["date"], "%Y-%m-%d") - target).days))
+        if closest["close"] and closest["close"] != 0:
+            return round(last_px / closest["close"] - 1, 6)
+        return None
+
+    mom_updates.append({"ticker": ticker, "exchange": exchange,
+                         "mom1w": mom_cal(7), "mom1m": mom_cal(31),
+                         "mom6m": mom_cal(182), "mom12m": mom_cal(365),
+                         "change1d": chg1d, "price": last_px})
+    ok += 1
+
+for i in range(0, len(mom_updates), 100):
+    requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
+print(f"  Momentum ok={ok} fail={fail}")
+ok_momentum = ok
+
+# ── 5. RANK APAC ─────────────────────────────────────────────
+print("\n[5/5] Ricalcolo rank APAC...")
+all_data = []
+offset = 0
+while True:
+    r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
+        params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
+                "exchange": "in.(TSE,SEHK,ASX)", "in_universe": "eq.true",
+                "offset": str(offset), "limit": "1000"})
+    data = r.json()
+    if not isinstance(data, list) or not data: break
+    all_data.extend(data); offset += 1000
+    if len(data) < 1000: break
+print(f"  Fundamentals: {len(all_data)}")
+
+# Mom maps da mom_updates (prezzi appena scaricati) NON dal DB vecchio
+mom1w_map  = {(d["ticker"], d["exchange"]): d.get("mom1w")  for d in mom_updates}
+mom1m_map  = {(d["ticker"], d["exchange"]): d.get("mom1m")  for d in mom_updates}
+mom6m_map  = {(d["ticker"], d["exchange"]): d.get("mom6m")  for d in mom_updates}
+mom12m_map = {(d["ticker"], d["exchange"]): d.get("mom12m") for d in mom_updates}
+
+RANK_GROUPS = {"JPN": ["TSE"], "HKG": ["SEHK"], "AUS": ["ASX"]}
+
+def calc_ranks(group):
+    ey_trail_g = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
+    ey_fwd_g   = [ey(d["pe_forward"])  for d in group if ey(d["pe_forward"])  is not None]
+    by_g       = [book_yield(d["pb"])   for d in group if book_yield(d["pb"])  is not None]
+    eps_g_vals = [d["eps_growth"]       for d in group if d["eps_growth"]      is not None]
+    rev_g_vals = [d["rev_growth"]       for d in group if d["rev_growth"]      is not None]
+    mom6_adj_g = []; mom12_adj_g = []
+    for d in group:
+        key = (d["ticker"], d["exchange"])
+        m6  = mom6m_map.get(key, d.get("mom6m"))
+        m12 = mom12m_map.get(key, d.get("mom12m"))
+        m1w = mom1w_map.get(key, d.get("mom1w"))
+        m1m = mom1m_map.get(key, d.get("mom1m"))
+        if m6  is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
+        if m12 is not None and m1m is not None: mom12_adj_g.append(m12 - m1m)
+    pre = []
+    for d in group:
+        key  = (d["ticker"], d["exchange"])
+        m6   = mom6m_map.get(key, d.get("mom6m"))
+        m12  = mom12m_map.get(key, d.get("mom12m"))
+        m1w  = mom1w_map.get(key, d.get("mom1w"))
+        m1m  = mom1m_map.get(key, d.get("mom1m"))
+        ey_t = ey(d.get("pe_trailing")); r_eyt = pct_rank(ey_trail_g, ey_t) if ey_t is not None else None
+        ey_f = ey(d.get("pe_forward"));  r_eyf = pct_rank(ey_fwd_g,   ey_f) if ey_f is not None else None
+        by_v = book_yield(d.get("pb"));  r_pb  = pct_rank(by_g,       by_v) if by_v is not None else None
+        r_epsg = pct_rank(eps_g_vals, d.get("eps_growth")) if d.get("eps_growth") is not None else None
+        r_revg = pct_rank(rev_g_vals, d.get("rev_growth")) if d.get("rev_growth") is not None else None
+        mom6_adj  = (m6  - m1w) if m6  is not None and m1w is not None else None
+        mom12_adj = (m12 - m1m) if m12 is not None and m1m is not None else None
+        r_m6  = pct_rank(mom6_adj_g,  mom6_adj)  if mom6_adj  is not None else None
+        r_m12 = pct_rank(mom12_adj_g, mom12_adj) if mom12_adj is not None else None
+        pre.append({"ticker": d["ticker"], "exchange": d["exchange"],
+                    "r_eyt": r_eyt, "r_eyf": r_eyf, "r_pb": r_pb,
+                    "r_epsg": r_epsg, "r_revg": r_revg, "r_m6": r_m6, "r_m12": r_m12})
+    val_sums = [sum(x for x in [p["r_eyt"], p["r_eyf"], p["r_pb"]] if x is not None)
+                for p in pre if len([x for x in [p["r_eyt"], p["r_eyf"], p["r_pb"]] if x is not None]) >= 2]
+    gr_sums  = [sum(x for x in [p["r_epsg"], p["r_revg"], p["r_m6"], p["r_m12"]] if x is not None)
+                for p in pre if len([x for x in [p["r_epsg"], p["r_revg"], p["r_m6"], p["r_m12"]] if x is not None]) >= 3]
+    results = []
+    for p in pre:
+        val_inputs = [x for x in [p["r_eyt"], p["r_eyf"], p["r_pb"]] if x is not None]
+        gr_inputs  = [x for x in [p["r_epsg"], p["r_revg"], p["r_m6"], p["r_m12"]] if x is not None]
+        value_score  = int(round(pct_rank(val_sums, sum(val_inputs)))) if len(val_inputs) >= 2 and val_sums else None
+        growth_score = int(round(pct_rank(gr_sums,  sum(gr_inputs))))  if len(gr_inputs) >= 3 and gr_sums  else None
+        results.append({"ticker": p["ticker"], "exchange": p["exchange"],
+                        "value_score": value_score, "growth_score": growth_score,
+                        "rank_pe_ltm": p["r_eyt"], "rank_pe_ntm": p["r_eyf"], "rank_pb": p["r_pb"],
+                        "rank_eps_gr": p["r_epsg"], "rank_rev_gr": p["r_revg"],
+                        "rank_mom6_adj": p["r_m6"], "rank_mom12_adj": p["r_m12"]})
+    return results
+
+rank_updates = []
+for country, exchanges in RANK_GROUPS.items():
+    group = [d for d in all_data if d["exchange"] in exchanges]
+    if group:
+        res = calc_ranks(group)
+        rank_updates.extend(res)
+        print(f"  {country}: {len(res)} rankati")
+
+ok = 0
+for i in range(0, len(rank_updates), 100):
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
+    if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
+print(f"  Rank APAC: {ok}/{len(rank_updates)}")
+
+# Combined rank AP = TSE+SEHK+ASX
+all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
+sum_arr    = [d["value_score"] + d["growth_score"] for d in all_scores]
+combined_updates = [{"ticker": d["ticker"], "exchange": d["exchange"],
+                     "combined_rank": min(99, pct_rank(sum_arr, d["value_score"] + d["growth_score"]))}
+                    for d in all_scores]
+ok = 0
+for i in range(0, len(combined_updates), 100):
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
+    if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
+print(f"  Combined rank AP: {ok}/{len(combined_updates)}")
+ok_rank = ok
+
+# ── INDICI APAC ───────────────────────────────────────────────
+print("\n  Aggiornamento indici APAC...")
+APAC_INDICES = [
+    ("N225.INDX",  "TSE",  "N225",  "Nikkei 225"),
+    ("HSI.INDX",   "SEHK", "HSI",   "Hang Seng"),
+    ("AXJO.INDX",  "ASX",  "AXJO",  "ASX 200"),
+]
+ok_idx = 0
+FROM_12M = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
+for db_ticker, exchange, lt, name in APAC_INDICES:
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_12M + "&to=" + TODAY
+    try:
+        r = requests.get(url, timeout=15)
+        if r.status_code != 200: print(f"  ERR {name}: HTTP {r.status_code}"); continue
+        data_raw = r.json()
+        if not isinstance(data_raw, list) or not data_raw:
+            print(f"  ERR {name}: no data"); continue
+        data_sorted = sorted(data_raw, key=lambda x: x["date"])
+        valid = [d for d in data_sorted if d.get("close") is not None and float(d["close"]) > 0]
+        if not valid: print(f"  ERR {name}: nessun close valido"); continue
+        rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"],
+                 "close": float(d["close"])} for d in valid]
+        if rows:
+            requests.post(SUPABASE_URL + "/rest/v1/price_history", headers=headers_up, json=rows)
+        last     = float(valid[-1]["close"])
+        prev     = float(valid[-2]["close"]) if len(valid) >= 2 else None
+        change1d = round((last / prev - 1) * 100, 2) if prev and prev != 0 else None
+        requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
+            params={"ticker": "eq." + db_ticker},
+            json={"price": last, "change1d": change1d, "date": valid[-1]["date"]})
+        print(f"  {name}: {last:,.2f} ({change1d:+.2f}%)")
+        ok_idx += 1
+    except Exception as e: print(f"  ERR {name}: {e}")
+    time.sleep(0.2)
+print(f"  Indici APAC: {ok_idx}/{len(APAC_INDICES)}")
+
+end_time = time_module.time()
+log_entry = {"run_date": TODAY, "market": "APAC", "prices_updated": ok_prices,
+             "prices_failed": fail_prices, "last_price_date": TODAY,
+             "momentum_updated": ok_momentum, "rank_updated": ok_rank,
+             "duration_seconds": int(end_time - start_time)}
+requests.post(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_up, json=[log_entry])
+print(f"\nLog: leeway={ok_prices} fail={fail_prices} momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
+print("\n" + "=" * 60)
+print("DAILY APAC LOAD COMPLETATO")
+print("=" * 60)SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE",
+    "ROG": "RO.SW",
+}
+
+SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE",
+    "ROG": "RO.SW",
+}
+
+SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
+}
+
+LEEWAY_SUFFIX = {
+    "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
+    "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
+    "LS":   ".LS",    "VI":    ".VI",     "HE":   ".HE",
+    "IR":   ".IR",    "AT":    ".VI",
+    "LSE":  ".LSE",   "AIM":   ".AIM",   "SWX":  ".SW",
+    "OM":   ".ST",    "NGM":   ".ST",    "OB":   ".OL",
+    "CPSE": ".CO",
+    "US":   ".US",    "TSX":   ".TO",
+    "TSE":  ".TSE",   "ASX":   ".AU",
+}
+
+def leeway_ticker(ticker, exchange):
+    if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
+    if exchange == "SEHK": return ticker.zfill(4) + ".HK"
+    if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
+    if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
+    if exchange == "BR":  return ticker.replace(".", "") + ".BR"
+    ticker_clean = ticker.rstrip(".")
+    return ticker_clean + LEEWAY_SUFFIX.get(exchange, "")
+
+
