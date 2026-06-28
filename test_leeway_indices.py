@@ -1,7 +1,6 @@
 import os, requests, time
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor
-import threading
+from collections import defaultdict
 
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -10,19 +9,6 @@ SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 TODAY        = datetime.now().strftime("%Y-%m-%d")
 FROM_10D     = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
 headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-
-# Rate limiter: 2 req/sec come raccomandato da Leeway
-_lock = threading.Lock()
-_last_call = [0.0]
-
-def rate_limited_get(url):
-    with _lock:
-        now = time.time()
-        elapsed = now - _last_call[0]
-        if elapsed < 0.5:  # 1/2 sec = 2 req/sec
-            time.sleep(0.5 - elapsed)
-        _last_call[0] = time.time()
-    return requests.get(url, timeout=15)
 
 SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
@@ -44,23 +30,8 @@ def leeway_ticker(ticker, exchange):
     if exchange == "BR":  return ticker.replace(".", "") + ".BR"
     return ticker.rstrip(".") + LEEWAY_SUFFIX.get(exchange, "")
 
-def test_one(args):
-    ticker, exchange = args
-    lt = leeway_ticker(ticker, exchange)
-    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_10D + "&to=" + TODAY
-    try:
-        r = rate_limited_get(url)
-        if r.status_code != 200:
-            return ticker, exchange, lt, False, f"HTTP {r.status_code}"
-        data = r.json() if isinstance(r.json(), list) else []
-        if data:
-            last = sorted(data, key=lambda x: x["date"])[-1]
-            return ticker, exchange, lt, True, last.get("date")
-        return ticker, exchange, lt, False, "empty"
-    except Exception as e:
-        return ticker, exchange, lt, False, str(e)[:30]
-
 print("TODAY:", TODAY, "FROM:", FROM_10D)
+print("LEEWAY_KEY:", LEEWAY_KEY[:8] + "..." if LEEWAY_KEY else "MANCANTE!")
 
 EXCHANGES = [
     "AS","MC","BR","LS","VI","HE","IR",
@@ -68,6 +39,7 @@ EXCHANGES = [
     "US","TSX","TSE","SEHK","ASX",
 ]
 
+# Carica tutti i titoli
 all_stocks = []
 for exchange in EXCHANGES:
     offset = 0
@@ -83,24 +55,39 @@ for exchange in EXCHANGES:
         if len(batch) < 1000: break
 
 print(f"Totale: {len(all_stocks)} titoli")
-print(f"Stima: {len(all_stocks)/2/60:.1f} minuti a 2 req/sec")
+print(f"Stima: {len(all_stocks)/2/60:.0f} minuti")
 
-# 2 thread — rispetta 2 req/sec grazie al rate limiter
-with ThreadPoolExecutor(max_workers=2) as executor:
-    results = list(executor.map(test_one, all_stocks))
+# Test primo ticker manualmente per verificare
+t0, e0 = all_stocks[0]
+lt0 = leeway_ticker(t0, e0)
+url0 = LEEWAY_BASE + "/historicalquotes/" + lt0 + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_10D + "&to=" + TODAY
+r0 = requests.get(url0, timeout=15)
+print(f"\nTest primo ticker {lt0}: HTTP {r0.status_code} — {str(r0.text)[:100]}")
 
-from collections import defaultdict
-by_ex = defaultdict(list)
+# Loop sequenziale semplice
+empty = defaultdict(list)
 ok = 0
-for ticker, exchange, lt, has_data, info in results:
-    if has_data: ok += 1
-    else: by_ex[exchange].append((ticker, lt, info))
+for i, (ticker, exchange) in enumerate(all_stocks):
+    lt = leeway_ticker(ticker, exchange)
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_10D + "&to=" + TODAY
+    try:
+        r = requests.get(url, timeout=15)
+        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        if data:
+            ok += 1
+        else:
+            empty[exchange].append((ticker, lt, f"HTTP {r.status_code}"))
+    except Exception as ex:
+        empty[exchange].append((ticker, lt, str(ex)[:30]))
+    time.sleep(0.5)
+    if (i+1) % 500 == 0:
+        print(f"  {i+1}/{len(all_stocks)} ok={ok} vuoti={sum(len(v) for v in empty.values())}")
 
 print(f"\n=== RISULTATO ===")
-print(f"OK: {ok}  VUOTI: {sum(len(v) for v in by_ex.values())}")
+print(f"OK: {ok}  VUOTI: {sum(len(v) for v in empty.values())}")
 for ex in EXCHANGES:
-    items = by_ex.get(ex, [])
-    total_ex = sum(1 for t, e, l, h, i in results if e == ex)
+    items = empty.get(ex, [])
+    total_ex = sum(1 for t, e in all_stocks if e == ex)
     print(f"\n{ex}: {total_ex} — OK={total_ex-len(items)} VUOTI={len(items)}")
     for tk, lt, info in items:
         print(f"  {tk} -> {lt} ({info})")
