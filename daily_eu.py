@@ -245,9 +245,8 @@ RANK_GROUPS = {
     "ITA": ["MIL"], "DEU": ["XETRA"], "FRA": ["PA"], "GBR": ["LSE"],
     "SWE": ["OM"],  "NOR": ["OB"],    "CHE": ["SWX"], "NLD": ["AS"],
     "BEL": ["BR"],  "FIN": ["HE"],    "ESP": ["MC"],  "DNK": ["CPSE"],
-    "POR": ["LS"],
 }
-NO_RANK = {"AT", "VI", "IR", "NGM", "AIM"}  # LS (Portogallo) ha rank proprio
+NO_RANK = {"AT", "VI", "IR", "NGM", "AIM", "LS"}  # LS: titoli insufficienti
 
 def calc_ranks(group):
     ey_trail_g = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
