@@ -12,31 +12,79 @@ EX_MAP = {
 }
 
 EXCLUDE_SECTORS = ["71","72","73","74","75","76","77"]
-EXCLUDE_EXACT = [
-    "UCITS","XTRACKERS","LYXOR","VANGUARD ETF","AMUNDI ETF",
-    "SPDR ETF","WISDOMTREE ETF","VANECK ETF","INDEX FUND",
-    "BOND FUND","EXCHANGE TRADED","EXCHANGE-TRADED",
+
+# Parole che identificano SEMPRE un prodotto passivo/fondo da escludere
+ALWAYS_EXCLUDE = [
+    " ETF"," ETP"," ETC ","UCITS","XTRACKERS","LYXOR",
+    "INDEX FUND","BOND FUND","EXCHANGE TRADED NOTE",
+    "EXCHANGE-TRADED NOTE","LEVERAGED NOTE",
+    "GOLD SHARES","SILVER TRUST","GOLD TRUST",
+    "GOLD MINISHARES","PHYSICAL GOLD","PHYSICAL SILVER",
+    "COVERED CALL","MONEY MARKET FUND","SAVINGS FUND",
+    "SAVINGS ACCOUNT FUND","URANIUM TRUST FUND",
+    "COMMODITY INDEX","AGRICULTURE FUND",
+    "HIGH INTEREST SAVINGS","CASH FUND","CASH MANAGEMENT FUND",
+    "DYNAMIC OVERWRITE FUND","PREMIUM YIELD FUND",
+    "MARKET NEUTRAL","LONG SHORT INCOME",
+    "GROWTH TECH FUND","PRIVATE REAL ESTATE FUND",
+    "GLOBAL EQUITY+ FUND","ENERGY FUND",
+    "NEXT GENERATION CONNECTIVITY FUND",
+    "DIVIDEND, INTEREST & PREMIUM","TOTAL RETURN FUND",
+    "STRATEGIC INVESTMENT FUND","STRATEGIC TOTAL RETURN FUND",
+    "INFRASTRUCTURE FUND","INCOME SOLUTIONS FUND",
+    "ENERGY INFRASTRUCTURE FUND",
+    "3X LEVERAGED","2X LEVERAGED","-1X",
+    "MINIATURES","MINI SHARES",
+    "MULTISECTOR COMMODITY",
 ]
-PASSIVE_KEYWORDS = ["ETF","ETP","ETC","UCITS","INDEX","TRACKER","SHARES TRUST"]
-ASSET_MANAGERS = ["BLACKROCK","INVESCO","WISDOMTREE","ISHARES","VANECK","SPDR","VANGUARD"]
+
+# Fondi con prefisso gestore — escludi SOLO se accompagnati da FUND/ETF/NOTES
+MANAGER_PRODUCTS = {
+    "ISHARES": ["ETF","ETP","ETC","TRUST","FUND","SHARES","PHYSICAL","MINI"],
+    "BLACKROCK": ["ETF","ETP","ETC","FUND","NOTES","TRUST TERM","TERM TRUST",
+                  "TAXABLE MUNICIPAL","CREDIT ALLOCATION","ESG CAPITAL","HEALTH SCIENCES",
+                  "INNOVATION AND GROWTH","SCIENCE AND TECHNOLOGY","MUNICIPAL 2030",
+                  "ENHANCED EQUITY","CAPITAL ALLOCATION TERM"],
+    "INVESCO DB": ["FUND","COMMODITY","AGRICULTURE"],
+    "VANGUARD": ["ETF","FUND","INDEX"],
+    "SPDR": ["ETF","FUND","SHARES","MINISHARES"],
+    "WISDOMTREE": ["ETF","FUND"],
+    "VANECK": ["ETF","FUND"],
+    "NUVEEN": ["FUND","OVERWRITE"],
+    "BMO": ["FUND","ETF","COVERED CALL"],
+    "PURPOSE": ["FUND","CASH","SAVINGS"],
+    "SPROTT PHYSICAL": ["FUND","TRUST FUND"],
+    "CORNERSTONE": ["FUND","INVESTMENT FUND","TOTAL RETURN FUND"],
+    "NEUBERGER BERMAN": ["FUND","INC."],
+    "CALAMOS": ["FUND"],
+    "COHEN & STEERS": ["FUND"],
+    "DOUBLELINE": ["FUND"],
+    "KAYNE ANDERSON": ["FUND"],
+    "VIRTUS": ["FUND"],
+    "PICTON": ["FUND"],
+    "FIDELITY GLOBAL": ["FUND"],
+    "NINEPOINT": ["FUND"],
+    "CI GLOBAL": ["FUND"],
+    "SRH TOTAL": ["FUND"],
+    "FUNDRISE": ["FUND"],
+    "MICORSECTORS": ["NOTE"],
+    "MICROSECTORS": ["NOTE"],
+}
 
 def is_excluded(company, sector):
     if sector in EXCLUDE_SECTORS: return True
     name = (company or "").upper()
-    for kw in EXCLUDE_EXACT:
+
+    # Check sempre esclusi
+    for kw in ALWAYS_EXCLUDE:
         if kw in name: return True
-    if " FUND" in name:
-        if any(x in name for x in ["REALTY","REIT","PROPERTY","PROPERTIES",
-                                    "INFRASTRUCTURE","INCOME TRUST","ROYALTY"]):
-            pass
-        else:
-            return True
-    for am in ASSET_MANAGERS:
-        if am in name:
-            if any(p in name for p in ["ETF","ETP","ETC","FUND","NOTES","SHARES","INDEX","MINI"]):
+
+    # Check manager + prodotto
+    for manager, products in MANAGER_PRODUCTS.items():
+        if manager in name:
+            if any(p in name for p in products):
                 return True
-    if "NOTES" in name and any(x in name for x in ["LEVERAGED","3X","2X","-1X","ETNS","DUE "]):
-        return True
+
     return False
 
 r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_na_latest.csv",
@@ -44,7 +92,13 @@ r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_na_latest.
 reader = csv.DictReader(io.StringIO(r.text))
 
 excluded = []
-included_check = ["NFLX","BLK","IVZ","WT","AMT","PLD","EQIX","WELL","VTR","SPG"]
+check_list = ["NFLX","BLK","IVZ","WT","AMT","PLD","EQIX","WELL","VTR","SPG",
+              "VICI","DLR","EQR","AVB","EXR","ESS","ARE","SBAC","CCI","O",
+              "PSA","IRM","REG","KIM","FRT","HST","ADC","STAG","COLD","LINE"]
+included_ok = []
+excluded_bad = []
+
+rows_all = []
 for row in reader:
     ticker = row.get("Ticker","").strip()
     ex_raw = row.get("Primary Exchange","").strip()
@@ -55,9 +109,15 @@ for row in reader:
     excl = is_excluded(company, sector)
     if excl:
         excluded.append((ticker, company))
-    if ticker in included_check:
-        print(f"  CHECK {ticker}: {'ESCLUSO ❌' if excl else 'INCLUSO ✅'} | {company}")
+    if ticker in check_list:
+        if excl:
+            excluded_bad.append(f"  {ticker}: ESCLUSO ❌ | {company}")
+        else:
+            included_ok.append(f"  {ticker}: INCLUSO ✅ | {company}")
 
+print("=== CHECK TITOLI CHIAVE ===")
+for x in sorted(included_ok): print(x)
+for x in sorted(excluded_bad): print(x)
 print(f"\nTotale esclusi: {len(excluded)}")
 print("\nLista esclusi:")
 for t, c in sorted(excluded):
