@@ -1,59 +1,63 @@
-import os, requests, csv, io, math
+import os, requests
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
-headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-headers_up = {**headers_r, "Content-Type": "application/json",
-              "Prefer": "resolution=merge-duplicates,return=minimal"}
+headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-EX_MAP = {
-    "XTRA":"XETRA","BIT":"MIL","ENXTPA":"PA","ENXTAM":"AS",
-    "ENXTBR":"BR","ENXTLS":"LS","BME":"MC","HLSE":"HE",
-    "WBAG":"VI","ISE":"IR","SWX":"SWX","LSE":"LSE","CPSE":"CPSE",
-    "NasdaqGS":"US","NYSE":"US","NasdaqCM":"US","AMEX":"US",
-    "NasdaqGM":"US","BATS":"US","NYSEArca":"US","OTC":"US",
-    "TSX":"TSX","TSXV":"TSX","OB":"OB","OTCNO":"OB",
-    "HMSE":"OM","XSAT":"OM",
-}
+EXCLUDE_NAMES = [
+    "ETF","FUND","TRUST","UCITS","ISHARES","VANGUARD","XTRACKERS",
+    "LYXOR","AMUNDI ETF","INVESCO","SPDR","WISDOMTREE","VANECK",
+    "BLACKROCK","INDEX FUND","TRACKER","WARRANT","CERTIFICATE",
+    "ETP","ETC","STRUCTURED","NOTES","BOND FUND",
+]
+EXCLUDE_SECTORS = ["71","72","73","74","75","76","77"]
 
-def parse_mktcap(v):
-    if not v: return None
-    s = str(v).replace("USDMM","").replace("MM","").strip()
-    s = s.replace(".","").replace(",",".")
-    try:
-        f = float(s)
-        return f if f > 0 and not math.isnan(f) else None
-    except: return None
+def is_excluded(company, sector):
+    if sector in EXCLUDE_SECTORS: return True
+    return any(kw in (company or "").upper() for kw in EXCLUDE_NAMES)
 
-# Test 1: leggi 5 righe TIKR EU e verifica parsing
-print("=== TEST PARSING TIKR EU ===")
-r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_eu_latest.csv",
-    headers=headers_r)
-print(f"Storage status: {r.status_code}")
-reader = csv.DictReader(io.StringIO(r.text))
-count = 0
-for row in reader:
-    ticker = row.get("Ticker","").strip()
-    ex_raw = row.get("Primary Exchange","").strip()
-    exchange = EX_MAP.get(ex_raw, ex_raw)
-    mktcap = parse_mktcap(row.get("Last Mkt Cap",""))
-    print(f"  {ticker} | ex_raw={ex_raw} | exchange={exchange} | mktcap={mktcap}")
-    count += 1
-    if count >= 5: break
+for exchange in ["US","LSE"]:
+    # Carica tutti i titoli con mkt_cap da fundamentals
+    fund = {}
+    offset = 0
+    while True:
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
+            params={"select":"ticker,mkt_cap","exchange":f"eq.{exchange}",
+                    "limit":"1000","offset":str(offset)})
+        batch = r.json()
+        if not isinstance(batch,list) or not batch: break
+        for s in batch: fund[s["ticker"]] = s.get("mkt_cap") or 0
+        offset += 1000
+        if len(batch)<1000: break
 
-# Test 2: patch mkt_cap su fundamentals per ASML
-print("\n=== TEST PATCH FUNDAMENTALS MKT_CAP ===")
-r2 = requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
-    headers=headers_up,
-    params={"ticker":"eq.ASML","exchange":"eq.AS"},
-    json={"mkt_cap": 691603.06})
-print(f"ASML patch: {r2.status_code} {r2.text[:100]}")
+    # Carica stocks per esclusioni
+    stocks = {}
+    offset = 0
+    while True:
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+            params={"select":"ticker,company,sector","exchange":f"eq.{exchange}",
+                    "limit":"1000","offset":str(offset)})
+        batch = r.json()
+        if not isinstance(batch,list) or not batch: break
+        for s in batch: stocks[s["ticker"]] = s
+        offset += 1000
+        if len(batch)<1000: break
 
-# Test 3: leggi stocks per AS — verifica company e sector
-print("\n=== TEST LETTURA STOCKS AS ===")
-r3 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
-    params={"select":"ticker,exchange,company,sector",
-            "exchange":"eq.AS","limit":"3"})
-print(f"Status: {r3.status_code}")
-for s in r3.json():
-    print(f"  {s['ticker']} | company={s.get('company','')} | sector={s.get('sector','')}")
+    total = len(stocks)
+    no_mktcap = sum(1 for t in stocks if fund.get(t,0) == 0)
+    excluded = sum(1 for t,s in stocks.items()
+                   if is_excluded(s.get("company",""), s.get("sector","")))
+    above_500 = sum(1 for t in stocks
+                    if not is_excluded(stocks[t].get("company",""), stocks[t].get("sector",""))
+                    and fund.get(t,0) >= 500)
+    not_excluded = sum(1 for t,s in stocks.items()
+                       if not is_excluded(s.get("company",""), s.get("sector","")))
+
+    print(f"\n{exchange}:")
+    print(f"  Totale nel DB: {total}")
+    print(f"  Con mkt_cap > 0: {sum(1 for t in stocks if fund.get(t,0)>0)}")
+    print(f"  Con mkt_cap = 0: {no_mktcap}")
+    print(f"  Esclusi (ETF/fondi): {excluded}")
+    print(f"  Non esclusi: {not_excluded}")
+    print(f"  Non esclusi con mkt_cap >= 500M: {above_500}")
+    print(f"  Non esclusi con mkt_cap > 0: {sum(1 for t,s in stocks.items() if not is_excluded(s.get('company',''),s.get('sector','')) and fund.get(t,0)>0)}")
