@@ -2122,17 +2122,11 @@ function AppContent() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const appRouter = useRouter()
-  const [page,        setPage]        = useState<Page>('dashboard')
+  // Deriva page direttamente dall'URL — unica sorgente di verità
+  const page = (searchParams.get('page') as Page) ?? 'dashboard'
 
-  // Leggi ?page= dall'URL al mount — ripristina stato dopo back navigation
-  useEffect(() => {
-    const urlPage = searchParams.get('page') as Page
-    if (urlPage) setPage(urlPage)
-  }, [searchParams])
-
-  // Sincronizza URL con page state usando router.replace (non replaceState nativo)
+  // Cambia schermata aggiornando solo l'URL
   const navigateTo = (newPage: Page) => {
-    setPage(newPage)
     if (newPage === 'dashboard') {
       appRouter.replace('/', { scroll: false })
     } else {
