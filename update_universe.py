@@ -44,7 +44,9 @@ EX_MAP = {
     "WBAG":"VI","ISE":"IR","SWX":"SWX","LSE":"LSE","CPSE":"CPSE",
     "NasdaqGS":"US","NYSE":"US","NasdaqCM":"US","AMEX":"US",
     "NasdaqGM":"US","BATS":"US","NYSEArca":"US","OTC":"US",
-    "TSX":"TSX","TSXV":"TSX","OB":"OB","OTCNO":"OB",
+    "ARCA":"US","OTCPK":"US","NYSEAM":"US",
+    "TSX":"TSX","TSXV":"TSX","CNSX":"TSX","NEOE":"TSX",
+    "OB":"OB","OTCNO":"OB",
     "HMSE":"OM","XSAT":"OM","OM":"OM",
 }
 
