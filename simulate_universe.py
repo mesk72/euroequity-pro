@@ -37,7 +37,8 @@ def load_exchange(exchange):
     return stocks
 
 def get_tickers_with_prices(exchange):
-    """Carica in bulk tutti i ticker con prezzi recenti per un exchange"""
+    """Carica in bulk tutti i ticker con prezzi recenti per un exchange.
+    Usa order=ticker per ottenere ticker distinti con paginazione affidabile."""
     tickers_with_price = set()
     offset = 0
     while True:
@@ -45,13 +46,14 @@ def get_tickers_with_prices(exchange):
             params={"select": "ticker",
                     "exchange": f"eq.{exchange}",
                     "date": f"gte.{MIN_PRICE_DATE}",
-                    "limit": "1000", "offset": str(offset)})
+                    "order": "ticker.asc",
+                    "limit": "2000", "offset": str(offset)})
         batch = r.json()
         if not isinstance(batch, list) or not batch: break
         for row in batch:
             tickers_with_price.add(row["ticker"])
-        offset += 1000
-        if len(batch) < 1000: break
+        offset += 2000
+        if len(batch) < 2000: break
     return tickers_with_price
 
 print(f"=== SIMULAZIONE NUOVO UNIVERSO ===")
