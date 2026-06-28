@@ -184,7 +184,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
           </div>
           {stocks.map((s) => (
             <div key={s.id}
-              onClick={() => { onSelectStock?.(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
+              onClick={() => { onSelectStock?.(s); sessionStorage.setItem("fa_back", window.location.href); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
               className="cursor-pointer border-b border-border px-3 py-2.5 hover:bg-white/5">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
@@ -269,7 +269,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
             <tbody>
               {stocks.map((s) => (
                 <tr key={s.id}
-                  onClick={() => { onSelectStock?.(s); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
+                  onClick={() => { onSelectStock?.(s); sessionStorage.setItem("fa_back", window.location.href); window.location.href = `/stock/${s.ticker}-${s.exchange}` }}
                   className="cursor-pointer">
                   <td style={{ position: 'sticky', left: 0, background: '#0d1017', zIndex: 1, boxShadow: '2px 0 4px rgba(0,0,0,0.3)' }}>
                     <span className="font-700 text-[12px] text-orange-400 whitespace-nowrap">{s.flag} {s.ticker}</span>
