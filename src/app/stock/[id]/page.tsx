@@ -201,13 +201,8 @@ export default function StockPage() {
     const from = searchParams.get('from')
     if (from) {
       const decoded = decodeURIComponent(from)
-      // Per pagine separate (/news, /research) usa hard navigation
-      // Per la homepage SPA usa router.push che mantiene il client cache
-      if (decoded.startsWith('/?') || decoded === '/') {
-        router.push(decoded)
-      } else {
-        window.location.href = decoded
-      }
+      router.push(decoded)
+      router.refresh()
     } else {
       router.back()
     }
