@@ -1,8 +1,7 @@
--- Aggiungi colonne FY2029 e FY2030 alla tabella fundamentals
--- Da eseguire su Supabase Dashboard → SQL Editor
-
+-- Aggiungi colonne FY2029, FY2030 e Reverse DCF alla tabella fundamentals
 ALTER TABLE fundamentals 
 ADD COLUMN IF NOT EXISTS eps_fy4 FLOAT,
+ADD COLUMN IF NOT EXISTS eps_fy5 FLOAT,
 ADD COLUMN IF NOT EXISTS eps_cagr_3y FLOAT,
 ADD COLUMN IF NOT EXISTS implied_growth FLOAT,
 ADD COLUMN IF NOT EXISTS ke FLOAT,
