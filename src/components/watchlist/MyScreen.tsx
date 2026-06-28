@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Star, Trash2, RefreshCw } from 'lucide-react'
 
@@ -68,6 +69,7 @@ interface Props {
 }
 
 export default function MyScreen({ userId, onSelectStock }: Props) {
+  const router = useRouter()
   const [allStocks, setAllStocks] = useState<WatchStock[]>([])
   const [loading, setLoading] = useState(true)
   const [activeWallet, setActiveWallet] = useState(0)
@@ -270,7 +272,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
             <tbody>
               {stocks.map((s) => (
                 <tr key={s.id}
-                  onClick={() => { document.location = `/stock/${s.ticker}-${s.exchange}` }}
+                  onClick={() => router.push(`/stock/${s.ticker}-${s.exchange}`)}
                   className="cursor-pointer">
                   <td style={{ position: 'sticky', left: 0, background: '#0d1017', zIndex: 1, boxShadow: '2px 0 4px rgba(0,0,0,0.3)' }}>
                     <span className="font-700 text-[12px] text-orange-400 whitespace-nowrap">{s.flag} {s.ticker}</span>
