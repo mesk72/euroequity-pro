@@ -33,7 +33,7 @@ LEEWAY_SUFFIX = {
     "VI": ".VI", "HE": ".HE", "IR": ".IR", "AT": ".VI",
     "SWX": ".SW", "OM": ".ST", "NGM": ".ST", "OB": ".OL",
     "CPSE": ".CO", "AIM": ".AIM",
-    "TSX": ".TO", "TSE": ".TSE", "SEHK": ".HK", "ASX": ".AU",
+    "US": ".US", "TSX": ".TO", "TSE": ".TSE", "SEHK": ".HK", "ASX": ".AU",
 }
 
 def leeway_ticker(ticker, exchange):
@@ -65,7 +65,7 @@ print("TODAY:", TODAY, "FROM:", FROM_10D)
 EXCHANGES = [
     "AS","MC","BR","LS","VI","HE","IR",
     "SWX","OM","OB","CPSE",
-    "TSX","TSE","SEHK","ASX",
+    "US","TSX","TSE","SEHK","ASX",
 ]
 
 all_stocks = []
