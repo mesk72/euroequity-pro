@@ -228,12 +228,7 @@ export default function StockPage() {
   const [history, setHistory] = useState<any[]>([])
   const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoading] = useState(true)
-  const [qty, setQty] = useState('')
-  const [px, setPx] = useState(stock?.price?.toFixed(2) || '')
-  const [pf, setPf] = useState('Portfolio 1')
-  const [added, setAdded] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null)) }, [])
+  const [addedScreen, setAddedScreen] = useState<number | null>(null)
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
@@ -244,20 +239,24 @@ export default function StockPage() {
       .catch(() => setLoading(false))
   }, [ticker, exchangeCode, chartDays])
 
-  function handleAdd() {
-    if (!stock || !qty || !px) return
-    const stored = JSON.parse(localStorage.getItem('portfolios') || '{}')
-    if (!stored[pf]) stored[pf] = []
-    stored[pf].push({
-      ticker: stock.ticker, exchange: stock.exchange,
-      company: stock.company, flag: stock.flag,
-      sector: stock.sector, country: stock.country,
-      qty: parseFloat(qty), buy_price: parseFloat(px),
-      added_at: new Date().toISOString(),
-    })
-    localStorage.setItem('portfolios', JSON.stringify(stored))
-    setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
+  function handleAddToScreen(screenNum: number) {
+    if (!stock) return
+    const key = `myscreen_${screenNum}`
+    const stored: any[] = JSON.parse(localStorage.getItem(key) || '[]')
+    const exists = stored.some(s => s.ticker === stock.ticker && s.exchange === stock.exchange)
+    if (!exists) {
+      if (stored.length >= 100) {
+        stored.shift() // rimuovi il primo se supera 100
+      }
+      stored.push({
+        ticker: stock.ticker, exchange: stock.exchange,
+        company: stock.company, flag: stock.flag,
+        sector: stock.sector, added_at: new Date().toISOString(),
+      })
+      localStorage.setItem(key, JSON.stringify(stored))
+    }
+    setAddedScreen(screenNum)
+    setTimeout(() => setAddedScreen(null), 2000)
   }
 
   if (!stock) {
@@ -447,41 +446,20 @@ export default function StockPage() {
           <div style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
             letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orange)',
             marginBottom:12 }}>
-            Add to Portfolio
+            Add to My Screen
           </div>
-          <div style={{ display:'flex', alignItems:'flex-end', gap:10, flexWrap:'wrap' }}>
-            <div>
-              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
-                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                textTransform:'uppercase' }}>Portfolio</div>
-              <select value={pf} onChange={e => setPf(e.target.value)}
-                className="input-field" style={{ width:140 }}>
-                {['Portfolio 1','Portfolio 2','Portfolio 3'].map(p => <option key={p}>{p}</option>)}
-              </select>
-            </div>
-            <div>
-              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
-                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                textTransform:'uppercase' }}>Quantity</div>
-              <input type="number" placeholder="100" value={qty}
-                onChange={e => setQty(e.target.value)}
-                className="input-field" style={{ width:90 }} />
-            </div>
-            <div>
-              <div style={{ fontSize:10, color:'var(--text4)', marginBottom:4,
-                fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                textTransform:'uppercase' }}>Buy Price</div>
-              <input type="number" value={px}
-                onChange={e => setPx(e.target.value)}
-                className="input-field" style={{ width:100 }} />
-            </div>
-            <button onClick={handleAdd} disabled={!qty || !px || added} className="btn-primary">
-              {added ? '✅ Added' : '+ Add to Portfolio'}
-            </button>
+          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+            {[1, 2, 3].map(n => (
+              <button key={n} onClick={() => handleAddToScreen(n)}
+                className="btn-primary"
+                style={{ opacity: addedScreen === n ? 0.7 : 1 }}>
+                {addedScreen === n ? `✅ Added to Screen ${n}` : `+ My Screen ${n}`}
+              </button>
+            ))}
           </div>
-          {added && (
+          {addedScreen && (
             <div style={{ marginTop:8, fontSize:12, color:'var(--green)' }}>
-              ✅ {stock.ticker} added to {pf}
+              ✅ {stock.ticker} added to My Screen {addedScreen} (max 100 stocks)
             </div>
           )}
         </div>
