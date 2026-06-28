@@ -1265,7 +1265,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
           <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
             {searchRes.map((r: any) => (
               <div key={`${r.ticker}.${r.exchange}`}
-                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}`}
+                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                 className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
                 <span style={{ fontSize:15 }}>{r.flag || ''}</span>
                 <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
@@ -1342,7 +1342,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={i}
-                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
@@ -1375,7 +1375,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={i}
-                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
@@ -1555,7 +1555,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
           <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
             {searchRes.map((r: any) => (
               <div key={`${r.ticker}.${r.exchange}`}
-                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}`}
+                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                 className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
                 <span style={{ fontSize:15 }}>{r.flag || ''}</span>
                 <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
@@ -1632,7 +1632,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={i}
-                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
@@ -1665,7 +1665,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
                 <tbody>
                   {list.map((s, i) => (
                     <tr key={i}
-                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`}
+                      onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
@@ -1765,7 +1765,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
           <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
             {searchRes.map((r: any) => (
               <div key={`${r.ticker}.${r.exchange}`}
-                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}`}
+                onClick={() => window.location.href = `/stock/${r.ticker}-${r.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                 className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
                 <span style={{ fontSize:15 }}>{r.flag || ''}</span>
                 <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
@@ -1815,7 +1815,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
                 </tr></thead>
                 <tbody>
                   {list.map((s, i) => (
-                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`} className="cursor-pointer">
+                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`} className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
                       <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
@@ -1843,7 +1843,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
                 </tr></thead>
                 <tbody>
                   {list.map((s, i) => (
-                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}`} className="cursor-pointer">
+                    <tr key={i} onClick={() => window.location.href = `/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`} className="cursor-pointer">
                       <td className="font-700 text-[12px] whitespace-nowrap" style={{ color: 'var(--orange)' }}>{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
                       <td className="font-mono font-700 text-right whitespace-nowrap" style={{ color: (s.mom12m||0) >= 0 ? '#22d48a' : '#e84560' }}>
