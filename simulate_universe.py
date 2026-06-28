@@ -1,5 +1,6 @@
 import os, requests
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -35,17 +36,23 @@ def load_exchange(exchange):
         if len(batch) < 1000: break
     return stocks
 
-def check_prices(stocks, exchange):
-    no_price = []
-    for s in stocks:
+def get_tickers_with_prices(exchange):
+    """Carica in bulk tutti i ticker con prezzi recenti per un exchange"""
+    tickers_with_price = set()
+    offset = 0
+    while True:
         r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "date", "ticker": f"eq.{s['ticker']}",
+            params={"select": "ticker",
                     "exchange": f"eq.{exchange}",
-                    "date": f"gte.{MIN_PRICE_DATE}", "limit": "1"})
-        rows = r.json()
-        if not isinstance(rows, list) or not rows:
-            no_price.append(s["ticker"])
-    return no_price
+                    "date": f"gte.{MIN_PRICE_DATE}",
+                    "limit": "1000", "offset": str(offset)})
+        batch = r.json()
+        if not isinstance(batch, list) or not batch: break
+        for row in batch:
+            tickers_with_price.add(row["ticker"])
+        offset += 1000
+        if len(batch) < 1000: break
+    return tickers_with_price
 
 print(f"=== SIMULAZIONE NUOVO UNIVERSO ===")
 print(f"Verifica prezzi: >= {MIN_PRICE_DATE}")
@@ -55,13 +62,14 @@ print()
 print("--- BORSE GRANDI: mkt_cap >= $500M ---")
 for ex in ["LSE","XETRA","PA","OM","SWX","MIL"]:
     stocks = load_exchange(ex)
+    with_price = get_tickers_with_prices(ex)
     eligible = [s for s in stocks
                 if not is_excluded(s.get("company",""), s.get("sector",""))
                 and (s.get("mkt_cap") or 0) >= 500]
-    no_price = check_prices(eligible, ex)
-    print(f"{ex:<8} eligible={len(eligible):>5} senza_prezzo={len(no_price):>4}")
+    no_price = [s["ticker"] for s in eligible if s["ticker"] not in with_price]
+    print(f"{ex:<8} eligible={len(eligible):>5} con_prezzo={len(eligible)-len(no_price):>5} senza_prezzo={len(no_price):>4}")
     if no_price:
-        print(f"         SENZA PREZZO: {no_price}")
+        print(f"         SENZA PREZZO: {no_price[:30]}")
 
 print()
 
@@ -69,13 +77,14 @@ print()
 print("--- BORSE MEDIE: top 100 ---")
 for ex in ["AS","MC","BR","HE","CPSE","OB"]:
     stocks = load_exchange(ex)
+    with_price = get_tickers_with_prices(ex)
     eligible = sorted(
         [s for s in stocks if not is_excluded(s.get("company",""), s.get("sector",""))],
         key=lambda s: s.get("mkt_cap") or 0, reverse=True)[:100]
-    no_price = check_prices(eligible, ex)
-    print(f"{ex:<8} eligible={len(eligible):>5} senza_prezzo={len(no_price):>4}")
+    no_price = [s["ticker"] for s in eligible if s["ticker"] not in with_price]
+    print(f"{ex:<8} eligible={len(eligible):>5} con_prezzo={len(eligible)-len(no_price):>5} senza_prezzo={len(no_price):>4}")
     if no_price:
-        print(f"         SENZA PREZZO: {no_price}")
+        print(f"         SENZA PREZZO: {no_price[:30]}")
 
 print()
 
@@ -83,37 +92,42 @@ print()
 print("--- BORSE PICCOLE: tutti ---")
 for ex in ["VI","IR","LS"]:
     stocks = load_exchange(ex)
+    with_price = get_tickers_with_prices(ex)
     eligible = [s for s in stocks if not is_excluded(s.get("company",""), s.get("sector",""))]
-    no_price = check_prices(eligible, ex)
-    print(f"{ex:<8} eligible={len(eligible):>5} senza_prezzo={len(no_price):>4}")
+    no_price = [s["ticker"] for s in eligible if s["ticker"] not in with_price]
+    print(f"{ex:<8} eligible={len(eligible):>5} con_prezzo={len(eligible)-len(no_price):>5} senza_prezzo={len(no_price):>4}")
     if no_price:
-        print(f"         SENZA PREZZO: {no_price}")
+        print(f"         SENZA PREZZO: {no_price[:30]}")
 
 print()
 
 # US — top 2000
 print("--- US: top 2000 ---")
 stocks = load_exchange("US")
+with_price = get_tickers_with_prices("US")
+print(f"  Ticker US con prezzi recenti: {len(with_price)}")
 eligible = sorted(
     [s for s in stocks if not is_excluded(s.get("company",""), s.get("sector",""))],
     key=lambda s: s.get("mkt_cap") or 0, reverse=True)[:2000]
-no_price = check_prices(eligible, "US")
-print(f"US       eligible={len(eligible):>5} senza_prezzo={len(no_price):>4}")
+no_price = [s["ticker"] for s in eligible if s["ticker"] not in with_price]
+print(f"US       eligible={len(eligible):>5} con_prezzo={len(eligible)-len(no_price):>5} senza_prezzo={len(no_price):>4}")
 if no_price:
-    print(f"         SENZA PREZZO: {no_price}")
+    print(f"         SENZA PREZZO: {no_price[:50]}")
 
 print()
 
 # TSX — top 400
 print("--- TSX: top 400 ---")
 stocks = load_exchange("TSX")
+with_price = get_tickers_with_prices("TSX")
+print(f"  Ticker TSX con prezzi recenti: {len(with_price)}")
 eligible = sorted(
     [s for s in stocks if not is_excluded(s.get("company",""), s.get("sector",""))],
     key=lambda s: s.get("mkt_cap") or 0, reverse=True)[:400]
-no_price = check_prices(eligible, "TSX")
-print(f"TSX      eligible={len(eligible):>5} senza_prezzo={len(no_price):>4}")
+no_price = [s["ticker"] for s in eligible if s["ticker"] not in with_price]
+print(f"TSX      eligible={len(eligible):>5} con_prezzo={len(eligible)-len(no_price):>5} senza_prezzo={len(no_price):>4}")
 if no_price:
-    print(f"         SENZA PREZZO: {no_price}")
+    print(f"         SENZA PREZZO: {no_price[:50]}")
 
 print()
 print("=== NESSUNA MODIFICA AL DB ===")
