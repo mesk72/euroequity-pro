@@ -1143,6 +1143,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   onSelectStock?: (s: Stock) => void
   onGoScreener?: (filter: string) => void
 }) {
+  const router = useRouter()
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -1426,6 +1427,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
   onSelectStock?: (s: Stock) => void
   onGoScreener?: (filter: string) => void
 }) {
+  const router = useRouter()
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -1714,6 +1716,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
   onSectorClick: (s: string) => void
   onSelectStock?: (s: Stock) => void
 }) {
+  const router = useRouter()
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
