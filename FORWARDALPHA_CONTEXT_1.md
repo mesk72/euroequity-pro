@@ -616,17 +616,20 @@ EU totale: 1.904 | US: 1.967 | TSX: 387 | APAC: 1.850
 | Hong Kong| SEHK    | ~500 |
 | Australia| ASX     | ~350 |
 | Corea   | KRX      | ~350-400 |
+| Singapore | SGX    | ~100 |
 
 ### Da fare
 1. Applicare filtri esclusione (fondi, ETF, settori 71-77) a EU e US come già fatto per APAC
 2. Aggiungere KRX (Corea) — verificare suffix Leeway con Lars, rimuovere "A" iniziale dai ticker numerici
-3. Combined rank Nord America = US + TSX insieme (come AP = TSE+SEHK+ASX)
+3. Aggiungere SGX (Singapore) — ~200 titoli TIKR, universo top 100 per mktcap
+4. Combined rank Nord America = US + TSX insieme (come AP = TSE+SEHK+ASX)
    - Aggiornare weekly_us per calcolare combined NA su distribuzione unica US+TSX
    - Screen Nord America aggregato nel frontend
-4. Nuovo screen Corea nel frontend
-5. Screen Asia Pacific aggiornato: JP+HK+AU+KR
-6. Modificare daily_us per includere KRX nei prezzi e momentum
-7. Modificare weekly per includere KRX nei rank
+5. Nuovo screen Corea nel frontend (~350-400 titoli)
+6. Nuovo screen Singapore nel frontend (~100 titoli)
+7. Screen Asia Pacific aggiornato: JP+HK+AU+KR+SG
+8. Modificare daily_apac per includere KRX e SGX nei prezzi e momentum
+9. Modificare weekly per includere KRX e SGX nei rank
 
 ---
 
