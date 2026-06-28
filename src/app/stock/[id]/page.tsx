@@ -200,9 +200,7 @@ export default function StockPage() {
   const handleBack = () => {
     const from = searchParams.get('from')
     if (from) {
-      const decoded = decodeURIComponent(from)
-      router.push(decoded)
-      router.refresh()
+      router.push(decodeURIComponent(from))
     } else {
       router.back()
     }
