@@ -262,6 +262,7 @@ export default function NewsPage() {
     setLoading(true)
     // Reset dati
     setData({ world: [], americas: [], europe: [], asia: [] })
+    try {
 
     // World + EU extra + Asia extra + Google News in parallelo
     const [worldRssResults, euResults, asiaResults, googleResults] = await Promise.all([
@@ -354,6 +355,11 @@ export default function NewsPage() {
 
     setLast(new Date().toLocaleTimeString())
     setCountdown(900)
+    } catch (e) {
+      console.error('News load error:', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const generateReportBest = async () => {
