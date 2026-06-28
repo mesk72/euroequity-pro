@@ -288,10 +288,338 @@ HE: AUROORA, CANATU, CITYVA
 Codice
 
 
+---
 
+## SESSIONE 27-28 GIUGNO 2026 — TUTTO QUELLO CHE È STATO FATTO
 
+---
 
+## LEEWAY — FUNZIONE leeway_ticker() DEFINITIVA
 
+```python
+SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE",
+    "ROG": "RO.SW",  # Roche: ticker Leeway diverso da Bloomberg
+}
 
+LEEWAY_SUFFIX = {
+    "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
+    "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
+    "LS":   ".LS",    "VI":    ".VI",     "HE":   ".HE",
+    "IR":   ".IR",    "AT":    ".VI",     # AT usa .VI non .AT
+    "LSE":  ".LSE",   "AIM":   ".AIM",   "SWX":  ".SW",
+    "OM":   ".ST",    "NGM":   ".ST",    "OB":   ".OL",
+    "CPSE": ".CO",
+    "US":   ".US",    "TSX":   ".TO",
+    "TSE":  ".TSE",   "ASX":   ".AU",    # ASX usa .AU non .AX
+}
 
+def leeway_ticker(ticker, exchange):
+    if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
+    if exchange == "SEHK": return ticker.zfill(4) + ".HK"  # 700→0700.HK
+    if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
+    if exchange == "TSX": return ticker.replace(".", "-") + ".TO"  # AD.UN→AD-UN.TO
+    if exchange == "BR":  return ticker.replace(".", "") + ".BR"   # AGF.B→AGFB.BR
+    ticker_clean = ticker.rstrip(".")  # UU.→UU (LSE ticker con punto finale)
+    return ticker_clean + LEEWAY_SUFFIX.get(exchange, "")
+```
 
+### Regole confermate dai test (5238 titoli, OK=5238 VUOTI=0 a 2 req/sec)
+- CPSE: spazio→trattino (AMBU B → AMBU-B.CO)
+- OM/NGM: spazio→trattino (SCA B → SCA-B.ST)
+- TSX: punto→trattino (AD.UN → AD-UN.TO, AGF.B → AGF-B.TO)
+- BR: punto→nulla (AGF.B → AGFB.BR) — regola DIVERSA da TSX
+- LSE: rstrip(".") dal ticker (UU. → UU.LSE, non UU..LSE)
+- SEHK: zero-pad esatto 4 cifre (700→0700, 10→0010, mai 5 cifre)
+- AT exchange: usa .VI non .AT (confermato 6/6 test)
+- ASX: .AU non .AX (Array vuoto con .AX, OK con .AU)
+- TSE: .TSE (es. 7203.TSE, 285A.TSE — alfanumerici supportati)
+- STO3.XETRA: unico titolo non coperto da Leeway (ETF strutturato)
+- Rate limit: 2 req/sec raccomandato da Lars (max tecnico 7 req/sec)
+- Sleep nei daily: 0.5s tra ogni chiamata Leeway
+- 100k chiamate/giorno incluse nel piano
+
+---
+
+## DAILY SCRIPTS — ARCHITETTURA DEFINITIVA
+
+### Flusso identico per daily_eu.py, daily_apac.py, daily_us.py
+
+```
+Step 1: Carica universo da stocks (in_universe=true)
+        - Leggi anche yahoo_ticker per fallback
+Step 2: Scarica prezzi EOD da Leeway → salva in prices_eod
+        - sleep 0.5s tra chiamate
+        - Se last_date >= TODAY → skip (già aggiornato)
+        - start_dt = last_date + 1 giorno
+Step 3: Leggi prezzi da prices_eod
+        - Chunk da 20 ticker
+        - Filtro date >= oggi-400 giorni (evita che un ticker monopolizzi 1000 righe)
+        - Ordine: ticker, date.desc
+        - Risultato: all_ph = {(ticker, exchange): [{"date":..., "close":...}]}
+Step 4: Calcola momentum da all_ph (prezzi NUOVI)
+        - mom1w: closest a 7 giorni fa
+        - mom1m: closest a 31 giorni fa
+        - mom6m: closest a 182 giorni fa
+        - mom12m: closest a 365 giorni fa
+        - change1d: data[0]/data[1] - 1
+        - Risultato: mom_updates = lista dizionari
+Step 5: POST mom_updates a fundamentals (upsert)
+Step 6 (solo EU): Aggiorna FX rates via yfinance
+Step 7: Leggi all_data da fundamentals
+        - Campi: pe_trailing, pe_forward, pb, eps_growth, rev_growth, mom6m, mom12m, mom1w, mom1m
+Step 8: Costruisci mappe momentum da mom_updates (NON da all_data/DB vecchio)
+        mom1w_map  = {(ticker, exchange): mom1w  for d in mom_updates}
+        mom1m_map  = {(ticker, exchange): mom1m  for d in mom_updates}
+        mom6m_map  = {(ticker, exchange): mom6m  for d in mom_updates}
+        mom12m_map = {(ticker, exchange): mom12m for d in mom_updates}
+        Fallback: d.get("mom6m") da fundamentals se titolo non in mom_updates
+Step 9: Calcola rank per paese (RANK_GROUPS)
+        - value_score: r_eyt, r_eyf, r_pb (min 2/3)
+        - growth_score: r_epsg, r_revg, r_m6, r_m12 (min 3/4)
+        - mom6m_adj = mom6m - mom1w (aggiustato overbought)
+        - mom12m_adj = mom12m - mom1m
+Step 10: Calcola combined rank (EU o AP o US)
+Step 11: Aggiorna indici
+Step 12: Salva log in daily_log
+```
+
+### Schedule GitHub Actions
+- daily_eu.py: `0 19 * * 1-5` (21:00 CET) — exchange not.in.(US,TSX,TSE,SEHK,ASX)
+- daily_apac.py: `0 20 * * 1-5` (22:00 CET) — exchange in.(TSE,SEHK,ASX)
+- daily_us.py: exchange in.(US,TSX)
+
+### RANK_GROUPS
+```python
+# EU
+RANK_GROUPS = {
+    "ITA": ["MIL"], "DEU": ["XETRA"], "FRA": ["PA"], "GBR": ["LSE"],
+    "SWE": ["OM"],  "NOR": ["OB"],    "CHE": ["SWX"], "NLD": ["AS"],
+    "BEL": ["BR"],  "FIN": ["HE"],    "ESP": ["MC"],  "DNK": ["CPSE"],
+    "POR": ["LS"],
+}
+NO_RANK = {"AT", "VI", "IR", "NGM", "AIM"}
+
+# APAC
+RANK_GROUPS = {
+    "JPN": ["TSE"], "HKG": ["SEHK"], "AUS": ["ASX"],
+}
+# Combined AP = TSE+SEHK+ASX insieme
+# TSX (Canada) non ha combined APAC — calcolato con US nel weekly_us
+
+# US: tutti insieme, combined con TSX nel weekly_us
+```
+
+---
+
+## INDICI — TICKER LEEWAY CONFERMATI
+
+### EU (da aggiornare in daily_eu.py → EU_INDICES)
+```python
+EU_INDICES = [
+    ("GDAXI.INDX",   "XETRA", "DAX",    "DAX"),           # 24.994 ✅
+    ("FCHI.INDX",    "PA",    "FCHI",   "CAC 40"),         # 8.431 ✅
+    ("AEX.INDX",     "AS",    "AEX",    "AEX"),            # 1.067 ✅
+    ("IBEX.INDX",    "MC",    "IBEX",   "IBEX 35"),        # 19.425 ✅
+    ("BFX.INDX",     "BR",    "BFX",    "BEL 20"),         # 5.739 ✅
+    ("SSMI.INDX",    "SWX",   "SMI",    "SMI"),            # 14.231 ✅
+    ("ATX.INDX",     "VI",    "ATX",    "ATX"),            # 6.488 ✅
+    ("OMXS30.INDX",  "OM",    "OMXS30", "OMX Stockholm"),  # 3.153 ✅
+    ("OMXC25.INDX",  "CPSE",  "C25",    "OMX Copenhagen"), # 1.800 ✅
+    ("OMXH25.INDX",  "HE",    "HEX",    "OMX Helsinki"),   # 6.143 ✅  (non OMXHPI)
+    ("STOXX50E.INDX","EZ",    "SX5E",   "Euro Stoxx 50"),  # 6.267 ✅
+    ("SXXP.INDX",    "EZ",    "SXXP",   "STOXX 600"),      # 635 ✅
+    ("PSI20.INDX",   "LS",    "PSI",    "PSI 20"),         # 9.136 ✅
+    # NON DISPONIBILI SU LEEWAY:
+    # FTSEMIB.MI → FTSE MIB (da chiedere a Lars)
+    # FTSE.INDX  → FTSE 100 (da chiedere a Lars)
+    # ISEQ.INDX  → ISEQ (da chiedere a Lars)
+]
+```
+
+### NA (daily_us.py → NA_INDICES)
+```python
+NA_INDICES = [
+    ("GSPC.INDX",   "US",  "GSPC",  "S&P 500"),   # 7.367 ✅
+    ("IXIC.INDX",   "US",  "IXIC",  "Nasdaq"),    # 25.371 ✅
+    ("DJI.INDX",    "US",  "DJI",   "Dow Jones"), # 51.927 ✅
+    ("GSPTSE.INDX", "TSX", "GSPTSE","TSX"),        # 34.909 ✅ (non OSPTSX)
+]
+```
+
+### APAC (daily_apac.py → APAC_INDICES)
+```python
+APAC_INDICES = [
+    ("N225.INDX", "TSE",  "N225", "Nikkei 225"),
+    ("HSI.INDX",  "SEHK", "HSI",  "Hang Seng"),
+    ("AXJO.INDX", "ASX",  "AXJO", "ASX 200"),
+]
+```
+
+### Regole indici
+- USA SEMPRE `close` (non `adjusted_close`) — adjusted_close per indici è sbagliato
+- Ordina dati per data ASC prima di prendere last/prev
+- Filtra close > 0 per evitare righe corrotte
+- Scarica 12 mesi di storia
+- Salva in tabella `indices` (non price_history)
+- PATCH con ticker come chiave
+
+---
+
+## NEWS PAGE — ARCHITETTURA
+
+### Report nella News Page
+- **Best Score Report**: ordina per bestScore (combined_rank) DESC, ultime 24h, max 1 per ticker, top 10 per regione
+- **Market Cap Report**: ordina per mktCap DESC, ultime 24h, max 1 per ticker, top 10 per regione
+
+### MarketStrip
+- Link Yahoo Finance cliccabili per indici (Americas, Europe, Asia Pac)
+- TradingView widget per commodities e FX (Gold, Oil WTI, EUR/USD, USD/JPY, GBP/USD)
+- NON mostrare prezzi live degli indici — solo link Yahoo
+
+### API /api/ticker-news
+- Legge da fundamentals ordinato per mkt_cap DESC
+- Restituisce: ticker, exchange, company, yahooTicker, valueScore, growthScore, bestScore, mktCap
+
+---
+
+## FETCH NEWS CACHE
+
+### fetch_news_cache.py
+- Top 200 US+CA + top 50 EU + top 50 Asia ogni ora
+- Restanti (~4200 titoli) ogni 3 ore (shell: HOUR%3==0)
+- ThreadPoolExecutor 20 worker per parallelismo
+- Salva in tabella `news_cache` Supabase
+
+### Workflow fetch_news_cache.yml
+```yaml
+schedule:
+  - cron: '0 * * * *'  # ogni ora
+# Logic shell:
+# HOUR=$(date -u +%H)
+# if [ $((HOUR % 3)) -eq 0 ]; then
+#   python fetch_news_cache.py all  # tutti i ticker
+# else
+#   python fetch_news_cache.py      # solo top
+```
+
+---
+
+## SEO (aggiornamenti giugno 2026)
+
+### layout.tsx
+```typescript
+title: 'ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked',
+description: 'Institutional-grade Value & Growth scoring across 7,000+ global stocks: Europe, US, Canada, Japan, Hong Kong, Australia. Daily price refresh. Built by ex J.P. Morgan & Zenit SGR Portfolio Manager, CFA.',
+```
+
+### sitemap.ts (src/app/sitemap.ts)
+- Include TUTTE le borse: EU + US + TSX + TSE + SEHK + ASX
+- Top 50 titoli per mktCap con priority 0.9 (Nvidia, ASML, Tencent appaiono per primi nei sitelink Google)
+- Pagine statiche: /, /news, /screens, /screens/europe, /screens/us, /screens/asia, /research, /about, /legal
+- NB: la sitemap è DINAMICA (src/app/sitemap.ts) — non creare public/sitemap.xml statica
+- Google Search Console: 5243 pagine rilevate, sitemap inviata il 29/05/2026
+
+### JSON-LD in homepage (page.tsx)
+```typescript
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'ForwardAlpha',
+  url: 'https://forwardalpha.pro',
+  ...
+}
+```
+
+---
+
+## UNIVERSO AGGIORNATO (giugno 2026)
+
+| Exchange | Titoli in_universe | Mercato |
+|----------|-------------------|---------|
+| US       | 1.967             | NYSE/NASDAQ |
+| TSE      | 1.000             | Tokyo |
+| SEHK     | 500               | Hong Kong |
+| TSX      | 387               | Toronto |
+| LSE      | 375               | Londra |
+| ASX      | 350               | Australia |
+| PA       | 200               | Parigi |
+| XETRA    | 186               | Francoforte |
+| OM       | 184               | Stoccolma |
+| SWX      | 142               | Zurigo |
+| MIL      | 109               | Milano |
+| AS       | 100               | Amsterdam |
+| HE       | 100               | Helsinki |
+| BR       | 99                | Bruxelles |
+| CPSE     | 98                | Copenhagen |
+| OB       | 98                | Oslo |
+| MC       | 88                | Madrid |
+| VI       | 70                | Vienna |
+| LS       | 39                | Lisbona |
+| IR       | 16                | Dublino |
+| **TOTALE** | **6.108**       | |
+
+EU totale: 1.904 | US: 1.967 | TSX: 387 | APAC: 1.850
+
+---
+
+## PROBLEMI RISOLTI IN QUESTA SESSIONE
+
+1. **Suffisso ASX sbagliato**: .AX → .AU (prezzi fermi al 19 giugno)
+2. **Suffisso AT sbagliato**: .AT → .VI
+3. **Doppio punto LSE**: UU. → rstrip(".") → UU.LSE
+4. **Spazio in ticker OM/CPSE**: spazio → trattino
+5. **Punto in ticker TSX**: punto → trattino (AD.UN → AD-UN.TO)
+6. **Punto in ticker BR**: punto → nulla (AGF.B → AGFB.BR)
+7. **Roche su SWX**: ROG → RO.SW (ticker Bloomberg ≠ Leeway)
+8. **Rate limit Leeway**: troppi thread → falsi vuoti. Fix: 2 req/sec, loop sequenziale
+9. **Indici valore sbagliato**: adjusted_close → close per indici
+10. **Indici invertiti (±17.4%)**: dati non ordinati per data → fix sorted(data, key=date) ASC
+11. **FTSE MIB 53 invece di 53.000**: non disponibile su Leeway (in attesa da Lars)
+12. **Helsinki indice**: OMXHPI.INDX vuoto → OMXH25.INDX ✅
+13. **TSX indice**: OSPTSX.INDX vuoto → GSPTSE.INDX ✅
+14. **Growth score non cambia**: filtro 400 giorni su prices_eod evita che un ticker monopolizzi le 1000 righe del chunk
+15. **daily_apac troncato**: file riscritto da zero dopo corruzione
+16. **f-string con doppie graffe**: riscritti i daily senza f-string per le query Supabase
+17. **combined_rank EU**: calcolato su tutti i paesi EU insieme (non per paese)
+18. **News Page generateReportBest**: ripristinato dal commit ad4cb211 (funzionante)
+19. **Market Cap Report**: aggiunto secondo report che ordina per mktCap reale
+20. **Link cliccabili nella News**: renderLines() con link "📰 Read article" e "📊 View on ForwardAlpha"
+21. **Cache 30 min**: /api/yahoo-news e /api/ticker-news con cache-control
+22. **sitemap.xml duplicata**: eliminata public/sitemap.xml (esiste già src/app/sitemap.ts dinamica)
+
+---
+
+## PENDENTI / DA FARE
+
+1. **FTSE MIB e FTSE 100**: chiedere a Lars il ticker corretto su Leeway
+2. **ISEQ**: ticker Leeway da verificare
+3. **daily_us combined rank**: verificare che includa TSX nella stessa distribuzione US
+4. **Dashboard APAC**: pagina non ancora creata (indici pronti in Supabase)
+5. **Growth/best score che non cambia**: verificare dopo il prossimo run daily con il fix filtro 400 giorni
+6. **Vercel build**: verificare dopo ogni modifica
+7. **Google Search Console**: richiedere reindicizzazione homepage dopo fix title
+
+---
+
+## TEST LEEWAY (test_leeway_indices.py)
+
+### Script di test
+- Loop sequenziale, sleep 0.5s, timeout 15s per chiamata
+- Testa tutti i 6108 titoli in universe
+- Risultato definitivo: OK=5238/5238 VUOTI=0 (solo borse EU+US+CA+APAC, escluso MIL/XETRA/PA/LSE già verificati separatamente)
+- Workflow: .github/workflows/test_leeway.yml (no timeout)
+
+---
+
+## GITHUB ACTIONS — WORKFLOWS ATTIVI
+
+| Workflow | Schedule | Note |
+|----------|----------|------|
+| daily_eu.yml | `0 19 * * 1-5` | 21:00 CET |
+| daily_apac.yml | `0 20 * * 1-5` | 22:00 CET |
+| daily_us.yml | separato | |
+| fetch_news_cache.yml | `0 * * * *` | ogni ora, HOUR%3 per full |
+| test_leeway.yml | manuale | no timeout |
+| fix_combined_rank.yml | manuale | |
