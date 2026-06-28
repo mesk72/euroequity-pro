@@ -1,7 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import {
   FileText, LayoutDashboard, Search, Briefcase, Globe, Info,
   LogIn, LogOut, User, Menu, X, RefreshCw,
@@ -2118,17 +2118,27 @@ function CookieBanner() {
 }
 
 // - ROOT APP -
-export default function App() {
+function AppContent() {
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const appRouter = useRouter()
   const [page,        setPage]        = useState<Page>('dashboard')
 
-  // Sincronizza URL con page state per back navigation
+  // Leggi ?page= dall'URL al mount — ripristina stato dopo back navigation
   useEffect(() => {
-    if (page === 'dashboard') {
-      window.history.replaceState(null, '', '/')
+    const urlPage = searchParams.get('page') as Page
+    if (urlPage) setPage(urlPage)
+  }, [searchParams])
+
+  // Sincronizza URL con page state usando router.replace (non replaceState nativo)
+  const navigateTo = (newPage: Page) => {
+    setPage(newPage)
+    if (newPage === 'dashboard') {
+      appRouter.replace('/', { scroll: false })
     } else {
-      window.history.replaceState(null, '', `/?page=${page}`)
+      appRouter.replace(`/?page=${newPage}`, { scroll: false })
     }
-  }, [page])
+  }
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
   const [showAuth,    setShowAuth]    = useState(false)
   const [sidebarOpen, setSidebar]     = useState(false)
@@ -2472,5 +2482,13 @@ export default function App() {
 
       <CookieBanner />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <Suspense fallback={null}>
+      <AppContent />
+    </Suspense>
   )
 }
