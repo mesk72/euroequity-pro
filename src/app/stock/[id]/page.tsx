@@ -229,6 +229,8 @@ export default function StockPage() {
   const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoading] = useState(true)
   const [addedScreen, setAddedScreen] = useState<number | null>(null)
+  const [user, setUser] = useState<any>(null)
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null)) }, [])
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
