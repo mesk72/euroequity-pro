@@ -301,6 +301,15 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
   const [sortAsc, setSortAsc] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
+  // Sincronizza URL con page state per back navigation
+  useEffect(() => {
+    if (page === 'dashboard') {
+      window.history.replaceState(null, '', '/')
+    } else {
+      window.history.replaceState(null, '', `/?page=${page}`)
+    }
+  }, [page])
+
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
     check()
