@@ -11,7 +11,7 @@ TODAY        = datetime.now().strftime("%Y-%m-%d")
 FROM_10D     = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
 headers_r    = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-# Rate limiter: max 7 req/sec
+# Rate limiter: 2 req/sec come raccomandato da Leeway
 _lock = threading.Lock()
 _last_call = [0.0]
 
@@ -19,10 +19,10 @@ def rate_limited_get(url):
     with _lock:
         now = time.time()
         elapsed = now - _last_call[0]
-        if elapsed < 1/7:
-            time.sleep(1/7 - elapsed)
+        if elapsed < 0.5:  # 1/2 sec = 2 req/sec
+            time.sleep(0.5 - elapsed)
         _last_call[0] = time.time()
-    return requests.get(url, timeout=10)
+    return requests.get(url, timeout=15)
 
 SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
@@ -50,13 +50,15 @@ def test_one(args):
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_10D + "&to=" + TODAY
     try:
         r = rate_limited_get(url)
-        data = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        if r.status_code != 200:
+            return ticker, exchange, lt, False, f"HTTP {r.status_code}"
+        data = r.json() if isinstance(r.json(), list) else []
         if data:
             last = sorted(data, key=lambda x: x["date"])[-1]
             return ticker, exchange, lt, True, last.get("date")
-        return ticker, exchange, lt, False, None
-    except:
-        return ticker, exchange, lt, False, None
+        return ticker, exchange, lt, False, "empty"
+    except Exception as e:
+        return ticker, exchange, lt, False, str(e)[:30]
 
 print("TODAY:", TODAY, "FROM:", FROM_10D)
 
@@ -66,7 +68,6 @@ EXCHANGES = [
     "TSX","TSE","SEHK","ASX",
 ]
 
-# Carica tutti i titoli
 all_stocks = []
 for exchange in EXCHANGES:
     offset = 0
@@ -82,26 +83,24 @@ for exchange in EXCHANGES:
         if len(batch) < 1000: break
 
 print(f"Totale: {len(all_stocks)} titoli")
-print(f"Stima: {len(all_stocks)/7/60:.1f} minuti a 7 req/sec")
+print(f"Stima: {len(all_stocks)/2/60:.1f} minuti a 2 req/sec")
 
-# Test con 7 thread — rispetta rate limit 7 req/sec
-results = []
-with ThreadPoolExecutor(max_workers=7) as executor:
+# 2 thread — rispetta 2 req/sec grazie al rate limiter
+with ThreadPoolExecutor(max_workers=2) as executor:
     results = list(executor.map(test_one, all_stocks))
 
-# Stampa vuoti per exchange
 from collections import defaultdict
 by_ex = defaultdict(list)
 ok = 0
-for ticker, exchange, lt, has_data, date in results:
+for ticker, exchange, lt, has_data, info in results:
     if has_data: ok += 1
-    else: by_ex[exchange].append((ticker, lt))
+    else: by_ex[exchange].append((ticker, lt, info))
 
 print(f"\n=== RISULTATO ===")
 print(f"OK: {ok}  VUOTI: {sum(len(v) for v in by_ex.values())}")
 for ex in EXCHANGES:
     items = by_ex.get(ex, [])
-    total_ex = sum(1 for t, e, l, h, d in results if e == ex)
+    total_ex = sum(1 for t, e, l, h, i in results if e == ex)
     print(f"\n{ex}: {total_ex} — OK={total_ex-len(items)} VUOTI={len(items)}")
-    for tk, lt in items:
-        print(f"  {tk} -> {lt}")
+    for tk, lt, info in items:
+        print(f"  {tk} -> {lt} ({info})")
