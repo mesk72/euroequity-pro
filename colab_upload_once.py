@@ -1,77 +1,127 @@
-# ============================================================
-# FORWARDALPHA — UPLOAD INIZIALE SU SUPABASE STORAGE
-# Da eseguire UNA VOLTA SOLA da Google Colab
-# Dopo questo, tutto gira da GitHub Actions
-# ============================================================
-# File necessari (da caricare in Colab prima di eseguire):
-#   tikr_eu_latest.csv     — TIKR Europa (scaricato da TIKR)
-#   tikr_na_latest.csv     — TIKR Nord America US+CA (scaricato da TIKR)
-#   fiscal_year_end_eu.csv — Fiscal year end Europa (colonne: ticker, exchange, fiscal_month)
-#   fiscal_year_end_na.csv — Fiscal year end Nord America (colonne: ticker, exchange, fiscal_month)
-# ============================================================
-
-import requests, io, os
 import pandas as pd
+import requests
+import io
 
-SUPABASE_URL = "YOUR_SUPABASE_URL"  # es. https://mlqkisnizgyvvqajdvbh.supabase.co
-SERVICE_KEY  = "YOUR_SERVICE_KEY"
+SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
+SERVICE_KEY  = "YOUR_SERVICE_KEY"  # sostituisci con la tua chiave
 
 headers_auth = {
     "apikey": SERVICE_KEY,
     "Authorization": "Bearer " + SERVICE_KEY,
 }
 
-def upload_to_storage(local_path, storage_name):
-    """Carica un file su Supabase Storage bucket tikr-uploads"""
-    with open(local_path, "rb") as f:
-        content = f.read()
-    
-    # Prima prova DELETE (per sovrascrivere)
+def upload_to_storage(content_bytes, storage_name):
     requests.delete(
         f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/{storage_name}",
         headers=headers_auth
     )
-    
-    # Poi upload
     r = requests.post(
         f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/{storage_name}",
         headers={**headers_auth, "Content-Type": "text/csv"},
-        data=content
+        data=content_bytes
     )
+    kb = len(content_bytes) // 1024
     if r.status_code in (200, 201):
-        print(f"  ✅ {storage_name} caricato ({len(content)//1024} KB)")
+        print(f"  OK {storage_name} ({kb} KB)")
     else:
-        print(f"  ❌ {storage_name} errore: {r.status_code} {r.text[:100]}")
+        print(f"  ERRORE {storage_name}: {r.status_code} {r.text[:150]}")
 
-# ── STEP 1: Carica file TIKR ──────────────────────────────────
-print("=== UPLOAD FILE TIKR ===")
-upload_to_storage("tikr_eu_latest.csv", "tikr_eu_latest.csv")
-upload_to_storage("tikr_na_latest.csv", "tikr_na_latest.csv")
+# ── Mostra colonne di tutti i file ───────────────────────────
+print("=== COLONNE FILE ===")
+for f in [
+    "fiscal_year_end_final.csv",
+    "fiscal_year_global.csv",
+    "tikr_load_eu_2806 - Foglio1.csv",
+    "tikr_load_na_2806 - Foglio1.csv",
+]:
+    df = pd.read_csv(f, nrows=2)
+    print(f"\n{f}:")
+    print(f"  {list(df.columns)}")
+    print(f"  {df.iloc[0].to_dict()}")
 
-# ── STEP 2: Unifica e carica fiscal_year_end ─────────────────
-print("\n=== UPLOAD FISCAL YEAR END ===")
+# ── TIKR EU ───────────────────────────────────────────────────
+print("\n=== TIKR EU ===")
+df_eu = pd.read_csv("tikr_load_eu_2806 - Foglio1.csv")
+print(f"  Righe: {len(df_eu)}")
+buf = df_eu.to_csv(index=False).encode("utf-8")
+upload_to_storage(buf, "tikr_eu_latest.csv")
 
-# Leggi i due file fiscal year end
-df_eu = pd.read_csv("fiscal_year_end_eu.csv")
-df_na = pd.read_csv("fiscal_year_end_na.csv")
+# ── TIKR NA (solo US — escludi Canada TSX) ───────────────────
+print("\n=== TIKR NA (solo US) ===")
+df_na = pd.read_csv("tikr_load_na_2806 - Foglio1.csv")
+print(f"  Righe totali: {len(df_na)}")
+print(f"  Colonna exchange/market: cerca tra {[c for c in df_na.columns if any(k in c.lower() for k in ['exch','market','country','bors'])]}")
 
-# Assicurati che abbiano le colonne giuste: ticker, exchange, fiscal_month
-# Se nel tuo file si chiamano diversamente, rinominale qui
-# es. df_eu = df_eu.rename(columns={"Ticker": "ticker", "Exchange": "exchange", "FY Month": "fiscal_month"})
+# Filtra solo US — escludi Canada
+# Adatta il nome colonna dopo aver visto l'output sopra
+EXCH_COL = None
+for col in df_na.columns:
+    if any(k in col.lower() for k in ["exchange", "market", "bors"]):
+        EXCH_COL = col
+        break
 
-print(f"  EU: {len(df_eu)} righe, colonne: {list(df_eu.columns)}")
-print(f"  NA: {len(df_na)} righe, colonne: {list(df_na.columns)}")
+if EXCH_COL:
+    print(f"  Uso colonna: {EXCH_COL}")
+    print(f"  Valori unici: {df_na[EXCH_COL].unique()[:20]}")
+    # Escludi TSX/TSXV canadesi
+    df_us = df_na[~df_na[EXCH_COL].str.upper().isin(["TSX","TSXV","TO"])]
+    print(f"  Righe US dopo filtro: {len(df_us)}")
+else:
+    print("  ATTENZIONE: colonna exchange non trovata — carico tutto")
+    df_us = df_na
 
-# Unifica in un file unico
-df_all = pd.concat([df_eu, df_na], ignore_index=True)
-df_all = df_all[["ticker", "exchange", "fiscal_month"]].drop_duplicates()
-print(f"  Totale unificato: {len(df_all)} righe")
+buf = df_us.to_csv(index=False).encode("utf-8")
+upload_to_storage(buf, "tikr_na_latest.csv")
 
-# Salva e carica
-df_all.to_csv("fiscal_year_end.csv", index=False)
-upload_to_storage("fiscal_year_end.csv", "fiscal_year_end.csv")
+# ── FISCAL YEAR END EU ────────────────────────────────────────
+print("\n=== FISCAL YEAR END EU ===")
+df_fy_eu = pd.read_csv("fiscal_year_end_final.csv")
+print(f"  Righe: {len(df_fy_eu)}")
+print(f"  Colonne: {list(df_fy_eu.columns)}")
 
-print("\n=== FATTO ===")
-print("Ora puoi lanciare Weekly EU Load e Weekly US Load da GitHub Actions.")
-print("Da oggi in poi: carica solo tikr_eu_latest.csv e tikr_na_latest.csv su Supabase Storage")
-print("e lancia i weekly da GitHub Actions. Non serve più Colab.")
+# Rinomina colonne per il formato atteso: ticker, exchange, fiscal_month
+# Adatta dopo aver visto le colonne
+col_map_eu = {}
+for col in df_fy_eu.columns:
+    cl = col.lower()
+    if "ticker" in cl: col_map_eu[col] = "ticker"
+    elif "exchange" in cl or "bors" in cl: col_map_eu[col] = "exchange"
+    elif "month" in cl or "mese" in cl or "fiscal" in cl: col_map_eu[col] = "fiscal_month"
+
+df_fy_eu = df_fy_eu.rename(columns=col_map_eu)
+df_fy_eu = df_fy_eu[["ticker","exchange","fiscal_month"]].dropna()
+print(f"  Dopo pulizia: {len(df_fy_eu)} righe")
+buf = df_fy_eu.to_csv(index=False).encode("utf-8")
+upload_to_storage(buf, "fiscal_year_end_eu.csv")
+
+# ── FISCAL YEAR END NA (solo US) ─────────────────────────────
+print("\n=== FISCAL YEAR END NA (solo US) ===")
+df_fy_na = pd.read_csv("fiscal_year_global.csv")
+print(f"  Righe: {len(df_fy_na)}")
+print(f"  Colonne: {list(df_fy_na.columns)}")
+
+col_map_na = {}
+for col in df_fy_na.columns:
+    cl = col.lower()
+    if "ticker" in cl: col_map_na[col] = "ticker"
+    elif "exchange" in cl or "bors" in cl: col_map_na[col] = "exchange"
+    elif "month" in cl or "mese" in cl or "fiscal" in cl: col_map_na[col] = "fiscal_month"
+
+df_fy_na = df_fy_na.rename(columns=col_map_na)
+df_fy_na = df_fy_na[["ticker","exchange","fiscal_month"]].dropna()
+
+# Filtra solo US — escludi TSX
+df_fy_us = df_fy_na[~df_fy_na["exchange"].str.upper().isin(["TSX","TSXV","TO"])]
+print(f"  Righe US dopo filtro: {len(df_fy_us)}")
+buf = df_fy_us.to_csv(index=False).encode("utf-8")
+upload_to_storage(buf, "fiscal_year_end_na.csv")
+
+# ── FISCAL YEAR END UNIFICATO (EU + US) ──────────────────────
+print("\n=== FISCAL YEAR END UNIFICATO ===")
+df_all = pd.concat([df_fy_eu, df_fy_us], ignore_index=True).drop_duplicates()
+print(f"  Totale: {len(df_all)} righe")
+buf = df_all.to_csv(index=False).encode("utf-8")
+upload_to_storage(buf, "fiscal_year_end.csv")
+
+print("\n=== TUTTO CARICATO ===")
+print("Ora lancia Weekly EU Load e Weekly US Load da GitHub Actions.")
