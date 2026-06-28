@@ -747,3 +747,37 @@ Con FY2030 disponibile, gli anni fissi diventano:
 - fy0=FY2026, fy1=FY2027, fy2=FY2028, fy3=FY2029, fy4=FY2030
 - eps_ntm calcolato come prima (blend fy1/fy2)
 - eps_cagr_3y = CAGR da eps_ntm a fy4 (3 anni forward)
+
+
+---
+
+## BUG CRITICO — GROWTH/BEST SCORE NON CAMBIA (DA VERIFICARE)
+
+### Stato al 28 giugno 2026
+Fix applicati ma NON ancora verificati in produzione:
+1. Filtro 400 giorni su prices_eod (chunk da 20 ticker)
+2. Mappe momentum costruite da mom_updates (non da DB vecchio)
+
+### Come verificare al prossimo run
+1. Prima del daily: annota growth_score di 5 titoli EU (es. ENI, SAP, LVMH, ASML, NESN)
+2. Lancia daily_eu
+3. Dopo il run: confronta growth_score — devono essere cambiati
+
+### Se ancora non cambiano — debug da fare
+Aggiungere print nel daily per verificare:
+```python
+print(f"mom_updates: {len(mom_updates)} titoli")
+print(f"all_ph: {len(all_ph)} titoli")
+print(f"all_data: {len(all_data)} titoli")
+# Campione: stampa momentum di 3 titoli noti
+for ticker, exchange in [("ENI","MIL"),("SAP","XETRA"),("MC","PA")]:
+    key = (ticker, exchange)
+    print(f"{ticker}: mom6m_map={mom6m_map.get(key)} mom12m_map={mom12m_map.get(key)}")
+    fund = next((d for d in all_data if d["ticker"]==ticker), None)
+    if fund: print(f"  DB mom6m={fund.get('mom6m')} mom12m={fund.get('mom12m')}")
+```
+
+### Causa più probabile se il bug persiste
+Il POST di mom_updates a fundamentals usa upsert ma la chiave
+primaria potrebbe non corrispondere — verificare che il PATCH/POST
+aggiorni effettivamente i record esistenti e non crei duplicati.
