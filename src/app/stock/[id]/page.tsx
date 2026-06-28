@@ -228,7 +228,6 @@ export default function StockPage() {
   const [history, setHistory] = useState<any[]>([])
   const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoading] = useState(true)
-  const [addedScreen, setAddedScreen] = useState<number | null>(null)
   const [user, setUser] = useState<any>(null)
   useEffect(() => { supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null)) }, [])
 
@@ -241,25 +240,7 @@ export default function StockPage() {
       .catch(() => setLoading(false))
   }, [ticker, exchangeCode, chartDays])
 
-  function handleAddToScreen(screenNum: number) {
-    if (!stock) return
-    const key = `myscreen_${screenNum}`
-    const stored: any[] = JSON.parse(localStorage.getItem(key) || '[]')
-    const exists = stored.some(s => s.ticker === stock.ticker && s.exchange === stock.exchange)
-    if (!exists) {
-      if (stored.length >= 100) {
-        stored.shift() // rimuovi il primo se supera 100
-      }
-      stored.push({
-        ticker: stock.ticker, exchange: stock.exchange,
-        company: stock.company, flag: stock.flag,
-        sector: stock.sector, added_at: new Date().toISOString(),
-      })
-      localStorage.setItem(key, JSON.stringify(stored))
-    }
-    setAddedScreen(screenNum)
-    setTimeout(() => setAddedScreen(null), 2000)
-  }
+
 
   if (!stock) {
     return (
@@ -450,20 +431,7 @@ export default function StockPage() {
             marginBottom:12 }}>
             Add to My Screen
           </div>
-          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-            {[1, 2, 3].map(n => (
-              <button key={n} onClick={() => handleAddToScreen(n)}
-                className="btn-primary"
-                style={{ opacity: addedScreen === n ? 0.7 : 1 }}>
-                {addedScreen === n ? `✅ Added to Screen ${n}` : `+ My Screen ${n}`}
-              </button>
-            ))}
-          </div>
-          {addedScreen && (
-            <div style={{ marginTop:8, fontSize:12, color:'var(--green)' }}>
-              ✅ {stock.ticker} added to My Screen {addedScreen} (max 100 stocks)
-            </div>
-          )}
+          <WatchlistButton stock={stock as any} userId={user?.id ?? null} />
         </div>
 
         {(() => {
