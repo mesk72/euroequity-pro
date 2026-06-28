@@ -236,7 +236,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   </button>
                 ))}
               </div>
-            </div>
+            </a>
           ))}
         </div>
       ) : (
