@@ -2174,11 +2174,11 @@ function AppContent() {
     }
   }, [])
   function goSector(sector: string) {
-    setScrExchange('EZ'); setScrSector(sector); setScrSectorUS('All'); setScrEpsMom(''); setPage('screener'); setSidebar(false)
+    setScrExchange('EZ'); setScrSector(sector); setScrSectorUS('All'); setScrEpsMom(''); navigateTo('screener'); setSidebar(false)
   }
 
   function goScreenerEpsMom(filter: string) {
-    setScrExchange('EZ'); setScrSector('All'); setScrEpsMom(filter); setPage('screener'); setSidebar(false)
+    setScrExchange('EZ'); setScrSector('All'); setScrEpsMom(filter); navigateTo('screener'); setSidebar(false)
   }
 
   const accordionMenus = [
@@ -2261,11 +2261,11 @@ function AppContent() {
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
         {/* About + Research */}
         {/* About + News + Research */}
-        <button onClick={() => { setPage('about'); setSidebar(false) }}
+        <button onClick={() => { navigateTo('about'); setSidebar(false) }}
           className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 transition-colors ${page === 'about' ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text hover:bg-white/5'}`}>
           <Info size={16} /> About
         </button>
-        <button onClick={() => { setPage('news'); setSidebar(false) }}
+        <button onClick={() => { navigateTo('news'); setSidebar(false) }}
           className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm font-700 transition-colors ${page === 'news' ? 'bg-gold/15 text-gold' : 'text-sub hover:text-text hover:bg-white/5'}`}>
           <span>📰 News</span>
         </button>
@@ -2304,8 +2304,8 @@ function AppContent() {
           <div key={idx} className='px-3 py-2 text-xs text-muted'>{item.label}</div>
         ))}
         <div style={{ height:1, background:'var(--border)', margin:'4px 4px' }} />
-        <button onClick={() => { setPage('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
-        <button onClick={() => { setPage('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
+        <button onClick={() => { navigateTo('portfolio'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'portfolio' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>💼 Portfolio</button>
+        <button onClick={() => { navigateTo('legal'); setSidebar(false) }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-sm transition-colors ${page === 'legal' ? 'bg-gold/10 text-gold' : 'text-text3 hover:text-text hover:bg-surface2'}`}>📋 Legal</button>
       </nav>
 
         {/* User */}
@@ -2387,9 +2387,9 @@ function AppContent() {
             ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
-          {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); setPage('northamerica') }} onSelectStock={setDetailStock} />}
+          {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); navigateTo('northamerica') }} onSelectStock={setDetailStock} />}
           {page === 'nascreen' && <Screener key={`nascreen-${scrSectorUS}`} initExchange="US,TSX" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
-          {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { setPage('asiapacific') }} onSelectStock={setDetailStock} />}
+          {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { navigateTo('asiapacific') }} onSelectStock={setDetailStock} />}
           {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
           {page === 'TSE' && <Screener key="TSE" initExchange="TSE" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={300} />}
           {page === 'SEHK' && <Screener key="SEHK" initExchange="SEHK" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={250} />}
@@ -2410,8 +2410,8 @@ function AppContent() {
           {page === 'usscreen' && <Screener key={'usscreen-'+scrSectorUS} initExchange='US' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
-          {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); setPage('northamerica') }} />}
-          {page === 'sectors_ap' && <SectorScreenAP onSectorClick={(s) => { setScrSectorAP(s); setPage('asiapacific') }} />}
+          {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); navigateTo('northamerica') }} />}
+          {page === 'sectors_ap' && <SectorScreenAP onSectorClick={(s) => { setScrSectorAP(s); navigateTo('asiapacific') }} />}
           {page === 'about' && (
             <div className="flex-1 overflow-y-auto">
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
@@ -2470,7 +2470,7 @@ function AppContent() {
           <span className="font-700 text-sub">ForwardAlpha · Verona, Italy</span>
           <span>⚠️ Not investment advice</span>
           <span>Prices indicative</span>
-          <button onClick={() => setPage('legal')} className="hover:text-gold underline">Terms &amp; Privacy</button>
+          <button onClick={() => navigateTo('legal')} className="hover:text-gold underline">Terms &amp; Privacy</button>
           <a href="mailto:andrea@forwardalpha.pro" className="hover:text-gold">Contact</a>
           <span>© 2026 Andrea Meschini</span>
         </footer>
