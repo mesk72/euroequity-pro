@@ -650,3 +650,47 @@ EU totale: 1.904 | US: 1.967 | TSX: 387 | APAC: 1.850
 | fetch_news_cache.yml | `0 * * * *` | ogni ora, HOUR%3 per full |
 | test_leeway.yml | manuale | no timeout |
 | fix_combined_rank.yml | manuale | |
+
+
+---
+
+## CALENDARIZZAZIONE — PROBLEMA ANNO 2026→2027
+
+### Problema hardcoding anni
+La formula attuale ha gli anni hardcodati:
+```python
+if fy_end.year >= 2026:
+    v0, v1, v2 = fy2026, fy2027, fy2028
+else:
+    v0, v1, v2 = fy2025, fy2026, fy2027
+```
+Quando arriviamo a fine 2026, la colonna `fiscal_year_end` nel DB passerà da
+`2025-12-31` a `2026-12-31` — e la formula punterebbe ancora a FY2026/FY2027/FY2028
+invece di FY2027/FY2028/FY2029.
+
+### Da verificare prima di fine 2026
+1. **Colonna `fiscal_year_end` nel DB**: contiene date come `2025-12-31` o `2026-12-31`?
+   - Se contiene l'anno esplicito → si aggiorna automaticamente con il nuovo TIKR
+   - Se contiene solo mese/giorno → non cambia e va aggiornato manualmente
+2. **Nuovo TIKR da scaricare**: deve includere FY2027, FY2028, FY2029
+3. **Formula da rendere dinamica** basata su `datetime.now().year` invece di hardcoding 2025/2026
+
+### Soluzione proposta (da implementare a fine 2026)
+```python
+CURRENT_YEAR = datetime.now().year
+if fy_end.year >= CURRENT_YEAR:
+    v0 = fundamentals[f"fy{CURRENT_YEAR}"]
+    v1 = fundamentals[f"fy{CURRENT_YEAR+1}"]
+    v2 = fundamentals[f"fy{CURRENT_YEAR+2}"]
+else:
+    v0 = fundamentals[f"fy{CURRENT_YEAR-1}"]
+    v1 = fundamentals[f"fy{CURRENT_YEAR}"]
+    v2 = fundamentals[f"fy{CURRENT_YEAR+1}"]
+```
+Questo richiede che le colonne in Supabase si chiamino `fy2025`, `fy2026` ecc.
+e che vengano aggiunte `fy2027`, `fy2028`, `fy2029` con il prossimo TIKR.
+
+### India
+- Lars conferma copertura Leeway ma fondamentali probabilmente incompleti
+- Verificare con Lars copertura EPS estimates per NSE prima di integrare
+- Se integrata: exchange = NSE, suffix Leeway da confermare
