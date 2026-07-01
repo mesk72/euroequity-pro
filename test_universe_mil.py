@@ -126,3 +126,42 @@ print("Titoli eligible MIL:")
 for t, mc, c in eligible:
     in_db = "IN DB" if t in stocks_mil else "NUOVO"
     print(f"  {t:<15} mktcap={mc:>10.0f} | {c} [{in_db}]")
+# 5. Verifica prezzi per i titoli eligible
+print("\n=== VERIFICA PREZZI TITOLI ELIGIBLE MIL ===")
+MIN_PRICE_DATE = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
+
+# Carica bulk tutti i ticker MIL con prezzi recenti
+tickers_with_price = set()
+offset = 0
+while True:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"ticker,date","exchange":"eq.MIL",
+                "date":f"gte.{MIN_PRICE_DATE}",
+                "order":"ticker.asc","limit":"2000","offset":str(offset)})
+    batch = r.json()
+    if not isinstance(batch,list) or not batch: break
+    for row in batch: tickers_with_price.add(row["ticker"])
+    offset += 2000
+    if len(batch)<2000: break
+
+print(f"Ticker MIL con prezzi negli ultimi 10 giorni: {len(tickers_with_price)}")
+print()
+
+con_prezzi = [(t,mc,c) for t,mc,c in eligible if t in tickers_with_price]
+senza_prezzi = [(t,mc,c) for t,mc,c in eligible if t not in tickers_with_price]
+
+print(f"Eligible CON prezzi aggiornati: {len(con_prezzi)}")
+print(f"Eligible SENZA prezzi: {len(senza_prezzi)}")
+
+if senza_prezzi:
+    print("\nTitoli eligible SENZA prezzi (da scaricare):")
+    for t,mc,c in senza_prezzi:
+        in_db = "IN DB" if t in stocks_mil else "NUOVO - non nel DB"
+        print(f"  {t:<15} mktcap={mc:>10.0f} | {c} [{in_db}]")
+
+print(f"\nRIEPILOGO MIL:")
+print(f"  Totale nel TIKR:        {len(tikr_mil)}")
+print(f"  Eligible (>=400M):      {len(eligible)}")
+print(f"  Con prezzi OK:          {len(con_prezzi)}")
+print(f"  Senza prezzi:           {len(senza_prezzi)}")
+print(f"  Pronti per universe:    {len(con_prezzi)}")
