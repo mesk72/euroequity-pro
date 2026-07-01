@@ -1,6 +1,8 @@
 import os, requests, csv, io, math
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
+from datetime import datetime, timedelta
+MIN_PRICE_DATE = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
@@ -224,17 +226,40 @@ print(f"  Con mkt_cap > 0: {sum(1 for v in mktcap_map.values() if v>0)}")
 print("\n=== CALCOLO NUOVO UNIVERSO ===")
 new_universe = set()
 
+def get_tickers_with_prices(exchange):
+    """Carica in bulk tutti i ticker con prezzi negli ultimi 10 giorni"""
+    tickers = set()
+    offset = 0
+    while True:
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+            params={"select": "ticker", "exchange": f"eq.{exchange}",
+                    "date": f"gte.{MIN_PRICE_DATE}",
+                    "order": "ticker.asc", "limit": "2000", "offset": str(offset)})
+        batch = r.json()
+        if not isinstance(batch, list) or not batch: break
+        for row in batch: tickers.add(row["ticker"])
+        offset += 2000
+        if len(batch) < 2000: break
+    return tickers
+
 def get_eligible(exchange, min_cap=None, top_n=None):
     keys = [(t,e) for (t,e) in stocks_info if e==exchange]
+    with_prices = get_tickers_with_prices(exchange)
     result = []
+    no_price = []
     for k in keys:
         s = stocks_info[k]
         mc = mktcap_map.get(k,0)
         if is_excluded(s.get("company","")): continue
         if min_cap and mc < min_cap: continue
+        if k[0] not in with_prices:
+            no_price.append((k,mc))
+            continue
         result.append((k,mc))
     result.sort(key=lambda x: x[1], reverse=True)
     if top_n: result = result[:top_n]
+    if no_price:
+        print(f"    {exchange}: {len(no_price)} titoli senza prezzi esclusi dall universe")
     return result
 
 for ex in ["LSE","XETRA","PA","OM","SWX","MIL"]:
