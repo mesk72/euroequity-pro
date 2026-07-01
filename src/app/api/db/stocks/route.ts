@@ -16,17 +16,19 @@ const NO_FILTER = new Set(['VI','IR','LS'])
 // APAC + North America: top N per market cap, solo titoli con company e sector
 const APAC_TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, TSX: 400, ASX: 350, US: 2000 }
 
-async function fetchAllByExchange(table: string, select: string, exchangeList: string[]) {
+async function fetchAllByExchange(table: string, select: string, exchangeList: string[], universeOnly = false) {
   // Legge un exchange alla volta per evitare il limite di 1000 righe miste
   const all: any[] = []
   for (const exchange of exchangeList) {
     const PAGE = 1000
     let from = 0
     while (true) {
-      const { data, error } = await supabase
+      let query = supabase
         .from(table)
         .select(select)
         .eq('exchange', exchange)
+      if (universeOnly) query = query.eq('in_universe', true)
+      const { data, error } = await query
         .range(from, from + PAGE - 1)
         .limit(PAGE)
       if (error || !data || data.length === 0) break
@@ -58,42 +60,18 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
 }
 
 function applyUniverseFilter(fundData: any[], stocksData: any[]) {
+  // Il filtro universo è già applicato a livello DB tramite in_universe=true
+  // Questa funzione ora serve solo per mappare i dati
   const fundMap: Record<string, any> = {}
   for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
 
   const stockMap: Record<string, any> = {}
   for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
-  const filtered = fundData.filter(f => {
-    if (!stockMap[`${f.ticker}.${f.exchange}`]) return false
-    const mktCap = f.mkt_cap ?? null
-    if (NO_FILTER.has(f.exchange)) return true
-    if (TOP_100_EX.has(f.exchange)) return true
-    if (FILTER_500M.has(f.exchange)) return mktCap != null && mktCap >= 500
-    return true
-  }).map(f => stockMap[`${f.ticker}.${f.exchange}`])
-
-  const top100Map: Record<string, any[]> = {}
-  filtered.forEach(s => {
-    if (s && TOP_100_EX.has(s.exchange)) {
-      if (!top100Map[s.exchange]) top100Map[s.exchange] = []
-      const f = fundMap[`${s.ticker}.${s.exchange}`] || {}
-      top100Map[s.exchange].push({ ...s, _mktCap: f.mkt_cap ?? 0 })
-    }
-  })
-  Object.keys(top100Map).forEach(ex => {
-    top100Map[ex].sort((a,b) => b._mktCap - a._mktCap)
-    top100Map[ex] = top100Map[ex].slice(0,100)
-  })
-  const top100Set = new Set(Object.values(top100Map).flat().map((s:any) => `${s.ticker}.${s.exchange}`))
-
-  const result = filtered.filter(s =>
-    !TOP_100_EX.has(s.exchange) || top100Set.has(`${s.ticker}.${s.exchange}`)
-  )
-
-  return result.map(s => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+  return stocksData
+    .filter(s => fundMap[`${s.ticker}.${s.exchange}`])
+    .map(s => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
 }
-
 
 function applyAPACFilter(fundData: any[], stocksData: any[]) {
   const fundMap: Record<string, any> = {}
@@ -202,7 +180,7 @@ export async function GET(req: NextRequest) {
 
     const [stocksData, fundData] = await Promise.all([
       isAPACOnly
-        ? fetchAllByExchange('stocks', stocksSelect, exList)
+        ? fetchAllByExchange('stocks', stocksSelect, exList, true)
         : fetchAll('stocks', stocksSelect, exList),
       fetchAll('fundamentals', fundSelect, exList),
     ])
