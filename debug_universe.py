@@ -13,77 +13,89 @@ EX_MAP = {
 
 EXCLUDE_SECTORS = ["71","72","73","74","75","76","77"]
 
-# Parole che identificano SEMPRE un prodotto passivo/fondo da escludere
-ALWAYS_EXCLUDE = [
-    " ETF"," ETP"," ETC ","UCITS","XTRACKERS","LYXOR",
-    "INDEX FUND","BOND FUND","EXCHANGE TRADED NOTE",
-    "EXCHANGE-TRADED NOTE","LEVERAGED NOTE",
-    "GOLD SHARES","SILVER TRUST","GOLD TRUST",
-    "GOLD MINISHARES","PHYSICAL GOLD","PHYSICAL SILVER",
-    "COVERED CALL","MONEY MARKET FUND","SAVINGS FUND",
-    "SAVINGS ACCOUNT FUND","URANIUM TRUST FUND",
-    "COMMODITY INDEX","AGRICULTURE FUND",
-    "HIGH INTEREST SAVINGS","CASH FUND","CASH MANAGEMENT FUND",
-    "DYNAMIC OVERWRITE FUND","PREMIUM YIELD FUND",
-    "MARKET NEUTRAL","LONG SHORT INCOME",
-    "GROWTH TECH FUND","PRIVATE REAL ESTATE FUND",
-    "GLOBAL EQUITY+ FUND","ENERGY FUND",
-    "NEXT GENERATION CONNECTIVITY FUND",
-    "DIVIDEND, INTEREST & PREMIUM","TOTAL RETURN FUND",
-    "STRATEGIC INVESTMENT FUND","STRATEGIC TOTAL RETURN FUND",
-    "INFRASTRUCTURE FUND","INCOME SOLUTIONS FUND",
-    "ENERGY INFRASTRUCTURE FUND",
-    "3X LEVERAGED","2X LEVERAGED","-1X",
-    "MINIATURES","MINI SHARES",
-    "MULTISECTOR COMMODITY",
+# Parole che indicano una società INVESTIBILE — se presenti nel nome
+# il titolo non va escluso anche se ha altre keyword sospette
+INVESTIBLE_SIGNALS = [
+    "REIT","REAL ESTATE INVESTMENT TRUST","INVESTMENT TRUST",
+    "REALTY","PROPERTIES","PROPERTY GROUP","PROPERTY TRUST",
+    "REALTY TRUST","REALTY CORP","REALTY CO",
+    "HOSPITALITY","HEALTHCARE REIT","INDUSTRIAL REIT",
+    "APARTMENT REIT","RESIDENTIAL REIT","INDUSTRIAL TRUST",
+    "INFRASTRUCTURE TRUST","GROCERY REIT","RETAIL REIT",
+    " INC."," INC,"," CORP."," CORP,"," LTD."," LTD,",
+    " PLC"," LLC"," LP ","L.P.","S.P.A.","N.V.","S.A.",
+    "INCORPORATED","CORPORATION","COMPANY",
 ]
 
-# Fondi con prefisso gestore — escludi SOLO se accompagnati da FUND/ETF/NOTES
-MANAGER_PRODUCTS = {
-    "ISHARES": ["ETF","ETP","ETC","TRUST","FUND","SHARES","PHYSICAL","MINI"],
-    "BLACKROCK": ["ETF","ETP","ETC","FUND","NOTES","TRUST TERM","TERM TRUST",
-                  "TAXABLE MUNICIPAL","CREDIT ALLOCATION","ESG CAPITAL","HEALTH SCIENCES",
-                  "INNOVATION AND GROWTH","SCIENCE AND TECHNOLOGY","MUNICIPAL 2030",
-                  "ENHANCED EQUITY","CAPITAL ALLOCATION TERM"],
-    "INVESCO DB": ["FUND","COMMODITY","AGRICULTURE"],
-    "VANGUARD": ["ETF","FUND","INDEX"],
-    "SPDR": ["ETF","FUND","SHARES","MINISHARES"],
-    "WISDOMTREE": ["ETF","FUND"],
-    "VANECK": ["ETF","FUND"],
-    "NUVEEN": ["FUND","OVERWRITE"],
-    "BMO": ["FUND","ETF","COVERED CALL"],
-    "PURPOSE": ["FUND","CASH","SAVINGS"],
-    "SPROTT PHYSICAL": ["FUND","TRUST FUND"],
-    "CORNERSTONE": ["FUND","INVESTMENT FUND","TOTAL RETURN FUND"],
-    "NEUBERGER BERMAN": ["FUND","INC."],
-    "CALAMOS": ["FUND"],
-    "COHEN & STEERS": ["FUND"],
-    "DOUBLELINE": ["FUND"],
-    "KAYNE ANDERSON": ["FUND"],
-    "VIRTUS": ["FUND"],
-    "PICTON": ["FUND"],
-    "FIDELITY GLOBAL": ["FUND"],
-    "NINEPOINT": ["FUND"],
-    "CI GLOBAL": ["FUND"],
-    "SRH TOTAL": ["FUND"],
-    "FUNDRISE": ["FUND"],
-    "MICORSECTORS": ["NOTE"],
-    "MICROSECTORS": ["NOTE"],
-}
+# Parole che identificano SEMPRE un prodotto passivo da escludere
+# Anche se c'è un segnale investibile
+ALWAYS_EXCLUDE = [
+    " ETF"," ETP"," ETC ","UCITS",
+    "GOLD SHARES","SILVER SHARES","GOLD TRUST","SILVER TRUST",
+    "GOLD MINISHARES","PHYSICAL GOLD","PHYSICAL SILVER","PHYSICAL METALS",
+    "COVERED CALL FUND","MONEY MARKET FUND","SAVINGS FUND",
+    "SAVINGS ACCOUNT FUND","CASH FUND","CASH MANAGEMENT FUND",
+    "DYNAMIC OVERWRITE FUND","PREMIUM YIELD FUND",
+    "COMMODITY INDEX TRACKING","AGRICULTURE FUND",
+    "HIGH INTEREST SAVINGS",
+    "3X LEVERAGED","2X LEVERAGED","-1X LEVERAGED",
+    "EXCHANGE TRADED NOTE","EXCHANGE-TRADED NOTE",
+]
+
+# Fondi specifici da escludere per nome gestore + tipo prodotto
+# MA solo se NON hanno segnali investibili
+PASSIVE_PATTERNS = [
+    ("XTRACKERS",),("LYXOR",),("VANGUARD ETF",),("AMUNDI ETF",),
+    ("SPDR ETF",),("SPDR GOLD",),("SPDR SILVER",),
+    ("ISHARES GOLD",),("ISHARES SILVER",),("ISHARES PHYSICAL",),
+    ("WISDOMTREE ETF",),("VANECK ETF",),
+    ("INDEX FUND",),("BOND FUND",),
+    ("MARKET NEUTRAL",),("LONG SHORT INCOME",),
+    ("GROWTH TECH FUND",),("PRIVATE REAL ESTATE FUND",),
+    ("GLOBAL EQUITY+ FUND",),("ENERGY FUND",),
+    ("CONNECTIVITY FUND",),("INFRASTRUCTURE FUND",),
+    ("INCOME SOLUTIONS FUND",),("ENERGY INFRASTRUCTURE FUND",),
+    ("OVERWRITE FUND",),("URANIUM TRUST FUND",),
+    ("MULTISECTOR COMMODITY",),("INVESCO DB ",),
+    ("MICROSECTORS",),("MICORSECTORS",),
+    ("BMO COVERED CALL",),("BMO MONEY MARKET",),("BMO PREMIUM YIELD",),
+    ("PURPOSE CASH",),("PURPOSE FUND",),("PURPOSE US CASH",),
+    ("PURPOSE HIGH INTEREST",),("SPROTT PHYSICAL URANIUM",),
+    ("PICTON LONG SHORT",),("PICTON MARKET NEUTRAL",),
+    ("FIDELITY GLOBAL EQUITY+",),("NINEPOINT ENERGY",),
+    ("CI GLOBAL ARTIFICIAL",),("SRH TOTAL RETURN FUND",),
+    ("FUNDRISE GROWTH",),("CORNERSTONE STRATEGIC INVESTMENT FUND",),
+    ("CORNERSTONE TOTAL RETURN FUND",),("CALAMOS STRATEGIC",),
+    ("COHEN & STEERS QUALITY INCOME REALTY FUND",),
+    ("COHEN & STEERS INFRASTRUCTURE FUND",),
+    ("DOUBLELINE INCOME SOLUTIONS",),("KAYNE ANDERSON ENERGY",),
+    ("VIRTUS DIVIDEND",),("NEUBERGER BERMAN NEXT GENERATION",),
+    ("NUVEEN NASDAQ",),("NUVEEN S&P",),
+    ("BLUEROCK PRIVATE",),("CIM REAL ESTATE FINANCE TRUST",),
+    ("SRH TOTAL RETURN",),("FUNDRISE",),
+]
 
 def is_excluded(company, sector):
     if sector in EXCLUDE_SECTORS: return True
     name = (company or "").upper()
 
-    # Check sempre esclusi
+    # Prima controlla se è un segnale investibile
+    is_investible = any(s in name for s in INVESTIBLE_SIGNALS)
+
+    # Sempre escludi indipendentemente
     for kw in ALWAYS_EXCLUDE:
         if kw in name: return True
 
-    # Check manager + prodotto
-    for manager, products in MANAGER_PRODUCTS.items():
-        if manager in name:
-            if any(p in name for p in products):
-                return True
+    # Escludi per pattern passivi
+    for pattern in PASSIVE_PATTERNS:
+        if all(p in name for p in pattern):
+            # Ma non se ha segnale investibile forte
+            if is_investible and any(s in name for s in [
+                "REIT","REAL ESTATE INVESTMENT TRUST","REALTY CORP",
+                "REALTY TRUST","PROPERTY TRUST","PROPERTIES INC"
+            ]):
+                continue
+            return True
 
     return False
 
@@ -92,13 +104,14 @@ r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_na_latest.
 reader = csv.DictReader(io.StringIO(r.text))
 
 excluded = []
-check_list = ["NFLX","BLK","IVZ","WT","AMT","PLD","EQIX","WELL","VTR","SPG",
-              "VICI","DLR","EQR","AVB","EXR","ESS","ARE","SBAC","CCI","O",
-              "PSA","IRM","REG","KIM","FRT","HST","ADC","STAG","COLD","LINE"]
-included_ok = []
-excluded_bad = []
+check_list = [
+    "NFLX","BLK","IVZ","WT","AMT","PLD","EQIX","WELL","VTR","SPG",
+    "VICI","DLR","EQR","AVB","EXR","ESS","ARE","SBAC","CCI","O",
+    "PSA","IRM","REG","KIM","FRT","HST","ADC","STAG","COLD","LINE",
+    "BXDC","CPT","MPT","SUI","UDR","INVH","CUBE","SAFE","NSA",
+    "WY","RYN","GLPI","OUT","LAMR","SVC","DHC",
+]
 
-rows_all = []
 for row in reader:
     ticker = row.get("Ticker","").strip()
     ex_raw = row.get("Primary Exchange","").strip()
@@ -110,14 +123,9 @@ for row in reader:
     if excl:
         excluded.append((ticker, company))
     if ticker in check_list:
-        if excl:
-            excluded_bad.append(f"  {ticker}: ESCLUSO ❌ | {company}")
-        else:
-            included_ok.append(f"  {ticker}: INCLUSO ✅ | {company}")
+        status = "ESCLUSO ❌" if excl else "INCLUSO ✅"
+        print(f"  {ticker:<8} {status} | {company}")
 
-print("=== CHECK TITOLI CHIAVE ===")
-for x in sorted(included_ok): print(x)
-for x in sorted(excluded_bad): print(x)
 print(f"\nTotale esclusi: {len(excluded)}")
 print("\nLista esclusi:")
 for t, c in sorted(excluded):
