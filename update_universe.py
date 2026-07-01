@@ -2,7 +2,7 @@ import os, requests, csv, io, math
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 from datetime import datetime, timedelta
-MIN_PRICE_DATE = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
+MIN_PRICE_DATE = (datetime.now() - timedelta(days=20)).strftime("%Y-%m-%d")
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
@@ -254,12 +254,11 @@ def get_eligible(exchange, min_cap=None, top_n=None):
         if min_cap and mc < min_cap: continue
         if k[0] not in with_prices:
             no_price.append((k,mc))
-            continue
         result.append((k,mc))
     result.sort(key=lambda x: x[1], reverse=True)
     if top_n: result = result[:top_n]
     if no_price:
-        print(f"    {exchange}: {len(no_price)} titoli senza prezzi esclusi dall universe")
+        print(f"    {exchange}: {len(no_price)} titoli senza prezzi recenti (inclusi comunque)")
     return result
 
 for ex in ["LSE","XETRA","PA","OM","SWX","MIL"]:
