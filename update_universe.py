@@ -233,7 +233,7 @@ def get_eligible(exchange, min_cap=None, top_n=None):
     for k in keys:
         s = stocks_info[k]
         mc = mktcap_map.get(k,0)
-        if is_excluded(s.get("company",""), s.get("sector","")): continue
+        if is_excluded(s.get("company","")): continue
         if min_cap and mc < min_cap: continue
         result.append((k,mc))
     result.sort(key=lambda x: x[1], reverse=True)
@@ -255,11 +255,11 @@ for ex in ["VI","IR","LS"]:
     for k,mc in el: new_universe.add(k)
     print(f"  {ex}: {len(el)} (tutti)")
 
-el_us = get_eligible("US", top_n=2500)
+el_us = get_eligible("US", top_n=3000)  # prendi 3000 per avere ~2000 netti dopo esclusioni
 for k,mc in el_us: new_universe.add(k)
 print(f"  US: {len(el_us)} (top 2500)")
 
-el_tsx = get_eligible("TSX", top_n=500)
+el_tsx = get_eligible("TSX", top_n=600)  # prendi 600 per avere ~500 netti
 for k,mc in el_tsx: new_universe.add(k)
 print(f"  TSX: {len(el_tsx)} (top 500)")
 
