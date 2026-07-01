@@ -8,52 +8,49 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "return=minimal"}
 
-EXCLUDE_SECTORS = ["71","72","73","74","75","76","77"]
-
-# Parole che da sole identificano un ETF/fondo passivo
-EXCLUDE_EXACT = [
-    "UCITS","XTRACKERS","LYXOR","VANGUARD ETF","AMUNDI ETF",
-    "SPDR ETF","WISDOMTREE ETF","VANECK ETF","INDEX FUND",
-    "BOND FUND","EXCHANGE TRADED","EXCHANGE-TRADED",
+ALWAYS_EXCLUDE = [
+    " ETF"," ETP"," ETC ","UCITS",
+    "GOLD SHARES","SILVER SHARES","GOLD TRUST","SILVER TRUST",
+    "GOLD MINISHARES","PHYSICAL GOLD","PHYSICAL SILVER","PHYSICAL METALS",
+    "COVERED CALL FUND","MONEY MARKET FUND","SAVINGS FUND",
+    "SAVINGS ACCOUNT FUND","CASH FUND","CASH MANAGEMENT FUND",
+    "DYNAMIC OVERWRITE FUND","PREMIUM YIELD FUND",
+    "COMMODITY INDEX TRACKING","AGRICULTURE FUND",
+    "HIGH INTEREST SAVINGS","3X LEVERAGED","2X LEVERAGED","-1X LEVERAGED",
+    "EXCHANGE TRADED NOTE","EXCHANGE-TRADED NOTE",
+    "XTRACKERS","LYXOR","VANGUARD ETF","AMUNDI ETF",
+    "SPDR ETF","SPDR GOLD","SPDR SILVER",
+    "ISHARES GOLD","ISHARES SILVER","ISHARES PHYSICAL",
+    "WISDOMTREE ETF","VANECK ETF","INDEX FUND","BOND FUND",
+    "MUTUAL FUND","MUTUALFUND",
+    "MARKET NEUTRAL EQUITY","LONG SHORT INCOME ALTERNATIVE",
+    "GROWTH TECH FUND","PRIVATE REAL ESTATE FUND",
+    "GLOBAL EQUITY+ FUND","NINEPOINT ENERGY FUND",
+    "CI GLOBAL ARTIFICIAL INTELLIGENCE FUND",
+    "INCOME SOLUTIONS FUND","ENERGY INFRASTRUCTURE FUND",
+    "OVERWRITE FUND","URANIUM TRUST FUND",
+    "MULTISECTOR COMMODITY","INVESCO DB ",
+    "MICROSECTORS","BMO COVERED CALL","BMO MONEY MARKET",
+    "BMO PREMIUM YIELD","PURPOSE CASH","PURPOSE HIGH INTEREST",
+    "SPROTT PHYSICAL URANIUM","PICTON LONG SHORT",
+    "PICTON MARKET NEUTRAL","FIDELITY GLOBAL EQUITY+",
+    "SRH TOTAL RETURN FUND","FUNDRISE GROWTH",
+    "CORNERSTONE STRATEGIC INVESTMENT FUND",
+    "CORNERSTONE TOTAL RETURN FUND","CALAMOS STRATEGIC",
+    "COHEN & STEERS QUALITY INCOME REALTY FUND",
+    "COHEN & STEERS INFRASTRUCTURE FUND",
+    "DOUBLELINE INCOME SOLUTIONS","KAYNE ANDERSON ENERGY",
+    "VIRTUS DIVIDEND, INTEREST","NEUBERGER BERMAN NEXT GENERATION",
+    "NUVEEN NASDAQ","NUVEEN S&P","BLUEROCK PRIVATE",
+    "CIM REAL ESTATE FINANCE TRUST",
 ]
 
-# Parole che identificano un ETF solo se accompagnate da altre keyword
-# es. "ISHARES GOLD TRUST" → ETF, ma "BLACKROCK INC" → società
-PASSIVE_KEYWORDS = ["ETF","ETP","ETC","UCITS","INDEX","TRACKER","SHARES TRUST"]
-ASSET_MANAGERS = ["BLACKROCK","INVESCO","WISDOMTREE","ISHARES","VANECK","SPDR","VANGUARD"]
-
-def is_excluded(company, sector):
-    if sector in EXCLUDE_SECTORS: return True
+def is_excluded(company, sector=None):
     name = (company or "").upper()
-
-    # Escludi se contiene keyword passive esatte
-    for kw in EXCLUDE_EXACT:
+    for kw in ALWAYS_EXCLUDE:
         if kw in name: return True
-
-    # Escludi FUND solo se non è un trust quotato investibile
-    # es. "BlackRock Science and Technology Trust" → includi
-    # es. "BMO Money Market Fund" → escludi
-    if " FUND" in name:
-        # Includi se è un trust/REIT/investment company con Fund nel nome
-        if any(x in name for x in ["REALTY","REIT","PROPERTY","PROPERTIES",
-                                    "INFRASTRUCTURE","INCOME TRUST","ROYALTY"]):
-            pass  # includi
-        else:
-            return True
-
-    # Escludi asset manager solo se gestiscono un prodotto passivo
-    for am in ASSET_MANAGERS:
-        if am in name:
-            # Se il nome contiene anche parole che indicano prodotto passivo → escludi
-            if any(p in name for p in ["ETF","ETP","ETC","FUND","NOTES","SHARES","INDEX","MINI"]):
-                return True
-            # Altrimenti è la società stessa → includi (es. BlackRock Inc., Invesco Ltd.)
-
-    # Escludi Exchange Traded Notes/Products leveraged
-    if "NOTES" in name and any(x in name for x in ["LEVERAGED","3X","2X","-1X","ETNS","DUE "]):
-        return True
-
     return False
+
 
 def parse_mktcap(v):
     if not v: return None
