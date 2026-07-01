@@ -11,24 +11,11 @@ EX_MAP = {
     "TSX":"TSX","TSXV":"TSX","CNSX":"TSX","NEOE":"TSX",
 }
 
-EXCLUDE_SECTORS = ["71","72","73","74","75","76","77"]
+# Settori da escludere — SOLO quelli puramente passivi
+# NON includere Real Estate (71-77) perché REIT sono investibili
+EXCLUDE_SECTORS = []  # nessun settore escluso per ora
 
-# Parole che indicano una società INVESTIBILE — se presenti nel nome
-# il titolo non va escluso anche se ha altre keyword sospette
-INVESTIBLE_SIGNALS = [
-    "REIT","REAL ESTATE INVESTMENT TRUST","INVESTMENT TRUST",
-    "REALTY","PROPERTIES","PROPERTY GROUP","PROPERTY TRUST",
-    "REALTY TRUST","REALTY CORP","REALTY CO",
-    "HOSPITALITY","HEALTHCARE REIT","INDUSTRIAL REIT",
-    "APARTMENT REIT","RESIDENTIAL REIT","INDUSTRIAL TRUST",
-    "INFRASTRUCTURE TRUST","GROCERY REIT","RETAIL REIT",
-    " INC."," INC,"," CORP."," CORP,"," LTD."," LTD,",
-    " PLC"," LLC"," LP ","L.P.","S.P.A.","N.V.","S.A.",
-    "INCORPORATED","CORPORATION","COMPANY",
-]
-
-# Parole che identificano SEMPRE un prodotto passivo da escludere
-# Anche se c'è un segnale investibile
+# Esclusioni per nome — solo prodotti passivi certi
 ALWAYS_EXCLUDE = [
     " ETF"," ETP"," ETC ","UCITS",
     "GOLD SHARES","SILVER SHARES","GOLD TRUST","SILVER TRUST",
@@ -40,63 +27,38 @@ ALWAYS_EXCLUDE = [
     "HIGH INTEREST SAVINGS",
     "3X LEVERAGED","2X LEVERAGED","-1X LEVERAGED",
     "EXCHANGE TRADED NOTE","EXCHANGE-TRADED NOTE",
-]
-
-# Fondi specifici da escludere per nome gestore + tipo prodotto
-# MA solo se NON hanno segnali investibili
-PASSIVE_PATTERNS = [
-    ("XTRACKERS",),("LYXOR",),("VANGUARD ETF",),("AMUNDI ETF",),
-    ("SPDR ETF",),("SPDR GOLD",),("SPDR SILVER",),
-    ("ISHARES GOLD",),("ISHARES SILVER",),("ISHARES PHYSICAL",),
-    ("WISDOMTREE ETF",),("VANECK ETF",),
-    ("INDEX FUND",),("BOND FUND",),
-    ("MARKET NEUTRAL",),("LONG SHORT INCOME",),
-    ("GROWTH TECH FUND",),("PRIVATE REAL ESTATE FUND",),
-    ("GLOBAL EQUITY+ FUND",),("ENERGY FUND",),
-    ("CONNECTIVITY FUND",),("INFRASTRUCTURE FUND",),
-    ("INCOME SOLUTIONS FUND",),("ENERGY INFRASTRUCTURE FUND",),
-    ("OVERWRITE FUND",),("URANIUM TRUST FUND",),
-    ("MULTISECTOR COMMODITY",),("INVESCO DB ",),
-    ("MICROSECTORS",),("MICORSECTORS",),
-    ("BMO COVERED CALL",),("BMO MONEY MARKET",),("BMO PREMIUM YIELD",),
-    ("PURPOSE CASH",),("PURPOSE FUND",),("PURPOSE US CASH",),
-    ("PURPOSE HIGH INTEREST",),("SPROTT PHYSICAL URANIUM",),
-    ("PICTON LONG SHORT",),("PICTON MARKET NEUTRAL",),
-    ("FIDELITY GLOBAL EQUITY+",),("NINEPOINT ENERGY",),
-    ("CI GLOBAL ARTIFICIAL",),("SRH TOTAL RETURN FUND",),
-    ("FUNDRISE GROWTH",),("CORNERSTONE STRATEGIC INVESTMENT FUND",),
-    ("CORNERSTONE TOTAL RETURN FUND",),("CALAMOS STRATEGIC",),
-    ("COHEN & STEERS QUALITY INCOME REALTY FUND",),
-    ("COHEN & STEERS INFRASTRUCTURE FUND",),
-    ("DOUBLELINE INCOME SOLUTIONS",),("KAYNE ANDERSON ENERGY",),
-    ("VIRTUS DIVIDEND",),("NEUBERGER BERMAN NEXT GENERATION",),
-    ("NUVEEN NASDAQ",),("NUVEEN S&P",),
-    ("BLUEROCK PRIVATE",),("CIM REAL ESTATE FINANCE TRUST",),
-    ("SRH TOTAL RETURN",),("FUNDRISE",),
+    "XTRACKERS","LYXOR","VANGUARD ETF","AMUNDI ETF",
+    "SPDR ETF","SPDR GOLD","SPDR SILVER",
+    "ISHARES GOLD","ISHARES SILVER","ISHARES PHYSICAL",
+    "WISDOMTREE ETF","VANECK ETF","INDEX FUND","BOND FUND",
+    "MARKET NEUTRAL EQUITY","LONG SHORT INCOME",
+    "GROWTH TECH FUND","PRIVATE REAL ESTATE FUND",
+    "GLOBAL EQUITY+ FUND","NINEPOINT ENERGY FUND",
+    "CI GLOBAL ARTIFICIAL INTELLIGENCE FUND",
+    "INCOME SOLUTIONS FUND","ENERGY INFRASTRUCTURE FUND",
+    "OVERWRITE FUND","URANIUM TRUST FUND",
+    "MULTISECTOR COMMODITY","INVESCO DB ",
+    "MICROSECTORS","BMO COVERED CALL","BMO MONEY MARKET",
+    "BMO PREMIUM YIELD","PURPOSE CASH","PURPOSE HIGH INTEREST",
+    "SPROTT PHYSICAL URANIUM","PICTON LONG SHORT",
+    "PICTON MARKET NEUTRAL","FIDELITY GLOBAL EQUITY+",
+    "SRH TOTAL RETURN FUND","FUNDRISE GROWTH",
+    "CORNERSTONE STRATEGIC INVESTMENT FUND",
+    "CORNERSTONE TOTAL RETURN FUND","CALAMOS STRATEGIC",
+    "COHEN & STEERS QUALITY INCOME REALTY FUND",
+    "COHEN & STEERS INFRASTRUCTURE FUND",
+    "DOUBLELINE INCOME SOLUTIONS","KAYNE ANDERSON ENERGY",
+    "VIRTUS DIVIDEND, INTEREST","NEUBERGER BERMAN NEXT GENERATION",
+    "NUVEEN NASDAQ","NUVEEN S&P","BLUEROCK PRIVATE",
+    "CIM REAL ESTATE FINANCE TRUST",
+    "MUTUAL FUND","MUTUALFUND",
 ]
 
 def is_excluded(company, sector):
     if sector in EXCLUDE_SECTORS: return True
     name = (company or "").upper()
-
-    # Prima controlla se è un segnale investibile
-    is_investible = any(s in name for s in INVESTIBLE_SIGNALS)
-
-    # Sempre escludi indipendentemente
     for kw in ALWAYS_EXCLUDE:
         if kw in name: return True
-
-    # Escludi per pattern passivi
-    for pattern in PASSIVE_PATTERNS:
-        if all(p in name for p in pattern):
-            # Ma non se ha segnale investibile forte
-            if is_investible and any(s in name for s in [
-                "REIT","REAL ESTATE INVESTMENT TRUST","REALTY CORP",
-                "REALTY TRUST","PROPERTY TRUST","PROPERTIES INC"
-            ]):
-                continue
-            return True
-
     return False
 
 r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_na_latest.csv",
@@ -108,8 +70,7 @@ check_list = [
     "NFLX","BLK","IVZ","WT","AMT","PLD","EQIX","WELL","VTR","SPG",
     "VICI","DLR","EQR","AVB","EXR","ESS","ARE","SBAC","CCI","O",
     "PSA","IRM","REG","KIM","FRT","HST","ADC","STAG","COLD","LINE",
-    "BXDC","CPT","MPT","SUI","UDR","INVH","CUBE","SAFE","NSA",
-    "WY","RYN","GLPI","OUT","LAMR","SVC","DHC",
+    "CPT","SUI","UDR","INVH","CUBE","SAFE","NSA","WY","GLPI",
 ]
 
 for row in reader:
@@ -123,8 +84,7 @@ for row in reader:
     if excl:
         excluded.append((ticker, company))
     if ticker in check_list:
-        status = "ESCLUSO ❌" if excl else "INCLUSO ✅"
-        print(f"  {ticker:<8} {status} | {company}")
+        print(f"  {ticker:<8} {'ESCLUSO ❌' if excl else 'INCLUSO ✅'} | {company}")
 
 print(f"\nTotale esclusi: {len(excluded)}")
 print("\nLista esclusi:")
