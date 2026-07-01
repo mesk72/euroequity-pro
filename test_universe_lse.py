@@ -5,7 +5,7 @@ SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-MIN_PRICE_DATE = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
+MIN_PRICE_DATE = (datetime.now() - timedelta(days=20)).strftime("%Y-%m-%d")
 
 EX_MAP = {"LSE":"LSE","AIM":"AIM"}
 
