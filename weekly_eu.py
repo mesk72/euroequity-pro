@@ -177,7 +177,9 @@ for r in tikr_rows:
         "pe_forward":  round(r["pe_forward"],2)  if r["pe_forward"]  is not None else None,
         "pb": r["pb"],
         "eps_fy0": r["eps_fy0"], "eps_fy1": r["eps_fy1"],
-        "eps_fy2": r["eps_fy2"],  # eps_fy3/4/5 rimossi temporaneamente
+        "eps_fy2": r["eps_fy2"], "eps_fy3": r["eps_fy3"],
+        "eps_fy4": r.get("eps_fy4"),
+        "eps_fy5": r.get("eps_fy5"),
         "eps_growth": round(eps_growth,6) if eps_growth is not None else None,
         "rev_growth": round(rev_growth,6) if rev_growth is not None else None,
     })
