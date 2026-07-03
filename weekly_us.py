@@ -213,7 +213,7 @@ while True:
                 "exchange":"in.(US,TSX)","in_universe":"eq.true",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
-    if not data: break
+    if not isinstance(data, list) or not data: break
     all_data.extend(data); offset += 1000
     if len(data) < 1000: break
 print(f" Fondamentali DB: {len(all_data)}")
