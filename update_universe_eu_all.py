@@ -6,7 +6,7 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 headers_ins = {**headers_r, "Content-Type": "application/json",
-               "Prefer": "return=minimal"}
+               "Prefer": "resolution=ignore-duplicates,return=minimal"}
 
 EX_MAP = {
     # Italia
