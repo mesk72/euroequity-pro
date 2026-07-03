@@ -1,9 +1,7 @@
 name: Daily EU Yahoo Finance
 
 on:
-  schedule:
-    - cron: '0 19 * * 1-5'
-  workflow_dispatch:
+  workflow_dispatch:  # DISABILITATO — non gira automaticamente
 
 jobs:
   update-eu-yahoo:
