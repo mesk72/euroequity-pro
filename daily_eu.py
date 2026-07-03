@@ -79,7 +79,7 @@ offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
         params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
-                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)",
+                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
     try: data = r.json()
@@ -233,7 +233,7 @@ universe_keys = {(s["ticker"], s["exchange"]) for s in all_stocks}
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
         params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
-                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX)",
+                "exchange": "not.in.(US,TSX,TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     data = r.json()
     if not isinstance(data, list) or not data: break
