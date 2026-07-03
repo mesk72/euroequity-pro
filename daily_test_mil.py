@@ -144,6 +144,7 @@ for stock in all_stocks:
         "mom1w":mom_cal(7),"mom1m":mom_cal(31),
         "mom6m":mom_cal(182),"mom12m":mom_cal(365),
         "change1d":chg1d,"price":last_px,
+        "updated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
     })
     ok += 1
 
