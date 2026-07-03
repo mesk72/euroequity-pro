@@ -210,19 +210,32 @@ while True:
 print(f" Momentum: {len(mom_rank_map)}")
 
 # ── LEGGE FONDAMENTALI AGGIORNATI ───────────────────────────
-# Legge dal DB usando i ticker del TIKR — non filtra per in_universe
-# perché alcuni titoli nuovi non sono ancora in universe
-tikr_keys = set((r["ticker"], r["exchange"]) for r in tikr_rows)
+# Carica universe keys da stocks (in_universe=true)
+universe_keys = set()
+offset = 0
+while True:
+    res = requests.get(SUPABASE_URL+"/rest/v1/stocks", headers=headers_r,
+        params={"select":"ticker,exchange","in_universe":"eq.true",
+                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX,KRX,SGX)",
+                "offset":str(offset),"limit":"1000"})
+    batch = res.json()
+    if not isinstance(batch, list) or not batch: break
+    for s in batch: universe_keys.add((s["ticker"],s["exchange"]))
+    offset += 1000
+    if len(batch) < 1000: break
+print(f" Universe EU: {len(universe_keys)}")
+
+# Legge fondamentali solo per titoli in universe
 all_data = []
 offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth",
-                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX)",
+                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX,KRX,SGX)",
                 "offset":str(offset),"limit":"1000"})
     batch = res.json()
     if not isinstance(batch, list) or not batch: break
-    all_data.extend([d for d in batch if (d["ticker"],d["exchange"]) in tikr_keys])
+    all_data.extend([d for d in batch if (d["ticker"],d["exchange"]) in universe_keys])
     offset += 1000
     if len(batch) < 1000: break
 print(f" Fondamentali DB: {len(all_data)}")
