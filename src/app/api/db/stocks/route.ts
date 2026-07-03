@@ -179,9 +179,7 @@ export async function GET(req: NextRequest) {
     const isAPACOnly = exList.every(e => APAC_EXCHANGES.has(e))
 
     const [stocksData, fundData] = await Promise.all([
-      isAPACOnly
-        ? fetchAllByExchange('stocks', stocksSelect, exList, true)
-        : fetchAll('stocks', stocksSelect, exList),
+      fetchAllByExchange('stocks', stocksSelect, exList, true),
       fetchAll('fundamentals', fundSelect, exList),
     ])
 
