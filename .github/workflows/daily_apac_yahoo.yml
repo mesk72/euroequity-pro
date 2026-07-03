@@ -1,9 +1,7 @@
 name: Daily APAC Yahoo Finance
 
 on:
-  schedule:
-    - cron: '0 11 * * 1-5'
-  workflow_dispatch:
+  workflow_dispatch:  # DISABILITATO — non gira automaticamente
 
 jobs:
   update-apac-yahoo:
