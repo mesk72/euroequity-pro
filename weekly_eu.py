@@ -210,17 +210,19 @@ while True:
 print(f" Momentum: {len(mom_rank_map)}")
 
 # ── LEGGE FONDAMENTALI AGGIORNATI ───────────────────────────
+# Usa i dati appena scritti invece di leggere dal DB con in_universe
+# Così funziona anche per titoli nuovi non ancora in universe
 all_data = []
-offset = 0
-while True:
-    res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth",
-                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX)","in_universe":"eq.true",
-                "offset":str(offset),"limit":"1000"})
-    data = res.json()
-    if not isinstance(data, list) or not data: break
-    all_data.extend(data); offset += 1000
-    if len(data) < 1000: break
+for upd in fund_updates:
+    all_data.append({
+        "ticker": upd["ticker"],
+        "exchange": upd["exchange"],
+        "pe_trailing": upd.get("pe_trailing"),
+        "pe_forward": upd.get("pe_forward"),
+        "pb": upd.get("pb"),
+        "eps_growth": upd.get("eps_growth"),
+        "rev_growth": upd.get("rev_growth"),
+    })
 print(f" Fondamentali DB: {len(all_data)}")
 
 # ── RANK ─────────────────────────────────────────────────────
