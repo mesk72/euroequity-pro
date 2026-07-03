@@ -153,6 +153,25 @@ try:
 except Exception as e:
     print(f" Errore lettura TIKR: {e}"); exit()
 
+# ── CARICA UNIVERSE KEYS DA STOCKS ───────────────────────────
+universe_keys = set()
+offset = 0
+while True:
+    res = requests.get(SUPABASE_URL+"/rest/v1/stocks", headers=headers_r,
+        params={"select":"ticker,exchange","in_universe":"eq.true",
+                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX,KRX,SGX)",
+                "offset":str(offset),"limit":"1000"})
+    batch = res.json()
+    if not isinstance(batch, list) or not batch: break
+    for s in batch: universe_keys.add((s["ticker"],s["exchange"]))
+    offset += 1000
+    if len(batch) < 1000: break
+print(f" Universe EU: {len(universe_keys)}")
+
+# Filtra tikr_rows solo per titoli in universe
+tikr_rows = [r for r in tikr_rows if (r["ticker"],r["exchange"]) in universe_keys]
+print(f" TIKR EU in universe: {len(tikr_rows)}")
+
 # ── FONDAMENTALI + CALENDARIZZAZIONE ─────────────────────────
 print("\n Calcola fondamentali...")
 fund_updates = []
@@ -210,22 +229,7 @@ while True:
 print(f" Momentum: {len(mom_rank_map)}")
 
 # ── LEGGE FONDAMENTALI AGGIORNATI ───────────────────────────
-# Carica universe keys da stocks (in_universe=true)
-universe_keys = set()
-offset = 0
-while True:
-    res = requests.get(SUPABASE_URL+"/rest/v1/stocks", headers=headers_r,
-        params={"select":"ticker,exchange","in_universe":"eq.true",
-                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX,KRX,SGX)",
-                "offset":str(offset),"limit":"1000"})
-    batch = res.json()
-    if not isinstance(batch, list) or not batch: break
-    for s in batch: universe_keys.add((s["ticker"],s["exchange"]))
-    offset += 1000
-    if len(batch) < 1000: break
-print(f" Universe EU: {len(universe_keys)}")
-
-# Legge fondamentali solo per titoli in universe
+# Usa direttamente fund_updates (già filtrati per in_universe)
 all_data = []
 offset = 0
 while True:
