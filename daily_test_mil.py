@@ -136,7 +136,6 @@ for stock in all_stocks:
         "mom1w":mom_cal(7),"mom1m":mom_cal(31),
         "mom6m":mom_cal(182),"mom12m":mom_cal(365),
         "change1d":chg1d,"price":last_px,
-        "last_price_date":data_p[0]["date"],
     })
     ok += 1
 
@@ -185,9 +184,12 @@ for i,d in enumerate(all_data):
         "rank_mom6_adj":r6m.get(i),"rank_mom12_adj":r12m.get(i),
     })
 
-for i in range(0,len(rank_updates),100):
-    requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
-        headers=headers_up, json=rank_updates[i:i+100])
+for upd in rank_updates:
+    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
+        headers=headers_up,
+        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
+        json=upd)
 
 print(f"  Rank calcolato per {len(rank_updates)} titoli")
 print(f"\n=== DONE MIL — vai su forwardalpha.pro screen Italy ===")
