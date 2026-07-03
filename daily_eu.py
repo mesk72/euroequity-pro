@@ -318,9 +318,13 @@ if unranked:
     rank_updates.extend(calc_ranks(unranked))
 
 ok = 0
-for i in range(0, len(rank_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
+for upd in rank_updates:
+    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
+        headers=headers_up,
+        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
+        json=upd)
+    if r.status_code in (200, 201, 204): ok += 1
 print("  Rank EU: " + str(ok) + "/" + str(len(rank_updates)))
 
 # Combined rank EU
@@ -330,9 +334,13 @@ combined_updates = [{"ticker": d["ticker"], "exchange": d["exchange"],
                      "combined_rank": min(99, pct_rank(sum_arr, d["value_score"] + d["growth_score"]))}
                     for d in all_scores]
 ok = 0
-for i in range(0, len(combined_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
+for upd in combined_updates:
+    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
+        headers=headers_up,
+        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
+        json=upd)
+    if r.status_code in (200, 201, 204): ok += 1
 print("  Combined rank EU: " + str(ok) + "/" + str(len(combined_updates)))
 ok_rank = ok
 
