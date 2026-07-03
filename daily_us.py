@@ -125,14 +125,14 @@ CHUNK = 20
 # Leggi ultima data prezzi
 ok_leeway = fail_leeway = 0
 price_buf = []
-print(f"  Scarico prezzi da Leeway per {{len(all_stocks)}} titoli...")
+print(f"  Scarico prezzi da Leeway per {len(all_stocks)} titoli...")
 for stock in all_stocks:
     ticker   = stock['ticker']
     exchange = stock['exchange']
     # Leggi ultima data disponibile nel DB
     r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-        params={{"select": "date", "ticker": f"eq.{{ticker}}",
-                "exchange": f"eq.{{exchange}}", "order": "date.desc", "limit": "1"}})
+        params={"select": "date", "ticker": f"eq.{ticker}",
+                "exchange": f"eq.{exchange}", "order": "date.desc", "limit": "1"})
     row = r.json()
     last = row[0]["date"] if isinstance(row, list) and row else "2021-01-01"
     if last >= TODAY:
