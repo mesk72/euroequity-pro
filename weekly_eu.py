@@ -24,7 +24,9 @@ EX_MAP = {
     "XTRA":"XETRA","BIT":"MIL","ENXTPA":"PA","ENXTAM":"AS",
     "ENXTBR":"BR","ENXTLS":"LS","BME":"MC","HLSE":"HE",
     "WBAG":"VI","ISE":"IR","DB":"XETRA","DUSE":"XETRA",
-    "MUN":"XETRA","BRSE":"BR","HMSE":"OM","XSAT":"OM","OTCNO":"OB",
+    "MUN":"XETRA","BRSE":"SWX","HMSE":"XETRA","XSAT":"OM","OTCNO":"OB",
+    "ATSE":"GR","BDM":"MC","OM":"OM","OB":"OB","LSE":"LSE",
+    "CPSE":"CPSE","SWX":"SWX","NGM":"OM",
 }
 
 RANK_GROUPS = {
