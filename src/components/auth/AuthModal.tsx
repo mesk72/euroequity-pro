@@ -31,20 +31,19 @@ export default function AuthModal({ onClose, onSuccess }: Props) {
   async function handleLogin() {
     if (!email || !password) { toast.error('Please enter email and password.'); return }
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password })
+    console.log('Login result:', { authData, error })
     setLoading(false)
     if (error) {
-      if (error.message.includes('Invalid login')) {
-        toast.error('Invalid email or password.')
-      } else if (error.message.includes('Email not confirmed')) {
-        toast.error('Please confirm your email first. Check your inbox.')
-      } else {
-        toast.error(error.message)
-      }
-    } else {
+      console.error('Login error:', error)
+      toast.error(error.message || 'Login failed. Please try again.')
+    } else if (authData?.session) {
       toast.success('Welcome back!')
       onSuccess()
       window.location.reload()
+    } else {
+      console.error('No session returned:', authData)
+      toast.error('Login failed — no session. Please try again.')
     }
   }
 
