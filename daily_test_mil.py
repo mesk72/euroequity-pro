@@ -39,7 +39,19 @@ print(f"[1/4] Titoli in universe {EXCHANGE}: {len(tickers)}")
 # ── 2. Download prezzi da Leeway (5 anni) ────────────────────
 print(f"[2/4] Download prezzi da Leeway (5 anni)...")
 
-# Non cancella — usa upsert direttamente
+# Cancella prezzi MIL via SQL (REST DELETE non funziona su tabelle grandi)
+print("  Cancello prezzi esistenti MIL via SQL...")
+r_del = requests.post(f"{SUPABASE_URL}/rest/v1/rpc/exec_sql",
+    headers=headers_up,
+    json={"query": f"DELETE FROM prices_eod WHERE exchange = '{EXCHANGE}'"})
+if r_del.status_code in (200,201,204):
+    print(f"  Delete OK")
+else:
+    # Fallback: delete via REST con header speciale
+    r_del2 = requests.delete(f"{SUPABASE_URL}/rest/v1/prices_eod",
+        headers={**headers_up, "Prefer": "return=minimal"},
+        params={"exchange": f"eq.{EXCHANGE}"})
+    print(f"  Delete fallback: HTTP {r_del2.status_code}")
 
 ok = fail = 0
 rows = []
