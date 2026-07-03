@@ -1,9 +1,7 @@
 name: Daily US Yahoo Finance
 
 on:
-  schedule:
-    - cron: '0 1 * * 2-6'
-  workflow_dispatch:
+  workflow_dispatch:  # DISABILITATO — non gira automaticamente
 
 jobs:
   update-us-yahoo:
