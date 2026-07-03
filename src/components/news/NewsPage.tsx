@@ -850,7 +850,17 @@ ${body}
             </button>
           </div>
         ) : (
-          items.map((item, i) => (
+          <>
+            {tab === 'world' && (
+              <div style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 11, color: 'var(--text4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>📡 CNBC</span>
+                <a href="https://www.cnbc.com/world/" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: 13, color: 'var(--orange)', fontWeight: 700, textDecoration: 'none' }}>
+                  CNBC Market News — World Markets
+                </a>
+              </div>
+            )}
+          {items.map((item, i) => (
             <div key={i} style={{
               padding: '12px 16px',
               background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
@@ -886,7 +896,8 @@ ${body}
                 </div>
               </div>
             </div>
-          ))
+          ))}
+          </>
         )}
       </div>
 
