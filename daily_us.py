@@ -139,8 +139,8 @@ for stock in all_stocks:
         ok_leeway += 1
         continue
     start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
-    lt = ticker + LEEWAY_SUFFIX.get(exchange, "")
-    url = f"{{LEEWAY_BASE}}/historicalquotes/{{lt}}?apitoken={{LEEWAY_KEY}}&from={{start_dt}}&to={{TODAY}}"
+    lt = leeway_ticker(ticker, exchange)
+    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
     try:
         resp = requests.get(url, timeout=15)
         if resp.status_code != 200: fail_leeway += 1; continue
@@ -149,10 +149,10 @@ for stock in all_stocks:
         for row2 in data_l:
             adj = row2.get('adjusted_close') or row2.get('close')
             if adj is None: continue
-            price_buf.append({{
+            price_buf.append({
                 "ticker": ticker, "exchange": exchange,
                 "date": row2['date'], "adj_close": float(adj),
-            }})
+            })
         ok_leeway += 1
     except: fail_leeway += 1
     if len(price_buf) >= 500:
@@ -161,7 +161,7 @@ for stock in all_stocks:
     time.sleep(0.5)
 if price_buf:
     requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
-print(f"  Prezzi Leeway: ok={{ok_leeway}} fail={{fail_leeway}}")
+print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
 # ── 3. LEGGI PREZZI DA prices_eod (chunk 20) ────────────────
 print("\n[3/5] Lettura prezzi da prices_eod...")
@@ -194,6 +194,8 @@ print(f"  Prezzi caricati: {len(all_ph)} titoli")
 print("\n[4/5] Calcolo momentum...")
 ok = fail = 0
 mom_updates = []
+SPLIT_THRESHOLD_PCT = 20
+split_suspects = []
 for stock in all_stocks:
     ticker = stock['ticker']; exchange = stock['exchange']
     data = all_ph.get((ticker, exchange), [])
@@ -201,6 +203,8 @@ for stock in all_stocks:
     last_px   = data[0]['close']
     last_date = datetime.strptime(data[0]['date'], "%Y-%m-%d")
     chg1d = round((data[0]['close'] / data[1]['close'] - 1) * 100, 4)
+    if abs(chg1d) > SPLIT_THRESHOLD_PCT:
+        split_suspects.append((ticker, exchange, chg1d))
 
     def mom_cal(days):
         target  = last_date - timedelta(days=days)
@@ -216,6 +220,56 @@ for stock in all_stocks:
         "change1d": chg1d, "price": last_px,
     })
     ok += 1
+
+# Se un titolo varia di oltre SPLIT_THRESHOLD_PCT in un giorno, probabile
+# stock split non segnalato da Leeway: ricarica tutto lo storico a 5 anni.
+if split_suspects:
+    print(f"\n  Rilevati {len(split_suspects)} possibili stock split (variazione 1gg > {SPLIT_THRESHOLD_PCT}%): ricarico 5 anni di storico...")
+    FROM_5Y = (datetime.now() - timedelta(days=365*5)).strftime("%Y-%m-%d")
+    mom_by_key = {(u["ticker"], u["exchange"]): u for u in mom_updates}
+    for ticker, exchange, old_chg in split_suspects:
+        lt = leeway_ticker(ticker, exchange)
+        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
+        try:
+            resp = requests.get(url, timeout=20)
+            data_l = resp.json() if resp.status_code == 200 else []
+            if not isinstance(data_l, list) or not data_l:
+                print(f"    {ticker}.{exchange}: nessun dato storico da Leeway (variazione era {old_chg}%), salto")
+                continue
+            requests.delete(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up,
+                params={"ticker": f"eq.{ticker}", "exchange": f"eq.{exchange}"})
+            new_rows = []
+            for row2 in data_l:
+                adj = row2.get('adjusted_close') or row2.get('close')
+                if adj is None: continue
+                new_rows.append({"ticker": ticker, "exchange": exchange,
+                                  "date": row2['date'], "adj_close": float(adj)})
+            for i in range(0, len(new_rows), 500):
+                requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=new_rows[i:i+500])
+            new_sorted = sorted(new_rows, key=lambda x: x["date"], reverse=True)
+            if len(new_sorted) >= 2:
+                last_px2   = new_sorted[0]["adj_close"]
+                last_date2 = datetime.strptime(new_sorted[0]["date"], "%Y-%m-%d")
+                new_chg1d  = round((new_sorted[0]["adj_close"] / new_sorted[1]["adj_close"] - 1) * 100, 4)
+
+                def mom_cal2(days):
+                    target  = last_date2 - timedelta(days=days)
+                    closest = min(new_sorted, key=lambda x: abs((datetime.strptime(x["date"], "%Y-%m-%d") - target).days))
+                    if closest["adj_close"] and closest["adj_close"] != 0:
+                        return round(last_px2 / closest["adj_close"] - 1, 6)
+                    return None
+
+                key = (ticker, exchange)
+                if key in mom_by_key:
+                    mom_by_key[key].update({
+                        "mom1w": mom_cal2(7), "mom1m": mom_cal2(31),
+                        "mom6m": mom_cal2(182), "mom12m": mom_cal2(365),
+                        "change1d": new_chg1d, "price": last_px2,
+                    })
+                print(f"    {ticker}.{exchange}: ricaricato ({len(new_rows)} righe), variazione ricalcolata {new_chg1d}%")
+        except Exception as e:
+            print(f"    {ticker}.{exchange}: errore ricarica — {e}")
+        time.sleep(0.3)
 
 for i in range(0, len(mom_updates), 100):
     requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
