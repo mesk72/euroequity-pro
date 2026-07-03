@@ -233,7 +233,7 @@ while True:
                 "exchange":"in.(TSE,SEHK,ASX)","in_universe":"eq.true",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
-    if not data: break
+    if not isinstance(data, list) or not data: break
     for d in data:
         mom_rank_map[(d["ticker"],d["exchange"])] = {
             "r_m6": d.get("rank_mom6_adj"), "r_m12": d.get("rank_mom12_adj")}
@@ -250,7 +250,7 @@ while True:
                 "exchange":"in.(TSE,SEHK,ASX)","in_universe":"eq.true",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
-    if not data: break
+    if not isinstance(data, list) or not data: break
     all_data.extend(data); offset += 1000
     if len(data) < 1000: break
 print(f" Fondamentali DB: {len(all_data)}")
