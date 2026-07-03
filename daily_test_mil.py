@@ -1,5 +1,6 @@
 import os, requests, time
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -14,73 +15,49 @@ EXCHANGE      = "MIL"
 LEEWAY_SUFFIX = ".MI"
 TODAY         = datetime.now().strftime("%Y-%m-%d")
 FROM_5Y       = (datetime.now() - timedelta(days=365*5)).strftime("%Y-%m-%d")
+FROM_400D     = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
 
 print(f"=== DAILY TEST MIL — {TODAY} ===")
 print()
 
 # ── 1. Carica titoli in universe ─────────────────────────────
-stocks = []
+all_stocks = []
 offset = 0
 while True:
     r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
-        params={"select":"ticker","exchange":f"eq.{EXCHANGE}",
+        params={"select":"ticker,exchange","exchange":f"eq.{EXCHANGE}",
                 "in_universe":"eq.true","limit":"1000","offset":str(offset)})
     batch = r.json()
     if not isinstance(batch,list) or not batch: break
-    stocks.extend([s["ticker"] for s in batch])
+    all_stocks.extend(batch)
     offset += 1000
     if len(batch)<1000: break
 
-print(f"[1/4] Titoli in universe {EXCHANGE}: {len(stocks)}")
+tickers = [s["ticker"] for s in all_stocks]
+print(f"[1/4] Titoli in universe {EXCHANGE}: {len(tickers)}")
 
-# ── 2. Scarica prezzi mancanti da Leeway ─────────────────────
-print(f"[2/4] Download prezzi da Leeway...")
+# ── 2. Download prezzi da Leeway (5 anni) ────────────────────
+print(f"[2/4] Download prezzi da Leeway (5 anni)...")
 
-# Carica ultimo prezzo in DB per ogni titolo (bulk)
-last_dates = {}
-offset = 0
-while True:
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"ticker,date","exchange":f"eq.{EXCHANGE}",
-                "order":"date.desc","limit":"1000","offset":str(offset)})
-    batch = r.json()
-    if not isinstance(batch,list) or not batch: break
-    for row in batch:
-        t = row["ticker"]
-        if t not in last_dates:
-            last_dates[t] = row["date"]
-    offset += 1000
-    if len(batch)<1000: break
-
-print(f"  Titoli con prezzi in DB: {len(last_dates)}")
+# Cancella prezzi esistenti
+r = requests.delete(f"{SUPABASE_URL}/rest/v1/prices_eod",
+    headers=headers_up, params={"exchange": f"eq.{EXCHANGE}"})
+print(f"  Delete esistenti: HTTP {r.status_code}")
 
 ok = fail = 0
-rows_to_insert = []
+rows = []
 
-# Cancella prezzi esistenti MIL per riscaricamento pulito
-print("  Cancello prezzi esistenti MIL...")
-r_del = requests.delete(f"{SUPABASE_URL}/rest/v1/prices_eod",
-    headers=headers_up,
-    params={"exchange": f"eq.{EXCHANGE}"})
-print(f"  Delete: HTTP {r_del.status_code}")
-
-for ticker in stocks:
-    leeway_ticker = f"{ticker}{LEEWAY_SUFFIX}"
-    # Scarica sempre 5 anni completi per evitare problemi con dati corrotti
-    from_date = FROM_5Y
-    url = f"{LEEWAY_BASE}/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={from_date}&to={TODAY}"
-
+for ticker in tickers:
+    lt = f"{ticker}{LEEWAY_SUFFIX}"
+    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
     try:
         r = requests.get(url, timeout=15)
         if r.status_code == 200 and isinstance(r.json(), list) and r.json():
-            prices = r.json()
-            for p in prices:
+            for p in r.json():
                 adj = p.get("adjusted_close") or p.get("close")
-                if not adj: continue
-                rows_to_insert.append({
-                    "ticker": ticker, "exchange": EXCHANGE,
-                    "date": p["date"], "adj_close": float(adj)
-                })
+                if adj:
+                    rows.append({"ticker":ticker,"exchange":EXCHANGE,
+                                 "date":p["date"],"adj_close":float(adj)})
             ok += 1
         else:
             fail += 1
@@ -89,148 +66,125 @@ for ticker in stocks:
         fail += 1
         print(f"  FAIL {ticker}: {e}")
 
-    if len(rows_to_insert) >= 2000:
+    if len(rows) >= 2000:
         r2 = requests.post(f"{SUPABASE_URL}/rest/v1/prices_eod",
-            headers={**headers_up, "Prefer": "resolution=merge-duplicates,return=minimal"}, json=rows_to_insert)
-        print(f"  >>> Salvate {len(rows_to_insert)} righe: HTTP {r2.status_code}")
-        rows_to_insert = []
+            headers=headers_up, json=rows)
+        if r2.status_code not in (200,201,204):
+            print(f"  WARN insert: HTTP {r2.status_code} {r2.text[:80]}")
+        rows = []
 
     time.sleep(0.5)
 
-if rows_to_insert:
+if rows:
     r2 = requests.post(f"{SUPABASE_URL}/rest/v1/prices_eod",
-        headers=headers_up, json=rows_to_insert)
-    print(f"  >>> Salvate {len(rows_to_insert)} righe finali: HTTP {r2.status_code}")
+        headers=headers_up, json=rows)
+    if r2.status_code not in (200,201,204):
+        print(f"  WARN insert finale: HTTP {r2.status_code} {r2.text[:80]}")
 
 print(f"  Prezzi: ok={ok} fail={fail}")
 
-# ── 3. Calcola momentum ──────────────────────────────────────
+# ── 3. Carica prezzi per momentum (chunk di 20, ultimi 400gg) ─
 print(f"[3/4] Calcolo momentum...")
 
-TODAY_DT = datetime.strptime(TODAY, "%Y-%m-%d")
-D1W  = (TODAY_DT - timedelta(days=7)).strftime("%Y-%m-%d")
-D1M  = (TODAY_DT - timedelta(days=30)).strftime("%Y-%m-%d")
-D6M  = (TODAY_DT - timedelta(days=182)).strftime("%Y-%m-%d")
-D12M = (TODAY_DT - timedelta(days=365)).strftime("%Y-%m-%d")
+CHUNK = 20
+all_ph = defaultdict(list)
+for i in range(0, len(tickers), CHUNK):
+    chunk = tickers[i:i+CHUNK]
+    offset_p = 0
+    while True:
+        rp = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+            params={"select":"ticker,date,adj_close",
+                    "exchange":f"eq.{EXCHANGE}",
+                    "ticker":"in.(" + ",".join(chunk) + ")",
+                    "date":f"gte.{FROM_400D}",
+                    "order":"ticker,date.desc",
+                    "limit":"1000","offset":str(offset_p)})
+        batch = rp.json()
+        if not isinstance(batch,list) or not batch: break
+        for d in batch:
+            if d["adj_close"] is not None:
+                all_ph[(d["ticker"],EXCHANGE)].append(
+                    {"date":d["date"],"close":d["adj_close"]})
+        offset_p += 1000
+        if len(batch)<1000: break
+    time.sleep(0.02)
 
-# Carica TUTTI i prezzi MIL degli ultimi 13 mesi in una sola query bulk
-all_prices_raw = []
-offset = 0
-while True:
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"ticker,date,adj_close",
-                "exchange":f"eq.{EXCHANGE}",
-                "date":f"gte.{D12M}",
-                "order":"ticker.asc,date.asc",
-                "limit":"2000","offset":str(offset)})
-    batch = r.json()
-    if not isinstance(batch,list) or not batch: break
-    all_prices_raw.extend(batch)
-    offset += 2000
-    if len(batch)<2000: break
+print(f"  Prezzi caricati: {len(all_ph)} titoli")
 
-print(f"  Prezzi caricati dal DB: {len(all_prices_raw)}")
+mom_updates = []
+ok = fail = 0
 
-# Organizza per ticker
-from collections import defaultdict
-prices_by_ticker = defaultdict(list)
-for row in all_prices_raw:
-    prices_by_ticker[row["ticker"]].append((row["date"], row["adj_close"]))
+for stock in all_stocks:
+    ticker   = stock["ticker"]
+    exchange = stock["exchange"]
+    data_p   = all_ph.get((ticker,exchange),[])
+    if len(data_p) < 2: fail += 1; continue
 
-mom_ok = mom_fail = 0
+    last_px   = data_p[0]["close"]
+    last_date = datetime.strptime(data_p[0]["date"],"%Y-%m-%d")
+    chg1d     = round((data_p[0]["close"]/data_p[1]["close"]-1)*100,4) if data_p[1]["close"] else None
 
-for ticker in stocks:
-    prices = sorted(prices_by_ticker.get(ticker, []), key=lambda x: x[0])
-    if len(prices) < 2:
-        mom_fail += 1
-        continue
-
-    price_map  = {d: v for d,v in prices}
-    last_date  = prices[-1][0]
-    last_price = prices[-1][1]
-
-    def nearest(target):
-        candidates = [d for d in price_map if d <= target]
-        if not candidates: return None
-        return price_map[max(candidates)]
-
-    def pct(old):
-        if old and old > 0: return round((last_price - old) / old, 4)
+    def mom_cal(days):
+        target  = last_date - timedelta(days=days)
+        closest = min(data_p, key=lambda x: abs((datetime.strptime(x["date"],"%Y-%m-%d")-target).days))
+        if closest["close"] and closest["close"] != 0:
+            return round(last_px/closest["close"]-1,6)
         return None
 
-    fund_update = {
-        "mom1w":  pct(nearest(D1W)),
-        "mom1m":  pct(nearest(D1M)),
-        "mom6m":  pct(nearest(D6M)),
-        "mom12m": pct(nearest(D12M)),
-        "price":  round(last_price, 4),
-        "last_price_date": last_date,
-    }
+    mom_updates.append({
+        "ticker":ticker,"exchange":exchange,
+        "mom1w":mom_cal(7),"mom1m":mom_cal(31),
+        "mom6m":mom_cal(182),"mom12m":mom_cal(365),
+        "change1d":chg1d,"price":last_px,
+        "last_price_date":data_p[0]["date"],
+    })
+    ok += 1
 
-    r2 = requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker":f"eq.{ticker}","exchange":f"eq.{EXCHANGE}"},
-        json=fund_update)
-    if r2.status_code in (200,204): mom_ok += 1
-    else: mom_fail += 1
+for i in range(0,len(mom_updates),100):
+    requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
+        headers=headers_up, json=mom_updates[i:i+100])
 
-print(f"  Momentum: ok={mom_ok} fail={mom_fail}")
+print(f"  Momentum: ok={ok} fail={fail}")
 
-# ── 4. Calcola rank momentum e value/growth ──────────────────
+# ── 4. Rank momentum ─────────────────────────────────────────
 print(f"[4/4] Calcolo rank...")
 
-# Carica tutti i fondamentali MIL in universe
 all_data = []
 offset = 0
-universe_keys = set(stocks)
 while True:
     r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
-                "exchange":f"eq.{EXCHANGE}",
-                "limit":"1000","offset":str(offset)})
+                "exchange":f"eq.{EXCHANGE}","limit":"1000","offset":str(offset)})
     batch = r.json()
     if not isinstance(batch,list) or not batch: break
-    all_data.extend([d for d in batch if d["ticker"] in universe_keys])
+    universe_set = set(tickers)
+    all_data.extend([d for d in batch if d["ticker"] in universe_set])
     offset += 1000
     if len(batch)<1000: break
 
-print(f"  Titoli con fondamentali: {len(all_data)}")
-
-def pct_rank(values, ascending=True):
+def pct_rank(values):
     valid = [(i,v) for i,v in enumerate(values) if v is not None]
     n = len(valid)
-    if n == 0: return {i: None for i in range(len(values))}
-    sorted_vals = sorted(valid, key=lambda x: x[1], reverse=not ascending)
+    if n==0: return {i:None for i in range(len(values))}
+    sorted_v = sorted(valid,key=lambda x: x[1])
     ranks = {}
-    for rank_pos, (orig_idx, val) in enumerate(sorted_vals):
-        ranks[orig_idx] = round((rank_pos + 0.5) / n * 100)
-    return {i: ranks.get(i) for i in range(len(values))}
+    for pos,(idx,val) in enumerate(sorted_v):
+        ranks[idx] = round((pos+0.5)/n*100)
+    return {i:ranks.get(i) for i in range(len(values))}
 
-# Calcola rank momentum
-mom6m_vals  = [d.get("mom6m")  for d in all_data]
-mom12m_vals = [d.get("mom12m") for d in all_data]
-mom1w_vals  = [d.get("mom1w")  for d in all_data]
-mom1m_vals  = [d.get("mom1m")  for d in all_data]
+r6m  = pct_rank([d.get("mom6m")  for d in all_data])
+r12m = pct_rank([d.get("mom12m") for d in all_data])
 
-r6m  = pct_rank(mom6m_vals)
-r12m = pct_rank(mom12m_vals)
-r1w  = pct_rank(mom1w_vals)
-r1m  = pct_rank(mom1m_vals)
+rank_updates = []
+for i,d in enumerate(all_data):
+    rank_updates.append({
+        "ticker":d["ticker"],"exchange":d["exchange"],
+        "rank_mom6_adj":r6m.get(i),"rank_mom12_adj":r12m.get(i),
+    })
 
-rank_ok = rank_fail = 0
-for i, d in enumerate(all_data):
-    ticker = d["ticker"]
-    update = {
-        "rank_mom6_adj":  r6m.get(i),
-        "rank_mom12_adj": r12m.get(i),
-    }
-    r2 = requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker":f"eq.{ticker}","exchange":f"eq.{EXCHANGE}"},
-        json=update)
-    if r2.status_code in (200,204): rank_ok += 1
-    else: rank_fail += 1
+for i in range(0,len(rank_updates),100):
+    requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
+        headers=headers_up, json=rank_updates[i:i+100])
 
-print(f"  Rank momentum: ok={rank_ok} fail={rank_fail}")
-print(f"\n=== DONE MIL ===")
-print(f"Vai su forwardalpha.pro/screen/Italy per verificare")
+print(f"  Rank calcolato per {len(rank_updates)} titoli")
+print(f"\n=== DONE MIL — vai su forwardalpha.pro screen Italy ===")
