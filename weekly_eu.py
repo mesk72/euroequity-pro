@@ -292,6 +292,8 @@ ranked_exchanges = set(ex for exs in RANK_GROUPS.values() for ex in exs)
 unranked = [d for d in all_data if d["exchange"] not in ranked_exchanges and d["exchange"] not in NO_RANK]
 if unranked: rank_updates.extend(calc_ranks(unranked))
 
+# Salva copia rank_updates con ticker/exchange per il combined
+rank_updates_copy = [dict(upd) for upd in rank_updates]
 ok = 0
 for i in range(0, len(rank_updates), 100):
     r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
@@ -300,7 +302,7 @@ print(f" Rank EU: {ok}/{len(rank_updates)}")
 
 # ── COMBINED EU ──────────────────────────────────────────────
 # combined_rank NON azzerato — aggiorna direttamente con merge-duplicates
-all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
+all_scores = [d for d in rank_updates_copy if d.get("value_score") is not None and d.get("growth_score") is not None]
 sum_arr    = [d["value_score"]+d["growth_score"] for d in all_scores]
 combined_updates = [{"ticker":d["ticker"],"exchange":d["exchange"],
                      "combined_rank":min(99,pct_rank(sum_arr,d["value_score"]+d["growth_score"]))}
