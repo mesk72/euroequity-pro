@@ -255,9 +255,12 @@ for p in pre:
     })
 
 # Salva rank
-for i in range(0,len(rank_updates),100):
-    requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
-        headers=headers_up, json=rank_updates[i:i+100])
+for upd in rank_updates:
+    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
+        headers=headers_up,
+        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
+        json=upd)
 
 # Combined rank
 all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
@@ -265,9 +268,12 @@ sum_arr    = [d["value_score"]+d["growth_score"] for d in all_scores]
 combined   = [{"ticker":d["ticker"],"exchange":d["exchange"],
                "combined_rank": min(99,int(round(pr(sum_arr,d["value_score"]+d["growth_score"]))))}
               for d in all_scores]
-for i in range(0,len(combined),100):
-    requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
-        headers=headers_up, json=combined[i:i+100])
+for upd in combined:
+    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
+        headers=headers_up,
+        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
+        json=upd)
 
 print(f"  Rank calcolato per {len(rank_updates)} titoli")
 print(f"  Combined rank: {len(combined)} titoli")
