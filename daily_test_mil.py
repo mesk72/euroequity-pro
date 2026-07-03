@@ -91,7 +91,7 @@ for ticker in stocks:
 
     if len(rows_to_insert) >= 2000:
         r2 = requests.post(f"{SUPABASE_URL}/rest/v1/prices_eod",
-            headers=headers_up, json=rows_to_insert)
+            headers={**headers_up, "Prefer": "resolution=merge-duplicates,return=minimal"}, json=rows_to_insert)
         print(f"  >>> Salvate {len(rows_to_insert)} righe: HTTP {r2.status_code}")
         rows_to_insert = []
 
@@ -124,6 +124,8 @@ for ticker in stocks:
     prices = r.json()
     if not isinstance(prices, list) or len(prices) < 2:
         mom_fail += 1
+        if mom_fail <= 3:
+            print(f"  FAIL momentum {ticker}: {r.status_code} rows={len(prices) if isinstance(prices,list) else type(prices)} resp={str(prices)[:100]}")
         continue
 
     price_map = {p["date"]: p["adj_close"] for p in prices}
