@@ -113,44 +113,56 @@ D1M  = (TODAY_DT - timedelta(days=30)).strftime("%Y-%m-%d")
 D6M  = (TODAY_DT - timedelta(days=182)).strftime("%Y-%m-%d")
 D12M = (TODAY_DT - timedelta(days=365)).strftime("%Y-%m-%d")
 
+# Carica TUTTI i prezzi MIL degli ultimi 13 mesi in una sola query bulk
+all_prices_raw = []
+offset = 0
+while True:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"ticker,date,adj_close",
+                "exchange":f"eq.{EXCHANGE}",
+                "date":f"gte.{D12M}",
+                "order":"ticker.asc,date.asc",
+                "limit":"2000","offset":str(offset)})
+    batch = r.json()
+    if not isinstance(batch,list) or not batch: break
+    all_prices_raw.extend(batch)
+    offset += 2000
+    if len(batch)<2000: break
+
+print(f"  Prezzi caricati dal DB: {len(all_prices_raw)}")
+
+# Organizza per ticker
+from collections import defaultdict
+prices_by_ticker = defaultdict(list)
+for row in all_prices_raw:
+    prices_by_ticker[row["ticker"]].append((row["date"], row["adj_close"]))
+
 mom_ok = mom_fail = 0
 
 for ticker in stocks:
-    # Carica prezzi degli ultimi 13 mesi
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"date,adj_close","ticker":f"eq.{ticker}",
-                "exchange":f"eq.{EXCHANGE}","date":f"gte.{D12M}",
-                "order":"date.asc","limit":"300"})
-    prices = r.json()
-    if not isinstance(prices, list) or len(prices) < 2:
+    prices = sorted(prices_by_ticker.get(ticker, []), key=lambda x: x[0])
+    if len(prices) < 2:
         mom_fail += 1
-        if mom_fail <= 3:
-            print(f"  FAIL momentum {ticker}: {r.status_code} rows={len(prices) if isinstance(prices,list) else type(prices)} resp={str(prices)[:100]}")
         continue
 
-    price_map = {p["date"]: p["adj_close"] for p in prices}
-    last_price = prices[-1]["adj_close"]
-    last_date  = prices[-1]["date"]
+    price_map  = {d: v for d,v in prices}
+    last_date  = prices[-1][0]
+    last_price = prices[-1][1]
 
     def nearest(target):
         candidates = [d for d in price_map if d <= target]
         if not candidates: return None
         return price_map[max(candidates)]
 
-    p1w  = nearest(D1W)
-    p1m  = nearest(D1M)
-    p6m  = nearest(D6M)
-    p12m = nearest(D12M)
-
     def pct(old):
         if old and old > 0: return round((last_price - old) / old, 4)
         return None
 
     fund_update = {
-        "mom1w":  pct(p1w),
-        "mom1m":  pct(p1m),
-        "mom6m":  pct(p6m),
-        "mom12m": pct(p12m),
+        "mom1w":  pct(nearest(D1W)),
+        "mom1m":  pct(nearest(D1M)),
+        "mom6m":  pct(nearest(D6M)),
+        "mom12m": pct(nearest(D12M)),
         "price":  round(last_price, 4),
         "last_price_date": last_date,
     }
