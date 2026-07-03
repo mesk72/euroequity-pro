@@ -217,8 +217,12 @@ for stock in all_stocks:
     })
     ok += 1
 
-for i in range(0, len(mom_updates), 100):
-    requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
+for upd in mom_updates:
+    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
+        headers=headers_up,
+        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
+        json=upd)
 print(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
