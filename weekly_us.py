@@ -182,9 +182,13 @@ for r in tikr_rows:
         "rev_growth": round(rev_growth,6) if rev_growth is not None else None,
     })
 ok = 0
-for i in range(0, len(fund_updates), 100):
-    res = requests.post(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_up, json=fund_updates[i:i+100])
-    if res.status_code in (200,201,204): ok += len(fund_updates[i:i+100])
+for upd in fund_updates:
+    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    res = requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",
+        headers=headers_up,
+        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
+        json=upd)
+    if res.status_code in (200,201,204): ok += 1
 print(f" Fondamentali: {ok}/{len(fund_updates)}")
 
 # ── MOMENTUM DAL DB (US+TSX) ─────────────────────────────────
