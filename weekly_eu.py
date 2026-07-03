@@ -318,7 +318,10 @@ for i in range(0, len(rank_updates), 100):
 print(f" Rank EU: {ok}/{len(rank_updates)}")
 
 # ── COMBINED EU ──────────────────────────────────────────────
-# combined_rank NON azzerato — aggiorna direttamente con merge-duplicates
+# Debug
+has_vs = sum(1 for d in rank_updates_copy if d.get("value_score") is not None)
+has_gs = sum(1 for d in rank_updates_copy if d.get("growth_score") is not None)
+print(f" rank_updates_copy: {len(rank_updates_copy)} titoli, con value_score={has_vs} con growth_score={has_gs}")
 all_scores = [d for d in rank_updates_copy if d.get("value_score") is not None and d.get("growth_score") is not None]
 sum_arr    = [d["value_score"]+d["growth_score"] for d in all_scores]
 combined_updates = [{"ticker":d["ticker"],"exchange":d["exchange"],
