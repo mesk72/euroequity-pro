@@ -210,9 +210,7 @@ function mapStock(s: any, f: any) {
     country: s.country ?? null,
     flag: s.flag ?? null,
     website: s.website ?? null,
-    price: ['TSE','SEHK','TSX','ASX'].includes(s.exchange)
-      ? (f.price ?? null)
-      : (s.price ?? f.price ?? null),
+    price: f.price ?? s.price ?? null,
     change1d: f.change1d ?? null,
     lastPriceDate: s.last_price_date ?? null,
     volume: null,
