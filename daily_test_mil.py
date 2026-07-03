@@ -39,12 +39,16 @@ print(f"[1/4] Titoli in universe {EXCHANGE}: {len(tickers)}")
 # ── 2. Download prezzi da Leeway (5 anni) ────────────────────
 print(f"[2/4] Download prezzi da Leeway (5 anni)...")
 
-# Cancella prezzi via RPC function
-print("  Cancello prezzi esistenti MIL via RPC...")
-r_del = requests.post(f"{SUPABASE_URL}/rest/v1/rpc/delete_prices_by_exchange",
-    headers=headers_up,
-    json={"exch": EXCHANGE})
-print(f"  Delete RPC: HTTP {r_del.status_code} {r_del.text[:100] if r_del.status_code not in (200,201,204) else 'OK'}")
+# Cancella prezzi ticker per ticker — evita timeout
+print("  Cancello prezzi esistenti MIL (ticker per ticker)...")
+del_ok = del_fail = 0
+for ticker in tickers:
+    r_del = requests.delete(f"{SUPABASE_URL}/rest/v1/prices_eod",
+        headers=headers_up,
+        params={"ticker": f"eq.{ticker}", "exchange": f"eq.{EXCHANGE}"})
+    if r_del.status_code in (200,204): del_ok += 1
+    else: del_fail += 1
+print(f"  Delete: ok={del_ok} fail={del_fail}")
 
 ok = fail = 0
 rows = []
