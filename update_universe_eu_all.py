@@ -9,11 +9,38 @@ headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "return=minimal"}
 
 EX_MAP = {
-    "BIT":"MIL","LSE":"LSE","XTRA":"XETRA","ENXTPA":"PA",
-    "HMSE":"OM","XSAT":"OM","SWX":"SWX","ENXTAM":"AS",
-    "BME":"MC","ENXTBR":"BR","HLSE":"HE","CPSE":"CPSE",
-    "OTCNO":"OB","OB":"OB","WBAG":"VI","ISE":"IR",
-    "ENXTLS":"LS","XATH":"GR","ATH":"GR",
+    # Italia
+    "BIT":"MIL",
+    # UK
+    "LSE":"LSE","AIM":"LSE",
+    # Germania
+    "XTRA":"XETRA","HMSE":"XETRA","DB":"XETRA","MUN":"XETRA","DUSE":"XETRA",
+    # Francia
+    "ENXTPA":"PA",
+    # Svezia
+    "OM":"OM","XSAT":"OM","NGM":"OM",
+    # Svizzera
+    "SWX":"SWX","BRSE":"SWX",
+    # Olanda
+    "ENXTAM":"AS",
+    # Spagna
+    "BME":"MC","BDM":"MC",
+    # Belgio
+    "ENXTBR":"BR",
+    # Finlandia
+    "HLSE":"HE",
+    # Danimarca
+    "CPSE":"CPSE",
+    # Norvegia
+    "OB":"OB","OTCNO":"OB",
+    # Grecia
+    "ATSE":"GR","XATH":"GR","ATH":"GR",
+    # Austria
+    "WBAG":"VI",
+    # Irlanda
+    "ISE":"IR",
+    # Portogallo
+    "ENXTLS":"LS",
 }
 
 ALWAYS_EXCLUDE = [
