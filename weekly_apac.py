@@ -219,13 +219,9 @@ for r in tikr_rows:
         "rev_growth": round(rev_growth,6) if rev_growth is not None else None,
     })
 ok = 0
-for upd in fund_updates:
-    _t = upd.pop("ticker"); _e = upd.pop("exchange")
-    res = requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
-        json=upd)
-    if res.status_code in (200,201,204): ok += 1
+for i in range(0, len(fund_updates), 100):
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=fund_updates[i:i+100])
+    if r.status_code in (200, 201, 204): ok += len(fund_updates[i:i+100])
 print(f" Fondamentali: {ok}/{len(fund_updates)}")
 
 # ── MOMENTUM DAL DB ──────────────────────────────────────────
@@ -306,13 +302,9 @@ for country, exchanges in APAC_GROUPS.items():
         print(f" {country}: {len(res)}")
 
 ok = 0
-for upd in rank_updates:
-    _t = upd.pop("ticker"); _e = upd.pop("exchange")
-    res = requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
-        json=upd)
-    if res.status_code in (200,201,204): ok += 1
+for i in range(0, len(rank_updates), 100):
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
+    if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print(f" Rank APAC paese: {ok}/{len(rank_updates)}")
 
 # ── COMBINED APAC = TSE+SEHK+ASX ────────────────────────────
@@ -323,13 +315,9 @@ combined_updates = [{"ticker":d["ticker"],"exchange":d["exchange"],
                      "combined_rank":min(99,pct_rank(comb_arr,d["value_score"]+d["growth_score"]))}
                     for d in all_scores]
 ok = 0
-for upd in combined_updates:
-    _t = upd.pop("ticker"); _e = upd.pop("exchange")
-    res = requests.patch(SUPABASE_URL+"/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
-        json=upd)
-    if res.status_code in (200,201,204): ok += 1
+for i in range(0, len(combined_updates), 100):
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
+    if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
 print(f" Combined APAC (TSE+SEHK+ASX): {ok}/{len(combined_updates)}")
 
 end_time = time_module.time()
