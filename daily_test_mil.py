@@ -157,8 +157,8 @@ for upd in mom_updates:
 
 print(f"  Momentum: ok={ok} fail={fail}")
 
-# ── 4. Rank momentum ─────────────────────────────────────────
-print(f"[4/4] Calcolo rank...")
+# ── 4. Rank completo (value, growth, combined) ───────────────
+print(f"[4/4] Calcolo rank completo...")
 
 all_data = []
 offset = 0
@@ -173,32 +173,102 @@ while True:
     offset += 1000
     if len(batch)<1000: break
 
-def pct_rank(values):
-    valid = [(i,v) for i,v in enumerate(values) if v is not None]
-    n = len(valid)
-    if n==0: return {i:None for i in range(len(values))}
-    sorted_v = sorted(valid,key=lambda x: x[1])
-    ranks = {}
-    for pos,(idx,val) in enumerate(sorted_v):
-        ranks[idx] = round((pos+0.5)/n*100)
-    return {i:ranks.get(i) for i in range(len(values))}
+print(f"  Fondamentali caricati: {len(all_data)}")
 
-r6m  = pct_rank([d.get("mom6m")  for d in all_data])
-r12m = pct_rank([d.get("mom12m") for d in all_data])
+# Funzioni helper
+def ey(pe):
+    if pe is None: return None
+    try:
+        v = float(pe)
+        return round(1/v, 6) if v != 0 else None
+    except: return None
+
+def book_yield(pb):
+    if pb is None: return None
+    try:
+        v = float(pb)
+        return round(1/v, 6) if v != 0 else None
+    except: return None
+
+def pr(arr, val):
+    if val is None or not arr: return None
+    below = sum(1 for x in arr if x < val)
+    equal = sum(1 for x in arr if x == val)
+    return round((below + 0.5 * equal) / len(arr) * 100)
+
+# Mappa momentum aggiornato
+mom_map = {(d["ticker"],d["exchange"]): d for d in all_data}
+for upd in mom_updates:
+    key = (upd.get("ticker") or upd.get("_t"), upd.get("exchange") or upd.get("_e"))
+
+# Calcola rank per il gruppo MIL
+group = all_data
+
+ey_trail_g  = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
+ey_fwd_g    = [ey(d["pe_forward"])  for d in group if ey(d["pe_forward"])  is not None]
+by_g        = [book_yield(d["pb"])  for d in group if book_yield(d["pb"]) is not None]
+eps_g_vals  = [d["eps_growth"]      for d in group if d["eps_growth"] is not None]
+rev_g_vals  = [d["rev_growth"]      for d in group if d["rev_growth"] is not None]
+
+mom6_adj_g  = []
+mom12_adj_g = []
+for d in group:
+    m6 = d.get("mom6m"); m12 = d.get("mom12m")
+    m1w = d.get("mom1w"); m1m = d.get("mom1m")
+    if m6 is not None and m1w is not None: mom6_adj_g.append(m6 - m1w)
+    if m12 is not None and m1m is not None: mom12_adj_g.append(m12 - m1m)
+
+pre = []
+for d in group:
+    m6=d.get("mom6m"); m12=d.get("mom12m"); m1w=d.get("mom1w"); m1m=d.get("mom1m")
+    ey_t=ey(d.get("pe_trailing")); r_eyt=pr(ey_trail_g,ey_t)
+    ey_f=ey(d.get("pe_forward"));  r_eyf=pr(ey_fwd_g,ey_f)
+    by_v=book_yield(d.get("pb")); r_pb=pr(by_g,by_v)
+    r_epsg=pr(eps_g_vals,d.get("eps_growth"))
+    r_revg=pr(rev_g_vals,d.get("rev_growth"))
+    mom6_adj  = (m6-m1w)   if m6 is not None and m1w is not None else None
+    mom12_adj = (m12-m1m)  if m12 is not None and m1m is not None else None
+    r_m6  = pr(mom6_adj_g,  mom6_adj)
+    r_m12 = pr(mom12_adj_g, mom12_adj)
+    pre.append({"ticker":d["ticker"],"exchange":d["exchange"],
+                "r_eyt":r_eyt,"r_eyf":r_eyf,"r_pb":r_pb,
+                "r_epsg":r_epsg,"r_revg":r_revg,"r_m6":r_m6,"r_m12":r_m12})
+
+val_sums = [sum(x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None)
+            for p in pre if len([x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None])>=2]
+gr_sums  = [sum(x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None)
+            for p in pre if len([x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None])>=3]
 
 rank_updates = []
-for i,d in enumerate(all_data):
+for p in pre:
+    val_inputs=[x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None]
+    gr_inputs =[x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None]
+    value_score  = int(round(pr(val_sums,sum(val_inputs)))) if len(val_inputs)>=2 and val_sums else None
+    growth_score = int(round(pr(gr_sums, sum(gr_inputs))))  if len(gr_inputs)>=3 and gr_sums  else None
     rank_updates.append({
-        "ticker":d["ticker"],"exchange":d["exchange"],
-        "rank_mom6_adj":r6m.get(i),"rank_mom12_adj":r12m.get(i),
+        "ticker":p["ticker"],"exchange":p["exchange"],
+        "value_score":value_score,"growth_score":growth_score,
+        "rank_pe_ltm":p["r_eyt"],"rank_pe_ntm":p["r_eyf"],"rank_pb":p["r_pb"],
+        "rank_eps_gr":p["r_epsg"],"rank_rev_gr":p["r_revg"],
+        "rank_mom6_adj":p["r_m6"],"rank_mom12_adj":p["r_m12"],
+        "updated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
     })
 
-for upd in rank_updates:
-    _t = upd.pop("ticker"); _e = upd.pop("exchange")
-    requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
-        json=upd)
+# Salva rank
+for i in range(0,len(rank_updates),100):
+    requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
+        headers=headers_up, json=rank_updates[i:i+100])
+
+# Combined rank
+all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
+sum_arr    = [d["value_score"]+d["growth_score"] for d in all_scores]
+combined   = [{"ticker":d["ticker"],"exchange":d["exchange"],
+               "combined_rank": min(99,int(round(pr(sum_arr,d["value_score"]+d["growth_score"]))))}
+              for d in all_scores]
+for i in range(0,len(combined),100):
+    requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
+        headers=headers_up, json=combined[i:i+100])
 
 print(f"  Rank calcolato per {len(rank_updates)} titoli")
+print(f"  Combined rank: {len(combined)} titoli")
 print(f"\n=== DONE MIL — vai su forwardalpha.pro screen Italy ===")
