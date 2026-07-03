@@ -39,10 +39,7 @@ print(f"[1/4] Titoli in universe {EXCHANGE}: {len(tickers)}")
 # ── 2. Download prezzi da Leeway (5 anni) ────────────────────
 print(f"[2/4] Download prezzi da Leeway (5 anni)...")
 
-# Cancella prezzi esistenti
-r = requests.delete(f"{SUPABASE_URL}/rest/v1/prices_eod",
-    headers=headers_up, params={"exchange": f"eq.{EXCHANGE}"})
-print(f"  Delete esistenti: HTTP {r.status_code}")
+# Non cancella — usa upsert direttamente
 
 ok = fail = 0
 rows = []
@@ -68,7 +65,8 @@ for ticker in tickers:
 
     if len(rows) >= 2000:
         r2 = requests.post(f"{SUPABASE_URL}/rest/v1/prices_eod",
-            headers=headers_up, json=rows)
+            headers={**headers_up, "Prefer": "resolution=merge-duplicates,return=minimal"},
+            json=rows)
         if r2.status_code not in (200,201,204):
             print(f"  WARN insert: HTTP {r2.status_code} {r2.text[:80]}")
         rows = []
@@ -77,7 +75,8 @@ for ticker in tickers:
 
 if rows:
     r2 = requests.post(f"{SUPABASE_URL}/rest/v1/prices_eod",
-        headers=headers_up, json=rows)
+        headers={**headers_up, "Prefer": "resolution=merge-duplicates,return=minimal"},
+        json=rows)
     if r2.status_code not in (200,201,204):
         print(f"  WARN insert finale: HTTP {r2.status_code} {r2.text[:80]}")
 
