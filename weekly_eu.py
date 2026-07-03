@@ -187,6 +187,8 @@ ok = 0
 for i in range(0, len(fund_updates), 100):
     r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=fund_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(fund_updates[i:i+100])
+    elif i == 0:
+        print(f" ERRORE HTTP {r.status_code}: {r.text[:200]}")
 print(f" Fondamentali: {ok}/{len(fund_updates)}")
 
 # ── MOMENTUM DAL DB ──────────────────────────────────────────
