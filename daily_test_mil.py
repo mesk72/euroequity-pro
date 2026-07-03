@@ -57,15 +57,17 @@ print(f"  Titoli con prezzi in DB: {len(last_dates)}")
 ok = fail = 0
 rows_to_insert = []
 
+# Cancella prezzi esistenti MIL per riscaricamento pulito
+print("  Cancello prezzi esistenti MIL...")
+r_del = requests.delete(f"{SUPABASE_URL}/rest/v1/prices_eod",
+    headers=headers_up,
+    params={"exchange": f"eq.{EXCHANGE}"})
+print(f"  Delete: HTTP {r_del.status_code}")
+
 for ticker in stocks:
     leeway_ticker = f"{ticker}{LEEWAY_SUFFIX}"
-    last_date = last_dates.get(ticker)
-
-    if last_date and last_date >= TODAY:
-        ok += 1
-        continue
-
-    from_date = (datetime.strptime(last_date, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d") if last_date else FROM_5Y
+    # Scarica sempre 5 anni completi per evitare problemi con dati corrotti
+    from_date = FROM_5Y
     url = f"{LEEWAY_BASE}/historicalquotes/{leeway_ticker}?apitoken={LEEWAY_KEY}&from={from_date}&to={TODAY}"
 
     try:
