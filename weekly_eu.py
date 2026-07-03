@@ -44,8 +44,25 @@ def parse_num(v):
     negative = False
     if s.startswith('(') and s.endswith(')'):
         negative = True; s = s[1:-1]
-    s = s.replace('$','').replace(',','').replace('x','').replace('%','').strip()
+    # Rimuovi suffissi non numerici
+    s = s.replace('$','').replace('x','').replace('%','').strip()
+    # Rimuovi suffissi tipo USDMM, MM ecc.
+    for suf in ['USDMM','EURMM','MM','B','bn']:
+        s = s.replace(suf,'').strip()
     if s in ['-','','N/A','nm',chr(8212)]: return None
+    # Gestisci formato europeo: punto=migliaia, virgola=decimale
+    # es. "691.603,06" -> 691603.06, "9,99" -> 9.99
+    if ',' in s and '.' in s:
+        # Formato con entrambi: punto migliaia, virgola decimale
+        s = s.replace('.','').replace(',','.')
+    elif ',' in s:
+        # Solo virgola: potrebbe essere decimale europeo
+        # Se c'e' solo una virgola e max 2 cifre dopo -> decimale
+        parts = s.split(',')
+        if len(parts) == 2 and len(parts[1]) <= 2:
+            s = s.replace(',','.')
+        else:
+            s = s.replace(',','')
     try:
         f = float(s)
         if math.isnan(f) or math.isinf(f): return None
