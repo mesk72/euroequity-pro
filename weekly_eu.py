@@ -284,13 +284,13 @@ def calc_ranks(group):
     val_sums = [sum(x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None)
                 for p in pre if len([x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None])>=2]
     gr_sums  = [sum(x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None)
-                for p in pre if len([x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None])>=2]
+                for p in pre if len([x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None])>=3]
     results = []
     for p in pre:
         val_inputs = [x for x in [p["r_eyt"],p["r_eyf"],p["r_pb"]] if x is not None]
         gr_inputs  = [x for x in [p["r_epsg"],p["r_revg"],p["r_m6"],p["r_m12"]] if x is not None]
         value_score  = int(round(pct_rank(val_sums, sum(val_inputs)))) if len(val_inputs)>=2 and val_sums else None
-        growth_score = int(round(pct_rank(gr_sums,  sum(gr_inputs))))  if len(gr_inputs)>=2 and gr_sums  else None
+        growth_score = int(round(pct_rank(gr_sums,  sum(gr_inputs))))  if len(gr_inputs)>=3 and gr_sums  else None
         results.append({"ticker":p["ticker"],"exchange":p["exchange"],
                         "value_score":value_score,"growth_score":growth_score,
                         "rank_pe_ltm":p["r_eyt"],"rank_pe_ntm":p["r_eyf"],"rank_pb":p["r_pb"],
