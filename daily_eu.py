@@ -196,6 +196,8 @@ for stock in all_stocks:
                          "change1d": chg1d, "price": last_px})
     ok += 1
 
+# Salva copia prima del pop — serve per mom_maps dopo
+mom_updates_copy = [dict(u) for u in mom_updates]
 for upd in mom_updates:
     ticker   = upd.pop("ticker")
     exchange = upd.pop("exchange")
@@ -203,6 +205,7 @@ for upd in mom_updates:
         headers=headers_up,
         params={"ticker": f"eq.{ticker}", "exchange": f"eq.{exchange}"},
         json=upd)
+mom_updates = mom_updates_copy  # ripristina con ticker/exchange
 print("  Momentum ok=" + str(ok) + " fail=" + str(fail))
 ok_momentum = ok
 
