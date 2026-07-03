@@ -154,6 +154,8 @@ print(f"  Prezzi caricati: {len(all_ph)} titoli")
 print("\n[4/5] Calcolo momentum...")
 ok = fail = 0
 mom_updates = []
+SPLIT_THRESHOLD_PCT = 20
+split_suspects = []
 for stock in all_stocks:
     ticker = stock["ticker"]; exchange = stock["exchange"]
     data = all_ph.get((ticker, exchange), [])
@@ -161,6 +163,8 @@ for stock in all_stocks:
     last_px   = data[0]["close"]
     last_date = datetime.strptime(data[0]["date"], "%Y-%m-%d")
     chg1d = round((data[0]["close"] / data[1]["close"] - 1) * 100, 4)
+    if abs(chg1d) > SPLIT_THRESHOLD_PCT:
+        split_suspects.append((ticker, exchange, chg1d))
 
     def mom_cal(days):
         target  = last_date - timedelta(days=days)
@@ -175,6 +179,56 @@ for stock in all_stocks:
                          "change1d": chg1d, "price": last_px})
     ok += 1
 
+# Se un titolo varia di oltre SPLIT_THRESHOLD_PCT in un giorno, probabile
+# stock split non segnalato da Leeway: ricarica tutto lo storico a 5 anni.
+if split_suspects:
+    print(f"\n  Rilevati {len(split_suspects)} possibili stock split (variazione 1gg > {SPLIT_THRESHOLD_PCT}%): ricarico 5 anni di storico...")
+    FROM_5Y = (datetime.now() - timedelta(days=365*5)).strftime("%Y-%m-%d")
+    mom_by_key = {(u["ticker"], u["exchange"]): u for u in mom_updates}
+    for ticker, exchange, old_chg in split_suspects:
+        lt = leeway_ticker(ticker, exchange)
+        url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5Y + "&to=" + TODAY
+        try:
+            resp = requests.get(url, timeout=20)
+            data_l = resp.json() if resp.status_code == 200 else []
+            if not isinstance(data_l, list) or not data_l:
+                print(f"    {ticker}.{exchange}: nessun dato storico da Leeway (variazione era {old_chg}%), salto")
+                continue
+            requests.delete(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up,
+                params={"ticker": f"eq.{ticker}", "exchange": f"eq.{exchange}"})
+            new_rows = []
+            for row2 in data_l:
+                adj = row2.get("adjusted_close") or row2.get("close")
+                if adj is None: continue
+                new_rows.append({"ticker": ticker, "exchange": exchange,
+                                  "date": row2["date"], "adj_close": float(adj)})
+            for i in range(0, len(new_rows), 500):
+                requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=new_rows[i:i+500])
+            new_sorted = sorted(new_rows, key=lambda x: x["date"], reverse=True)
+            if len(new_sorted) >= 2:
+                last_px2   = new_sorted[0]["adj_close"]
+                last_date2 = datetime.strptime(new_sorted[0]["date"], "%Y-%m-%d")
+                new_chg1d  = round((new_sorted[0]["adj_close"] / new_sorted[1]["adj_close"] - 1) * 100, 4)
+
+                def mom_cal2(days):
+                    target  = last_date2 - timedelta(days=days)
+                    closest = min(new_sorted, key=lambda x: abs((datetime.strptime(x["date"], "%Y-%m-%d") - target).days))
+                    if closest["adj_close"] and closest["adj_close"] != 0:
+                        return round(last_px2 / closest["adj_close"] - 1, 6)
+                    return None
+
+                key = (ticker, exchange)
+                if key in mom_by_key:
+                    mom_by_key[key].update({
+                        "mom1w": mom_cal2(7), "mom1m": mom_cal2(31),
+                        "mom6m": mom_cal2(182), "mom12m": mom_cal2(365),
+                        "change1d": new_chg1d, "price": last_px2,
+                    })
+                print(f"    {ticker}.{exchange}: ricaricato ({len(new_rows)} righe), variazione ricalcolata {new_chg1d}%")
+        except Exception as e:
+            print(f"    {ticker}.{exchange}: errore ricarica — {e}")
+        time.sleep(0.3)
+
 for i in range(0, len(mom_updates), 100):
     requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
 print(f"  Momentum ok={ok} fail={fail}")
@@ -184,14 +238,18 @@ ok_momentum = ok
 print("\n[5/5] Ricalcolo rank APAC...")
 all_data = []
 offset = 0
+# in_universe vive in stocks non in fundamentals — usa universe_keys
+# (stesso fix già applicato in daily_eu.py e daily_us.py)
+universe_keys = {(s["ticker"], s["exchange"]) for s in all_stocks}
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
         params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
-                "exchange": "in.(TSE,SEHK,ASX)", "in_universe": "eq.true",
+                "exchange": "in.(TSE,SEHK,ASX)",
                 "offset": str(offset), "limit": "1000"})
     data = r.json()
     if not isinstance(data, list) or not data: break
-    all_data.extend(data); offset += 1000
+    all_data.extend([d for d in data if (d["ticker"], d["exchange"]) in universe_keys])
+    offset += 1000
     if len(data) < 1000: break
 print(f"  Fundamentals: {len(all_data)}")
 
