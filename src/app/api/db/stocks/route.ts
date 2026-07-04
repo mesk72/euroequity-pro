@@ -29,6 +29,7 @@ async function fetchAllByExchange(table: string, select: string, exchangeList: s
         .eq('exchange', exchange)
       if (universeOnly) query = query.eq('in_universe', true)
       const { data, error } = await query
+        .order('ticker', { ascending: true })
         .range(from, from + PAGE - 1)
         .limit(PAGE)
       if (error || !data || data.length === 0) break
@@ -49,6 +50,7 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
       .from(table)
       .select(select)
       .in('exchange', exchangeList)
+      .order('ticker', { ascending: true })
       .range(from, from + PAGE - 1)
       .limit(PAGE)
     if (error || !data || data.length === 0) break
