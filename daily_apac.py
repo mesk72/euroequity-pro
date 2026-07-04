@@ -80,11 +80,17 @@ price_buf = []
 for stock in all_stocks:
     ticker   = stock["ticker"]
     exchange = stock["exchange"]
-    r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-        params={"select": "date", "ticker": "eq." + ticker,
-                "exchange": "eq." + exchange, "order": "date.desc", "limit": "1"})
-    row = r.json()
-    last = row[0]["date"] if isinstance(row, list) and row else "2021-01-01"
+    try:
+        r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+            params={"select": "date", "ticker": "eq." + ticker,
+                    "exchange": "eq." + exchange, "order": "date.desc", "limit": "1"},
+            timeout=15)
+        row = r.json()
+        last = row[0]["date"] if isinstance(row, list) and row else "2021-01-01"
+    except Exception as e:
+        print(f"  WARN lettura ultima data {ticker}.{exchange}: {e}")
+        fail_leeway += 1
+        continue
     if last >= TODAY:
         ok_leeway += 1
         continue
