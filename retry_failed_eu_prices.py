@@ -96,54 +96,69 @@ print(f"\n[3/3] Ritento il download per {len(senza_prezzi)} titoli, con motivo e
 esiti = {}  # motivo -> count
 ok = 0
 for ticker, exchange, old_count in senza_prezzi:
-    lt = leeway_ticker(ticker, exchange)
-    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
-    try:
-        resp = requests.get(url, timeout=20)
-    except Exception as e:
-        motivo = f"eccezione rete: {type(e).__name__}"
-        esiti[motivo] = esiti.get(motivo, 0) + 1
-        print(f"    {ticker}.{exchange} (leeway={lt}): {motivo}")
-        continue
+    # Per la Germania, se .XETRA non trova nulla, ritenta con .F (confermato
+    # funzionante da verifica manuale su Leeway per i titoli minori/meno liquidi)
+    candidati = [leeway_ticker(ticker, exchange)]
+    if exchange == "XETRA":
+        candidati.append(ticker.rstrip(".") + ".F")
 
-    if resp.status_code != 200:
-        motivo = f"HTTP {resp.status_code}"
-        esiti[motivo] = esiti.get(motivo, 0) + 1
-        print(f"    {ticker}.{exchange} (leeway={lt}): {motivo} — {resp.text[:120]}")
-        continue
+    trovato = False
+    for tentativo, lt in enumerate(candidati):
+        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
+        try:
+            resp = requests.get(url, timeout=20)
+        except Exception as e:
+            motivo = f"eccezione rete: {type(e).__name__}"
+            if tentativo == len(candidati) - 1:
+                esiti[motivo] = esiti.get(motivo, 0) + 1
+                print(f"    {ticker}.{exchange} (leeway={lt}): {motivo}")
+            continue
 
-    try:
-        data_l = resp.json()
-    except Exception:
-        motivo = "risposta non JSON"
-        esiti[motivo] = esiti.get(motivo, 0) + 1
-        print(f"    {ticker}.{exchange} (leeway={lt}): {motivo} — {resp.text[:120]}")
-        continue
+        if resp.status_code != 200:
+            motivo = f"HTTP {resp.status_code}"
+            if tentativo == len(candidati) - 1:
+                esiti[motivo] = esiti.get(motivo, 0) + 1
+                print(f"    {ticker}.{exchange} (leeway={lt}): {motivo} — {resp.text[:120]}")
+            continue
 
-    if not isinstance(data_l, list) or not data_l:
-        motivo = "risposta vuota (ticker non trovato su Leeway con questo formato)"
-        esiti[motivo] = esiti.get(motivo, 0) + 1
-        print(f"    {ticker}.{exchange} (leeway={lt}): {motivo}")
-        continue
+        try:
+            data_l = resp.json()
+        except Exception:
+            motivo = "risposta non JSON"
+            if tentativo == len(candidati) - 1:
+                esiti[motivo] = esiti.get(motivo, 0) + 1
+                print(f"    {ticker}.{exchange} (leeway={lt}): {motivo} — {resp.text[:120]}")
+            continue
 
-    rows = []
-    for row in data_l:
-        adj = row.get("adjusted_close") or row.get("close")
-        if adj is None: continue
-        rows.append({"ticker": ticker, "exchange": exchange,
-                      "date": row["date"], "adj_close": float(adj)})
-    if not rows:
-        motivo = "righe ricevute ma tutte senza prezzo valido"
-        esiti[motivo] = esiti.get(motivo, 0) + 1
-        print(f"    {ticker}.{exchange} (leeway={lt}): {motivo}")
-        continue
+        if not isinstance(data_l, list) or not data_l:
+            motivo = "risposta vuota (ticker non trovato su Leeway con questo formato)"
+            if tentativo == len(candidati) - 1:
+                esiti[motivo] = esiti.get(motivo, 0) + 1
+                print(f"    {ticker}.{exchange} (leeway={lt}): {motivo}")
+            continue
 
-    requests.delete(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up,
-        params={"ticker": f"eq.{ticker}", "exchange": f"eq.{exchange}"})
-    for j in range(0, len(rows), 500):
-        requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=rows[j:j+500])
-    ok += 1
-    print(f"    {ticker}.{exchange} (leeway={lt}): OK, {len(rows)} righe salvate")
+        rows = []
+        for row in data_l:
+            adj = row.get("adjusted_close") or row.get("close")
+            if adj is None: continue
+            rows.append({"ticker": ticker, "exchange": exchange,
+                          "date": row["date"], "adj_close": float(adj)})
+        if not rows:
+            motivo = "righe ricevute ma tutte senza prezzo valido"
+            if tentativo == len(candidati) - 1:
+                esiti[motivo] = esiti.get(motivo, 0) + 1
+                print(f"    {ticker}.{exchange} (leeway={lt}): {motivo}")
+            continue
+
+        requests.delete(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up,
+            params={"ticker": f"eq.{ticker}", "exchange": f"eq.{exchange}"})
+        for j in range(0, len(rows), 500):
+            requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=rows[j:j+500])
+        ok += 1
+        suffisso_usato = lt.split(".")[-1]
+        print(f"    {ticker}.{exchange} (leeway={lt}): OK ({suffisso_usato}), {len(rows)} righe salvate")
+        trovato = True
+        break
     time.sleep(0.4)
 
 print("\n" + "=" * 60)
