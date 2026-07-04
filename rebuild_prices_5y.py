@@ -136,14 +136,22 @@ for i, stock in enumerate(all_stocks):
     lt = leeway_ticker(ticker, exchange)
     url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
     resp = safe_get(url)
-    if resp is None or resp.status_code != 200:
-        fail += 1
-        continue
-    try:
-        data_l = resp.json()
-    except Exception:
-        fail += 1
-        continue
+    data_l = None
+    if resp is not None and resp.status_code == 200:
+        try:
+            data_l = resp.json()
+        except Exception:
+            data_l = None
+    # Fallback Germania: .XETRA a volte non trova titoli minori, .F spesso si
+    if (not isinstance(data_l, list) or not data_l) and exchange == "XETRA":
+        lt = ticker.rstrip(".") + ".F"
+        url2 = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
+        resp = safe_get(url2)
+        if resp is not None and resp.status_code == 200:
+            try:
+                data_l = resp.json()
+            except Exception:
+                data_l = None
     if not isinstance(data_l, list) or not data_l:
         fail += 1
         continue
