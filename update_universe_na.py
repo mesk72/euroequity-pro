@@ -88,7 +88,9 @@ r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_na_latest.
 print(f"TIKR NA: HTTP {r.status_code} — {len(r.text.splitlines())} righe")
 
 reader = csv.DictReader(io.StringIO(r.text))
+print(f"Colonne nel CSV: {reader.fieldnames}")
 tikr_by_exchange = {"US":{}, "TSX":{}}
+mktcap_col_usata = None
 
 for row in reader:
     ticker  = row.get("Ticker","").strip()
@@ -96,13 +98,21 @@ for row in reader:
     exchange = EX_MAP.get(ex_raw)
     if not exchange or exchange not in tikr_by_exchange: continue
     company = row.get("Company Name","").strip()
-    mktcap  = parse_mktcap(row.get("Last Mkt Cap",""))
+    mktcap_raw = None
+    for col in ("Last Mkt Cap", "Market Cap", "Mkt Cap", "MarketCap", "Last Market Cap"):
+        if row.get(col):
+            mktcap_raw = row.get(col)
+            if mktcap_col_usata is None:
+                mktcap_col_usata = col
+            break
+    mktcap  = parse_mktcap(mktcap_raw)
     sector  = row.get("Sector","").strip()
     country = row.get("Country","").strip()
     tikr_by_exchange[exchange][ticker] = {
         "company":company,"mkt_cap":mktcap,
         "sector":sector,"country":country,"ex_raw":ex_raw
     }
+print(f"Colonna market cap trovata e usata: {mktcap_col_usata}")
 
 print(f"US nel TIKR: {len(tikr_by_exchange['US'])}")
 print(f"TSX nel TIKR: {len(tikr_by_exchange['TSX'])}")
