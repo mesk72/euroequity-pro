@@ -107,6 +107,7 @@ r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_apac_lates
 print(f"TIKR APAC: HTTP {r.status_code} — {len(r.text.splitlines())} righe")
 
 reader = csv.DictReader(io.StringIO(r.text))
+print(f"Colonne nel CSV: {reader.fieldnames}")
 tikr_by_exchange = {ex: {} for ex in EXCHANGE_CRITERIA}
 for row in reader:
     ex_raw  = row.get("Primary Exchange","").strip()
@@ -117,7 +118,7 @@ for row in reader:
     ticker = raw_ticker.lstrip("0") if exchange == "SEHK" else raw_ticker
     if not ticker: continue
     company = row.get("Company Name","").strip()
-    mktcap  = parse_mktcap(row.get("Last Mkt Cap","") or row.get("Market Cap","") or row.get("Mkt Cap",""))
+    mktcap  = parse_mktcap(row.get("Last Mkt Cap","") or row.get("Market Cap","") or row.get("Mkt Cap","") or row.get("MarketCap","") or row.get("Last Market Cap",""))
     sector  = row.get("Sector","").strip()
     country = row.get("Country","").strip()
     tikr_by_exchange[exchange][ticker] = {
