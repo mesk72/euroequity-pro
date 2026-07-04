@@ -89,8 +89,15 @@ def is_excluded(company):
 
 def parse_mktcap(v):
     if not v: return None
-    s = str(v).replace("USDMM","").replace("MM","").strip()
-    s = s.replace(".","").replace(",",".")
+    s = str(v).strip()
+    s = s.replace("$","").strip()
+    for suf in ("USDMM","EURMM","MM"):
+        s = s.replace(suf,"")
+    s = s.strip()
+    if not s or s in ("-","N/A","nm"): return None
+    # Formato osservato nel file TIKR: es. "$337,855.12MM"
+    # virgola = separatore migliaia, punto = decimale (formato americano)
+    s = s.replace(",","")
     try:
         f = float(s)
         return f if f > 0 and not math.isnan(f) else None
