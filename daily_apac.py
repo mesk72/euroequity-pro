@@ -1,7 +1,7 @@
 # ============================================================
 # FORWARDALPHA — DAILY APAC LOAD
 # Da eseguire ogni giorno alle 09:00 CET (dopo chiusura Asia)
-# Copre: TSE (Giappone), SEHK (Hong Kong), ASX (Australia)
+# Copre: TSE (Giappone), SEHK (Hong Kong), ASX (Australia), KRX (Corea), SGX (Singapore)
 # ============================================================
 
 import os, math, time, time as time_module, requests
@@ -44,6 +44,10 @@ def leeway_ticker(ticker, exchange):
         return ticker.zfill(4) + ".HK" # es. 0700.HK
     elif exchange == "ASX":
         return ticker + ".AU"          # es. BHP.AU
+    elif exchange == "KRX":
+        return ticker.lstrip("A") + ".KO"  # es. 005930.KO (Samsung)
+    elif exchange == "SGX":
+        return ticker + ".SG"          # es. D05.SG
     return ticker
 
 start_time = time_module.time()
@@ -58,7 +62,7 @@ offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
         params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
-                "exchange": "in.(TSE,SEHK,ASX)",
+                "exchange": "in.(TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
     try: data = r.json()
@@ -250,7 +254,7 @@ universe_keys = {(s["ticker"], s["exchange"]) for s in all_stocks}
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
         params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
-                "exchange": "in.(TSE,SEHK,ASX)",
+                "exchange": "in.(TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     data = r.json()
     if not isinstance(data, list) or not data: break
@@ -265,7 +269,7 @@ mom1m_map  = {(d["ticker"], d["exchange"]): d.get("mom1m")  for d in mom_updates
 mom6m_map  = {(d["ticker"], d["exchange"]): d.get("mom6m")  for d in mom_updates}
 mom12m_map = {(d["ticker"], d["exchange"]): d.get("mom12m") for d in mom_updates}
 
-RANK_GROUPS = {"JPN": ["TSE"], "HKG": ["SEHK"], "AUS": ["ASX"]}
+RANK_GROUPS = {"JPN": ["TSE"], "HKG": ["SEHK"], "AUS": ["ASX"], "KOR": ["KRX"], "SGP": ["SGX"]}
 
 def calc_ranks(group):
     ey_trail_g = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
@@ -336,7 +340,7 @@ for upd in rank_updates:
     if r.status_code in (200, 201, 204): ok += 1
 print(f"  Rank APAC: {ok}/{len(rank_updates)}")
 
-# Combined rank AP = TSE+SEHK+ASX
+# Combined rank AP = TSE+SEHK+ASX+KRX+SGX
 all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
 sum_arr    = [d["value_score"] + d["growth_score"] for d in all_scores]
 combined_updates = [{"ticker": d["ticker"], "exchange": d["exchange"],
