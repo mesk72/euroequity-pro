@@ -1,12 +1,53 @@
-import os, requests, csv, io, math
+import os, requests, csv, io, math, time
+from datetime import datetime, timedelta
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "resolution=ignore-duplicates,return=minimal"}
+
+SPECIAL_TICKERS = {
+    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
+    "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
+}
+LEEWAY_SUFFIX = {
+    "XETRA": ".XETRA", "PA":   ".PA",
+    "AS":    ".AS",    "MC":    ".MC",     "BR":   ".BR",
+    "LS":    ".LS",    "VI":    ".VI",     "HE":   ".HE",
+    "IR":    ".IR",    "GR":    ".AT",
+    "SWX":   ".SW",    "OM":    ".ST",     "OB":   ".OL",
+    "CPSE":  ".CO",
+}
+
+def leeway_ticker(ticker, exchange):
+    if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
+    if exchange in ("CPSE", "OM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
+    if exchange == "BR": return ticker.replace(".", "") + ".BR"
+    return ticker.rstrip(".") + LEEWAY_SUFFIX.get(exchange, "")
+
+def ha_prezzo_su_leeway(ticker, exchange):
+    """Verifica leggera (30gg). Per la Germania ritenta con .F se .XETRA fallisce."""
+    to_d = datetime.now().strftime("%Y-%m-%d")
+    from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+    candidati_lt = [leeway_ticker(ticker, exchange)]
+    if exchange == "XETRA":
+        candidati_lt.append(ticker.rstrip(".") + ".F")
+    for lt in candidati_lt:
+        try:
+            url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+            resp = requests.get(url, timeout=15)
+            if resp.status_code == 200:
+                data = resp.json()
+                if isinstance(data, list) and data:
+                    return True
+        except Exception:
+            continue
+    return False
 
 EX_MAP = {
     # Italia
@@ -161,19 +202,32 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
         offset += 1000
         if len(batch)<1000: break
 
-    # Calcola eligible
-    eligible = []
+    # Calcola candidati — escludi ETF/fondi e sotto-soglia, ordina per mkt_cap
+    candidati = []
     for t, info in tikr.items():
         mc = info["mkt_cap"] or 0
         if is_excluded(info["company"]): continue
         if min_cap and mc < min_cap: continue
-        eligible.append((t, mc))
+        candidati.append((t, mc))
+    candidati.sort(key=lambda x: x[1], reverse=True)
 
-    eligible.sort(key=lambda x: x[1], reverse=True)
-    if top_n:
-        eligible = eligible[:top_n]
+    # Verifica Leeway in ordine di mkt_cap decrescente. Per i mercati a
+    # soglia (top_n=None) filtra tutti i candidati; per i mercati top-N
+    # si ferma al target, scartando chi non ha prezzo e passando
+    # automaticamente al prossimo per mkt_cap (backfill).
+    eligible = []
+    esclusi_no_leeway = []
+    for t, mc in candidati:
+        if top_n and len(eligible) >= top_n: break
+        if ha_prezzo_su_leeway(t, exchange):
+            eligible.append((t, mc))
+        else:
+            esclusi_no_leeway.append(t)
+        time.sleep(0.1)
 
     eligible_tickers = [t for t,mc in eligible]
+    if esclusi_no_leeway:
+        print(f"  {exchange:<8} scartati senza prezzo Leeway: {len(esclusi_no_leeway)}")
 
     # Inserisci nuovi titoli
     new_stocks = []
@@ -210,20 +264,29 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
         params={"exchange":f"eq.{exchange}"},
         json={"in_universe": False})
 
-    # Set in_universe=true per eligible
-    ok = fail = 0
-    for t in eligible_tickers:
+    # Set in_universe=true A BLOCCHI (non un titolo alla volta)
+    ok = 0
+    CHUNK = 100
+    for i in range(0, len(eligible_tickers), CHUNK):
+        chunk = eligible_tickers[i:i+CHUNK]
         r2 = requests.patch(f"{SUPABASE_URL}/rest/v1/stocks",
             headers=headers_up,
-            params={"ticker":f"eq.{t}","exchange":f"eq.{exchange}"},
+            params={"ticker": "in.(" + ",".join(chunk) + ")", "exchange": f"eq.{exchange}"},
             json={"in_universe": True})
-        if r2.status_code in (200,204): ok += 1
-        else: fail += 1
+        if r2.status_code in (200, 204):
+            ok += len(chunk)
+        else:
+            print(f"  FAIL blocco in_universe {exchange} {i}: {r2.status_code} {r2.text[:120]}")
 
     total_eu += ok
-    print(f"  {exchange:<8} eligible={len(eligible_tickers):>5} in_universe=true={ok} fail={fail}")
+    print(f"  {exchange:<8} eligible={len(eligible_tickers):>5} in_universe=true={ok}")
 
-# Aggiungi MIL e LSE al totale
-total_eu += 115 + 424
+# Ricontrolla dal DB MIL/LSE invece di un totale scritto a mano
+for ex_mil_lse in ("MIL", "LSE"):
+    r_check = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers={**headers_r, "Prefer": "count=exact"},
+        params={"select": "ticker", "exchange": f"eq.{ex_mil_lse}", "in_universe": "eq.true", "limit": "1"})
+    count = int(r_check.headers.get("content-range", "0/0").split("/")[-1])
+    total_eu += count
+    print(f"  {ex_mil_lse:<8} in_universe attuale (da DB): {count}")
+
 print(f"\n=== TOTALE EU IN UNIVERSE: {total_eu} ===")
-print("(inclusi MIL=115 e LSE=424 già aggiornati)")
