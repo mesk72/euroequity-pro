@@ -1,0 +1,30 @@
+name: Rebuild Prices 5Y (one-off)
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'Regione da ricostruire'
+        required: true
+        type: choice
+        options:
+          - EU
+          - US
+          - APAC
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Rebuild 5Y
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+          REGION: ${{ inputs.region }}
+        run: python rebuild_prices_5y.py
