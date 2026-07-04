@@ -1,12 +1,35 @@
-import os, requests, csv, io, math
+import os, requests, csv, io, math, time
+from datetime import datetime, timedelta
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "resolution=ignore-duplicates,return=minimal"}
+
+def leeway_ticker(ticker, exchange):
+    if exchange == "KRX": return ticker.lstrip("A") + ".KO"
+    if exchange == "SGX": return ticker + ".SG"
+    return ticker
+
+def ha_prezzo_su_leeway(ticker, exchange):
+    to_d = datetime.now().strftime("%Y-%m-%d")
+    from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+    lt = leeway_ticker(ticker, exchange)
+    try:
+        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+        resp = requests.get(url, timeout=15)
+        if resp.status_code == 200:
+            data = resp.json()
+            if isinstance(data, list) and data:
+                return True
+    except Exception:
+        pass
+    return False
 
 # Mapping exchange raw → ForwardAlpha
 EX_MAP = {
@@ -103,22 +126,34 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
     print(f"--- {exchange} ---")
     print(f"  Nel DB: {len(stocks_db)}")
 
-    # Calcola eligible
-    eligible = []
+    # Calcola candidati — escludi ETF/fondi, ordina per mkt_cap
+    candidati = []
     excl_count = 0
     for t, info in tikr.items():
         mc = info["mkt_cap"] or 0
         if is_excluded(info["company"]):
             excl_count += 1
             continue
-        eligible.append((t, mc))
-
-    eligible.sort(key=lambda x: x[1], reverse=True)
-    eligible = eligible[:top_n]
-    eligible_tickers = [t for t,mc in eligible]
+        candidati.append((t, mc))
+    candidati.sort(key=lambda x: x[1], reverse=True)
 
     print(f"  Nel TIKR: {len(tikr)} — esclusi ETF/indici: {excl_count}")
-    print(f"  Eligible top {top_n}: {len(eligible)}")
+    print(f"  Verifico presenza su Leeway (target {top_n})...")
+
+    eligible = []
+    esclusi_no_leeway = []
+    for t, mc in candidati:
+        if len(eligible) >= top_n: break
+        if ha_prezzo_su_leeway(t, exchange):
+            eligible.append((t, mc))
+        else:
+            esclusi_no_leeway.append(t)
+        time.sleep(0.1)
+    eligible_tickers = [t for t,mc in eligible]
+
+    print(f"  Eligible top {top_n} CON prezzo Leeway: {len(eligible)}")
+    if esclusi_no_leeway:
+        print(f"  Scartati senza prezzo Leeway: {len(esclusi_no_leeway)}")
 
     # Inserisci nuovi titoli
     new_stocks = []
@@ -160,18 +195,22 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
         params={"exchange":f"eq.{exchange}"},
         json={"in_universe": False})
 
-    # Set in_universe=true
-    ok = fail = 0
-    for t in eligible_tickers:
+    # Set in_universe=true A BLOCCHI
+    ok = 0
+    CHUNK = 100
+    for i in range(0, len(eligible_tickers), CHUNK):
+        chunk = eligible_tickers[i:i+CHUNK]
         r2 = requests.patch(f"{SUPABASE_URL}/rest/v1/stocks",
             headers=headers_up,
-            params={"ticker":f"eq.{t}","exchange":f"eq.{exchange}"},
+            params={"ticker": "in.(" + ",".join(chunk) + ")", "exchange": f"eq.{exchange}"},
             json={"in_universe": True})
-        if r2.status_code in (200,204): ok += 1
-        else: fail += 1
+        if r2.status_code in (200, 204):
+            ok += len(chunk)
+        else:
+            print(f"  FAIL blocco {i}: {r2.status_code} {r2.text[:120]}")
 
     total += ok
-    print(f"  in_universe=true: {ok} fail={fail}")
+    print(f"  in_universe=true: {ok}/{len(eligible_tickers)}")
     print()
 
 print(f"=== TOTALE KRX+SGX IN UNIVERSE: {total} ===")
