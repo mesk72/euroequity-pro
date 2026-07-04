@@ -131,6 +131,11 @@ for stock in all_stocks:
                 if lt2 != lt:
                     resp2 = requests.get(LEEWAY_BASE + "/historicalquotes/" + lt2 + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY, timeout=15)
                     data_l = resp2.json() if resp2.status_code == 200 else []
+        # Fallback Germania: .XETRA a volte non trova titoli minori, .F spesso si
+        if (not isinstance(data_l, list) or not data_l) and exchange == "XETRA":
+            lt3 = ticker.rstrip(".") + ".F"
+            resp3 = requests.get(LEEWAY_BASE + "/historicalquotes/" + lt3 + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY, timeout=15)
+            data_l = resp3.json() if resp3.status_code == 200 else []
         if not isinstance(data_l, list) or not data_l: fail_leeway += 1; continue
         for row2 in data_l:
             adj = row2.get("adjusted_close") or row2.get("close")
@@ -220,6 +225,10 @@ if split_suspects:
         try:
             resp = requests.get(url, timeout=20)
             data_l = resp.json() if resp.status_code == 200 else []
+            if (not isinstance(data_l, list) or not data_l) and exchange == "XETRA":
+                lt = ticker.rstrip(".") + ".F"
+                resp = requests.get(LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5Y + "&to=" + TODAY, timeout=20)
+                data_l = resp.json() if resp.status_code == 200 else []
             if not isinstance(data_l, list) or not data_l:
                 print(f"    {ticker}.{exchange}: nessun dato storico da Leeway (variazione era {old_chg}%), salto")
                 continue
