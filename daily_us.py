@@ -100,12 +100,16 @@ all_stocks = []
 for exchange in ['US', 'TSX']:
     offset = 0
     while True:
-        r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
-                    "exchange": f"eq.{exchange}", "offset": str(offset), "limit": "1000"})
-        if not r.text or r.text == "[]": break
-        try: data = r.json()
-        except: break
+        try:
+            r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+                params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
+                        "exchange": f"eq.{exchange}", "offset": str(offset), "limit": "1000"},
+                timeout=20)
+            if not r.text or r.text == "[]": break
+            data = r.json()
+        except Exception as e:
+            print(f"  WARN lettura universo {exchange} offset {offset}: {e}")
+            break
         if not data: break
         all_stocks.extend(data)
         offset += 1000
@@ -121,6 +125,18 @@ for ex, tks in by_exchange.items():
 # ── 2. SCARICA PREZZI EOD DA LEEWAY → prices_eod ────────────
 print("\n[2/5] Download prezzi EOD da Leeway...")
 CHUNK = 20
+
+def safe_post(url, headers, json_data, retries=2):
+    """POST con retry: una connessione persa non deve far crashare tutto lo script."""
+    for attempt in range(retries + 1):
+        try:
+            return requests.post(url, headers=headers, json=json_data, timeout=30)
+        except Exception as e:
+            if attempt < retries:
+                time.sleep(2 * (attempt + 1))
+                continue
+            print(f"  WARN salvataggio fallito dopo {retries+1} tentativi: {e}")
+            return None
 
 # Leggi ultima data prezzi
 ok_leeway = fail_leeway = 0
@@ -162,11 +178,11 @@ for stock in all_stocks:
         ok_leeway += 1
     except: fail_leeway += 1
     if len(price_buf) >= 500:
-        requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+        safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
         price_buf = []
     time.sleep(0.5)
 if price_buf:
-    requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+    safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
 # ── 3. LEGGI PREZZI DA prices_eod (chunk 20) ────────────────
@@ -178,14 +194,19 @@ for exchange, tickers in by_exchange.items():
         offset_p = 0
         from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
         while True:
-            rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-                params={"select": "ticker,date,adj_close",
-                        "exchange": f"eq.{exchange}",
-                        "ticker": f"in.({','.join(chunk)})",
-                        "date": f"gte.{from_400d}",
-                        "order": "ticker,date.desc",
-                        "limit": "1000", "offset": str(offset_p)})
-            batch = rp.json()
+            try:
+                rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+                    params={"select": "ticker,date,adj_close",
+                            "exchange": f"eq.{exchange}",
+                            "ticker": f"in.({','.join(chunk)})",
+                            "date": f"gte.{from_400d}",
+                            "order": "ticker,date.desc",
+                            "limit": "1000", "offset": str(offset_p)},
+                    timeout=20)
+                batch = rp.json()
+            except Exception as e:
+                print(f"  WARN lettura prezzi chunk {exchange} offset {offset_p}: {e}")
+                break
             if not isinstance(batch, list) or not batch: break
             for d in batch:
                 if d['adj_close'] is not None:
@@ -278,7 +299,7 @@ if split_suspects:
         time.sleep(0.3)
 
 for i in range(0, len(mom_updates), 100):
-    requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
+    safe_post(SUPABASE_URL + "/rest/v1/fundamentals", headers_up, mom_updates[i:i+100])
 print(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
@@ -289,11 +310,16 @@ offset = 0
 # in_universe vive in stocks non in fundamentals — usa universe_keys
 universe_keys = {(s["ticker"], s["exchange"]) for s in all_stocks}
 while True:
-    r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
-        params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
-                "exchange": "in.(US,TSX)",
-                "offset": str(offset), "limit": "1000"})
-    data = r.json()
+    try:
+        r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
+            params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
+                    "exchange": "in.(US,TSX)",
+                    "offset": str(offset), "limit": "1000"},
+            timeout=20)
+        data = r.json()
+    except Exception as e:
+        print(f"  WARN lettura fundamentals per rank offset {offset}: {e}")
+        break
     if not isinstance(data, list) or not data: break
     all_data.extend([d for d in data if (d["ticker"], d["exchange"]) in universe_keys])
     offset += 1000
@@ -373,18 +399,24 @@ for country, exchanges in RANK_GROUPS.items():
 ok = 0
 for upd in rank_updates:
     body = {k: v for k, v in upd.items() if k not in ("ticker", "exchange")}
-    r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{upd['ticker']}", "exchange": f"eq.{upd['exchange']}"},
-        json=body)
-    if r.status_code in (200, 201, 204): ok += 1
+    try:
+        r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
+            headers=headers_up,
+            params={"ticker": f"eq.{upd['ticker']}", "exchange": f"eq.{upd['exchange']}"},
+            json=body, timeout=20)
+        if r.status_code in (200, 201, 204): ok += 1
+    except Exception as e:
+        print(f"  WARN PATCH rank {upd['ticker']}.{upd['exchange']}: {e}")
 print(f"  Rank US+CA: {ok}/{len(rank_updates)}")
 
 # Combined rank NA = US+TSX insieme
-requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-    headers={**headers_up, "Prefer": "return=minimal"},
-    params={"exchange": "in.(US,TSX)"},
-    json={"combined_rank": None})
+try:
+    requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
+        headers={**headers_up, "Prefer": "return=minimal"},
+        params={"exchange": "in.(US,TSX)"},
+        json={"combined_rank": None}, timeout=30)
+except Exception as e:
+    print(f"  WARN reset combined_rank: {e}")
 all_scores = [d for d in rank_updates if d.get('value_score') is not None and d.get('growth_score') is not None]
 comb_arr   = [d['value_score'] + d['growth_score'] for d in all_scores]
 combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
@@ -392,12 +424,15 @@ combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
                     for d in all_scores]
 ok = 0
 for upd in combined_updates:
-    _t = upd.pop("ticker"); _e = upd.pop("exchange")
-    r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
-        json=upd)
-    if r.status_code in (200, 201, 204): ok += 1
+    body = {k: v for k, v in upd.items() if k not in ("ticker", "exchange")}
+    try:
+        r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
+            headers=headers_up,
+            params={"ticker": f"eq.{upd['ticker']}", "exchange": f"eq.{upd['exchange']}"},
+            json=body, timeout=20)
+        if r.status_code in (200, 201, 204): ok += 1
+    except Exception as e:
+        print(f"  WARN PATCH combined {upd['ticker']}.{upd['exchange']}: {e}")
 print(f"  Combined rank NA (US+TSX): {ok}/{len(combined_updates)}")
 ok_rank = ok
 
@@ -443,7 +478,10 @@ log_entry = {"run_date": TODAY, "market": "US+CA", "prices_updated": ok_prices,
              "prices_failed": fail_prices, "last_price_date": TODAY,
              "momentum_updated": ok_momentum, "rank_updated": ok_rank,
              "duration_seconds": int(end_time - start_time)}
-requests.post(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_up, json=[log_entry])
+try:
+    requests.post(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_up, json=[log_entry], timeout=15)
+except Exception as e:
+    print(f"  WARN salvataggio daily_log: {e}")
 print(f"\nLog: leeway={ok_prices} fail={fail_prices} momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
 print("\n" + "=" * 60)
 print("DAILY US+CA LOAD COMPLETATO")
