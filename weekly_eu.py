@@ -117,7 +117,10 @@ def get_fy_month(ticker, exchange):
     return fy_map.get((ticker, exchange), 12)
 
 def calendarize(ticker, exchange, fy2025, fy2026, fy2027, fy2028, today_dt):
-    """Calendarizzazione DINAMICA — mai hardcoded"""
+    """Calendarizzazione DINAMICA — mai hardcoded.
+    Se il pub_date del ciclo piu' recente non e' ancora arrivato (entro i 60
+    giorni dopo la chiusura), resta sul ciclo precedente invece di saltare
+    in avanti a stime piu' lontane — elimina la discontinuita' 'not_yet'."""
     if fy2025 is None and fy2026 is None: return None, None, True
     fm = get_fy_month(ticker, exchange)
     last_day = 28 if fm == 2 else 30 if fm in [4,6,9,11] else 31
@@ -126,7 +129,9 @@ def calendarize(ticker, exchange, fy2025, fy2026, fy2027, fy2028, today_dt):
         fy_end = datetime(today_dt.year - 1, fm, last_day)
     pub_date = fy_end + timedelta(days=60)
     if pub_date > today_dt:
-        return None, None, True  # not_yet → usa fy2027/fy2028
+        # Non ancora "pubblicato": resta sul ciclo precedente (ancora non spostata)
+        fy_end = datetime(fy_end.year - 1, fm, last_day)
+        pub_date = fy_end + timedelta(days=60)
     # Determina fy0/fy1/fy2 dinamicamente da fy_end.year
     if fy_end.year >= 2026:
         v0, v1, v2 = fy2026, fy2027, fy2028
