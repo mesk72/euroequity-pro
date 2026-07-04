@@ -1,12 +1,42 @@
-import os, requests, csv, io, math
+import os, requests, csv, io, math, time
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "resolution=ignore-duplicates,return=minimal"}
+
+LEEWAY_SUFFIX = {"MIL": ".MI", "LSE": ".LSE"}
+
+def leeway_ticker(ticker, exchange):
+    ticker_clean = ticker.rstrip(".")
+    lt = ticker_clean + LEEWAY_SUFFIX.get(exchange, "")
+    if exchange == "MIL":
+        return lt, [ticker_clean + ".F"]  # nessun fallback noto per MIL al momento
+    return lt, []
+
+def ha_prezzo_su_leeway(ticker, exchange):
+    """Verifica leggera: chiede solo gli ultimi 30 giorni, ci basta sapere
+    se Leeway conosce questo ticker, non serve lo storico completo qui."""
+    from datetime import datetime, timedelta
+    to_d = datetime.now().strftime("%Y-%m-%d")
+    from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+    lt_principale, fallback_list = leeway_ticker(ticker, exchange)
+    for lt in [lt_principale] + fallback_list:
+        try:
+            url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+            resp = requests.get(url, timeout=15)
+            if resp.status_code == 200:
+                data = resp.json()
+                if isinstance(data, list) and data:
+                    return True, lt
+        except Exception:
+            continue
+    return False, None
 
 EX_MAP = {"BIT":"MIL","LSE":"LSE"}
 
@@ -87,13 +117,27 @@ for exchange in ["MIL","LSE"]:
 
     # Calcola eligible
     eligible = []
+    esclusi_no_leeway = []
+    candidati = []
     for t, info in tikr[exchange].items():
         mc = info["mkt_cap"] or 0
         if is_excluded(info["company"]): continue
         if mc < 400: continue
-        eligible.append(t)
+        candidati.append(t)
 
-    print(f"  Eligible (>=400M non esclusi): {len(eligible)}")
+    print(f"  Candidati (>=400M non esclusi): {len(candidati)}")
+    print(f"  Verifico presenza su Leeway per ciascuno...")
+    for t in candidati:
+        trovato, lt_usato = ha_prezzo_su_leeway(t, exchange)
+        if trovato:
+            eligible.append(t)
+        else:
+            esclusi_no_leeway.append(t)
+        time.sleep(0.15)
+
+    print(f"  Eligible (>=400M, non esclusi, CON prezzo su Leeway): {len(eligible)}")
+    if esclusi_no_leeway:
+        print(f"  Esclusi perche' senza prezzo su Leeway ({len(esclusi_no_leeway)}): {esclusi_no_leeway}")
 
     # Inserisci nuovi titoli mancanti
     new_stocks = []
@@ -136,17 +180,24 @@ for exchange in ["MIL","LSE"]:
         json={"in_universe": False})
     print(f"  Reset in_universe=false: HTTP {r2.status_code}")
 
-    # Set in_universe=true per eligible
-    ok = fail = 0
-    for t in eligible:
+    # Set in_universe=true A BLOCCHI (non un titolo alla volta): una PATCH
+    # con filtro ticker=in.(...) aggiorna centinaia di righe in una sola
+    # chiamata, molto più affidabile delle PATCH singole.
+    ok = 0
+    CHUNK = 100
+    for i in range(0, len(eligible), CHUNK):
+        chunk = eligible[i:i+CHUNK]
         r2 = requests.patch(f"{SUPABASE_URL}/rest/v1/stocks",
             headers=headers_up,
-            params={"ticker":f"eq.{t}","exchange":f"eq.{exchange}"},
+            params={"ticker": "in.(" + ",".join(chunk) + ")", "exchange": f"eq.{exchange}"},
             json={"in_universe": True})
-        if r2.status_code in (200,204): ok += 1
-        else: fail += 1
-    print(f"  in_universe=true: ok={ok} fail={fail}")
+        if r2.status_code in (200, 204):
+            ok += len(chunk)
+        else:
+            print(f"  FAIL blocco in_universe {i}: {r2.status_code} {r2.text[:150]}")
+    print(f"  in_universe=true: ok={ok}/{len(eligible)}")
     print()
 
 print("=== DONE ===")
-print("Verifica: MIL dovrebbe avere 115, LSE 424")
+print("Nota: MIL/LSE potrebbero risultare leggermente sotto 115/424 se")
+print("qualche titolo e' stato escluso per assenza di prezzo su Leeway.")
