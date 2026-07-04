@@ -1346,3 +1346,111 @@ EXCLUDE_SECTORS = ["71","72","73","74","75","76","77"]
 | check_prices_quality.yml | manuale | Verifica qualità prezzi |
 | check_yahoo_tickers.yml | manuale | Verifica yahoo_ticker nel DB |
 | fetch_news_cache.yml | `0 * * * *` | Ogni ora |
+
+---
+
+## BUG CRITICI RISOLTI E CONFERMATI (04/07/2026)
+
+Tutti i punti seguenti sono stati verificati con evidenza concreta (run riusciti,
+numeri confermati via debug script, o output di log reale) — non solo pushati.
+
+### 1. daily_apac.py — errore di sintassi che bloccava tutto
+Riga 337: `print("=" * 60)SPECIAL_TICKERS = {` — due istruzioni incollate senza
+a capo, più un blocco di codice morto europeo (LEEWAY_SUFFIX/leeway_ticker EU)
+appiccicato per errore in fondo al file APAC. Lo script non partiva mai.
+**Confermato:** dopo il fix lo step "Run APAC daily load" è passato da un
+crash istantaneo a un'esecuzione reale e completa.
+
+### 2. daily_apac.py — bug "pop poi riuso" nel calcolo combined_rank
+Il codice faceva `upd.pop("ticker")` per salvare value_score/growth_score,
+poi riusava lo stesso `rank_updates` (ormai svuotato di ticker/exchange) per
+calcolare il combined_rank → KeyError silenzioso/crash a seconda dei dati.
+Fix: costruisce un `body` separato per la PATCH, non muta il dizionario
+originale. **Stesso identico bug trovato e fixato anche in:**
+`daily_eu.py`, `daily_us.py`, `daily_test_mil.py`.
+**Confermato:** run APAC completo end-to-end (incluso lo stage rank/combined),
+e l'utente ha verificato sul sito che i punteggi Growth/Best di titoli APAC
+(es. 9984 SoftBank, 941 China Mobile, 7203 Toyota) cambiano davvero da un
+caricamento all'altro — prima restavano sempre fermi.
+
+### 3. daily_apac.py — filtro `in_universe` fasullo su `fundamentals`
+`in_universe` vive nella tabella `stocks`, non in `fundamentals`. La query
+`fundamentals?in_universe=eq.true` tornava sempre vuota, azzerando il
+rank APAC ogni volta. Fix: costruisce `universe_keys` da `stocks` e filtra
+in Python. Stesso bug e stesso fix già noto per EU (vedi regola già in
+questo documento) — qui applicato anche a APAC.
+
+### 4. Rilevamento stock split (nuovo, soglia 20%)
+Aggiunto a `daily_eu.py`, `daily_us.py`, `daily_apac.py`: se un titolo varia
+di oltre il 20% in un giorno, il titolo viene marcato "sospetto split" e
+lo script ricarica tutti i 5 anni di storico da Leeway per quel solo titolo,
+ricalcolando il momentum sulla serie corretta invece che su dati pre-split
+disallineati.
+**Confermato da log reale:** run APAC ha rilevato 2 casi (2670.SEHK,
+variazione -23,52%; PXA.ASX, variazione -21,29%) e ricaricato con successo
+173 e 1265 righe rispettivamente.
+
+### 5. update_universe_na.py — PATCH individuali → aggiornamento a blocchi
+Il flag `in_universe=true` veniva impostato con 2000 chiamate PATCH separate,
+una per titolo, senza retry — bastava un timeout su una sola chiamata per
+perdere quel titolo silenziosamente (causa dello storico US=1917 invece di
+2000). Fix: PATCH con filtro `ticker=in.(...)` a blocchi da 150 titoli.
+**Confermato via debug_universe.py:** `US: in_universe=2000`,
+`TSX: in_universe=400` — numeri esatti attesi.
+
+### 6. update_universe_apac_jhk.py — nuovo script (prima non esisteva)
+Giappone/Hong Kong/Australia non avevano MAI avuto uno script di ricostruzione
+universo con filtro ETF/fondi: l'universo era statico dal primo caricamento
+manuale, senza mai escludere fondi, senza inserire titoli nuovi, senza mai
+aggiornare `in_universe`. Creato script dedicato (stesso schema di
+`update_universe_krx_sgx.py`, target fissi TSE=1000/SEHK=500/ASX=350,
+aggiornamento `in_universe` a blocchi da subito, non uno a uno).
+**Confermato:** eseguito con successo, tutti gli step verdi.
+
+### 7. tikr_na_latest.csv — confermato struttura corretta
+Verificato via `debug_universe.py`: il file contiene sia US (2499 righe)
+sia TSX/Canada (500 righe) insieme, come da restructuring. Nessuna azione
+necessaria — il file caricato manualmente su Supabase Storage (non più via
+Colab) è strutturato correttamente.
+
+---
+
+## APPLICATI IL 04/07/2026 — CODICE CORRETTO MA NON ANCORA VERIFICATO END-TO-END
+
+Elenco separato apposta: questi fix sono stati scritti, verificati per
+sintassi e pushati, ma non hanno ancora avuto un run completo confermato
+con dati reali dopo la modifica. Da verificare prima di considerarli definitivi.
+
+- `daily_us.py`: fix graffe doppie, uso corretto di `leeway_ticker()` per
+  ticker canadesi, protezione try/except+timeout su tutte le chiamate di
+  rete rimaste (causa del crash con `ConnectionResetError` dell'84 minuti).
+  Ultimo run lanciato dopo il fix è stato cancellato su richiesta esplicita
+  (priorità al rebuild EU), non ancora rilanciato a completamento.
+- `weekly_us.py`: fix filtro `in_universe` fasullo su momentum/fondamentali
+  (stesso bug di EU/APAC), protezione rete completa. **Mai eseguito nemmeno
+  una volta da quando esiste** — nessuna conferma possibile finché non gira.
+- `weekly_eu.py`: protezione rete completa, rimozione mappatura errata
+  AIM→LSE e NGM→OM (mercati alternativi da escludere, non fondere nel
+  mercato principale). Non ancora verificato con un run successivo alla modifica.
+- `weekly_apac.py`: protezione rete completa. Include già da tempo i gruppi
+  Corea (KOR/KRX) e Singapore (SGP/SGX), mai eseguito con questi due mercati.
+- `update_universe_eu_all.py`: stessa rimozione AIM/NGM. Script già in
+  produzione (girato con successo prima del fix) — va rilanciato per
+  ripulire eventuale contaminazione residua di titoli AIM/NGM nell'universo.
+- `daily_eu.py`: aggiunto suffisso Leeway mancante per la Grecia (`GR`→`.AT`,
+  prima assente del tutto, i prezzi greci non venivano mai scaricati).
+- `route.ts` (frontend): aggiunto `order('ticker')` esplicito nella
+  paginazione di `fetchAll`/`fetchAllByExchange` — senza ordinamento
+  esplicito, le query multi-mercato (es. Asia Pacific = 3+ mercati insieme)
+  potevano perdere righe tra una pagina e l'altra. Non ancora confermato
+  dal sito live dopo il deploy.
+- `rebuild_prices_5y.py`: nuovo script one-off generico (parametrizzato per
+  regione EU/US/APAC) per cancellare e riscaricare da zero 5 anni di storico
+  Leeway, dopo contaminazione dati Yahoo/Leeway mescolati. Rebuild Europa
+  lanciato e in corso al momento di scrivere questa nota — esito non ancora noto.
+- `colab_upload_once.py`: **non modificato** (è un template che l'utente non
+  usa più, ha confermato di caricare i file manualmente su Supabase Storage).
+  Segnalato per cronaca: contiene ancora logica che esclude TSX dal file NA,
+  ormai superata dal restructuring Canada — irrilevante dato che non viene
+  più usato.
+
