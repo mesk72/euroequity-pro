@@ -1,13 +1,13 @@
 # ============================================================
 # FORWARDALPHA — WEEKLY APAC LOAD
 # Da eseguire ogni domenica alle 10:00 CET
-# Copre: TSE (Giappone), SEHK (Hong Kong), ASX (Australia)
+# Copre: TSE (Giappone), SEHK (Hong Kong), ASX (Australia), KRX (Corea), SGX (Singapore)
 # REGOLE: FORWARDALPHA_CONTEXT.md
 # - CSV TIKR: tikr_apac_latest.csv in Supabase storage
 # - SEHK ticker: lstrip('0') prima del match
 # - calendarizzazione dinamica
 # - book_yield = 1/pb
-# - combined AP = TSE+SEHK+ASX
+# - combined AP = TSE+SEHK+ASX+KRX+SGX
 # - TSX (Canada) = combined con US nel weekly_us
 # ============================================================
 
@@ -28,10 +28,12 @@ EX_MAP_APAC = {
     "TSE": "TSE", "TYO": "TSE", "XTKS": "TSE",
     "SEHK": "SEHK", "HKG": "SEHK", "XHKG": "SEHK",
     "ASX": "ASX", "XASX": "ASX",
+    "KOSE": "KRX", "KOSDAQ": "KRX",
+    "SGX": "SGX", "Catalist": "SGX", "NSE": "SGX", "SPSE": "SGX", "NSX": "SGX", "XKON": "SGX",
     # TSX/Canada escluso — Canada va nel weekly_us con tikr_us_latest.csv
 }
 
-TARGETS = {"TSE": 1000, "SEHK": 500, "ASX": 350}
+TARGETS = {"TSE": 1000, "SEHK": 500, "ASX": 350, "KRX": 400, "SGX": 100}
 # TSX non incluso — Canada rankato con US nel weekly_us
 
 def parse_num(v):
@@ -121,8 +123,8 @@ def calendarize(ticker, exchange, fy2025, fy2026, fy2027, fy2028, today_dt):
 
 # ── LEGGE STOCKS DAL DB (per match ticker) ───────────────────
 print("\n Legge stocks APAC dal DB...")
-stocks_tickers = {"TSE": set(), "SEHK": set(), "ASX": set()}
-for exchange in ["TSE", "SEHK", "ASX"]:
+stocks_tickers = {"TSE": set(), "SEHK": set(), "ASX": set(), "KRX": set(), "SGX": set()}
+for exchange in ["TSE", "SEHK", "ASX", "KRX", "SGX"]:
     offset = 0
     while True:
         r = requests.get(SUPABASE_URL+"/rest/v1/stocks", headers=headers_r,
@@ -190,6 +192,9 @@ try:
 except Exception as e:
     print(f" Errore TIKR APAC: {e}"); exit()
 
+# Set delle coppie (ticker, exchange) effettivamente in universo per questo run
+universe_keys = {(r["ticker"], r["exchange"]) for r in tikr_rows}
+
 # ── FONDAMENTALI ─────────────────────────────────────────────
 print("\n Calcola fondamentali...")
 fund_updates = []
@@ -230,11 +235,12 @@ offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,rank_mom6_adj,rank_mom12_adj",
-                "exchange":"in.(TSE,SEHK,ASX)","in_universe":"eq.true",
+                "exchange":"in.(TSE,SEHK,ASX,KRX,SGX)",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
     if not isinstance(data, list) or not data: break
     for d in data:
+        if (d["ticker"],d["exchange"]) not in universe_keys: continue
         mom_rank_map[(d["ticker"],d["exchange"])] = {
             "r_m6": d.get("rank_mom6_adj"), "r_m12": d.get("rank_mom12_adj")}
     offset += 1000
@@ -247,16 +253,17 @@ offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth",
-                "exchange":"in.(TSE,SEHK,ASX)","in_universe":"eq.true",
+                "exchange":"in.(TSE,SEHK,ASX,KRX,SGX)",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
     if not isinstance(data, list) or not data: break
-    all_data.extend(data); offset += 1000
+    all_data.extend([d for d in data if (d["ticker"],d["exchange"]) in universe_keys])
+    offset += 1000
     if len(data) < 1000: break
 print(f" Fondamentali DB: {len(all_data)}")
 
 # ── RANK PER PAESE ───────────────────────────────────────────
-APAC_GROUPS = {"JPN": ["TSE"], "HKG": ["SEHK"], "AUS": ["ASX"]}
+APAC_GROUPS = {"JPN": ["TSE"], "HKG": ["SEHK"], "AUS": ["ASX"], "KOR": ["KRX"], "SGP": ["SGX"]}
 
 def calc_ranks(group):
     ey_trail_g = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
@@ -307,7 +314,7 @@ for i in range(0, len(rank_updates), 100):
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print(f" Rank APAC paese: {ok}/{len(rank_updates)}")
 
-# ── COMBINED APAC = TSE+SEHK+ASX ────────────────────────────
+# ── COMBINED APAC = TSE+SEHK+ASX+KRX+SGX ────────────────────
 # combined_rank NON azzerato — aggiorna direttamente con merge-duplicates
 all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
 comb_arr   = [d["value_score"]+d["growth_score"] for d in all_scores]
@@ -318,7 +325,7 @@ ok = 0
 for i in range(0, len(combined_updates), 100):
     r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
-print(f" Combined APAC (TSE+SEHK+ASX): {ok}/{len(combined_updates)}")
+print(f" Combined APAC (TSE+SEHK+ASX+KRX+SGX): {ok}/{len(combined_updates)}")
 
 end_time = time_module.time()
 print(f"\nWeekly APAC completato in {int(end_time-start_time)}s")
