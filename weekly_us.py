@@ -204,17 +204,34 @@ for i in range(0, len(fund_updates), 100):
     if r.status_code in (200, 201, 204): ok += len(fund_updates[i:i+100])
 print(f" Fondamentali: {ok}/{len(fund_updates)}")
 
+# ── UNIVERSE_KEYS DA STOCKS (in_universe vive li', non in fundamentals) ──
+universe_keys = set()
+for exchange in ("US", "TSX"):
+    offset = 0
+    while True:
+        res = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+            params={"select": "ticker,exchange", "in_universe": "eq.true",
+                    "exchange": f"eq.{exchange}", "offset": str(offset), "limit": "1000"})
+        data = res.json()
+        if not isinstance(data, list) or not data: break
+        for d in data:
+            universe_keys.add((d["ticker"], d["exchange"]))
+        offset += 1000
+        if len(data) < 1000: break
+print(f" Universe keys (stocks): {len(universe_keys)}")
+
 # ── MOMENTUM DAL DB (US+TSX) ─────────────────────────────────
 mom_rank_map = {}
 offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,rank_mom6_adj,rank_mom12_adj",
-                "exchange":"in.(US,TSX)","in_universe":"eq.true",
+                "exchange":"in.(US,TSX)",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
     if not isinstance(data, list) or not data: break
     for d in data:
+        if (d["ticker"], d["exchange"]) not in universe_keys: continue
         mom_rank_map[(d["ticker"],d["exchange"])] = {
             "r_m6": d.get("rank_mom6_adj"), "r_m12": d.get("rank_mom12_adj")}
     offset += 1000
@@ -227,11 +244,12 @@ offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth",
-                "exchange":"in.(US,TSX)","in_universe":"eq.true",
+                "exchange":"in.(US,TSX)",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
     if not isinstance(data, list) or not data: break
-    all_data.extend(data); offset += 1000
+    all_data.extend([d for d in data if (d["ticker"], d["exchange"]) in universe_keys])
+    offset += 1000
     if len(data) < 1000: break
 print(f" Fondamentali DB: {len(all_data)}")
 
