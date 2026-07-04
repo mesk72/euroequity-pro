@@ -773,7 +773,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (combinedMin > 0 && (s.combinedRank || 0)       < combinedMin) return false
     // Escludi mercati senza rank dai Best screens
     if ((valMin > 0 || growMin > 0 || combinedMin > 0) &&
-        ['GR','VI','LS','IR','GR'].includes(s.exchange)) return false
+        ['VI','LS','IR'].includes(s.exchange)) return false
     return true
   })
 
@@ -800,6 +800,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           { code: 'VI',            label: '🇦🇹 Austria' },
           { code: 'HE',            label: '🇫🇮 Finland' },
           { code: 'IR',            label: '🇮🇪 Ireland' },
+          { code: 'GR',            label: '🇬🇷 Greece' },
           { code: 'LSE',           label: '🇬🇧 UK (LSE)' },
           { code: 'SWX',           label: '🇨🇭 Switzerland' },
           { code: 'OM',            label: '🇸🇪 Sweden' },
@@ -2217,6 +2218,7 @@ function AppContent() {
     { id: 'HE' as Page, label: '🇫🇮 Finland' },
     { id: 'PA' as Page, label: '🇫🇷 France' },
     { id: 'XETRA' as Page, label: '🇩🇪 Germany' },
+    { id: 'GR' as Page, label: '🇬🇷 Greece' },
     { id: 'SEHK' as Page, label: '🇭🇰 Hong Kong' },
     { id: 'IR' as Page, label: '🇮🇪 Ireland' },
     { id: 'MIL' as Page, label: '🇮🇹 Italy' },
