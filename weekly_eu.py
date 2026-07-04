@@ -26,7 +26,9 @@ EX_MAP = {
     "WBAG":"VI","ISE":"IR","DB":"XETRA","DUSE":"XETRA",
     "MUN":"XETRA","BRSE":"SWX","HMSE":"XETRA","XSAT":"OM","OTCNO":"OB",
     "ATSE":"GR","XATH":"GR","ATH":"GR","BDM":"MC","OM":"OM","OB":"OB","LSE":"LSE",
-    "CPSE":"CPSE","SWX":"SWX","NGM":"OM",
+    "CPSE":"CPSE","SWX":"SWX",
+    # NGM e AIM non vanno mappati: sono mercati alternativi da escludere
+    # del tutto dall'universo, non da fondere dentro OM/LSE.
 }
 
 RANK_GROUPS = {
