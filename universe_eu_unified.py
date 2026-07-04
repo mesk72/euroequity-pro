@@ -165,20 +165,31 @@ r = requests.get(f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_eu_latest.
 print(f"TIKR EU: HTTP {r.status_code} — {len(r.text.splitlines())} righe")
 
 reader = csv.DictReader(io.StringIO(r.text))
+print(f"Colonne nel CSV: {reader.fieldnames}")
 tikr_by_exchange = {ex: {} for ex in EXCHANGE_CRITERIA}
+mktcap_col_usata = None
 for row in reader:
     ticker  = row.get("Ticker","").strip()
     ex_raw  = row.get("Primary Exchange","").strip()
     exchange = EX_MAP.get(ex_raw)
     if not exchange or exchange not in tikr_by_exchange: continue
     company = row.get("Company Name","").strip()
-    mktcap  = parse_mktcap(row.get("Last Mkt Cap",""))
+    # Prova più nomi possibili per la colonna market cap (il file puo' cambiare formato)
+    mktcap_raw = None
+    for col in ("Last Mkt Cap", "Market Cap", "Mkt Cap", "MarketCap", "Last Market Cap"):
+        if row.get(col):
+            mktcap_raw = row.get(col)
+            if mktcap_col_usata is None:
+                mktcap_col_usata = col
+            break
+    mktcap  = parse_mktcap(mktcap_raw)
     country = row.get("Country","").strip()
     sector  = row.get("Sector","").strip()
     tikr_by_exchange[exchange][ticker] = {
         "company":company,"mkt_cap":mktcap,
         "country":country,"sector":sector,"ex_raw":ex_raw
     }
+print(f"Colonna market cap trovata e usata: {mktcap_col_usata}")
 
 print()
 total_eu = 0
