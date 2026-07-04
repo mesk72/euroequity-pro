@@ -162,18 +162,25 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
         params={"exchange":f"eq.{exchange}"},
         json={"in_universe": False})
 
-    # Set in_universe=true per eligible
-    ok = fail = 0
-    for t in eligible_tickers:
+    # Set in_universe=true A BLOCCHI (non un titolo alla volta): una PATCH
+    # con filtro ticker=in.(...) aggiorna centinaia di righe in una sola
+    # chiamata, molto più affidabile delle PATCH singole che causavano
+    # US=1917 invece di 2000 per richieste individuali fallite in silenzio.
+    ok = 0
+    CHUNK = 150
+    for i in range(0, len(eligible_tickers), CHUNK):
+        chunk = eligible_tickers[i:i+CHUNK]
         r2 = requests.patch(f"{SUPABASE_URL}/rest/v1/stocks",
             headers=headers_up,
-            params={"ticker":f"eq.{t}","exchange":f"eq.{exchange}"},
+            params={"ticker": "in.(" + ",".join(chunk) + ")", "exchange": f"eq.{exchange}"},
             json={"in_universe": True})
-        if r2.status_code in (200,204): ok += 1
-        else: fail += 1
+        if r2.status_code in (200, 204):
+            ok += len(chunk)
+        else:
+            print(f"  FAIL blocco in_universe {i}: {r2.status_code} {r2.text[:150]}")
 
     total_na += ok
-    print(f"  in_universe=true: {ok} fail={fail}")
+    print(f"  in_universe=true: {ok}/{len(eligible_tickers)}")
     print()
 
 print(f"=== TOTALE NA IN UNIVERSE: {total_na} ===")
