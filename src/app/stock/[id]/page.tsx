@@ -215,7 +215,6 @@ export default function StockPage() {
   const [ticker, exchangeCode] = id.split('-')
 
   const [stock, setStock] = useState<any>(null)
-  const [showFullDesc, setShowFullDesc] = useState(false)
   const [loadingStock, setLoadingStock] = useState(true)
 
   useEffect(() => {
@@ -477,29 +476,23 @@ export default function StockPage() {
           )
         })()}
 
-        {(stock as any).description && (
+        {(stock as any).yahooTicker && (
           <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
             borderRadius:4, padding:'16px 20px', marginBottom:12 }}>
             <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
               letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
               About the Company
             </div>
-            <div style={{
-              fontSize:12, color:'var(--text3)', lineHeight:1.75, textAlign:'justify',
-              overflow: showFullDesc ? 'visible' : 'hidden',
-              display: showFullDesc ? 'block' : '-webkit-box',
-              WebkitLineClamp: showFullDesc ? 'unset' : 4,
-              WebkitBoxOrient: 'vertical'
-            }}>
-              {(stock as any).description}
+            <div style={{ fontSize:12, color:'var(--text3)', lineHeight:1.6, marginBottom:10 }}>
+              Full business description and company profile available on Yahoo Finance.
             </div>
-            {(stock as any).description.length > 300 && (
-              <button onClick={() => setShowFullDesc(!showFullDesc)}
-                style={{ fontSize:11, color:'var(--orange)', background:'none', border:'none',
-                  cursor:'pointer', padding:'4px 0', marginTop:4 }}>
-                {showFullDesc ? 'Show less ▲' : 'Read more ▼'}
-              </button>
-            )}
+            <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/profile`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed',
+                fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3,
+                textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+              📄 View Company Profile on Yahoo Finance ↗
+            </a>
           </div>
         )}
 
