@@ -322,11 +322,11 @@ for country, exchanges in RANK_GROUPS.items():
 
 ok = 0
 for upd in rank_updates:
-    _t = upd.pop("ticker"); _e = upd.pop("exchange")
+    body = {k: v for k, v in upd.items() if k not in ("ticker", "exchange")}
     r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
         headers=headers_up,
-        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
-        json=upd)
+        params={"ticker": f"eq.{upd['ticker']}", "exchange": f"eq.{upd['exchange']}"},
+        json=body)
     if r.status_code in (200, 201, 204): ok += 1
 print(f"  Rank APAC: {ok}/{len(rank_updates)}")
 
