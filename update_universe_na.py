@@ -1,12 +1,36 @@
-import os, requests, csv, io, math
+import os, requests, csv, io, math, time
+from datetime import datetime, timedelta
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
+LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "resolution=ignore-duplicates,return=minimal"}
+
+def leeway_ticker(ticker, exchange):
+    if exchange == "TSX":
+        return ticker.replace(".", "-") + ".TO"
+    return ticker.rstrip(".") + ".US"
+
+def ha_prezzo_su_leeway(ticker, exchange):
+    """Verifica leggera (30gg) — ci basta sapere se Leeway conosce il ticker."""
+    to_d = datetime.now().strftime("%Y-%m-%d")
+    from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+    lt = leeway_ticker(ticker, exchange)
+    try:
+        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+        resp = requests.get(url, timeout=15)
+        if resp.status_code == 200:
+            data = resp.json()
+            if isinstance(data, list) and data:
+                return True
+    except Exception:
+        pass
+    return False
 
 EX_MAP = {
     "NasdaqGS":"US","NYSE":"US","NasdaqCM":"US","AMEX":"US",
@@ -106,20 +130,36 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
     print(f"--- {exchange} ---")
     print(f"  Nel DB: {len(stocks_db)}")
 
-    # Calcola eligible — escludi ETF/fondi poi ordina per mkt_cap
-    eligible = []
+    # Calcola candidati — escludi ETF/fondi, ordina per mkt_cap
+    candidati = []
     for t, info in tikr.items():
         mc = info["mkt_cap"] or 0
         if is_excluded(info["company"]): continue
-        eligible.append((t, mc))
-
-    eligible.sort(key=lambda x: x[1], reverse=True)
-    eligible = eligible[:top_n]
-    eligible_tickers = [t for t,mc in eligible]
+        candidati.append((t, mc))
+    candidati.sort(key=lambda x: x[1], reverse=True)
 
     excl_count = len(tikr) - len([t for t in tikr if not is_excluded(tikr[t]["company"])])
     print(f"  Nel TIKR: {len(tikr)} — esclusi ETF/fondi: {excl_count}")
-    print(f"  Eligible top {top_n}: {len(eligible)}")
+
+    # Verifica Leeway in ordine di mkt_cap decrescente: se un candidato non
+    # ha prezzo, si scarta e si passa al prossimo per mkt_cap — backfill
+    # automatico, il conteggio finale resta sempre top_n (se ci sono
+    # abbastanza candidati con prezzo disponibile).
+    print(f"  Verifico presenza su Leeway (target {top_n})...")
+    eligible = []
+    esclusi_no_leeway = []
+    for t, mc in candidati:
+        if len(eligible) >= top_n: break
+        if ha_prezzo_su_leeway(t, exchange):
+            eligible.append((t, mc))
+        else:
+            esclusi_no_leeway.append(t)
+        time.sleep(0.1)
+    eligible_tickers = [t for t, mc in eligible]
+
+    print(f"  Eligible top {top_n} CON prezzo Leeway: {len(eligible)}")
+    if esclusi_no_leeway:
+        print(f"  Scartati per mancanza prezzo Leeway: {len(esclusi_no_leeway)} (es. {esclusi_no_leeway[:10]})")
 
     # Inserisci nuovi titoli
     new_stocks = []
