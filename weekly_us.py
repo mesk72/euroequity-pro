@@ -200,8 +200,11 @@ for r in tikr_rows:
     })
 ok = 0
 for i in range(0, len(fund_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=fund_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(fund_updates[i:i+100])
+    try:
+        r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=fund_updates[i:i+100], timeout=30)
+        if r.status_code in (200, 201, 204): ok += len(fund_updates[i:i+100])
+    except Exception as e:
+        print(f" WARN salvataggio fondamentali batch {i}: {e}")
 print(f" Fondamentali: {ok}/{len(fund_updates)}")
 
 # ── UNIVERSE_KEYS DA STOCKS (in_universe vive li', non in fundamentals) ──
@@ -209,10 +212,13 @@ universe_keys = set()
 for exchange in ("US", "TSX"):
     offset = 0
     while True:
-        res = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker,exchange", "in_universe": "eq.true",
-                    "exchange": f"eq.{exchange}", "offset": str(offset), "limit": "1000"})
-        data = res.json()
+        try:
+            res = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+                params={"select": "ticker,exchange", "in_universe": "eq.true",
+                        "exchange": f"eq.{exchange}", "offset": str(offset), "limit": "1000"}, timeout=20)
+            data = res.json()
+        except Exception as e:
+            print(f" WARN lettura stocks {exchange}: {e}"); break
         if not isinstance(data, list) or not data: break
         for d in data:
             universe_keys.add((d["ticker"], d["exchange"]))
@@ -224,11 +230,14 @@ print(f" Universe keys (stocks): {len(universe_keys)}")
 mom_rank_map = {}
 offset = 0
 while True:
-    res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,rank_mom6_adj,rank_mom12_adj",
-                "exchange":"in.(US,TSX)",
-                "offset":str(offset),"limit":"1000"})
-    data = res.json()
+    try:
+        res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
+            params={"select":"ticker,exchange,rank_mom6_adj,rank_mom12_adj",
+                    "exchange":"in.(US,TSX)",
+                    "offset":str(offset),"limit":"1000"}, timeout=20)
+        data = res.json()
+    except Exception as e:
+        print(f" WARN lettura momentum: {e}"); break
     if not isinstance(data, list) or not data: break
     for d in data:
         if (d["ticker"], d["exchange"]) not in universe_keys: continue
@@ -242,11 +251,14 @@ print(f" Momentum: {len(mom_rank_map)}")
 all_data = []
 offset = 0
 while True:
-    res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth",
-                "exchange":"in.(US,TSX)",
-                "offset":str(offset),"limit":"1000"})
-    data = res.json()
+    try:
+        res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
+            params={"select":"ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth",
+                    "exchange":"in.(US,TSX)",
+                    "offset":str(offset),"limit":"1000"}, timeout=20)
+        data = res.json()
+    except Exception as e:
+        print(f" WARN lettura fondamentali: {e}"); break
     if not isinstance(data, list) or not data: break
     all_data.extend([d for d in data if (d["ticker"], d["exchange"]) in universe_keys])
     offset += 1000
@@ -301,8 +313,11 @@ for country, exchanges in RANK_GROUPS.items():
 
 ok = 0
 for i in range(0, len(rank_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
+    try:
+        r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100], timeout=30)
+        if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
+    except Exception as e:
+        print(f" WARN salvataggio rank batch {i}: {e}")
 print(f" Rank US+CA: {ok}/{len(rank_updates)}")
 
 # ── COMBINED NA = US+TSX ─────────────────────────────────────
@@ -314,8 +329,11 @@ combined_updates = [{"ticker":d["ticker"],"exchange":d["exchange"],
                     for d in all_scores]
 ok = 0
 for i in range(0, len(combined_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
+    try:
+        r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100], timeout=30)
+        if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
+    except Exception as e:
+        print(f" WARN salvataggio combined batch {i}: {e}")
 print(f" Combined NA (US+TSX): {ok}/{len(combined_updates)}")
 
 end_time = time_module.time()
