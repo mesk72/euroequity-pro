@@ -11,14 +11,14 @@ headers_ins = {**headers_r, "Content-Type": "application/json",
 EX_MAP = {
     # Italia
     "BIT":"MIL",
-    # UK
-    "LSE":"LSE","AIM":"LSE",
+    # UK (AIM escluso: mercato alternativo, non va fuso con LSE)
+    "LSE":"LSE",
     # Germania
     "XTRA":"XETRA","HMSE":"XETRA","DB":"XETRA","MUN":"XETRA","DUSE":"XETRA",
     # Francia
     "ENXTPA":"PA",
-    # Svezia
-    "OM":"OM","XSAT":"OM","NGM":"OM",
+    # Svezia (NGM escluso: mercato alternativo, non va fuso con OM)
+    "OM":"OM","XSAT":"OM",
     # Svizzera
     "SWX":"SWX","BRSE":"SWX",
     # Olanda
