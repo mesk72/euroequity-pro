@@ -20,7 +20,6 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       stock.combinedRank != null ? `Best Score ${stock.combinedRank}.` : '',
       stock.peTrail != null ? `P/E ${stock.peTrail.toFixed(1)}x.` : '',
       stock.pb != null ? `P/B ${stock.pb.toFixed(2)}x.` : '',
-      stock.description ? stock.description.slice(0, 120) + '...' : '',
       'ForwardAlpha quantitative equity research.',
     ].filter(Boolean).join(' ')
 
