@@ -48,7 +48,7 @@ LEEWAY_SUFFIX = {
     "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
     "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
     "LS":   ".LS",    "VI":    ".VI",     "HE":   ".HE",
-    "IR":   ".IR",    "AT":    ".VI",
+    "IR":   ".IR",    "AT":    ".VI",     "GR":   ".AT",
     "LSE":  ".LSE",   "AIM":   ".AIM",   "SWX":  ".SW",
     "OM":   ".ST",    "NGM":   ".ST",    "OB":   ".OL",
     "CPSE": ".CO",
