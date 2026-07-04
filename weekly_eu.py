@@ -25,7 +25,7 @@ EX_MAP = {
     "ENXTBR":"BR","ENXTLS":"LS","BME":"MC","HLSE":"HE",
     "WBAG":"VI","ISE":"IR","DB":"XETRA","DUSE":"XETRA",
     "MUN":"XETRA","BRSE":"SWX","HMSE":"XETRA","XSAT":"OM","OTCNO":"OB",
-    "ATSE":"GR","BDM":"MC","OM":"OM","OB":"OB","LSE":"LSE",
+    "ATSE":"GR","XATH":"GR","ATH":"GR","BDM":"MC","OM":"OM","OB":"OB","LSE":"LSE",
     "CPSE":"CPSE","SWX":"SWX","NGM":"OM",
 }
 
@@ -236,11 +236,12 @@ offset = 0
 while True:
     res = requests.get(SUPABASE_URL+"/rest/v1/fundamentals", headers=headers_r,
         params={"select":"ticker,exchange,rank_mom6_adj,rank_mom12_adj",
-                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX)","in_universe":"eq.true",
+                "exchange":"not.in.(US,TSX,TSE,SEHK,ASX)",
                 "offset":str(offset),"limit":"1000"})
     data = res.json()
     if not isinstance(data, list) or not data: break
     for d in data:
+        if (d["ticker"],d["exchange"]) not in universe_keys: continue
         mom_rank_map[(d["ticker"],d["exchange"])] = {
             "r_m6": d.get("rank_mom6_adj"), "r_m12": d.get("rank_mom12_adj")}
     offset += 1000
