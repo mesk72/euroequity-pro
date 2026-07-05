@@ -253,6 +253,7 @@ for r in tikr_rows:
         rev_growth = (rev_ntm/abs(rev_ltm)-1) if rev_ntm and rev_ltm and rev_ltm!=0 else None
     fund_updates.append({
         "ticker": ticker, "exchange": exchange,
+        "mkt_cap": round(r["mktcap"], 2) if r["mktcap"] else None,
         "pe_trailing": round(r["pe_trailing"],2) if r["pe_trailing"] is not None else None,
         "pe_forward":  round(r["pe_forward"],2)  if r["pe_forward"]  is not None else None,
         "pb": r["pb"],
