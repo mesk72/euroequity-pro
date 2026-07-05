@@ -124,7 +124,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
+type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'KRX' | 'SGX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -137,7 +137,7 @@ async function apiExchange(code: string): Promise<Stock[]> {
     try {
       const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR'
       const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE'
-      // Gestisce exchange multipli separati da virgola (es. "US,TSX" o "TSE,SEHK,ASX")
+      // Gestisce exchange multipli separati da virgola (es. "US,TSX" o "TSE,SEHK,ASX,KRX,SGX")
       const isMulti = code.includes(',')
       const url = code === 'EZ' || code === 'ALL'
         ? `/api/db/stocks?exchanges=${ALL_EX}`
@@ -789,7 +789,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           { code: 'US,TSX',        label: '🌎 North America' },
           { code: 'EZ',            label: '🌍 All Europe' },
           { code: 'EMU',           label: '🇪🇺 Eurozone' },
-          { code: 'TSE,SEHK,ASX', label: '🌏 Asia Pacific' },
+          { code: 'TSE,SEHK,ASX,KRX,SGX', label: '🌏 Asia Pacific' },
           { code: 'MIL',           label: '🇮🇹 Italy' },
           { code: 'XETRA',         label: '🇩🇪 Germany' },
           { code: 'PA',            label: '🇫🇷 France' },
@@ -811,6 +811,8 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
           { code: 'TSE',           label: '🇯🇵 Japan' },
           { code: 'SEHK',          label: '🇭🇰 Hong Kong' },
           { code: 'ASX',           label: '🇦🇺 Australia' },
+          { code: 'KRX',           label: '🇰🇷 South Korea' },
+          { code: 'SGX',           label: '🇸🇬 Singapore' },
         ].map(({ code, label }) => (
           <button key={code} onClick={() => setExchange(code)}
             className={`px-3 py-1.5 rounded text-xs font-600 border whitespace-nowrap transition-colors ${exchange === code ? 'bg-gold text-bg border-gold' : 'border-border text-muted hover:border-gold hover:text-gold'}`}>
@@ -1730,7 +1732,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
     loadIndices()
     const timer = setInterval(loadIndices, 60000)
     setLoading(true)
-    apiExchange('TSE,SEHK,ASX').then(stocks => { setAllStocks(stocks); setLoading(false) })
+    apiExchange('TSE,SEHK,ASX,KRX,SGX').then(stocks => { setAllStocks(stocks); setLoading(false) })
     return () => clearInterval(timer)
   }, [])
 
@@ -1884,7 +1886,7 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
 
   useEffect(() => {
     setLoading(true)
-    apiExchange('TSE,SEHK,ASX').then(data => { setStocks(data); setLoading(false) })
+    apiExchange('TSE,SEHK,ASX,KRX,SGX').then(data => { setStocks(data); setLoading(false) })
   }, [])
 
   const stocksAP = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
@@ -2226,6 +2228,8 @@ function AppContent() {
     { id: 'AS' as Page, label: '🇳🇱 Netherlands' },
     { id: 'OB' as Page, label: '🇳🇴 Norway' },
     { id: 'LS' as Page, label: '🇵🇹 Portugal' },
+    { id: 'SGX' as Page, label: '🇸🇬 Singapore' },
+    { id: 'KRX' as Page, label: '🇰🇷 South Korea' },
     { id: 'MC' as Page, label: '🇪🇸 Spain' },
     { id: 'OM' as Page, label: '🇸🇪 Sweden' },
     { id: 'SWX' as Page, label: '🇨🇭 Switzerland' },
@@ -2386,21 +2390,23 @@ function AppContent() {
           {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); navigateTo('northamerica') }} onSelectStock={setDetailStock} />}
           {page === 'nascreen' && <Screener key={`nascreen-${scrSectorUS}`} initExchange="US,TSX" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
           {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { navigateTo('asiapacific') }} onSelectStock={setDetailStock} />}
-          {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
+          {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX,KRX,SGX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
           {page === 'TSE' && <Screener key="TSE" initExchange="TSE" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={300} />}
           {page === 'SEHK' && <Screener key="SEHK" initExchange="SEHK" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={250} />}
           {page === 'TSX' && <Screener key="TSX" initExchange="TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={200} />}
           {page === 'ASX' && <Screener key="ASX" initExchange="ASX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={150} />}
+          {page === 'KRX' && <Screener key="KRX" initExchange="KRX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={400} />}
+          {page === 'SGX' && <Screener key="SGX" initExchange="SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={100} />}
           {page === 'bestvalue_ap' && (user
-            ? <Screener key="bestvalue_ap" initExchange="TSE,SEHK,ASX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
+            ? <Screener key="bestvalue_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value Asia Pacific" />
           )}
           {page === 'bestideas_ap' && (user
-            ? <Screener key="bestideas_ap" initExchange="TSE,SEHK,ASX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
+            ? <Screener key="bestideas_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas Asia Pacific" />
           )}
           {page === 'bestgrowth_ap' && (user
-            ? <Screener key="bestgrowth_ap" initExchange="TSE,SEHK,ASX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
+            ? <Screener key="bestgrowth_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth Asia Pacific" />
           )}
           {page === 'usscreen' && <Screener key={'usscreen-'+scrSectorUS} initExchange='US' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
