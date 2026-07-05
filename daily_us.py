@@ -64,6 +64,7 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 SPECIAL_TICKERS = {
     "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
     "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
+    "BRK.A": "BRK-B.US",  # Leeway copre solo la classe B, più liquida
 }
 
 LEEWAY_SUFFIX = {
@@ -84,6 +85,7 @@ def leeway_ticker(ticker, exchange):
     if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
     if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
     if exchange == "BR":  return ticker.replace(".", "") + ".BR"
+    if exchange == "US":  return ticker.rstrip(".").replace(".", "-") + ".US"
     # Rimuovi punto finale dal ticker (es. UU. -> UU, AO. -> AO)
     ticker_clean = ticker.rstrip(".")
     return ticker_clean + LEEWAY_SUFFIX.get(exchange, "")
