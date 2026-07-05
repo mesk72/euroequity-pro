@@ -167,18 +167,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ stocks, source: 'supabase' })
     }
 
-    const APAC_EX = new Set(['TSE','SEHK','TSX','ASX','KRX','SGX'])
     const isUSOnly = exList.length === 1 && exList[0] === 'US'
-    const hasAPAC = exList.some(e => APAC_EX.has(e))
-    const isMultiNorthAmerica = exList.includes('US') && exList.includes('TSX') && exList.length === 2
 
     // Per APAC leggi stocks con limit=5000 per assicurarsi di prendere tutti i record
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj'
-
-    // Per APAC: leggi stocks uno exchange alla volta per superare limite 1000 righe
-    const APAC_EXCHANGES = new Set(['TSE','SEHK','TSX','ASX','KRX','SGX'])
-    const isAPACOnly = exList.every(e => APAC_EXCHANGES.has(e))
 
     const [stocksData, fundData] = await Promise.all([
       fetchAllByExchange('stocks', stocksSelect, exList, true),
@@ -190,9 +183,14 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
-    } else if (hasAPAC || isMultiNorthAmerica) {
-      stocks = applyAPACFilter(fundData, stocksData)
     } else {
+      // Unificato su applyUniverseFilter: si fida di in_universe=true, ora
+      // affidabile su tutti i continenti grazie alla verifica Leeway
+      // aggiunta alla costruzione dell'universo. applyAPACFilter (che
+      // ricalcolava il top-N da zero ignorando in_universe, includendo
+      // quindi anche titoli ormai esclusi rimasti nei fondamentali) non
+      // serve piu' ed era la causa dello scarto tra "US" (corretto) e
+      // "North America"/"Asia Pacific" combinati (gonfiati).
       stocks = applyUniverseFilter(fundData, stocksData)
     }
     return NextResponse.json({ stocks, source: 'supabase' })
