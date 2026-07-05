@@ -145,14 +145,10 @@ try:
     r = requests.get(SUPABASE_URL + "/storage/v1/object/tikr-uploads/fiscal_year_end.csv", headers=headers_r)
     reader = csv.DictReader(io.StringIO(r.text))
     for row in reader:
-        ticker = row.get("Ticker", "").strip()
-        exch_raw = (row.get("Exchange", "") or row.get("Market", "")).strip().upper()
-        exchange = "TSX" if exch_raw in ("TSX", "TSXV", "TO") else "US"
-        fm = row.get("Fiscal Year End Month") or row.get("FYE Month")
-        try:
-            fy_map[(ticker, exchange)] = int(float(fm))
-        except Exception:
-            continue
+        ticker = row["ticker"].strip()
+        exchange = row["exchange"].strip()
+        month = parse_num(row.get("fiscal_month", "12"))
+        fy_map[(ticker, exchange)] = int(month) if month else 12
     print(f"  Fiscal year end caricati: {len(fy_map)}")
 except Exception as e:
     print(f"  WARN lettura fiscal_year_end.csv: {e} — uso default dicembre per tutti")
