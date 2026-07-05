@@ -497,7 +497,7 @@ export default function StockPage() {
         )}
 
         {(stock as any).exchange === 'US' && (stock as any).ke != null && (
-          <ReverseDCFSection stock={stock as any} />
+          <ReverseDCFSection key={`${(stock as any).ticker}-${(stock as any).exchange}`} stock={stock as any} />
         )}
 
         <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
