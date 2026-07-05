@@ -35,6 +35,7 @@ RANK_GROUPS = {
     "ITA": ["MIL"], "DEU": ["XETRA"], "FRA": ["PA"], "GBR": ["LSE"],
     "SWE": ["OM"],  "NOR": ["OB"],    "CHE": ["SWX"], "NLD": ["AS"],
     "BEL": ["BR"],  "FIN": ["HE"],    "ESP": ["MC"],  "DNK": ["CPSE"],
+    "GRC": ["GR"],
 }
 NO_RANK = {"AT", "VI", "IR", "NGM", "AIM", "LS"}  # Portugal escluso
 
