@@ -99,6 +99,17 @@ print("=" * 60)
 
 # ── FISCAL YEAR END ──────────────────────────────────────────
 print("\n Legge fiscal year end...")
+TIKR_FY_EXCHANGE_MAP = {
+    "NasdaqGS": "US", "NasdaqGM": "US", "NasdaqCM": "US",
+    "NYSE": "US", "NYSEAM": "US", "ARCA": "US", "BATS": "US",
+    "OTCPK": "US", "CNSX": "US",
+    "JPX": "TSE", "HKEX": "SEHK", "KOSDAQ": "KRX",
+    "TSXV": "TSX",
+    "Catalist": "SGX",
+}
+def _norm_fy_exchange(raw):
+    return TIKR_FY_EXCHANGE_MAP.get(raw, raw)
+
 fy_map = {}
 try:
     r_fy = requests.get(
@@ -107,15 +118,15 @@ try:
     reader = csv.DictReader(io.StringIO(r_fy.text))
     for row in reader:
         ticker   = row["ticker"].strip()
-        exchange = row["exchange"].strip()
+        exchange = _norm_fy_exchange(row["exchange"].strip())
         month    = parse_num(row.get("fiscal_month", "12"))
-        fy_map[ticker] = int(month) if month else 12  # chiave solo ticker: exchange in questo file usa i nomi TIKR (es. NasdaqGS), non i nostri codici interni
+        fy_map[(ticker, exchange)] = int(month) if month else 12
     print(f" FY end caricati: {len(fy_map)}")
 except Exception as e:
     print(f" FY end non trovato, uso dicembre default: {e}")
 
 def get_fy_month(ticker, exchange):
-    return fy_map.get(ticker, 12)
+    return fy_map.get((ticker, exchange), 12)
 
 def calendarize(ticker, exchange, fy2025, fy2026, fy2027, fy2028, today_dt):
     """Calendarizzazione DINAMICA — mai hardcoded.
