@@ -173,21 +173,21 @@ try:
         else:
             ticker = str(row["Ticker"]).strip()
         if not ticker: continue
-        mktcap = parse_num(row.get("Market Cap","") or row.get("Mkt Cap",""))
+        mktcap = parse_num(row.get("Last Mkt Cap",""))
         raw_rows.append({
             "ticker": ticker, "exchange": exchange,
             "mktcap": mktcap or 0,
-            "pe_trailing": parse_num(row.get("Trailing P/Diluted EPS before Extra LTM","")),
-            "pe_forward":  parse_num(row.get("Mean Forward P/E NTM","")),
-            "pb":          parse_num(row.get("Trailing P/BVPS LTM","")),
+            "pe_trailing": parse_num(row.get("LTM P/E LTM","")),
+            "pe_forward":  parse_num(row.get("Mean Fwd P/E NTM","")),
+            "pb":          parse_num(row.get("LTM P/BVPS LTM","")),
             "eps_fy0": parse_num(row.get("EPS Normalized (FY 2025)","")),
             "eps_fy1": parse_num(row.get("Mean EPS Normalized (FY 2026)","")),
             "eps_fy2": parse_num(row.get("Mean EPS Normalized (FY 2027)","")),
             "eps_fy3": parse_num(row.get("Mean EPS Normalized (FY 2028)","")),
-            "rev_fy0": parse_num(row.get("Revenue (FY 2025)","")),
-            "rev_fy1": parse_num(row.get("Mean Revenue (FY 2026)","")),
-            "rev_fy2": parse_num(row.get("Mean Revenue (FY 2027)","")),
-            "rev_fy3": parse_num(row.get("Mean Revenue (FY 2028)","")),
+            "rev_fy0": parse_num(row.get("Rev (FY 2025)","")),
+            "rev_fy1": parse_num(row.get("Mean Rev (FY 2026)","")),
+            "rev_fy2": parse_num(row.get("Mean Rev (FY 2027)","")),
+            "rev_fy3": parse_num(row.get("Mean Rev (FY 2028)","")),
         })
 
     # Per ogni exchange: filtra solo titoli presenti nel DB, top N per mktcap
