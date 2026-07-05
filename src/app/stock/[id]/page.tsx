@@ -518,7 +518,7 @@ function ReverseDCFSection({ stock }: { stock: any }) {
   const epsCagr2y = stock.epsCagr2y
   const growth1224 = stock.epsGrowth1224m
   const growth2436 = stock.epsGrowth2436m
-  const epsNtm = (price != null && peFwd) ? price / peFwd : null
+  const epsNtm = stock.epsNtmDcf ?? ((price != null && peFwd) ? price / peFwd : null)
 
   const G_TERMINAL = 0.025
   const YEARS = 10
