@@ -64,7 +64,7 @@ def leeway_ticker(ticker, exchange):
     if exchange == "TSE":  return ticker + ".TSE"
     if exchange == "SEHK": return ticker.zfill(4) + ".HK"
     if exchange == "ASX":  return ticker + ".AU"
-    if exchange == "KRX":  return ticker.lstrip("A") + ".KO"
+    if exchange == "KRX":  return ticker.lstrip("A").zfill(6) + ".KO"
     if exchange == "SGX":  return ticker + ".SG"
     return ticker
 
