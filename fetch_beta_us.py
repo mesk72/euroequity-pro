@@ -44,7 +44,7 @@ try:
     hist = tnx.history(period="5d")
     if not hist.empty:
         last_close = float(hist["Close"].dropna().iloc[-1])
-        risk_free_10y = round(last_close / 10, 4)  # ^TNX quota x10 rispetto al rendimento %
+        risk_free_10y = round(last_close, 4)  # ^TNX gia' in percentuale diretta (es. 4.46 = 4.46%)
         print(f"  Treasury 10Y: {risk_free_10y}% (quotazione grezza ^TNX: {last_close})")
     else:
         print("  WARN: nessun dato storico per ^TNX")
