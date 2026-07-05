@@ -424,22 +424,22 @@ ok_rank = ok
 # ── INDICI EU ────────────────────────────────────────────────
 print("\n  Aggiornamento indici EU...")
 EU_INDICES = [
-    ("GDAXI.INDX", "XETRA", "DAX",      "DAX"),
+    ("GDAXI.INDX", "XETRA", "GDAXI",    "DAX"),
     ("FCHI.INDX",  "PA",    "FCHI",     "CAC 40"),
     ("AEX.INDX",   "AS",    "AEX",      "AEX"),
     ("IBEX.INDX",  "MC",    "IBEX",     "IBEX 35"),
     ("BFX.INDX",   "BR",    "BFX",      "BEL 20"),
     # ("FTSE.INDX", "LSE", "FTSE", "FTSE 100"),  # ticker Leeway da verificare
-    ("SSMI.INDX",  "SWX",   "SMI",      "SMI"),
+    ("SSMI.INDX",  "SWX",   "SSMI",     "SMI"),
     ("OMXS30.INDX","OM",    "OMXS30",   "OMX Stockholm"),
-    ("OMXC25.INDX","CPSE",  "C25",      "OMX Copenhagen"),
+    ("OMXC25.INDX","CPSE",  "OMXC25",   "OMX Copenhagen"),
     ("ATX.INDX",   "VI",    "ATX",      "ATX"),
     # ("ISEQ.INDX", "IR", "IEX", "ISEQ"),  # ticker Leeway da verificare
-    ("STOXX50E.INDX","EZ",  "SX5E",     "Euro Stoxx 50"),
+    ("STOXX50E.INDX","EZ",  "STOXX50E", "Euro Stoxx 50"),
     ("SXXP.INDX",  "EZ",    "SXXP",     "STOXX 600"),
-    ("OMXH25.INDX", "HE",   "HEX",      "OMX Helsinki"),
+    ("OMXH25.INDX", "HE",   "OMXH25",   "OMX Helsinki"),
     # ("FTSEMIB.MI", "MIL", "MIB", "FTSE MIB"),  # ticker Leeway da verificare
-    ("PSI20.INDX", "LS",    "PSI",      "PSI 20"),
+    ("PSI20.INDX", "LS",    "PSI20",    "PSI 20"),
 ]
 ok_idx = 0
 FROM_12M = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
