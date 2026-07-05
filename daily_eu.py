@@ -96,20 +96,37 @@ for s in all_stocks:
 
 # ── 2. SCARICA PREZZI EOD DA LEEWAY ──────────────────────────
 print("\n[2/5] Download prezzi EOD da Leeway...")
+
+# Carica ultime date in bulk — una query per exchange invece di 2202 query singole
+last_date_map = {}
+eu_exchanges = list(set(s["exchange"] for s in all_stocks))
+for exch in eu_exchanges:
+    offset_p = 0
+    while True:
+        rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+            params={"select": "ticker,date", "exchange": "eq." + exch,
+                    "order": "ticker.asc,date.desc", "limit": "2000", "offset": str(offset_p)})
+        batch = rp.json()
+        if not isinstance(batch, list) or not batch: break
+        for row in batch:
+            key = (row["ticker"], exch)
+            if key not in last_date_map:
+                last_date_map[key] = row["date"]
+        offset_p += 2000
+        if len(batch) < 2000: break
+print("  Ultime date caricate: " + str(len(last_date_map)) + " titoli")
+
 ok_leeway = fail_leeway = 0
 price_buf = []
 for stock in all_stocks:
     ticker   = stock["ticker"]
     exchange = stock["exchange"]
-    try:
-        r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "date", "ticker": "eq." + ticker,
-                    "exchange": "eq." + exchange, "order": "date.desc", "limit": "1"},
-            timeout=15)
-        row = r.json()
-        last = row[0]["date"] if isinstance(row, list) and row else "2021-01-01"
-    except Exception as e:
-        print(f"  WARN lettura ultima data {ticker}.{exchange}: {e}")
+    last = last_date_map.get((ticker, exchange), "2021-01-01")
+    if True:  # mantieni struttura try/except
+        try:
+            last = last  # già calcolato
+        except Exception as e:
+            print(f"  WARN lettura ultima data {ticker}.{exchange}: {e}")
         fail_leeway += 1
         continue
     if last >= TODAY:
