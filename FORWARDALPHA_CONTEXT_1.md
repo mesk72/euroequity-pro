@@ -1454,3 +1454,110 @@ con dati reali dopo la modifica. Da verificare prima di considerarli definitivi.
   ormai superata dal restructuring Canada — irrilevante dato che non viene
   più usato.
 
+---
+
+## FIX CALENDARIZZAZIONE — ELIMINATA LA DISCONTINUITA' "NOT_YET" (04/07/2026)
+
+### Il problema trovato
+
+La funzione `calendarize()` (identica in `weekly_eu.py`, `weekly_us.py`,
+`weekly_apac.py`) aveva un caso limite: quando un titolo chiude il bilancio
+ma non sono ancora passati 60 giorni (soglia presunta di pubblicazione),
+`pub_date > today_dt` diventa vero e la funzione restituiva
+`return None, None, True` (flag `not_yet`). A valle, il codice chiamante
+sostituiva il blend pesato con un rapporto grezzo e NON pesato:
+`eps_growth = fy3/|fy2| - 1`.
+
+Risultato pratico: per ~60 giorni l'anno (su 365), ogni titolo con quella
+data di chiusura passava da un calcolo pesato coerente a un calcolo
+completamente diverso da un giorno all'altro — una discontinuità reale nel
+growth_score, verificata con un test isolato (vedi sotto).
+
+### La causa esatta
+
+`pub_date` è nel futuro rispetto a oggi in quella finestra, quindi
+`days_since = oggi - pub_date` risulta negativo — un peso privo di senso.
+Il codice esistente usava `fy3/fy2` come toppa per evitare quel numero
+negativo, non per scelta sui dati.
+
+### La soluzione applicata
+
+Invece di saltare in avanti a un `pub_date` che deve ancora arrivare, la
+funzione **resta ancorata al ciclo precedente** (fy_end di un anno prima)
+finché il nuovo pub_date non è realmente passato:
+
+```python
+def calendarize(ticker, exchange, fy2025, fy2026, fy2027, fy2028, today_dt):
+    if fy2025 is None and fy2026 is None: return None, None, True
+    fm = get_fy_month(ticker, exchange)
+    last_day = 28 if fm == 2 else 30 if fm in [4,6,9,11] else 31
+    fy_end = datetime(today_dt.year, fm, last_day)
+    if fy_end > today_dt:
+        fy_end = datetime(today_dt.year - 1, fm, last_day)
+    pub_date = fy_end + timedelta(days=60)
+    if pub_date > today_dt:
+        # NUOVO: non ancora "pubblicato" — resta sul ciclo precedente
+        fy_end = datetime(fy_end.year - 1, fm, last_day)
+        pub_date = fy_end + timedelta(days=60)
+    if fy_end.year >= 2026:
+        v0, v1, v2 = fy2026, fy2027, fy2028
+    else:
+        v0, v1, v2 = fy2025, fy2026, fy2027
+    next_pub = datetime(pub_date.year + 1, pub_date.month, pub_date.day)
+    days_since = (today_dt - pub_date).days
+    days_total = (next_pub - pub_date).days
+    w_next = days_since / days_total
+    w_curr = 1 - w_next
+    ltm = w_curr * v0 + w_next * v1 if v0 is not None and v1 is not None else None
+    ntm = w_curr * v1 + w_next * v2 if v1 is not None and v2 is not None else None
+    return ltm, ntm, False
+```
+
+`not_yet=True` ora scatta solo per il caso genuino "mancano proprio i dati
+FY2025 e FY2026", non più per il caso temporale.
+
+### Esempio verificato (chiusura 30/06, oggi 04/07/2026)
+
+- `pub_date` ciclo nuovo = 29/08/2026 (nel futuro) → si resta sul ciclo
+  vecchio: `fy_end` = 30/06/2025, `pub_date` = 29/08/2025
+- `days_since` = 309, `days_total` = 365
+- `w_next` = 0,847, `w_curr` = 0,153
+- v0,v1,v2 = FY2025, FY2026, FY2027 (perché fy_end.year=2025 < 2026)
+- EPS LTM = 0,153×FY2025 + 0,847×FY2026
+- EPS NTM = 0,153×FY2026 + 0,847×FY2027
+
+### Test di verifica eseguiti PRIMA di toccare i file live
+
+Script isolato con 4 test:
+1. Confronto vecchia/nuova formula sui 5 casi (chiusura 31/12, 31/01, 31/03,
+   31/05, 30/06) — i primi 3 (già funzionanti) restano **identici**, gli
+   ultimi 2 (prima `None`) ora danno valori reali
+2. Continuità attraverso il giorno di chiusura 30/06: w_next passa da
+   0,8301 (28/06) a 0,8329 (29/06) a 0,8356 (30/06, nuovo) a 0,8384 (01/07)
+   — progressione liscia, nessun salto
+3. Sanity check pesi sempre in [0,1] su un anno intero di date, per tutti
+   i 12 mesi di chiusura possibili — nessuna violazione trovata
+4. Match esatto con l'esempio concordato in chat (w_curr=0,153,
+   w_next=0,847) — confermato alla terza cifra decimale
+
+### Applicato a
+
+`weekly_eu.py`, `weekly_us.py`, `weekly_apac.py` — stessa identica
+correzione, adattata alla formattazione di ciascun file. Pushato e
+testato con un run reale di `weekly_eu.py` (completato con successo in
+26 secondi, in linea con la durata storica di questo script — è normale,
+non fa migliaia di chiamate singole come i file daily, legge il TIKR una
+volta e scrive a blocchi da 100).
+
+### Reverse Earnings Model — lavoro in corso
+
+Discussa e verificata la logica per un nuovo modello (non ancora scritto):
+implied growth a 10 anni via bisection (gTV=2,5%) confrontato con la
+crescita EPS calendarizzata a 12-24 mesi e 24-36 mesi (stessa formula
+sopra, applicata a coppie di anni fiscali via via spostate: FY_next1/FY_next2
+per il forward 12m, FY_next2/FY_next3 per il 24m, ecc.). Giappone escluso
+(EPS GAAP invece di normalizzato). CAGR tra le due finestre calcolato come
+radice quadrata del prodotto dei due fattori di crescita, non elevamento a
+potenza negativa (errore corretto in chat prima di scrivere codice).
+
+
