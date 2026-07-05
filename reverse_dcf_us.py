@@ -266,6 +266,7 @@ for i, stock in enumerate(all_stocks):
         "eps_cagr_2y": round(cagr_2y, 4) if cagr_2y is not None else None,
         "implied_growth_10y": round(implied_g, 4) if implied_g is not None else None,
         "ke": round(ke, 4),
+        "eps_ntm_dcf": round(ntm, 4),
     }
     updates.append(upd)
     ok += 1
