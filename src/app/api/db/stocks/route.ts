@@ -8,13 +8,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM','TSE','SEHK','TSX','ASX','US']
+const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM','TSE','SEHK','TSX','ASX','KRX','SGX','US']
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR']
 const FILTER_500M = new Set(['LSE','XETRA','PA','OM','SWX','MIL'])
 const TOP_100_EX = new Set(['OB','MC','AS','BR','CPSE','HE','GR'])
 const NO_FILTER = new Set(['VI','IR','LS'])
 // APAC + North America: top N per market cap, solo titoli con company e sector
-const APAC_TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, TSX: 400, ASX: 350, US: 2000 }
+const APAC_TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, TSX: 400, ASX: 350, KRX: 400, SGX: 100, US: 2000 }
 
 async function fetchAllByExchange(table: string, select: string, exchangeList: string[], universeOnly = false) {
   // Legge un exchange alla volta per evitare il limite di 1000 righe miste
@@ -82,7 +82,7 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
   const stockMap: Record<string, any> = {}
   for (const s of stocksData) stockMap[`${s.ticker}.${s.exchange}`] = s
 
-  const TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, ASX: 350, TSX: 400, US: 2000 }
+  const TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, ASX: 350, TSX: 400, KRX: 400, SGX: 100, US: 2000 }
   const EXCL_SECTORS = new Set(['71','72','73','74','75','76','77'])
 
   // Filtra fundData - NON esclude se non in stockMap
@@ -167,7 +167,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ stocks, source: 'supabase' })
     }
 
-    const APAC_EX = new Set(['TSE','SEHK','TSX','ASX'])
+    const APAC_EX = new Set(['TSE','SEHK','TSX','ASX','KRX','SGX'])
     const isUSOnly = exList.length === 1 && exList[0] === 'US'
     const hasAPAC = exList.some(e => APAC_EX.has(e))
     const isMultiNorthAmerica = exList.includes('US') && exList.includes('TSX') && exList.length === 2
@@ -177,7 +177,7 @@ export async function GET(req: NextRequest) {
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj'
 
     // Per APAC: leggi stocks uno exchange alla volta per superare limite 1000 righe
-    const APAC_EXCHANGES = new Set(['TSE','SEHK','TSX','ASX'])
+    const APAC_EXCHANGES = new Set(['TSE','SEHK','TSX','ASX','KRX','SGX'])
     const isAPACOnly = exList.every(e => APAC_EXCHANGES.has(e))
 
     const [stocksData, fundData] = await Promise.all([
