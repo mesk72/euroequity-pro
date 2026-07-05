@@ -2139,7 +2139,7 @@ function AppContent() {
   const [sidebarOpen, setSidebar]     = useState(false)
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['dashboard']))
   const toggleMenu = (id: string) => setExpandedMenus(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
-  const [scrExchange, setScrExchange] = useState('MIL')
+  const [scrExchange, setScrExchange] = useState('EZ')
   const [scrSector,   setScrSector]   = useState('All')
   const [scrSectorUS, setScrSectorUS] = useState('All')
   const [scrSectorAP, setScrSectorAP] = useState('All')
