@@ -280,13 +280,12 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
                 print(f"  FAIL inserimento batch {i}: {r2.status_code} {r2.text[:120]}")
         print(f"  Inseriti {len(new_stocks)} nuovi titoli")
 
-    # Aggiorna mkt_cap in fundamentals
-    for t, mc in eligible:
-        if not mc: continue
-        requests.patch(f"{SUPABASE_URL}/rest/v1/fundamentals",
-            headers=headers_up,
-            params={"ticker":f"eq.{t}","exchange":f"eq.{exchange}"},
-            json={"mkt_cap": mc})
+    # Aggiorna mkt_cap in fundamentals — upsert, non PATCH (una PATCH
+    # non tocca righe non ancora esistenti per titoli nuovi in universo)
+    mkt_updates = [{"ticker": t, "exchange": exchange, "mkt_cap": mc} for t, mc in eligible if mc]
+    for i in range(0, len(mkt_updates), 100):
+        requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals",
+            headers=headers_up, json=mkt_updates[i:i+100])
 
     # Reset in_universe=false per l'intero exchange
     requests.patch(f"{SUPABASE_URL}/rest/v1/stocks",
