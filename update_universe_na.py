@@ -11,10 +11,16 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "resolution=ignore-duplicates,return=minimal"}
 
+SPECIAL_TICKERS_US = {
+    "BRK.A": "BRK-B",  # Leeway copre solo la classe B, più liquida
+}
+
 def leeway_ticker(ticker, exchange):
     if exchange == "TSX":
         return ticker.replace(".", "-") + ".TO"
-    return ticker.rstrip(".") + ".US"
+    if ticker in SPECIAL_TICKERS_US:
+        return SPECIAL_TICKERS_US[ticker] + ".US"
+    return ticker.rstrip(".").replace(".", "-") + ".US"
 
 def ha_prezzo_su_leeway(ticker, exchange):
     """Verifica leggera (30gg) — ci basta sapere se Leeway conosce il ticker."""
