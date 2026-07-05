@@ -93,7 +93,7 @@ def _norm_fy_exchange(raw):
 fy_map = {}
 try:
     r_fy = requests.get(
-        f"{SUPABASE_URL}/storage/v1/object/public/tikr-uploads/fiscal_year_end.csv",
+        f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/fiscal_year_end.csv",
         headers=headers_r)
     reader = csv.DictReader(io.StringIO(r_fy.text))
     for row in reader:
@@ -159,7 +159,7 @@ print("\n Legge file TIKR APAC...")
 tikr_rows = []
 try:
     r_tikr = requests.get(
-        f"{SUPABASE_URL}/storage/v1/object/public/tikr-uploads/tikr_apac_latest.csv",
+        f"{SUPABASE_URL}/storage/v1/object/tikr-uploads/tikr_apac_latest.csv",
         headers=headers_r)
     reader = csv.DictReader(io.StringIO(r_tikr.text))
     raw_rows = []
