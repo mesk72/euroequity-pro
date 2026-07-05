@@ -135,8 +135,8 @@ async function apiExchange(code: string): Promise<Stock[]> {
   }
   if (USE_DB) {
     try {
-      const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR'
-      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,LSE,SWX,OM,OB,CPSE'
+      const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR'
+      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE'
       // Gestisce exchange multipli separati da virgola (es. "US,TSX" o "TSE,SEHK,ASX")
       const isMulti = code.includes(',')
       const url = code === 'EZ' || code === 'ALL'
@@ -2358,7 +2358,7 @@ function AppContent() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
-          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'CPSE' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
+          {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'GR' || page === 'CPSE' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'bestvalue'  && (user
             ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value" />
