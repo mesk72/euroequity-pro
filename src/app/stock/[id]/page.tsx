@@ -497,7 +497,20 @@ export default function StockPage() {
         )}
 
         {(stock as any).exchange === 'US' && (stock as any).ke != null && (
-          <ReverseDCFSection key={`${(stock as any).ticker}-${(stock as any).exchange}`} stock={stock as any} />
+          user?.id ? (
+            <ReverseDCFSection key={`${(stock as any).ticker}-${(stock as any).exchange}`} stock={stock as any} />
+          ) : (
+            <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+              borderRadius:4, padding:'24px 20px', marginBottom:12, textAlign:'center' }}>
+              <div style={{ fontSize:28, marginBottom:8 }}>🔒</div>
+              <div style={{ fontSize:12, fontWeight:700, color:'var(--text2)', marginBottom:4 }}>
+                Reverse Earnings Model
+              </div>
+              <div style={{ fontSize:11, color:'var(--text4)' }}>
+                Log in to view implied growth, EPS forward estimates, and the interactive valuation calculator.
+              </div>
+            </div>
+          )
         )}
 
         <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
