@@ -164,6 +164,7 @@ try:
             exchange = "US"
         tikr_rows.append({
             "ticker": ticker, "exchange": exchange,
+            "mktcap": parse_num(row.get("Last Mkt Cap","")),
             "pe_trailing": parse_num(row.get("LTM P/E LTM","")),
             "pe_forward":  parse_num(row.get("Mean Fwd P/E NTM","")),
             "pb":          parse_num(row.get("LTM P/BVPS LTM","")),
@@ -207,6 +208,7 @@ for r in tikr_rows:
         rev_growth = (rev_ntm/abs(rev_ltm)-1) if rev_ntm and rev_ltm and rev_ltm!=0 else None
     fund_updates.append({
         "ticker": ticker, "exchange": exchange,
+        "mkt_cap": round(r["mktcap"],2) if r.get("mktcap") else None,
         "pe_trailing": round(r["pe_trailing"],2) if r["pe_trailing"] is not None else None,
         "pe_forward":  round(r["pe_forward"],2)  if r["pe_forward"]  is not None else None,
         "pb": r["pb"],
