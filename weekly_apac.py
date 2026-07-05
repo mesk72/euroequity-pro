@@ -89,13 +89,13 @@ try:
         ticker   = row["ticker"].strip()
         exchange = row["exchange"].strip()
         month    = parse_num(row.get("fiscal_month","12"))
-        fy_map[(ticker, exchange)] = int(month) if month else 12
+        fy_map[ticker] = int(month) if month else 12  # chiave solo ticker: exchange in questo file usa i nomi TIKR (es. NasdaqGS), non i nostri codici interni
     print(f" FY end: {len(fy_map)}")
 except Exception as e:
     print(f" FY end non trovato: {e}")
 
 def get_fy_month(ticker, exchange):
-    return fy_map.get((ticker, exchange), 12)
+    return fy_map.get(ticker, 12)
 
 def calendarize(ticker, exchange, fy2025, fy2026, fy2027, fy2028, today_dt):
     """Calendarizzazione DINAMICA.
