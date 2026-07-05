@@ -177,8 +177,8 @@ try:
             2026: parse_num(row.get("Mean EPS Normalized (FY 2026)", "")),
             2027: parse_num(row.get("Mean EPS Normalized (FY 2027)", "")),
             2028: parse_num(row.get("Mean EPS Normalized (FY 2028)", "")),
-            2029: parse_num(row.get("Mean EPS (GAAP) (FY 2029)", "") or row.get("Mean EPS Normalized (FY 2029)", "")),
-            2030: parse_num(row.get("Mean EPS Normalized (FY 2030)", "") or row.get("Mean EPS (GAAP) (FY 2030)", "")),
+            2029: parse_num(row.get("Mean EPS Normalized (FY 2029)", "")),
+            2030: parse_num(row.get("Mean EPS Normalized (FY 2030)", "")),
         }
         eps_by_ticker[(ticker, exchange)] = fy_values
     print(f"  Titoli con dati EPS: {len(eps_by_ticker)}")
