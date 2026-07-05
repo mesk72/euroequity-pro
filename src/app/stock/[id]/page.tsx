@@ -586,15 +586,15 @@ function ReverseDCFSection({ stock }: { stock: any }) {
       </div>
 
       <div style={{ fontSize:11, color:'var(--text3)', lineHeight:1.6, marginBottom:12 }}>
-        Il modello calcola l&apos;implied growth confrontando prezzo attuale, EPS forward e
-        costo del capitale (Ke = risk-free + Beta × 5%). Se l&apos;implied growth è molto più
-        alto della crescita EPS attesa dagli analisti, il mercato sta prezzando aspettative
-        superiori a quelle stimate — e viceversa.
+        The model calculates implied growth by comparing the current price, forward EPS,
+        and cost of equity (Ke = risk-free rate + Beta × 5%). If implied growth is much
+        higher than the EPS growth expected by analysts, the market is pricing in
+        expectations above current estimates — and vice versa.
       </div>
 
       <div style={{ borderTop:'1px solid var(--border)', paddingTop:12 }}>
         <div style={{ fontSize:10, color:'var(--text4)', marginBottom:6 }}>
-          Simula: se la crescita a 10 anni fosse...
+          Simulate: if 10-year growth were...
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
           <input type="range" min={-20} max={40} step={0.5} value={growthInput}
@@ -607,14 +607,14 @@ function ReverseDCFSection({ stock }: { stock: any }) {
           <span style={{ fontSize:12, color:'var(--text3)' }}>%</span>
         </div>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <span style={{ fontSize:11, color:'var(--text4)' }}>...il prezzo giusto sarebbe:</span>
+          <span style={{ fontSize:11, color:'var(--text4)' }}>...the fair price would be:</span>
           <span style={{ fontSize:18, fontWeight:700, color:'var(--orange)' }}>
             {stock.exchange === 'US' ? '$' : ''}{fmtPrice(simulatedPrice)}
           </span>
         </div>
         {price != null && simulatedPrice != null && (
           <div style={{ fontSize:11, color:'var(--text4)', marginTop:4, textAlign:'right' }}>
-            vs prezzo attuale {price.toFixed(2)} ({simulatedPrice > price ? '+' : ''}
+            vs current price {price.toFixed(2)} ({simulatedPrice > price ? '+' : ''}
             {((simulatedPrice / price - 1) * 100).toFixed(1)}%)
           </div>
         )}
