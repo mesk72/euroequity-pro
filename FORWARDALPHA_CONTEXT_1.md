@@ -1671,5 +1671,137 @@ fondamentali.
 - **Daily US, Daily APAC**: rilanciati dopo essere stati cancellati il
   giorno prima, in corso al momento di scrivere questa nota.
 
+---
+
+## SESSIONE 05/07/2026 (POMERIGGIO/SERA) — REVERSE EARNINGS MODEL US + CACCIA A BUG SISTEMICI APAC
+
+### Reverse Earnings Model — costruito e reso funzionante per gli US
+
+**Motore di calcolo** (`reverse_dcf_us.py`, nuovo script):
+- Bisection per l'implied growth a 10 anni (DCF a due stadi, gTV=2,5%),
+  testato con esempi isolati prima di girare su dati veri (stesso
+  approccio disciplinato della calendarizzazione)
+- Estensione della calendarizzazione a forward 24m/36m (per la crescita
+  EPS 12-24m e 24-36m) e CAGR a 2 anni
+- Ke = Rf (Treasury 10Y) + Beta × 5% ERP
+- `fetch_beta_us.py` (nuovo): scarica Beta (Yahoo Finance, metodologia
+  standard 60 mesi vs S&P 500) e il rendimento Treasury 10Y per tutti i
+  titoli US
+
+**Bug critici trovati e corretti, in ordine di scoperta:**
+
+1. **Tasso Treasury sballato di un fattore ~10**: lo script divideva per
+   10 un valore che era già in percentuale diretta da Yahoo Finance,
+   sottostimando il Ke di ~4 punti percentuali per tutti i titoli US.
+   Confermato e corretto.
+
+2. **`fiscal_year_end.csv` — nomi colonna completamente sbagliati**: lo
+   script cercava colonne come "Ticker"/"Exchange"/"Fiscal Year End
+   Month" (maiuscolo, parole intere) mentre i nomi veri sono
+   "ticker"/"exchange"/"fiscal_month" (minuscolo). Nessuna corrispondenza
+   veniva mai trovata, quindi OGNI azienda con anno fiscale diverso da
+   dicembre (Micron=agosto, Marvell=gennaio, e probabilmente centinaia
+   di altre) veniva silenziosamente trattata come se chiudesse a
+   dicembre. **Questo bug esisteva anche in `weekly_us.py`, `weekly_eu.py`
+   e `weekly_apac.py`** — corretto in tutti e quattro i file, non solo
+   nel nuovo script.
+
+3. **`fiscal_year_end.csv` — valori exchange con nomi TIKR, non i nostri
+   codici**: anche dopo il fix dei nomi colonna, il campo `exchange` in
+   questo file specifico usa nomi come "NasdaqGS" (non "US"), causando
+   ancora mancata corrispondenza. Confermato con un titolo reale (DIA:
+   DiaSorin a Milano vs Distribuidora a Madrid, stesso ticker, mercati
+   diversi — l'Europa in questo file usa già i nostri codici corretti,
+   solo gli USA e alcuni mercati asiatici usano nomi TIKR). Fix: mappa
+   `TIKR_FY_EXCHANGE_MAP` (NasdaqGS/NYSE/ARCA/ecc.→US, JPX→TSE,
+   HKEX→SEHK, KOSDAQ→KRX, TSXV→TSX, Catalist→SGX), applicata in tutti e
+   quattro i file mantenendo la chiave (ticker, exchange) — non più
+   "solo ticker" come un fix intermedio aveva tentato (quella toppa
+   causava collisioni tra ticker uguali su mercati diversi, es. DIA).
+
+4. **Mescolanza GAAP/Normalized per FY2029/2030**: quando manca la stima
+   "Normalized" per un anno lontano, il codice ripiegava sul dato GAAP
+   (metodologia diversa, tipicamente più basso), creando un calo finto
+   tra anni consecutivi e sballando `eps_cagr_2y` (es. Micron mostrava
+   3,2% invece di un dato coerente). Fix: niente più fallback tra
+   metodologie diverse; se manca il dato Normalized, il campo resta
+   vuoto invece di un numero fuorviante.
+
+5. **Calcolatore frontend disallineato dal motore server-side**: il
+   calcolatore ricalcolava l'EPS base come prezzo/P-E forward, diverso
+   dall'EPS calendarizzato usato per l'implied growth server-side —
+   inserire lo stesso tasso di crescita non ridava lo stesso prezzo.
+   Fix: nuovo campo `eps_ntm_dcf` salvato dal motore server-side e
+   riusato identico dal calcolatore.
+
+**Verifica con dati reali (Micron, Marvell) confrontati con TIKR**:
+confermato che il "324,9% Fwd 2-Yr EPS CAGR" di TIKR è calcolato dal
+FY2025 (ultimo anno chiuso, pre-boom) al FY2027 — non "prossimi 2 anni
+da oggi" — spiegando perché il nostro calcolo (da oggi in avanti, base
+già elevata) dà legittimamente un numero molto più basso (~27%) senza
+essere un errore.
+
+**UI**: calcolatore interattivo sulla pagina titolo (solo US per ora) —
+mostra implied growth, EPS CAGR, e uno slider "se la crescita fosse X%,
+il prezzo giusto sarebbe Y" — **protetto dietro login** (lucchetto per
+utenti non loggati) — testo tradotto in inglese.
+
+### Bug sistemici trovati in APAC (Corea/Singapore) — caccia a più livelli
+
+Partito da: Corea mostrava 91 titoli invece di 400, Singapore 3 invece
+di 100, tutti senza punteggi.
+
+1. **Fix zero-padding ticker coreani** (già in sessione precedente):
+   universo passato da 91→334 (Corea) e 3→100 (Singapore) titoli eligible.
+
+2. **`weekly_apac.py` leggeva il file TIKR da un URL `/public/` cachato
+   da CDN**, mostrando dati vecchi anche dopo l'aggiornamento del file.
+   Fix: rimosso `/public/` dal percorso, allineato agli altri script.
+
+3. **Confronto ticker Corea case/prefisso-sensibile**: `stocks.ticker`
+   ha il prefisso "A" (es. "A006800"), il file TIKR letto da
+   `weekly_apac.py` a volte no. Fix: normalizzazione robusta al
+   prefisso, usando sempre il ticker vero di `stocks` per la scrittura.
+
+4. **Nomi colonna sbagliati per P/E forward, P/B, revenue in
+   `weekly_apac.py`**: "Market Cap"/"Mkt Cap" invece di "Last Mkt Cap",
+   "Mean Forward P/E NTM" invece di "Mean Fwd P/E NTM", "Trailing P/BVPS
+   LTM" invece di "LTM P/BVPS LTM", "Revenue (FY ...)" invece di "Rev
+   (FY ...)". Confermato leggendo tutte le colonne reali del file con
+   un diagnostico dedicato. Questo spiegava perché value_score/
+   growth_score erano sempre None. Fix applicato, `value_score` ora si
+   calcola correttamente.
+
+5. **`growth_score` ancora mancante dopo il fix #4**: richiede almeno 3
+   input tra crescita EPS, crescita ricavi, momentum 6m, momentum 12m —
+   i dati di momentum (`rank_mom6_adj`/`rank_mom12_adj`) sono calcolati
+   da `daily_apac.py`, non ancora rilanciato con l'universo ampliato.
+   Rilancio in corso al momento di scrivere questa nota.
+
+6. **`mkt_cap` mai scritto in `fundamentals`**: letto e usato per
+   ordinare i candidati per market cap, ma mai incluso nel payload di
+   scrittura — in **tutti e tre** gli script weekly (EU/US/APAC), non
+   solo APAC. Corretto in tutti e tre.
+
+### Orari di aggiornamento automatico modificati (ora italiana)
+
+- **EU**: da 21:00 a **mezzanotte** (cron: `0 22 * * 1-5`, UTC)
+- **US**: da 22:30 a **02:00 del giorno dopo** (cron: `0 0 * * 2-6`,
+  UTC — weekday spostato di un giorno per allinearsi alle chiusure
+  lun-ven)
+- **APAC**: già corretto a 22:00, nessun cambio (cron: `0 20 * * 1-5`)
+
+### Ancora da verificare/completare
+
+- Daily APAC in corso (per il momentum di Corea/Singapore)
+- Weekly APAC da rilanciare un'ultima volta dopo Daily APAC (per
+  growth_score, combined_rank, e il nuovo fix mkt_cap)
+- Weekly US, Weekly EU da rilanciare per il fix mkt_cap (non ancora
+  fatto al momento di scrivere questa nota)
+- Universo Nord America: da riverificare se i fix Berkshire/trattino
+  hanno davvero portato US a 2000/2000 (l'utente ha segnalato ~1978-1979
+  in precedenza, rilanciato ma non riconfermato)
+
+
 
 
