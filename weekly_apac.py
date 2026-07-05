@@ -192,10 +192,31 @@ try:
 
     # Per ogni exchange: filtra solo titoli presenti nel DB, top N per mktcap
     from collections import defaultdict
+
+    def _norm_krx(t):
+        return t.lstrip("A") if t else t
+
+    # Mappa ticker-normalizzato -> ticker-vero-in-stocks (per KRX, dove i
+    # due file possono differire sul prefisso "A"). Il ticker scritto in
+    # fundamentals deve SEMPRE combaciare esattamente con stocks.ticker.
+    krx_norm_to_real = {_norm_krx(t): t for t in stocks_tickers["KRX"]}
+    stocks_tickers["KRX"] = set(krx_norm_to_real.keys())  # per il check di appartenenza sotto
+
     by_ex = defaultdict(list)
     for r in raw_rows:
-        if r["ticker"] in stocks_tickers.get(r["exchange"], set()):
-            by_ex[r["exchange"]].append(r)
+        if r["exchange"] == "KRX":
+            ticker_norm = _norm_krx(r["ticker"])
+            if ticker_norm in stocks_tickers["KRX"]:
+                r["ticker"] = krx_norm_to_real[ticker_norm]  # usa il ticker vero di stocks
+                by_ex[r["exchange"]].append(r)
+        else:
+            if r["ticker"] in stocks_tickers.get(r["exchange"], set()):
+                by_ex[r["exchange"]].append(r)
+
+    print(f" DEBUG: candidati SGX nel file TIKR (raw_rows): {len([r for r in raw_rows if r['exchange']=='SGX'])}")
+    print(f" DEBUG: ticker SGX in stocks_tickers: {len(stocks_tickers['SGX'])}")
+    print(f" DEBUG: primi 5 ticker SGX dal TIKR: {[r['ticker'] for r in raw_rows if r['exchange']=='SGX'][:5]}")
+    print(f" DEBUG: primi 5 ticker SGX in stocks: {list(stocks_tickers['SGX'])[:5]}")
 
     for exchange, target in TARGETS.items():
         rows = sorted(by_ex[exchange], key=lambda x: x["mktcap"], reverse=True)[:target]
