@@ -1559,5 +1559,117 @@ per il forward 12m, FY_next2/FY_next3 per il 24m, ecc.). Giappone escluso
 (EPS GAAP invece di normalizzato). CAGR tra le due finestre calcolato come
 radice quadrata del prodotto dei due fattori di crescita, non elevamento a
 potenza negativa (errore corretto in chat prima di scrivere codice).
+Deciso: Ke semplificato = Rf_valuta + 5% ERP, senza Beta per titolo (Beta
+richiederebbe scaricare storico indici locali per ogni mercato — lavoro
+non ancora fatto). Reverse DCF completo rimandato, priorità data prima a
+finire la pipeline di aggiornamento del sito.
+
+---
+
+## SESSIONE 05/07/2026 — REBUILD COMPLETO PIPELINE + FIX AGGIUNTIVI
+
+### Confermati e funzionanti
+
+**1. Fix bug critico parse_mktcap (formato numerico americano vs europeo)**
+La funzione di conversione market cap scritta il giorno prima assumeva
+sempre formato europeo (virgola=decimale), ma i dati TIKR sono in formato
+americano (es. `$337,855.12MM`, virgola=migliaia, punto=decimale). Ogni
+market cap falliva la conversione, azzerando i candidati in TUTTI i
+mercati di tutti e tre i continenti. Confermato riproducendo l'errore
+esatto con un valore reale dal file dell'utente, poi corretto e
+riverificato con lo stesso valore. Fix applicato a
+`universe_eu_unified.py`, `update_universe_na.py`,
+`universe_apac_unified.py`.
+
+**2. LEEWAY_KEY mancante nel workflow update_universe_na.yml**
+Quando lo script era stato aggiornato per includere la verifica Leeway,
+il workflow YAML non era stato aggiornato per passare il secret
+`LEEWAY_KEY` — ogni chiamata a Leeway falliva con chiave vuota, azzerando
+l'intero universo US+TSX (`in_universe=true` impostato per 0 titoli, sito
+rimasto temporaneamente senza universo NA). Trovato grazie a uno
+screenshot dell'utente, corretto subito, universo ripristinato.
+
+**3. Consolidamento script universo — da 6 file a 2**
+Sostituiti `update_universe_mil_lse.py` + `update_universe_eu_all.py` con
+un unico `universe_eu_unified.py` (16 mercati EU in un solo file, stessa
+logica: 6 mercati a soglia 400M senza tetto, 7 top-100, 3 senza tetto).
+Sostituiti `update_universe_apac_jhk.py` + `update_universe_krx_sgx.py`
+con un unico `universe_apac_unified.py` (5 mercati APAC: TSE=1000,
+SEHK=500, ASX=350, KRX=400, SGX=100). I 4 vecchi workflow disattivati
+(non cancellati) per evitare ambiguità su quale lanciare.
+
+**4. Verifica Leeway aggiunta alla costruzione di TUTTI gli universi**
+Ogni candidato (per tutti e 3 i continenti) deve avere anche un prezzo
+verificabile su Leeway (finestra leggera di 30gg) per entrare in
+universo — altrimenti scartato e sostituito automaticamente dal prossimo
+per market cap (backfill), sui mercati con tetto (top-N). Sui mercati a
+soglia, chi non ha prezzo Leeway viene escluso e basta (nessun backfill
+necessario). Fallback `.F` per la Germania incluso ovunque.
+
+**5. Rebuild completo eseguito con successo su tutti e tre i continenti**
+Universo EU (16 mercati), Universo NA (US+TSX), Universo APAC (5 mercati,
+mai fatto prima in versione unificata) — tutti completati con successo
+dopo il fix del parse_mktcap.
+
+**6. Fix calendarizzazione "not_yet" verificato in produzione**
+`weekly_eu.py` rilanciato con il fix (vedi sessione precedente) —
+completato con successo in 26 secondi, in linea con la durata storica
+(nessun rallentamento anomalo: questo script fa poche decine di chiamate
+batch, non migliaia di chiamate singole come i file daily). `weekly_us.py`
+e `weekly_apac.py` rilanciati anch'essi con successo.
+
+**7. Daily EU rilanciato con successo (88 min)** dopo un fallimento la
+sera prima (precedente a tutti i fix di oggi — non indagato nel dettaglio
+dato che predatava le correzioni).
+
+**8. Rimossa la riproduzione di testo Yahoo Finance non licenziato**
+`src/app/stock/[id]/page.tsx`: sostituito il blocco descrizione aziendale
+(scaricato in passato da Yahoo via script Colab, mai autorizzato alla
+ripubblicazione) con un link diretto al profilo Yahoo Finance del titolo.
+`src/app/stock/[id]/layout.tsx`: rimosso uno snippet della stessa
+descrizione dal meta tag SEO (finiva nei risultati Google/anteprime
+social) — sostituito con testo originale basato solo su dati proprietari
+(scores, P/E, P/B).
+
+**9. Trovati e corretti 6 ticker Leeway sbagliati negli indici EU**
+In `daily_eu.py`, la tupla `EU_INDICES` usava per interrogare Leeway
+un'abbreviazione colloquiale (es. "DAX") invece del simbolo vero
+(es. "GDAXI") per 6 indici su 13: DAX→GDAXI, SMI→SSMI,
+OMX Copenhagen (C25)→OMXC25, Euro Stoxx 50 (SX5E)→STOXX50E,
+OMX Helsinki (HEX)→OMXH25, PSI 20 (PSI)→PSI20. Confermato dal fatto che
+i valori mostrati sul sito erano assurdi (es. DAX=45 invece di ~20.000).
+Fix pushato, **non ancora verificato con un run fresco**.
+
+### Segnalato ma NON risolto — richiede verifica manuale dell'utente
+
+**Altri 7 indici EU con valori ANCHE loro implausibili nonostante il nome
+del ticker sembri corretto** (CAC 40, AEX, IBEX 35, BEL 20, OMX Stockholm,
+ATX, STOXX 600) — es. CAC40 mostrava 1,79 invece di ~7.500. Ipotesi non
+confermata: Leeway senza suffisso di mercato potrebbe agganciare un ETF o
+fondo omonimo invece dell'indice vero. Richiede verifica diretta su
+Leeway (come già fatto con successo per il caso `.F` della Germania).
+
+**Esclusioni eccessive nell'universo dopo la verifica Leeway** — l'utente
+ha segnalato titoli noti esclusi ingiustamente (es. Berkshire Hathaway
+negli USA, e casi simili in Canada/Germania/Austria). Causa sospetta ma
+NON verificata: probabile problema di formattazione ticker per simboli
+con punto (es. BRK.A/BRK.B) nella funzione `ha_prezzo_su_leeway()`.
+Esplicitamente rimandato dall'utente ("sono stufo di provare, va bene
+così per ora") — da riprendere in futuro insieme al lavoro sui
+fondamentali.
+
+### Applicato oggi — non ancora verificato con un run completo
+
+- **`fetch_beta_us.py`** (nuovo): scarica il campo `beta` precalcolato da
+  Yahoo Finance (metodologia standard: 60 mesi contro S&P 500) per tutti
+  i titoli US in universo via `yahoo_ticker`, più il rendimento del
+  Treasury 10Y (`^TNX`, diviso per 10 per ottenere la percentuale) come
+  risk-free rate di riferimento USA. Richiede le colonne/tabelle
+  `fundamentals.beta` e `macro_rates` (create dall'utente via SQL Editor
+  prima del lancio). Lanciato, esito non ancora noto al momento di
+  scrivere questa nota.
+- **Daily US, Daily APAC**: rilanciati dopo essere stati cancellati il
+  giorno prima, in corso al momento di scrivere questa nota.
+
 
 
