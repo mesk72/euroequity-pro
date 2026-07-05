@@ -80,7 +80,7 @@ def implied_growth_bisection(price, eps_ntm, ke, g_terminal=G_TERMINAL, years=YE
 
 
 def get_fy_month(ticker, exchange):
-    return fy_map.get(ticker, 12)
+    return fy_map.get((ticker, exchange), 12)
 
 
 def calendarize_full(ticker, exchange, fy_values, today_dt):
@@ -140,14 +140,23 @@ if risk_free is None:
 
 # ── 2. FISCAL YEAR END PER TICKER ────────────────────────────
 print("\n[2/4] Lettura fiscal_year_end.csv...")
+TIKR_FY_EXCHANGE_MAP = {
+    "NasdaqGS": "US", "NasdaqGM": "US", "NasdaqCM": "US",
+    "NYSE": "US", "NYSEAM": "US", "ARCA": "US", "BATS": "US",
+    "OTCPK": "US", "CNSX": "US", "TSXV": "TSX",
+}
+def _norm_fy_exchange(raw):
+    return TIKR_FY_EXCHANGE_MAP.get(raw, raw)
+
 fy_map = {}
 try:
     r = requests.get(SUPABASE_URL + "/storage/v1/object/tikr-uploads/fiscal_year_end.csv", headers=headers_r)
     reader = csv.DictReader(io.StringIO(r.text))
     for row in reader:
         ticker = row["ticker"].strip()
+        exchange = _norm_fy_exchange(row["exchange"].strip())
         month = parse_num(row.get("fiscal_month", "12"))
-        fy_map[ticker] = int(month) if month else 12  # chiave solo ticker: exchange qui usa i nomi TIKR (es. NasdaqGS), non i nostri codici interni
+        fy_map[(ticker, exchange)] = int(month) if month else 12
     print(f"  Fiscal year end caricati: {len(fy_map)}")
 except Exception as e:
     print(f"  WARN lettura fiscal_year_end.csv: {e} — uso default dicembre per tutti")
