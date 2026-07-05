@@ -496,6 +496,42 @@ export default function StockPage() {
           </div>
         )}
 
+        {(() => {
+          const asiaExchange = (stock as any).exchange as string
+          const asiaTicker = (stock as any).ticker as string
+          if (!asiaTicker) return null
+          let asiaLink: { url: string, label: string } | null = null
+          if (asiaExchange === 'TSE') {
+            asiaLink = { url: `https://kabutan.jp/stock/?code=${asiaTicker}`, label: 'Kabutan (Japan)' }
+          } else if (asiaExchange === 'SEHK') {
+            const noZeros = asiaTicker.replace(/^0+/, '')
+            asiaLink = { url: `https://www.hkex.com.hk/Market-Data/Securities-Prices/Equities/Equities-Quote?sym=${noZeros}&sc_lang=en`, label: 'HKEX (Hong Kong)' }
+          } else if (asiaExchange === 'ASX') {
+            asiaLink = { url: `https://www.asx.com.au/markets/company/${asiaTicker}`, label: 'ASX (Australia)' }
+          } else if (asiaExchange === 'SGX') {
+            asiaLink = { url: `https://investors.sgx.com/market/security-details/stocks/${asiaTicker}?from=/market/securities`, label: 'SGX (Singapore)' }
+          } else if (asiaExchange === 'KRX') {
+            const noA = asiaTicker.replace(/^A/, '')
+            asiaLink = { url: `https://finance.naver.com/item/main.naver?code=${noA}`, label: 'Naver Finance (Korea)' }
+          }
+          if (!asiaLink) return null
+          return (
+            <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+              borderRadius:4, padding:'16px 20px', marginBottom:12 }}>
+              <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
+                Local Exchange
+              </div>
+              <a href={asiaLink.url} target="_blank" rel="noopener noreferrer"
+                style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed',
+                  fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3,
+                  textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+                📈 View on {asiaLink.label} ↗
+              </a>
+            </div>
+          )
+        })()}
+
         {(stock as any).exchange === 'US' && (stock as any).ke != null && (
           user?.id ? (
             <ReverseDCFSection key={`${(stock as any).ticker}-${(stock as any).exchange}`} stock={stock as any} />
