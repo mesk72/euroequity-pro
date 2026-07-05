@@ -126,6 +126,32 @@ for s in all_stocks:
 for ex, n in by_exchange.items():
     print(f"    {ex}: {n}")
 
+# Salta i titoli che hanno gia' storico sufficiente in prices_eod (per
+# non rifare da zero un rebuild completo quando serve solo colmare le
+# lacune dei titoli appena entrati in universo)
+print(f"\n  Verifico quali titoli hanno gia' storico...")
+existing_tickers = set()
+offset = 0
+while True:
+    r = safe_get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+        params={"select": "ticker,exchange", "exchange": f"in.({','.join(EXCHANGES)})",
+                "offset": str(offset), "limit": "10000"})
+    if r is None: break
+    try:
+        data = r.json()
+    except Exception:
+        break
+    if not isinstance(data, list) or not data: break
+    for d in data:
+        existing_tickers.add((d["ticker"], d["exchange"]))
+    offset += 10000
+    if len(data) < 10000: break
+
+before_count = len(all_stocks)
+all_stocks = [s for s in all_stocks if (s["ticker"], s["exchange"]) not in existing_tickers]
+print(f"  Titoli con storico gia' presente: {before_count - len(all_stocks)} — saltati")
+print(f"  Titoli da ricostruire: {len(all_stocks)}")
+
 # ── 2. CANCELLA E RICOSTRUISCE 5 ANNI PER OGNI TITOLO ────────
 print(f"\n[2/2] Ricostruzione storico 5 anni ({len(all_stocks)} titoli)...")
 ok = fail = 0
