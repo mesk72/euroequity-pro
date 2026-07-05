@@ -496,11 +496,115 @@ export default function StockPage() {
           </div>
         )}
 
+        {(stock as any).exchange === 'US' && (stock as any).ke != null && (
+          <ReverseDCFSection stock={stock as any} />
+        )}
+
         <div style={{ marginTop:16, fontSize:10, color:'var(--text4)',
           textAlign:'center', paddingTop:12, borderTop:'1px solid var(--border)' }}>
           ⚠️ Data for informational purposes only · Not investment advice ·
           Andrea Meschini · Verona, Italy · andrea@forwardalpha.pro
         </div>
+      </div>
+    </div>
+  )
+}
+
+function ReverseDCFSection({ stock }: { stock: any }) {
+  const price   = stock.price
+  const peFwd   = stock.peFwd
+  const ke      = stock.ke
+  const impliedG = stock.impliedGrowth10y
+  const epsCagr2y = stock.epsCagr2y
+  const growth1224 = stock.epsGrowth1224m
+  const growth2436 = stock.epsGrowth2436m
+  const epsNtm = (price != null && peFwd) ? price / peFwd : null
+
+  const G_TERMINAL = 0.025
+  const YEARS = 10
+
+  // Stesso DCF a due stadi usato lato server (bisection), qui usato in
+  // avanti: dato un tasso di crescita, calcola il prezzo implicito.
+  function priceForGrowth(g: number): number | null {
+    if (epsNtm == null || ke == null || ke <= G_TERMINAL) return null
+    let pv = 0
+    for (let t = 1; t <= YEARS; t++) {
+      pv += epsNtm * Math.pow(1 + g, t) / Math.pow(1 + ke, t)
+    }
+    const epsTerminal = epsNtm * Math.pow(1 + g, YEARS)
+    const tv = epsTerminal * (1 + G_TERMINAL) / (ke - G_TERMINAL)
+    pv += tv / Math.pow(1 + ke, YEARS)
+    return pv
+  }
+
+  const [growthInput, setGrowthInput] = useState(
+    impliedG != null ? Math.round(impliedG * 1000) / 10 : 10
+  )
+  const simulatedPrice = priceForGrowth(growthInput / 100)
+
+  const fmtPct = (v: number | null) => v == null ? '—' : `${(v * 100).toFixed(1)}%`
+  const fmtPrice = (v: number | null) => v == null ? '—' : v.toFixed(2)
+
+  return (
+    <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
+      borderRadius:4, padding:'16px 20px', marginBottom:12 }}>
+      <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+        letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:10 }}>
+        Reverse Earnings Model
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:14 }}>
+        <div>
+          <div style={{ fontSize:9, color:'var(--text4)', textTransform:'uppercase' }}>Implied Growth (10y)</div>
+          <div style={{ fontSize:16, fontWeight:700, color:'var(--text1)' }}>{fmtPct(impliedG)}</div>
+        </div>
+        <div>
+          <div style={{ fontSize:9, color:'var(--text4)', textTransform:'uppercase' }}>EPS CAGR (12-36m)</div>
+          <div style={{ fontSize:16, fontWeight:700, color:'var(--text1)' }}>{fmtPct(epsCagr2y)}</div>
+        </div>
+        <div>
+          <div style={{ fontSize:9, color:'var(--text4)', textTransform:'uppercase' }}>EPS Growth 12-24m</div>
+          <div style={{ fontSize:13, color:'var(--text2)' }}>{fmtPct(growth1224)}</div>
+        </div>
+        <div>
+          <div style={{ fontSize:9, color:'var(--text4)', textTransform:'uppercase' }}>EPS Growth 24-36m</div>
+          <div style={{ fontSize:13, color:'var(--text2)' }}>{fmtPct(growth2436)}</div>
+        </div>
+      </div>
+
+      <div style={{ fontSize:11, color:'var(--text3)', lineHeight:1.6, marginBottom:12 }}>
+        Il modello calcola l&apos;implied growth confrontando prezzo attuale, EPS forward e
+        costo del capitale (Ke = risk-free + Beta × 5%). Se l&apos;implied growth è molto più
+        alto della crescita EPS attesa dagli analisti, il mercato sta prezzando aspettative
+        superiori a quelle stimate — e viceversa.
+      </div>
+
+      <div style={{ borderTop:'1px solid var(--border)', paddingTop:12 }}>
+        <div style={{ fontSize:10, color:'var(--text4)', marginBottom:6 }}>
+          Simula: se la crescita a 10 anni fosse...
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
+          <input type="range" min={-20} max={40} step={0.5} value={growthInput}
+            onChange={e => setGrowthInput(parseFloat(e.target.value))}
+            style={{ flex:1 }} />
+          <input type="number" value={growthInput} step={0.5}
+            onChange={e => setGrowthInput(parseFloat(e.target.value) || 0)}
+            style={{ width:64, fontSize:12, padding:'4px 6px', background:'var(--bg)',
+              border:'1px solid var(--border)', borderRadius:3, color:'var(--text1)' }} />
+          <span style={{ fontSize:12, color:'var(--text3)' }}>%</span>
+        </div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <span style={{ fontSize:11, color:'var(--text4)' }}>...il prezzo giusto sarebbe:</span>
+          <span style={{ fontSize:18, fontWeight:700, color:'var(--orange)' }}>
+            {stock.exchange === 'US' ? '$' : ''}{fmtPrice(simulatedPrice)}
+          </span>
+        </div>
+        {price != null && simulatedPrice != null && (
+          <div style={{ fontSize:11, color:'var(--text4)', marginTop:4, textAlign:'right' }}>
+            vs prezzo attuale {price.toFixed(2)} ({simulatedPrice > price ? '+' : ''}
+            {((simulatedPrice / price - 1) * 100).toFixed(1)}%)
+          </div>
+        )}
       </div>
     </div>
   )
