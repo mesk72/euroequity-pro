@@ -51,10 +51,12 @@ LEEWAY_SUFFIX = {
     "TSE":  ".TSE",   "ASX":   ".AU",
 }
 
-def leeway_ticker(ticker, exchange):
+def leeway_ticker(ticker, exchange, primary_ex=""):
     if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
     if exchange == "SEHK": return ticker.zfill(4) + ".HK"
-    if exchange == "KRX":  return ticker.lstrip("A") + ".KO"
+    if exchange == "KRX":
+        # KOSPI = .KO, KOSDAQ = .KQ (verificato 06/07/2026)
+        return ticker.lstrip("A") + (".KQ" if primary_ex == "KOSDAQ" else ".KO")
     if exchange == "SGX":  return ticker + ".SG"
     if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
     if exchange == "TSX":  return ticker.replace(".", "-") + ".TO"
@@ -107,7 +109,7 @@ for exchange in EXCHANGES:
     offset = 0
     while True:
         r = safe_get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-            params={"select": "ticker,exchange", "in_universe": "eq.true",
+            params={"select": "ticker,exchange,primary_exchange", "in_universe": "eq.true",
                     "exchange": f"eq.{exchange}", "offset": str(offset), "limit": "1000"})
         if r is None: break
         try:
@@ -159,7 +161,7 @@ t0 = time.time()
 for i, stock in enumerate(all_stocks):
     ticker = stock["ticker"]
     exchange = stock["exchange"]
-    lt = leeway_ticker(ticker, exchange)
+    lt = leeway_ticker(ticker, exchange, stock.get("primary_exchange") or "")
     url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
     resp = safe_get(url)
     data_l = None
@@ -168,6 +170,17 @@ for i, stock in enumerate(all_stocks):
             data_l = resp.json()
         except Exception:
             data_l = None
+    # Fallback Corea: se la classificazione KOSE/KOSDAQ non e' esatta,
+    # prova l'altro suffisso (.KO <-> .KQ) prima di dichiarare fail
+    if (not isinstance(data_l, list) or not data_l) and exchange == "KRX":
+        alt = lt[:-3] + (".KO" if lt.endswith(".KQ") else ".KQ")
+        url_kr = f"{LEEWAY_BASE}/historicalquotes/{alt}?apitoken={LEEWAY_KEY}&from={FROM_5Y}&to={TODAY}"
+        resp = safe_get(url_kr)
+        if resp is not None and resp.status_code == 200:
+            try:
+                data_l = resp.json()
+            except Exception:
+                data_l = None
     # Fallback Germania: .XETRA a volte non trova titoli minori, .F spesso si
     if (not isinstance(data_l, list) or not data_l) and exchange == "XETRA":
         lt = ticker.rstrip(".") + ".F"
