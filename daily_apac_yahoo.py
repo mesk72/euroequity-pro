@@ -57,8 +57,8 @@ all_stocks = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
-                "exchange": "in.(TSE,SEHK,ASX)",
+        params={"select": "ticker,exchange,yahoo_ticker,primary_exchange", "in_universe": "eq.true",
+                "exchange": "in.(TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
     try: data = r.json()
@@ -84,12 +84,14 @@ YAHOO_SUFFIX = {
     "SGX":  ".SI", # Yahoo: D05.SI (DBS)
 }
 
-def yahoo_ticker(ticker, exchange):
+def yahoo_ticker(ticker, exchange, primary_ex=""):
     if exchange == "SEHK": return ticker.zfill(4) + ".HK"
     if exchange == "TSE":
         # Tokyo: rimuovi zeri iniziali extra, aggiungi .T
         return ticker.lstrip("0") + ".T" if ticker.isdigit() else ticker + ".T"
-    if exchange == "KRX": return ticker.lstrip("A") + ".KS"
+    if exchange == "KRX":
+        # Yahoo: KOSPI = .KS, KOSDAQ = .KQ
+        return ticker.lstrip("A") + (".KQ" if primary_ex == "KOSDAQ" else ".KS")
     if exchange == "SGX": return ticker + ".SI"
     if exchange in ("TSX",): return ticker.replace(".", "-") + ".TO"
     return ticker + YAHOO_SUFFIX.get(exchange, "")
@@ -120,7 +122,7 @@ for exchange, tickers in by_exchange.items():
             if last_dates.get((tk, exchange), "") >= TODAY:
                 ok_yf += 1; continue
             s = stock_map.get(tk, {})
-            yt = s.get("yahoo_ticker") or yahoo_ticker(tk, exchange)
+            yt = s.get("yahoo_ticker") or yahoo_ticker(tk, exchange, s.get("primary_exchange") or "")
             ytickers.append(yt)
             ticker_map[yt] = (tk, exchange)
         if not ytickers: continue
@@ -365,42 +367,4 @@ requests.post(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_up, json=[log
 print(f"\nLog: leeway={ok_prices} fail={fail_prices} momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
 print("\n" + "=" * 60)
 print("DAILY APAC LOAD COMPLETATO")
-print("=" * 60)SPECIAL_TICKERS = {
-    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
-    "BA.": "BA.LSE", "NG.": "NG.LSE",
-    "ROG": "RO.SW",
-}
-
-SPECIAL_TICKERS = {
-    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
-    "BA.": "BA.LSE", "NG.": "NG.LSE",
-    "ROG": "RO.SW",
-}
-
-SPECIAL_TICKERS = {
-    "BP.": "BP.LSE", "RR.": "RR.LSE", "BT.A": "BT-A.LSE",
-    "BA.": "BA.LSE", "NG.": "NG.LSE", "ROG": "RO.SW",
-}
-
-LEEWAY_SUFFIX = {
-    "MIL":  ".MI",    "XETRA": ".XETRA", "PA":   ".PA",
-    "AS":   ".AS",    "MC":    ".MC",     "BR":   ".BR",
-    "LS":   ".LS",    "VI":    ".VI",     "HE":   ".HE",
-    "IR":   ".IR",    "AT":    ".VI",
-    "LSE":  ".LSE",   "AIM":   ".AIM",   "SWX":  ".SW",
-    "OM":   ".ST",    "NGM":   ".ST",    "OB":   ".OL",
-    "CPSE": ".CO",
-    "US":   ".US",    "TSX":   ".TO",
-    "TSE":  ".TSE",   "ASX":   ".AU",
-}
-
-def leeway_ticker(ticker, exchange):
-    if ticker in SPECIAL_TICKERS: return SPECIAL_TICKERS[ticker]
-    if exchange == "SEHK": return ticker.zfill(4) + ".HK"
-    if exchange in ("CPSE", "OM", "NGM"): return ticker.replace(" ", "-") + LEEWAY_SUFFIX.get(exchange, "")
-    if exchange == "TSX": return ticker.replace(".", "-") + ".TO"
-    if exchange == "BR":  return ticker.replace(".", "") + ".BR"
-    ticker_clean = ticker.rstrip(".")
-    return ticker_clean + LEEWAY_SUFFIX.get(exchange, "")
-
-
+print("=" * 60)
