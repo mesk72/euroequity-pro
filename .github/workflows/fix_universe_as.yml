@@ -25,7 +25,7 @@ jobs:
         run: |
           git config user.name "debug-bot"
           git config user.email "debug-bot@users.noreply.github.com"
-          git pull --rebase
           git add debug_output_as.txt
           git commit -m "output fix universo AS" || echo "nothing to commit"
+          git pull --rebase
           git push
