@@ -23,19 +23,24 @@ def leeway_ticker(ticker, exchange):
     return ticker.rstrip(".").replace(".", "-") + ".US"
 
 def ha_prezzo_su_leeway(ticker, exchange):
-    """Verifica leggera (30gg) — ci basta sapere se Leeway conosce il ticker."""
+    """Verifica leggera (30gg) — 3 tentativi con backoff: senza retry un
+    timeout transitorio scarta per sempre un titolo valido, ed e' questo
+    che faceva fermare US a ~1979 invece di 2000."""
     to_d = datetime.now().strftime("%Y-%m-%d")
     from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
     lt = leeway_ticker(ticker, exchange)
-    try:
-        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
-        resp = requests.get(url, timeout=15)
-        if resp.status_code == 200:
-            data = resp.json()
-            if isinstance(data, list) and data:
-                return True
-    except Exception:
-        pass
+    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+    for attempt in range(3):
+        try:
+            resp = requests.get(url, timeout=20)
+            if resp.status_code == 200:
+                data = resp.json()
+                return isinstance(data, list) and bool(data)
+            if resp.status_code in (429, 500, 502, 503, 504):
+                time.sleep(2 * (attempt + 1)); continue
+            return False  # 404 e simili: risposta definitiva
+        except Exception:
+            if attempt < 2: time.sleep(2 * (attempt + 1))
     return False
 
 EX_MAP = {
@@ -247,3 +252,12 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
 
 print(f"=== TOTALE NA IN UNIVERSE: {total_na} ===")
 print(f"Atteso: US=2000 + TSX=400 = 2400")
+
+# Verifica finale REALE dal DB (count=exact), non il conteggio dei chunk
+print("\nVerifica finale dal DB:")
+headers_count = {**headers_r, "Prefer": "count=exact"}
+for exch in ["US", "TSX"]:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
+        params={"select": "ticker", "in_universe": "eq.true",
+                "exchange": f"eq.{exch}", "limit": "1"})
+    print(f"  {exch} in_universe (DB): {r.headers.get('content-range')}")
