@@ -58,7 +58,7 @@ offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
         params={"select": "ticker,exchange,yahoo_ticker,primary_exchange", "in_universe": "eq.true",
-                "exchange": "in.(TSE,SEHK,ASX,KRX,SGX)",
+                "exchange": "in.(TSE,SEHK,ASX)",  # KRX/SGX ESCLUSI: prezzi solo da Leeway (daily_apac.py)
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
     try: data = r.json()
