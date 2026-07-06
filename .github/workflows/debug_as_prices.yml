@@ -3,6 +3,9 @@ name: Debug AS Prices
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   debug:
     runs-on: ubuntu-latest
@@ -17,4 +20,11 @@ jobs:
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
-        run: python debug_as_prices.py
+        run: python debug_as_prices.py | tee debug_output_as.txt
+      - name: Commit output
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add debug_output_as.txt
+          git commit -m "debug output AS prices" || echo "nothing to commit"
+          git push
