@@ -1,0 +1,139 @@
+============================================================
+[1] TOP CANDIDATI AS (ENXTAM) DAL TIKR EU
+============================================================
+TIKR EU: HTTP 200 — 3926 righe
+Candidati AS (esclusi ETF/fondi): 113
+
+============================================================
+[2] CHECK .AS SUI PRIMI 115 PER MKT CAP
+============================================================
+  SENZA PREZZO: SWICH (SWI Capital Holding Ltd.) mkt_cap=3,958MM
+  SENZA PREZZO: KORPT (Kempen Oranje Participaties) mkt_cap=1,778MM
+  SENZA PREZZO: VTA (Volta Finance Limited) mkt_cap=250MM
+  SENZA PREZZO: CABLE (Global InterConnection Group Limited) mkt_cap=69MM
+  SENZA PREZZO: BACE (BM3EAC Corp.) mkt_cap=62MM
+  SENZA PREZZO: NAI (New Amsterdam Invest N.V.) mkt_cap=52MM
+  SENZA PREZZO: ARCPF (Arcona Property Fund N.V.) mkt_cap=29MM
+  SENZA PREZZO: ERC (ER Capital N.V.) mkt_cap=10MM
+  SENZA PREZZO: AGIL (Agility Capital Holding Inc.) mkt_cap=2MM
+  SENZA PREZZO: BBED (Beter Bed Holding N.V.) mkt_cap=0MM
+  SENZA PREZZO: JDEP (JDE Peet's N.V.) mkt_cap=0MM
+  SENZA PREZZO: TITAN (Titan N.V.) mkt_cap=0MM
+  SENZA PREZZO: GSED (Goldman Sachs Paraplufonds 1 N.V. - Goldman Sachs Europe Sustainable Small Cap Fund (NL)) mkt_cap=0MM
+  SENZA PREZZO: CEMD (CARDANO ASSET MANAGEMENT N.V - CARDANO ESG TRANSITION EMERGING MARKETS Fund) mkt_cap=0MM
+  SENZA PREZZO: ASNMF (ASN-Novib Microkredietfonds) mkt_cap=0MM
+
+  OK con .AS: 98/115 — falliti: 15
+
+============================================================
+[3] TEST SUFFISSI ALTERNATIVI SUI FALLITI
+============================================================
+
+  SWICH — SWI Capital Holding Ltd. (mkt_cap=3,958MM)
+    SWICH.F: righe=0
+    SWICH.XETRA: righe=0
+    SWICH.BR: righe=0
+    SWICH.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  KORPT — Kempen Oranje Participaties (mkt_cap=1,778MM)
+    KORPT.F: righe=0
+    KORPT.XETRA: righe=0
+    KORPT.BR: righe=0
+    KORPT.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  VTA — Volta Finance Limited (mkt_cap=250MM)
+    VTA.F: righe=0
+    VTA.XETRA: righe=0
+    VTA.BR: righe=0
+    VTA.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  CABLE — Global InterConnection Group Limited (mkt_cap=69MM)
+    CABLE.F: righe=0
+    CABLE.XETRA: righe=0
+    CABLE.BR: righe=0
+    CABLE.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  BACE — BM3EAC Corp. (mkt_cap=62MM)
+    BACE.F: righe=0
+    BACE.XETRA: righe=0
+    BACE.BR: righe=0
+    BACE.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  NAI — New Amsterdam Invest N.V. (mkt_cap=52MM)
+    NAI.F: righe=0
+    NAI.XETRA: righe=0
+    NAI.BR: righe=0
+    NAI.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  ARCPF — Arcona Property Fund N.V. (mkt_cap=29MM)
+    ARCPF.F: righe=0
+    ARCPF.XETRA: righe=0
+    ARCPF.BR: righe=0
+    ARCPF.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  ERC — ER Capital N.V. (mkt_cap=10MM)
+    ERC.F: righe=0
+    ERC.XETRA: righe=0
+    ERC.BR: righe=0
+    ERC.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  AGIL — Agility Capital Holding Inc. (mkt_cap=2MM)
+    AGIL.F: righe=0
+    AGIL.XETRA: righe=0
+    AGIL.BR: righe=0
+    AGIL.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  BBED — Beter Bed Holding N.V. (mkt_cap=0MM)
+    BBED.F: righe=0
+    BBED.XETRA: righe=0
+    BBED.BR: righe=0
+    BBED.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  JDEP — JDE Peet's N.V. (mkt_cap=0MM)
+    JDEP.F: righe=0
+    JDEP.XETRA: righe=0
+    JDEP.BR: righe=0
+    JDEP.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  TITAN — Titan N.V. (mkt_cap=0MM)
+    TITAN.F: righe=0
+    TITAN.XETRA: righe=0
+    TITAN.BR: righe=0
+    TITAN.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  GSED — Goldman Sachs Paraplufonds 1 N.V. - Goldman Sachs Europe Sustainable Small Cap Fund (NL) (mkt_cap=0MM)
+    GSED.F: righe=0
+    GSED.XETRA: righe=0
+    GSED.BR: righe=0
+    GSED.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+  CEMD — CARDANO ASSET MANAGEMENT N.V - CARDANO ESG TRANSITION EMERGING MARKETS Fund (mkt_cap=0MM)
+    CEMD.F: righe=0
+    CEMD.XETRA: righe=20  <-- FUNZIONA
+    CEMD.BR: righe=0
+    CEMD.PA: righe=0
+
+  ASNMF — ASN-Novib Microkredietfonds (mkt_cap=0MM)
+    ASNMF.F: righe=0
+    ASNMF.XETRA: righe=0
+    ASNMF.BR: righe=0
+    ASNMF.PA: righe=0
+    NESSUN SUFFISSO ALTERNATIVO FUNZIONA
+
+============================================================
+[4] CONFRONTO CON DB: AS in_universe attuali
+============================================================
+  AS in_universe (DB): 0-0/97
