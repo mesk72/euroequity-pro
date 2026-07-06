@@ -31,22 +31,29 @@ def leeway_ticker(ticker, exchange):
     return ticker.rstrip(".") + LEEWAY_SUFFIX.get(exchange, "")
 
 def ha_prezzo_su_leeway(ticker, exchange):
-    """Verifica leggera (30gg). Per la Germania ritenta con .F se .XETRA fallisce."""
+    """Verifica leggera (30gg). Per la Germania ritenta con .F se .XETRA fallisce.
+    3 tentativi con backoff per errori transitori: senza retry un timeout
+    scarta per sempre un titolo valido (es. AS fermo a 97 invece di 98)."""
     to_d = datetime.now().strftime("%Y-%m-%d")
     from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
     candidati_lt = [leeway_ticker(ticker, exchange)]
     if exchange == "XETRA":
         candidati_lt.append(ticker.rstrip(".") + ".F")
     for lt in candidati_lt:
-        try:
-            url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
-            resp = requests.get(url, timeout=15)
-            if resp.status_code == 200:
-                data = resp.json()
-                if isinstance(data, list) and data:
-                    return True
-        except Exception:
-            continue
+        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+        for attempt in range(3):
+            try:
+                resp = requests.get(url, timeout=20)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if isinstance(data, list) and data:
+                        return True
+                    break  # 200 ma vuoto: risposta definitiva, passa al prossimo lt
+                if resp.status_code in (429, 500, 502, 503, 504):
+                    time.sleep(2 * (attempt + 1)); continue
+                break  # 404 e simili: definitivo
+            except Exception:
+                if attempt < 2: time.sleep(2 * (attempt + 1))
     return False
 
 EX_MAP = {
