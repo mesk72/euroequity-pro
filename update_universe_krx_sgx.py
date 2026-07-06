@@ -11,24 +11,42 @@ headers_up = {**headers_r, "Content-Type": "application/json",
 headers_ins = {**headers_r, "Content-Type": "application/json",
                "Prefer": "resolution=ignore-duplicates,return=minimal"}
 
-def leeway_ticker(ticker, exchange):
-    if exchange == "KRX": return ticker.lstrip("A") + ".KO"
+def leeway_ticker(ticker, exchange, ex_raw=""):
+    if exchange == "KRX":
+        # Verificato con debug 06/07/2026: KOSPI = .KO, KOSDAQ = .KQ
+        base = ticker.lstrip("A")
+        return base + (".KQ" if ex_raw == "KOSDAQ" else ".KO")
     if exchange == "SGX": return ticker + ".SG"
     return ticker
 
-def ha_prezzo_su_leeway(ticker, exchange):
+def _leeway_ha_dati(lt, from_d, to_d):
+    """3 tentativi con backoff: un timeout transitorio non deve
+    scartare per sempre un titolo valido (causa dei conteggi instabili)."""
+    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+    for attempt in range(3):
+        try:
+            resp = requests.get(url, timeout=20)
+            if resp.status_code == 200:
+                data = resp.json()
+                return isinstance(data, list) and bool(data)
+            if resp.status_code in (429, 500, 502, 503, 504):
+                time.sleep(2 * (attempt + 1)); continue
+            return False  # 404 e simili: risposta definitiva
+        except Exception:
+            if attempt < 2: time.sleep(2 * (attempt + 1))
+    return False
+
+def ha_prezzo_su_leeway(ticker, exchange, ex_raw=""):
     to_d = datetime.now().strftime("%Y-%m-%d")
     from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-    lt = leeway_ticker(ticker, exchange)
-    try:
-        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
-        resp = requests.get(url, timeout=15)
-        if resp.status_code == 200:
-            data = resp.json()
-            if isinstance(data, list) and data:
-                return True
-    except Exception:
-        pass
+    lt = leeway_ticker(ticker, exchange, ex_raw)
+    if _leeway_ha_dati(lt, from_d, to_d):
+        return True
+    # Corea: la classificazione KOSE/KOSDAQ di TIKR non e' sempre esatta —
+    # prova anche l'altro suffisso prima di scartare
+    if exchange == "KRX":
+        alt = lt[:-3] + (".KO" if lt.endswith(".KQ") else ".KQ")
+        return _leeway_ha_dati(alt, from_d, to_d)
     return False
 
 # Mapping exchange raw → ForwardAlpha
@@ -144,7 +162,7 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
     esclusi_no_leeway = []
     for t, mc in candidati:
         if len(eligible) >= top_n: break
-        if ha_prezzo_su_leeway(t, exchange):
+        if ha_prezzo_su_leeway(t, exchange, tikr[t].get("ex_raw", "")):
             eligible.append((t, mc))
         else:
             esclusi_no_leeway.append(t)
@@ -215,3 +233,12 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
 
 print(f"=== TOTALE KRX+SGX IN UNIVERSE: {total} ===")
 print(f"Atteso: KRX=400 + SGX=100 = 500")
+
+# Verifica finale REALE dal DB (count=exact), non il conteggio dei chunk
+print("\nVerifica finale dal DB:")
+headers_count = {**headers_r, "Prefer": "count=exact"}
+for exch in ["KRX", "SGX"]:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
+        params={"select": "ticker", "in_universe": "eq.true",
+                "exchange": f"eq.{exch}", "limit": "1"})
+    print(f"  {exch} in_universe (DB): {r.headers.get('content-range')}")
