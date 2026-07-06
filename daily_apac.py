@@ -37,7 +37,7 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 
-def leeway_ticker(ticker, exchange):
+def leeway_ticker(ticker, exchange, primary_ex=""):
     if exchange == "TSE":
         return ticker + ".TSE"         # es. 7203.TSE
     elif exchange == "SEHK":
@@ -45,7 +45,9 @@ def leeway_ticker(ticker, exchange):
     elif exchange == "ASX":
         return ticker + ".AU"          # es. BHP.AU
     elif exchange == "KRX":
-        return ticker.lstrip("A").zfill(6) + ".KO"  # es. 005930.KO (Samsung)
+        # KOSPI = .KO, KOSDAQ = .KQ (verificato su Leeway 06/07/2026)
+        base = ticker.lstrip("A").zfill(6)
+        return base + (".KQ" if primary_ex == "KOSDAQ" else ".KO")
     elif exchange == "SGX":
         return ticker + ".SG"          # es. D05.SG
     return ticker
@@ -61,7 +63,7 @@ all_stocks = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
+        params={"select": "ticker,exchange,yahoo_ticker,primary_exchange", "in_universe": "eq.true",
                 "exchange": "in.(TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
@@ -99,18 +101,23 @@ for stock in all_stocks:
         ok_leeway += 1
         continue
     start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
-    lt  = leeway_ticker(ticker, exchange)
+    lt  = leeway_ticker(ticker, exchange, stock.get("primary_exchange") or "")
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY
     try:
         resp = requests.get(url, timeout=15)
         data_l = resp.json() if resp.status_code == 200 else []
+        # Fallback Corea: prova l'altro suffisso (.KO <-> .KQ)
+        if (not isinstance(data_l, list) or not data_l) and exchange == "KRX":
+            alt = lt[:-3] + (".KO" if lt.endswith(".KQ") else ".KQ")
+            resp_kr = requests.get(LEEWAY_BASE + "/historicalquotes/" + alt + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY, timeout=15)
+            data_l = resp_kr.json() if resp_kr.status_code == 200 else []
         # Fallback: usa yahoo_ticker se il ticker principale fallisce
         if not isinstance(data_l, list) or not data_l:
             yt = stock.get("yahoo_ticker", "")
             if yt:
                 # Costruisci ticker Leeway dal yahoo_ticker rimuovendo suffisso Yahoo
                 yt_base = yt.split(".")[0] if "." in yt else yt
-                lt2 = leeway_ticker(yt_base, exchange)
+                lt2 = leeway_ticker(yt_base, exchange, stock.get("primary_exchange") or "")
                 if lt2 != lt:
                     resp2 = requests.get(LEEWAY_BASE + "/historicalquotes/" + lt2 + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY, timeout=15)
                     data_l = resp2.json() if resp2.status_code == 200 else []
@@ -195,12 +202,18 @@ if split_suspects:
     print(f"\n  Rilevati {len(split_suspects)} possibili stock split (variazione 1gg > {SPLIT_THRESHOLD_PCT}%): ricarico 5 anni di storico...")
     FROM_5Y = (datetime.now() - timedelta(days=365*5)).strftime("%Y-%m-%d")
     mom_by_key = {(u["ticker"], u["exchange"]): u for u in mom_updates}
+    primary_by_key = {(s["ticker"], s["exchange"]): (s.get("primary_exchange") or "") for s in all_stocks}
     for ticker, exchange, old_chg in split_suspects:
-        lt = leeway_ticker(ticker, exchange)
+        lt = leeway_ticker(ticker, exchange, primary_by_key.get((ticker, exchange), ""))
         url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5Y + "&to=" + TODAY
         try:
             resp = requests.get(url, timeout=20)
             data_l = resp.json() if resp.status_code == 200 else []
+            # Fallback Corea: prova l'altro suffisso (.KO <-> .KQ)
+            if (not isinstance(data_l, list) or not data_l) and exchange == "KRX":
+                alt = lt[:-3] + (".KO" if lt.endswith(".KQ") else ".KQ")
+                resp_kr = requests.get(LEEWAY_BASE + "/historicalquotes/" + alt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_5Y + "&to=" + TODAY, timeout=20)
+                data_l = resp_kr.json() if resp_kr.status_code == 200 else []
             if not isinstance(data_l, list) or not data_l:
                 print(f"    {ticker}.{exchange}: nessun dato storico da Leeway (variazione era {old_chg}%), salto")
                 continue
