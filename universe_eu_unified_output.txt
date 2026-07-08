@@ -1,0 +1,171 @@
+============================================================
+AGGIORNAMENTO IN_UNIVERSE — TUTTI I 16 MERCATI EU (unificato)
+============================================================
+
+TIKR EU: HTTP 200 — 3926 righe
+Colonne nel CSV: ['Ticker', 'Company Name', 'Primary Exchange', 'Country', 'Sector', 'Last Price', 'Last Mkt Cap', 'LTM P/E LTM', 'LTM P/BVPS LTM', 'EPS Normalized (FY 2025)', 'Mean EPS Normalized (FY 2026)', 'Mean EPS Normalized (FY 2027)', 'Mean EPS Normalized (FY 2028)', 'EPS (GAAP) (FY 2025)', 'Mean EPS (GAAP) (FY 2026)', 'Mean EPS (GAAP) (FY 2027)', 'Mean EPS (GAAP) (FY 2028)', 'Rev (FY 2025)', 'Mean Rev (FY 2026)', 'Mean Rev (FY 2027)', 'Mean Rev (FY 2028)', 'Mean EPS Normalized (FY 2030)', 'Mean EPS (GAAP) (FY 2029)', 'Mean EPS (GAAP) (FY 2030)', 'Mean Fwd P/E NTM', 'ECS Total Shares Outstanding on Filing Date LTM']
+Colonna market cap trovata e usata: Last Mkt Cap
+
+--- MIL ---
+  Nel TIKR: 123
+  Nel DB: 249
+  Esclusi ETF/fondi: 6 — Candidati: 117
+  Eligible (tutti (soglia)) CON prezzo Leeway: 117
+  Riconciliazione: nessun gap
+  in_universe=true: 117/117
+
+--- LSE ---
+  Nel TIKR: 432
+  Nel DB: 515
+  Esclusi ETF/fondi: 6 — Candidati: 426
+  Eligible (tutti (soglia)) CON prezzo Leeway: 424
+  Scartati senza prezzo Leeway: 2
+  Riconciliazione: nessun gap
+  in_universe=true: 424/424
+
+--- XETRA ---
+  Nel TIKR: 247
+  Nel DB: 384
+  Esclusi ETF/fondi: 3 — Candidati: 244
+  Eligible (tutti (soglia)) CON prezzo Leeway: 211
+  Scartati senza prezzo Leeway: 33
+  Riconciliazione: nessun gap
+  in_universe=true: 211/211
+
+--- PA ---
+  Nel TIKR: 226
+  Nel DB: 517
+  Esclusi ETF/fondi: 6 — Candidati: 220
+  Eligible (tutti (soglia)) CON prezzo Leeway: 217
+  Scartati senza prezzo Leeway: 3
+  Riconciliazione: nessun gap
+  in_universe=true: 217/217
+
+--- OM ---
+  Nel TIKR: 206
+  Nel DB: 526
+  Esclusi ETF/fondi: 0 — Candidati: 206
+  Eligible (tutti (soglia)) CON prezzo Leeway: 206
+  Riconciliazione: nessun gap
+  in_universe=true: 206/206
+
+--- SWX ---
+  Nel TIKR: 166
+  Nel DB: 204
+  Esclusi ETF/fondi: 2 — Candidati: 164
+  Eligible (tutti (soglia)) CON prezzo Leeway: 161
+  Scartati senza prezzo Leeway: 3
+  Riconciliazione: nessun gap
+  in_universe=true: 161/161
+
+--- AS ---
+  Nel TIKR: 118
+  Nel DB: 107
+  Esclusi ETF/fondi: 8 — Candidati: 110
+  Eligible (100) CON prezzo Leeway: 98
+  Scartati senza prezzo Leeway: 12
+  Riconciliazione: nessun gap
+  in_universe=true: 98/98
+
+--- MC ---
+  Nel TIKR: 802
+  Nel DB: 167
+  Esclusi ETF/fondi: 476 — Candidati: 326
+  Eligible (100) CON prezzo Leeway: 100
+  Scartati senza prezzo Leeway: 3
+  Riconciliazione: nessun gap
+  in_universe=true: 100/100
+
+--- BR ---
+  Nel TIKR: 181
+  Nel DB: 122
+  Esclusi ETF/fondi: 0 — Candidati: 181
+  Eligible (100) CON prezzo Leeway: 100
+  Scartati senza prezzo Leeway: 15
+  Riconciliazione: nessun gap
+  in_universe=true: 100/100
+
+--- HE ---
+  Nel TIKR: 181
+  Nel DB: 155
+  Esclusi ETF/fondi: 0 — Candidati: 181
+  Eligible (100) CON prezzo Leeway: 100
+  Scartati senza prezzo Leeway: 5
+  Riconciliazione: nessun gap
+  in_universe=true: 100/100
+
+--- CPSE ---
+  Nel TIKR: 608
+  Nel DB: 139
+  Esclusi ETF/fondi: 10 — Candidati: 598
+  Eligible (100) CON prezzo Leeway: 100
+  Scartati senza prezzo Leeway: 24
+  Riconciliazione: nessun gap
+  in_universe=true: 100/100
+
+--- OB ---
+  Nel TIKR: 313
+  Nel DB: 227
+  Esclusi ETF/fondi: 1 — Candidati: 312
+  Eligible (100) CON prezzo Leeway: 100
+  Scartati senza prezzo Leeway: 2
+  Riconciliazione: nessun gap
+  in_universe=true: 100/100
+
+--- GR ---
+  Nel TIKR: 142
+  Nel DB: 104
+  Esclusi ETF/fondi: 0 — Candidati: 142
+  Eligible (100) CON prezzo Leeway: 100
+  Scartati senza prezzo Leeway: 2
+  Riconciliazione: nessun gap
+  in_universe=true: 100/100
+
+--- VI ---
+  Nel TIKR: 74
+  Nel DB: 72
+  Esclusi ETF/fondi: 0 — Candidati: 74
+  Eligible (tutti (soglia)) CON prezzo Leeway: 53
+  Scartati senza prezzo Leeway: 21
+  Riconciliazione: nessun gap
+  in_universe=true: 53/53
+
+--- IR ---
+  Nel TIKR: 18
+  Nel DB: 16
+  Esclusi ETF/fondi: 0 — Candidati: 18
+  Eligible (tutti (soglia)) CON prezzo Leeway: 15
+  Scartati senza prezzo Leeway: 3
+  Riconciliazione: nessun gap
+  in_universe=true: 15/15
+
+--- LS ---
+  Nel TIKR: 47
+  Nel DB: 47
+  Esclusi ETF/fondi: 0 — Candidati: 47
+  Eligible (tutti (soglia)) CON prezzo Leeway: 35
+  Scartati senza prezzo Leeway: 12
+  Riconciliazione: nessun gap
+  in_universe=true: 35/35
+
+============================================================
+TOTALE EU IN UNIVERSE (16 mercati): 2137
+============================================================
+
+Verifica finale dal DB (count=exact):
+  MIL: 0-0/117
+  LSE: 0-0/424
+  XETRA: 0-0/211
+  PA: 0-0/217
+  OM: 0-0/206
+  SWX: 0-0/161
+  AS: 0-0/98
+  MC: 0-0/100
+  BR: 0-0/100
+  HE: 0-0/100
+  CPSE: 0-0/100
+  OB: 0-0/100
+  GR: 0-0/100
+  VI: 0-0/53
+  IR: 0-0/15
+  LS: 0-0/35
