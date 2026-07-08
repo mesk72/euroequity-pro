@@ -2,8 +2,8 @@
 [1] MARKET CAP: valore attuale in fundamentals (PRIMA del
     prossimo run weekly che applichera' il fix)
 ============================================================
-  JPM.US: mkt_cap DB = 896.22
-  AAPL.US: mkt_cap DB = None
+  JPM.US: mkt_cap DB = 896216.18
+  AAPL.US: mkt_cap DB = 4532958.68
   7203.TSE: mkt_cap DB = None
   0700.SEHK: mkt_cap DB = None
   BHP.ASX: mkt_cap DB = None
@@ -29,12 +29,12 @@
 ============================================================
 [5] STATO PREZZI KRX/SGX in prices_eod (campione)
 ============================================================
-  A000080.KRX: ultima data prezzo = 2026-07-03
-  A000100.KRX: ultima data prezzo = 2026-07-03
-  A000120.KRX: ultima data prezzo = 2026-07-03
-  544.SGX: ultima data prezzo = 2026-07-03
-  558.SGX: ultima data prezzo = 2026-07-03
-  5E2.SGX: ultima data prezzo = 2026-07-03
+  A000080.KRX: ultima data prezzo = 2026-07-08
+  A000100.KRX: ultima data prezzo = 2026-07-08
+  A000120.KRX: ultima data prezzo = 2026-07-08
+  544.SGX: ultima data prezzo = 2026-07-08
+  558.SGX: ultima data prezzo = 2026-07-08
+  5E2.SGX: ultima data prezzo = 2026-07-08
 
 ============================================================
 [6] STATO PREZZI EU (prima del fix daily_eu appena lanciato)
