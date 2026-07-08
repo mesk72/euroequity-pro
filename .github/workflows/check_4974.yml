@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
-      - run: python check_4974.py | tee check_4974_output.txt
+      - run: python check_4974b.py | tee check_4974_output.txt
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
