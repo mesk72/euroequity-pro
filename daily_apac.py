@@ -63,7 +63,7 @@ all_stocks = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange,yahoo_ticker,primary_exchange", "in_universe": "eq.true",
+        params={"select": "ticker,exchange,yahoo_ticker,primary_exchange,company", "in_universe": "eq.true",
                 "exchange": "in.(TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
@@ -172,8 +172,21 @@ for round_num in range(1, MAX_ROUNDS + 1):
 
 fail_leeway = len(pending)
 if pending:
-    falliti_desc = [s["ticker"] + "." + s["exchange"] for s in pending]
-    print(f"  FALLITI DEFINITIVI dopo {MAX_ROUNDS} giri ({fail_leeway}): {falliti_desc}")
+    print(f"  FALLITI DEFINITIVI dopo {MAX_ROUNDS} giri ({fail_leeway}) — diagnosi automatica:")
+    for s in pending:
+        ticker, exchange = s["ticker"], s["exchange"]
+        company = s.get("company", "?")
+        lt = leeway_ticker(ticker, exchange, s.get("primary_exchange") or "")
+        wide_url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from=2020-01-01&to={TODAY}"
+        try:
+            wr = requests.get(wide_url, timeout=20)
+            wd = wr.json() if wr.status_code == 200 else []
+            if isinstance(wd, list) and wd:
+                print(f"    {ticker}.{exchange} ({company}): Leeway si ferma al {wd[-1]['date']} — gap dati sul fornitore, non recuperabile da noi")
+            else:
+                print(f"    {ticker}.{exchange} ({company}): Leeway non ha MAI avuto dati per questo ticker con suffisso {lt} — verificare formato ticker")
+        except Exception as e:
+            print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
 if price_buf:
     requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
