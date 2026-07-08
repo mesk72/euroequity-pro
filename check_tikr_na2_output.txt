@@ -1,0 +1,70 @@
+Distinct Primary Exchange values nel nuovo file TIKR NA:
+  'NYSE': 1613
+  'NasdaqGS': 1076
+  'TSX': 434
+  'NasdaqGM': 360
+  'NasdaqCM': 247
+  'OTCPK': 112
+  'TSXV': 57
+  'ARCA': 50
+  'NYSEAM': 35
+  'CNSX': 7
+  'BATS': 6
+  'NEOE': 2
+  'MutualFund': 1
+
+fiscal_year_end.csv primi 300 char:
+ticker,exchange,fiscal_month
+80M,AIM,12
+AAU,AIM,12
+AAZ,AIM,12
+ABDP,AIM,8
+ABDX,AIM,6
+ACSO,AIM,12
+ADVT,AIM,2
+AET,AIM,12
+AGY,AIM,6
+ALL,AIM,6
+ALU,AIM,6
+AMCO,AIM,12
+AMS,AIM,12
+ANCR,AIM,12
+ANG,AIM,1
+ANIC,AIM,6
+ANP,AIM,12
+AOM,AIM,3
+AOTI,AIM,12
+APTA,AIM,6
+ARBB,AIM,12
+AREC,AIM,12
+ARS,AIM,12
+ART,AIM,12
+ASY,AI
+
+Colonne fiscal_year_end.csv: ['ticker', 'exchange', 'fiscal_month']
+Righe totali: 17545
+Distinct 'exchange' values in fiscal_year_end.csv:
+  'JPX': 2616
+  'KRX': 1534
+  'HKEX': 1508
+  'NYSE': 1503
+  'NSE': 1028
+  'TSE': 998
+  'NasdaqGS': 986
+  'ASX': 775
+  'TSX': 548
+  'SEHK': 500
+  'OM': 498
+  'PA': 497
+  'LSE': 480
+  'SGX': 375
+  'TSXV': 361
+  'XETRA': 332
+  'KOSE': 308
+  'AIM': 299
+  'MIL': 250
+  'NasdaqGM': 208
+Primi 3 righe complete:
+  {'ticker': '80M', 'exchange': 'AIM', 'fiscal_month': '12'}
+  {'ticker': 'AAU', 'exchange': 'AIM', 'fiscal_month': '12'}
+  {'ticker': 'AAZ', 'exchange': 'AIM', 'fiscal_month': '12'}
