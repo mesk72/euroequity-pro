@@ -1,0 +1,11 @@
+TSE in_universe: 0-0/1000
+SEHK in_universe: 0-0/500
+ASX in_universe: 0-0/350
+KRX in_universe: 0-0/400
+SGX in_universe: 0-0/100
+
+7203.TSE ultima data prices_eod: [{'date': '2026-07-08'}]
+0700.SEHK ultima data prices_eod: []
+BHP.ASX ultima data prices_eod: [{'date': '2026-07-07'}]
+005930.KRX ultima data prices_eod: []
+D05.SGX ultima data prices_eod: [{'date': '2026-07-03'}]
