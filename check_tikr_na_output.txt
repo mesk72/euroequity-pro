@@ -1,0 +1,10 @@
+METADATA: 200 {"id":"659fb706-e13c-4f47-b2e8-abff3ae9958b","name":"tikr_na_latest.csv","version":"92fa99a9-b9e8-4fb3-831c-e852b427546c","bucket_id":"tikr-uploads","size":763616,"content_type":"text/csv","cache_control":"max-age=3600","etag":"\"696696e4529d010bf77f0bc2743a4ba9\"","metadata":null,"last_modified":"2
+Righe totali file: 4000
+Righe US-like: 1619
+Righe TSX-like: 491
+Colonne disponibili: ['Ticker', 'Company Name', 'Primary Exchange', 'Country', 'Sector', 'Last Price', 'Last Mkt Cap', 'LTM P/E LTM', 'LTM P/BVPS LTM', 'EPS Normalized (FY 2025)', 'Mean EPS Normalized (FY 2026)', 'Mean EPS Normalized (FY 2027)', 'Mean EPS Normalized (FY 2028)', 'EPS (GAAP) (FY 2025)', 'Mean EPS (GAAP) (FY 2026)', 'Mean EPS (GAAP) (FY 2027)', 'Mean EPS (GAAP) (FY 2028)', 'Rev (FY 2025)', 'Mean Rev (FY 2026)', 'Mean Rev (FY 2027)', 'Mean Rev (FY 2028)', 'Mean EPS Normalized (FY 2030)', 'Mean EPS (GAAP) (FY 2029)', 'Mean EPS (GAAP) (FY 2030)', 'Mean Fwd P/E NTM', 'ECS Total Shares Outstanding on Filing Date LTM']
+
+Fiscal year end coverage attuale per US: 0 ticker
+Ticker US nel nuovo file TIKR: 1619
+Di cui MANCANTI in fiscal_year_end.csv: 1619
+Esempio 10 mancanti: ['JEF', 'CAPL', 'HGV', 'CMC', 'STZ', 'KKR', 'C', 'KRG', 'LXP', 'AMH']
