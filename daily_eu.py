@@ -116,50 +116,90 @@ for exch in eu_exchanges:
         if len(batch) < 2000: break
 print("  Ultime date caricate: " + str(len(last_date_map)) + " titoli")
 
+def _fetch_leeway(lt, from_d, to_d):
+    """Singola chiamata con retry immediato (errori transitori)."""
+    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + from_d + "&to=" + to_d
+    for attempt in range(3):
+        try:
+            resp = requests.get(url, timeout=20)
+            if resp.status_code == 200:
+                data = resp.json()
+                return data if isinstance(data, list) else []
+            if resp.status_code in (429, 500, 502, 503, 504):
+                time.sleep(2 * (attempt + 1)); continue
+            return None  # 404 e simili: risposta definitiva, non ritentare
+        except Exception:
+            if attempt < 2: time.sleep(2 * (attempt + 1))
+    return None
+
+def try_fetch_stock(stock, start_dt, to_d):
+    """Prova ticker principale + fallback Yahoo + fallback .F (Germania).
+    Ritorna (righe, None) se ok, (None, motivo) se fallito."""
+    ticker, exchange = stock["ticker"], stock["exchange"]
+    lt = leeway_ticker(ticker, exchange)
+    data_l = _fetch_leeway(lt, start_dt, to_d)
+    if not data_l:
+        yt = stock.get("yahoo_ticker", "")
+        if yt:
+            yt_base = yt.split(".")[0] if "." in yt else yt
+            lt2 = leeway_ticker(yt_base, exchange)
+            if lt2 != lt:
+                data_l = _fetch_leeway(lt2, start_dt, to_d)
+    if not data_l and exchange == "XETRA":
+        lt3 = ticker.rstrip(".") + ".F"
+        data_l = _fetch_leeway(lt3, start_dt, to_d)
+    if not data_l:
+        return None, "nessun dato su Leeway (ticker/Yahoo/fallback)"
+    return data_l, None
+
+MAX_ROUNDS = 5
 ok_leeway = fail_leeway = 0
 price_buf = []
-for stock in all_stocks:
-    ticker   = stock["ticker"]
-    exchange = stock["exchange"]
-    last = last_date_map.get((ticker, exchange), "2021-01-01")
-    if last >= TODAY:
-        ok_leeway += 1
-        continue
-    start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
-    lt  = leeway_ticker(ticker, exchange)
-    url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY
-    try:
-        resp = requests.get(url, timeout=15)
-        data_l = resp.json() if resp.status_code == 200 else []
-        # Fallback: usa yahoo_ticker se il ticker principale fallisce
-        if not isinstance(data_l, list) or not data_l:
-            yt = stock.get("yahoo_ticker", "")
-            if yt:
-                # Costruisci ticker Leeway dal yahoo_ticker rimuovendo suffisso Yahoo
-                yt_base = yt.split(".")[0] if "." in yt else yt
-                lt2 = leeway_ticker(yt_base, exchange)
-                if lt2 != lt:
-                    resp2 = requests.get(LEEWAY_BASE + "/historicalquotes/" + lt2 + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY, timeout=15)
-                    data_l = resp2.json() if resp2.status_code == 200 else []
-        # Fallback Germania: .XETRA a volte non trova titoli minori, .F spesso si
-        if (not isinstance(data_l, list) or not data_l) and exchange == "XETRA":
-            lt3 = ticker.rstrip(".") + ".F"
-            resp3 = requests.get(LEEWAY_BASE + "/historicalquotes/" + lt3 + "?apitoken=" + LEEWAY_KEY + "&from=" + start_dt + "&to=" + TODAY, timeout=15)
-            data_l = resp3.json() if resp3.status_code == 200 else []
-        if not isinstance(data_l, list) or not data_l: fail_leeway += 1; continue
+pending = list(all_stocks)
+definitive_failures = []
+
+for round_num in range(1, MAX_ROUNDS + 1):
+    if not pending: break
+    print(f"  --- Giro {round_num}/{MAX_ROUNDS}: {len(pending)} titoli da scaricare ---")
+    still_pending = []
+    for stock in pending:
+        ticker, exchange = stock["ticker"], stock["exchange"]
+        last = last_date_map.get((ticker, exchange), "2021-01-01")
+        if last >= TODAY:
+            ok_leeway += 1
+            continue
+        start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+        data_l, reason = try_fetch_stock(stock, start_dt, TODAY)
+        if data_l is None:
+            still_pending.append(stock)
+            continue
         for row2 in data_l:
             adj = row2.get("adjusted_close") or row2.get("close")
             if adj is None: continue
             price_buf.append({"ticker": ticker, "exchange": exchange,
                                "date": row2["date"], "adj_close": float(adj)})
+        # aggiorna la mappa in memoria cosi' un giro successivo non riparte da zero
+        if data_l:
+            last_date_map[(ticker, exchange)] = max(row2["date"] for row2 in data_l)
         ok_leeway += 1
-    except: fail_leeway += 1
-    if len(price_buf) >= 500:
-        requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
-        price_buf = []
-    time.sleep(0.5)
+        if len(price_buf) >= 500:
+            requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+            price_buf = []
+        time.sleep(0.5)
+    pending = still_pending
+    if pending and round_num < MAX_ROUNDS:
+        pausa = 20 * round_num
+        print(f"  {len(pending)} ancora falliti — pausa {pausa}s prima del prossimo giro...")
+        time.sleep(pausa)
+
 if price_buf:
     requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+
+fail_leeway = len(pending)
+if pending:
+    falliti_desc = [s["ticker"] + "." + s["exchange"] for s in pending]
+    print(f"  FALLITI DEFINITIVI dopo {MAX_ROUNDS} giri ({fail_leeway}): {falliti_desc}")
+
 print("  Prezzi Leeway: ok=" + str(ok_leeway) + " fail=" + str(fail_leeway))
 ok_prices = ok_leeway; fail_prices = fail_leeway
 
