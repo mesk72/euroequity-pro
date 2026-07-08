@@ -1,0 +1,5 @@
+Ticker US nel nuovo file TIKR (normalizzati): 3503
+Ticker TSX/Canada nel nuovo file TIKR (normalizzati): 491
+Copertura fiscal_year_end.csv per US (normalizzata): 3004
+MANCANTI: 531
+Esempio 15: ['GIW', 'AMCX', 'SAC', 'DUOT', 'EFTY', 'BXC', 'GALT', 'LXEO', 'XNET', 'MEI', 'GBAB', 'STRT', 'FDXF', 'PLTS', 'OSPR.U']
