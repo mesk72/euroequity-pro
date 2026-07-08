@@ -3,6 +3,10 @@ name: Update Universe NA
 on:
   workflow_dispatch:
 
+concurrency:
+  group: update-universe-na
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
