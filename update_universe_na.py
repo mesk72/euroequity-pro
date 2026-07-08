@@ -247,6 +247,51 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
         else:
             print(f"  FAIL blocco in_universe {i}: {r2.status_code} {r2.text[:150]}")
 
+    # ── RICONCILIAZIONE: verifica REALE riga per riga, non fidarsi del
+    # solo HTTP 200 del blocco (un blocco puo' "riuscire" anche se solo
+    # alcuni titoli al suo interno erano gia' presenti come riga in stocks).
+    # Confronta l'insieme atteso con quello reale e corregge chi manca,
+    # uno alla volta finche' non collima esattamente.
+    r_check = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+        params={"select": "ticker", "in_universe": "eq.true", "exchange": f"eq.{exchange}", "limit": "10000"})
+    actual_set = set(row["ticker"] for row in r_check.json()) if isinstance(r_check.json(), list) else set()
+    missing = [t for t in eligible_tickers if t not in actual_set]
+    if missing:
+        print(f"  Riconciliazione: {len(missing)} titoli mancanti dopo i blocchi, correggo uno per uno...")
+        for t in missing:
+            # Se la riga non esiste affatto in stocks, creala ora
+            rex = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+                params={"select": "ticker", "ticker": f"eq.{t}", "exchange": f"eq.{exchange}"})
+            if not (isinstance(rex.json(), list) and rex.json()):
+                info = tikr[t]
+                country = info.get("country") or COUNTRY_DEFAULT[exchange]
+                requests.post(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_ins, json=[{
+                    "ticker": t, "exchange": exchange, "company": info["company"],
+                    "sector": info["sector"], "country": country,
+                    "flag": FLAG_MAP.get(country, FLAG_MAP[COUNTRY_DEFAULT[exchange]]),
+                    "currency": CURRENCY_MAP[exchange], "in_universe": False,
+                    "primary_exchange": info["ex_raw"],
+                }])
+            rp = requests.patch(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_up,
+                params={"ticker": f"eq.{t}", "exchange": f"eq.{exchange}"},
+                json={"in_universe": True})
+            if rp.status_code in (200, 204):
+                ok += 1
+            else:
+                print(f"    ANCORA FALLITO {t}: {rp.status_code} {rp.text[:120]}")
+        # riverifica dopo la riconciliazione
+        r_check2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+            params={"select": "ticker", "in_universe": "eq.true", "exchange": f"eq.{exchange}", "limit": "10000"})
+        actual_set2 = set(row["ticker"] for row in r_check2.json()) if isinstance(r_check2.json(), list) else set()
+        still_missing = [t for t in eligible_tickers if t not in actual_set2]
+        if still_missing:
+            print(f"  ANCORA MANCANTI dopo riconciliazione ({len(still_missing)}): {still_missing}")
+        else:
+            print(f"  Riconciliazione completata: tutti i {len(eligible_tickers)} titoli sono ora in_universe=true")
+        ok = len(actual_set2)
+    else:
+        print(f"  Riconciliazione: nessun gap, {len(eligible_tickers)}/{len(eligible_tickers)} confermati")
+
     total_na += ok
     print(f"  in_universe=true: {ok}/{len(eligible_tickers)}")
     print()
