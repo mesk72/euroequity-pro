@@ -1,0 +1,52 @@
+============================================================
+[1] MARKET CAP: valore attuale in fundamentals (PRIMA del
+    prossimo run weekly che applichera' il fix)
+============================================================
+  JPM.US: mkt_cap DB = 896.22
+  AAPL.US: mkt_cap DB = None
+  7203.TSE: mkt_cap DB = None
+  0700.SEHK: mkt_cap DB = None
+  BHP.ASX: mkt_cap DB = None
+
+============================================================
+[2] RAW TIKR — valore grezzo per confronto (US)
+============================================================
+  AAPL: raw 'Last Mkt Cap' = '$4,532,958.68MM'
+  JPM: raw 'Last Mkt Cap' = '$896,216.18MM'
+
+============================================================
+[3] RAW TIKR APAC — valore grezzo per confronto
+============================================================
+  7203: raw 'Last Mkt Cap' = '$198,285.93MM'
+  BHP: raw 'Last Mkt Cap' = '$208,032.67MM'
+
+============================================================
+[4] STATO KRX/SGX in_universe (post run di oggi)
+============================================================
+  KRX in_universe: 0-0/400
+  SGX in_universe: 0-0/100
+
+============================================================
+[5] STATO PREZZI KRX/SGX in prices_eod (campione)
+============================================================
+  A000080.KRX: ultima data prezzo = 2026-07-03
+  A000100.KRX: ultima data prezzo = 2026-07-03
+  A000120.KRX: ultima data prezzo = 2026-07-03
+  544.SGX: ultima data prezzo = 2026-07-03
+  558.SGX: ultima data prezzo = 2026-07-03
+  5E2.SGX: ultima data prezzo = 2026-07-03
+
+============================================================
+[6] STATO PREZZI EU (prima del fix daily_eu appena lanciato)
+============================================================
+  ASML.AS: ultima data prezzo = 2026-07-03
+  SAP.XETRA: ultima data prezzo = 2026-07-03
+  BNP.PA: ultima data prezzo = 2026-07-02
+  NESN.SWX: ultima data prezzo = 2026-07-03
+
+============================================================
+[7] US in_universe count (verifica retry fix)
+============================================================
+  US in_universe: 0-0/1979
+
+FATTO.
