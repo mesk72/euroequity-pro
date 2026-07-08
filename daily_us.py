@@ -140,59 +140,85 @@ def safe_post(url, headers, json_data, retries=2):
             print(f"  WARN salvataggio fallito dopo {retries+1} tentativi: {e}")
             return None
 
-# Leggi ultima data prezzi
-ok_leeway = fail_leeway = 0
-price_buf = []
-print(f"  Scarico prezzi da Leeway per {len(all_stocks)} titoli...")
-for stock in all_stocks:
-    ticker   = stock['ticker']
-    exchange = stock['exchange']
-    # Leggi ultima data disponibile nel DB
-    try:
-        r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "date", "ticker": f"eq.{ticker}",
-                    "exchange": f"eq.{exchange}", "order": "date.desc", "limit": "1"},
-            timeout=15)
-        row = r.json()
-        last = row[0]["date"] if isinstance(row, list) and row else "2021-01-01"
-    except Exception as e:
-        print(f"  WARN lettura ultima data {ticker}.{exchange}: {e}")
-        fail_leeway += 1
-        continue
-    if last >= TODAY:
-        ok_leeway += 1
-        continue
-    start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
-    lt = leeway_ticker(ticker, exchange)
-    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
-    data_l = None
+# Leggi ultima data prezzi — in bulk, una query per exchange invece di N query singole
+print("  Carico ultime date prezzi (bulk)...")
+last_date_map = {}
+for exch in ['US', 'TSX']:
+    offset_p = 0
+    while True:
+        rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+            params={"select": "ticker,date", "exchange": "eq." + exch,
+                    "order": "ticker.asc,date.desc", "limit": "2000", "offset": str(offset_p)},
+            timeout=20)
+        batch = rp.json()
+        if not isinstance(batch, list) or not batch: break
+        for row in batch:
+            key = (row["ticker"], exch)
+            if key not in last_date_map:
+                last_date_map[key] = row["date"]
+        offset_p += 2000
+        if len(batch) < 2000: break
+print(f"  Ultime date caricate: {len(last_date_map)} titoli")
+
+def _fetch_leeway(lt, from_d, to_d):
+    url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
     for attempt in range(3):
         try:
-            resp = requests.get(url, timeout=15)
+            resp = requests.get(url, timeout=20)
             if resp.status_code == 200:
-                data_l = resp.json()
-                break
+                data = resp.json()
+                return data if isinstance(data, list) else []
             if resp.status_code in (429, 500, 502, 503, 504):
                 time.sleep(2 * (attempt + 1)); continue
-            break  # 404 e simili: definitivo
+            return None
         except Exception:
             if attempt < 2: time.sleep(2 * (attempt + 1))
-    try:
-        if not isinstance(data_l, list) or not data_l: fail_leeway += 1; continue
+    return None
+
+MAX_ROUNDS = 5
+ok_leeway = fail_leeway = 0
+price_buf = []
+pending = list(all_stocks)
+
+for round_num in range(1, MAX_ROUNDS + 1):
+    if not pending: break
+    print(f"  --- Giro {round_num}/{MAX_ROUNDS}: {len(pending)} titoli da scaricare ---")
+    still_pending = []
+    for stock in pending:
+        ticker, exchange = stock['ticker'], stock['exchange']
+        last = last_date_map.get((ticker, exchange), "2021-01-01")
+        if last >= TODAY:
+            ok_leeway += 1
+            continue
+        start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+        lt = leeway_ticker(ticker, exchange)
+        data_l = _fetch_leeway(lt, start_dt, TODAY)
+        if not data_l:
+            still_pending.append(stock)
+            continue
         for row2 in data_l:
             adj = row2.get('adjusted_close') or row2.get('close')
             if adj is None: continue
-            price_buf.append({
-                "ticker": ticker, "exchange": exchange,
-                "date": row2['date'], "adj_close": float(adj),
-            })
+            price_buf.append({"ticker": ticker, "exchange": exchange,
+                               "date": row2['date'], "adj_close": float(adj)})
+        last_date_map[(ticker, exchange)] = max(row2['date'] for row2 in data_l)
         ok_leeway += 1
-    except: fail_leeway += 1
-    if len(price_buf) >= 500:
-        safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
-        price_buf = []
-    time.sleep(0.5)
+        if len(price_buf) >= 500:
+            safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
+            price_buf = []
+        time.sleep(0.5)
+    pending = still_pending
+    if pending and round_num < MAX_ROUNDS:
+        pausa = 20 * round_num
+        print(f"  {len(pending)} ancora falliti — pausa {pausa}s prima del prossimo giro...")
+        time.sleep(pausa)
+
+fail_leeway = len(pending)
+if pending:
+    falliti_desc = [s['ticker'] + '.' + s['exchange'] for s in pending]
+    print(f"  FALLITI DEFINITIVI dopo {MAX_ROUNDS} giri ({fail_leeway}): {falliti_desc}")
 if price_buf:
+
     safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
