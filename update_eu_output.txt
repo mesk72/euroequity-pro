@@ -1,0 +1,32 @@
+=== AGGIORNAMENTO IN_UNIVERSE TUTTE LE BORSE EU ===
+
+  MIL      SKIPPED (già aggiornato)
+  LSE      SKIPPED (già aggiornato)
+  XETRA    eligible=    0 in_universe=true=0
+  PA       eligible=    0 in_universe=true=0
+  OM       eligible=    0 in_universe=true=0
+  SWX      eligible=    0 in_universe=true=0
+  AS       scartati senza prezzo Leeway: 12
+  AS       eligible=   98 in_universe=true=98
+  MC       scartati senza prezzo Leeway: 3
+  MC       eligible=  100 in_universe=true=100
+  BR       scartati senza prezzo Leeway: 15
+  BR       eligible=  100 in_universe=true=100
+  HE       scartati senza prezzo Leeway: 4
+  HE       eligible=  100 in_universe=true=100
+  CPSE     scartati senza prezzo Leeway: 5
+  CPSE     eligible=  100 in_universe=true=100
+  OB       scartati senza prezzo Leeway: 2
+  OB       eligible=  100 in_universe=true=100
+  GR       scartati senza prezzo Leeway: 2
+  GR       eligible=  100 in_universe=true=100
+  VI       scartati senza prezzo Leeway: 21
+  VI       eligible=   53 in_universe=true=53
+  IR       scartati senza prezzo Leeway: 3
+  IR       eligible=   15 in_universe=true=15
+  LS       scartati senza prezzo Leeway: 12
+  LS       eligible=   35 in_universe=true=35
+  MIL      in_universe attuale (da DB): 117
+  LSE      in_universe attuale (da DB): 424
+
+=== TOTALE EU IN UNIVERSE: 1342 ===
