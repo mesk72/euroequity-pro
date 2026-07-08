@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: daily-apac
+  group: apac-pipeline
   cancel-in-progress: false
 
 jobs:
