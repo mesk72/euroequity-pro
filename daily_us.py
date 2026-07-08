@@ -165,10 +165,19 @@ for stock in all_stocks:
     start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
     lt = leeway_ticker(ticker, exchange)
     url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={start_dt}&to={TODAY}"
+    data_l = None
+    for attempt in range(3):
+        try:
+            resp = requests.get(url, timeout=15)
+            if resp.status_code == 200:
+                data_l = resp.json()
+                break
+            if resp.status_code in (429, 500, 502, 503, 504):
+                time.sleep(2 * (attempt + 1)); continue
+            break  # 404 e simili: definitivo
+        except Exception:
+            if attempt < 2: time.sleep(2 * (attempt + 1))
     try:
-        resp = requests.get(url, timeout=15)
-        if resp.status_code != 200: fail_leeway += 1; continue
-        data_l = resp.json()
         if not isinstance(data_l, list) or not data_l: fail_leeway += 1; continue
         for row2 in data_l:
             adj = row2.get('adjusted_close') or row2.get('close')
