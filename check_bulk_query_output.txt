@@ -1,0 +1,11 @@
+Status: 200
+Body: [{"ticker":"0E2B","date":"2026-07-03"}, 
+ {"ticker":"0E2B","date":"2026-07-02"}, 
+ {"ticker":"0E2B","date":"2026-07-01"}, 
+ {"ticker":"0E2B","date":"2026-06-30"}, 
+ {"ticker":"0E2B","date":"2026-06-29"}, 
+ {"ticker":"0E2B","date":"2026-06-26"}, 
+ {"ticker":"0E2B","date":"2026-06-25"}, 
+ {"ticker":"0E2B","date":"2026-06-24"}, 
+ {"ticker":"0E2B","date":"2026-06-23"}, 
+ {"ticker":"0E2B","date":"2026-06-22"}]
