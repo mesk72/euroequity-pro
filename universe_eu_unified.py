@@ -63,6 +63,7 @@ ALWAYS_EXCLUDE = [
     "SICAV","ICAV"," MSCI ","YOURINDEX","ETFS EUR","ETFS USD",
     "BNP PARIBAS EASY","AMUNDI MSCI","LYXOR MSCI","ISHARES MSCI",
     "EASY MSCI","YIS MSCI","WISDOMTREE ISSUER",
+    "PARTICIPATIES","PARAPLUFONDS","MICROKREDIETFONDS",
 ]
 
 CURRENCY_MAP = {
@@ -123,22 +124,29 @@ def leeway_ticker(ticker, exchange):
     return ticker.rstrip(".") + LEEWAY_SUFFIX.get(exchange, "")
 
 def ha_prezzo_su_leeway(ticker, exchange):
-    """Verifica leggera (30gg). Per la Germania ritenta con .F se .XETRA fallisce."""
+    """Verifica leggera (30gg). Per la Germania ritenta con .F se .XETRA fallisce.
+    3 tentativi con backoff: un errore transitorio non deve scartare per
+    sempre un titolo valido."""
     to_d = datetime.now().strftime("%Y-%m-%d")
     from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
     candidati_lt = [leeway_ticker(ticker, exchange)]
     if exchange == "XETRA":
         candidati_lt.append(ticker.rstrip(".") + ".F")
     for lt in candidati_lt:
-        try:
-            url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
-            resp = requests.get(url, timeout=15)
-            if resp.status_code == 200:
-                data = resp.json()
-                if isinstance(data, list) and data:
-                    return True
-        except Exception:
-            continue
+        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+        for attempt in range(3):
+            try:
+                resp = requests.get(url, timeout=20)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if isinstance(data, list) and data:
+                        return True
+                    break  # 200 ma vuoto: definitivo per questo suffisso
+                if resp.status_code in (429, 500, 502, 503, 504):
+                    time.sleep(2 * (attempt + 1)); continue
+                break  # 404 e simili: definitivo
+            except Exception:
+                if attempt < 2: time.sleep(2 * (attempt + 1))
     return False
 
 def is_excluded(company):
@@ -307,6 +315,42 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
         else:
             print(f"  FAIL blocco in_universe {i}: {r2.status_code} {r2.text[:120]}")
 
+    # Riconciliazione: verifica REALE riga per riga, non fidarsi del solo
+    # HTTP 200 del blocco (un blocco puo' "riuscire" anche se solo alcuni
+    # titoli al suo interno esistevano gia' come riga in stocks).
+    r_check = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+        params={"select": "ticker", "in_universe": "eq.true", "exchange": f"eq.{exchange}", "limit": "10000"})
+    actual_set = set(row["ticker"] for row in r_check.json()) if isinstance(r_check.json(), list) else set()
+    missing = [t for t in eligible_tickers if t not in actual_set]
+    if missing:
+        print(f"  Riconciliazione: {len(missing)} mancanti dopo i blocchi, correggo uno per uno...")
+        for t in missing:
+            rex = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+                params={"select": "ticker", "ticker": f"eq.{t}", "exchange": f"eq.{exchange}"})
+            if not (isinstance(rex.json(), list) and rex.json()):
+                info = tikr[t]
+                country = info.get("country") or COUNTRY_DEFAULT.get(exchange, "")
+                requests.post(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_ins, json=[{
+                    "ticker": t, "exchange": exchange, "company": info["company"],
+                    "sector": info["sector"], "country": country,
+                    "flag": FLAG_MAP.get(country, "🏳️"), "currency": CURRENCY_MAP.get(exchange, "EUR"),
+                    "in_universe": False, "primary_exchange": info["ex_raw"],
+                }])
+            rp = requests.patch(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_up,
+                params={"ticker": f"eq.{t}", "exchange": f"eq.{exchange}"},
+                json={"in_universe": True})
+            if rp.status_code not in (200, 204):
+                print(f"    ANCORA FALLITO {t}: {rp.status_code} {rp.text[:100]}")
+        r_check2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+            params={"select": "ticker", "in_universe": "eq.true", "exchange": f"eq.{exchange}", "limit": "10000"})
+        actual_set2 = set(row["ticker"] for row in r_check2.json()) if isinstance(r_check2.json(), list) else set()
+        still_missing = [t for t in eligible_tickers if t not in actual_set2]
+        if still_missing:
+            print(f"  ANCORA MANCANTI dopo riconciliazione ({len(still_missing)}): {still_missing}")
+        ok = len(actual_set2)
+    else:
+        print(f"  Riconciliazione: nessun gap")
+
     total_eu += ok
     print(f"  in_universe=true: {ok}/{len(eligible_tickers)}")
     print()
@@ -314,3 +358,9 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
 print("=" * 60)
 print(f"TOTALE EU IN UNIVERSE (16 mercati): {total_eu}")
 print("=" * 60)
+print("\nVerifica finale dal DB (count=exact):")
+headers_count = {**headers_r, "Prefer": "count=exact"}
+for exch in EXCHANGE_CRITERIA:
+    rc = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
+        params={"select": "ticker", "in_universe": "eq.true", "exchange": f"eq.{exch}", "limit": "1"})
+    print(f"  {exch}: {rc.headers.get('content-range')}")
