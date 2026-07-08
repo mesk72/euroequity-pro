@@ -5,6 +5,10 @@ on:
     - cron: '0 20 * * 1-5'
   workflow_dispatch:
 
+concurrency:
+  group: daily-apac
+  cancel-in-progress: false
+
 jobs:
   update-apac:
     runs-on: ubuntu-latest
