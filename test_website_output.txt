@@ -1,0 +1,2 @@
+PATCH website test -> 204 
+verifica -> 200 [{'ticker': 'JPM', 'website': 'https://www.jpmorganchase.com'}]
