@@ -1,0 +1,2 @@
+0E2B righe totali: 0-0/1388
+primi 3 LSE in_universe: [{'ticker': '0E2B'}, {'ticker': '3IN'}, {'ticker': 'AAF'}]
