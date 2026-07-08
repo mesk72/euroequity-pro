@@ -153,7 +153,7 @@ def try_fetch_stock(stock, start_dt, to_d):
     return data_l, None
 
 WEEK_AGO = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
-MAX_ROUNDS = 10
+MAX_ROUNDS = 20
 ok_leeway = fail_leeway = 0
 price_buf = []
 pending = list(all_stocks)
@@ -190,7 +190,7 @@ for round_num in range(1, MAX_ROUNDS + 1):
         time.sleep(0.5)
     pending = still_pending
     if pending and round_num < MAX_ROUNDS:
-        pausa = 20 * round_num
+        pausa = min(20 * round_num, 90)
         print(f"  {len(pending)} ancora falliti — pausa {pausa}s prima del prossimo giro...")
         time.sleep(pausa)
 
