@@ -1,0 +1,31 @@
+name: Fix Universe Top100 EU
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Fix
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python fix_universe_top100_eu.py | tee fix_top100_output.txt
+      - name: Commit output
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add fix_top100_output.txt
+          git commit -m "output fix top100 EU" || echo "nothing to commit"
+          git pull --rebase
+          git push
