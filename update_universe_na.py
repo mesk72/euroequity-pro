@@ -71,9 +71,10 @@ CURRENCY_MAP = {"US":"USD","TSX":"CAD"}
 COUNTRY_DEFAULT = {"US":"USA","TSX":"CAN"}
 FLAG_MAP = {"USA":"🇺🇸","CAN":"🇨🇦"}
 
-# US top 2000 netti, TSX top 400 netti
+# US top 3000 netti, TSX top 400 netti (soglia US alzata 08/07/2026:
+# nuovo file TIKR con 3500 candidati USA / 500 candidati Canada)
 EXCHANGE_CRITERIA = {
-    "US":  {"top_n": 2000},
+    "US":  {"top_n": 3000},
     "TSX": {"top_n": 400},
 }
 
@@ -251,7 +252,7 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
     print()
 
 print(f"=== TOTALE NA IN UNIVERSE: {total_na} ===")
-print(f"Atteso: US=2000 + TSX=400 = 2400")
+print(f"Atteso: US=3000 + TSX=400 = 3400")
 
 # Verifica finale REALE dal DB (count=exact), non il conteggio dei chunk
 print("\nVerifica finale dal DB:")
