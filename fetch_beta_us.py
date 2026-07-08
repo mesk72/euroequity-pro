@@ -85,25 +85,27 @@ print(f"  Titoli US in universo: {len(all_stocks)}")
 
 ok = fail = skip_no_yahoo = 0
 beta_batch = []
+website_batch = []
 t0 = time.time()
 
 for i, stock in enumerate(all_stocks):
     ticker = stock["ticker"]
     exchange = stock["exchange"]
-    yahoo_ticker = stock.get("yahoo_ticker")
-
-    if not yahoo_ticker:
-        skip_no_yahoo += 1
-        continue
+    # Fallback: se yahoo_ticker non e' popolato (es. titoli appena inseriti),
+    # usa il ticker stesso (US: '.' -> '-', es. BRK.B -> BRK-B)
+    yahoo_ticker = stock.get("yahoo_ticker") or ticker.replace(".", "-")
 
     try:
         info = yf.Ticker(yahoo_ticker).info
         beta = info.get("beta")
+        website = info.get("website")
         if beta is None:
             fail += 1
         else:
             beta_batch.append({"ticker": ticker, "exchange": exchange, "beta": round(float(beta), 3)})
             ok += 1
+        if website:
+            website_batch.append({"ticker": ticker, "exchange": exchange, "website": website})
     except Exception as e:
         fail += 1
         if fail <= 5:
@@ -115,6 +117,12 @@ for i, stock in enumerate(all_stocks):
             print(f"    WARN salvataggio batch beta: HTTP {rr.status_code} — {rr.text[:200]}")
         beta_batch = []
 
+    if len(website_batch) >= 100:
+        rw = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, json=website_batch)
+        if rw.status_code not in (200, 201, 204):
+            print(f"    WARN salvataggio batch website: HTTP {rw.status_code} — {rw.text[:200]}")
+        website_batch = []
+
     if (i + 1) % 200 == 0:
         elapsed = time.time() - t0
         print(f"    ... {i+1}/{len(all_stocks)} processati ({elapsed/60:.1f} min) — ok={ok} fail={fail}")
@@ -125,8 +133,12 @@ if beta_batch:
     rr = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=beta_batch)
     if rr.status_code not in (200, 201, 204):
         print(f"  WARN salvataggio ultimo batch beta: HTTP {rr.status_code} — {rr.text[:200]}")
+if website_batch:
+    rw = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, json=website_batch)
+    if rw.status_code not in (200, 201, 204):
+        print(f"  WARN salvataggio ultimo batch website: HTTP {rw.status_code} — {rw.text[:200]}")
 
-print(f"\n  Beta salvati: ok={ok} fail={fail} skip_no_yahoo_ticker={skip_no_yahoo} su {len(all_stocks)}")
+print(f"\n  Beta salvati: ok={ok} fail={fail} su {len(all_stocks)}")
 print("\n" + "=" * 60)
 print(f"COMPLETATO in {(time.time()-t0)/60:.1f} min")
 print("=" * 60)
