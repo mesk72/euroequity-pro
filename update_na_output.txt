@@ -1,0 +1,38 @@
+=== AGGIORNAMENTO IN_UNIVERSE NA (US + TSX) ===
+
+TIKR NA: HTTP 200 — 4001 righe
+Colonne nel CSV: ['Ticker', 'Company Name', 'Primary Exchange', 'Country', 'Sector', 'Last Price', 'Last Mkt Cap', 'LTM P/E LTM', 'LTM P/BVPS LTM', 'EPS Normalized (FY 2025)', 'Mean EPS Normalized (FY 2026)', 'Mean EPS Normalized (FY 2027)', 'Mean EPS Normalized (FY 2028)', 'EPS (GAAP) (FY 2025)', 'Mean EPS (GAAP) (FY 2026)', 'Mean EPS (GAAP) (FY 2027)', 'Mean EPS (GAAP) (FY 2028)', 'Rev (FY 2025)', 'Mean Rev (FY 2026)', 'Mean Rev (FY 2027)', 'Mean Rev (FY 2028)', 'Mean EPS Normalized (FY 2030)', 'Mean EPS (GAAP) (FY 2029)', 'Mean EPS (GAAP) (FY 2030)', 'Mean Fwd P/E NTM', 'ECS Total Shares Outstanding on Filing Date LTM']
+Colonna market cap trovata e usata: Last Mkt Cap
+US nel TIKR: 3499
+TSX nel TIKR: 500
+
+--- US ---
+  Nel DB: 2162
+  Nel TIKR: 3499 — esclusi ETF/fondi: 21
+  Verifico presenza su Leeway (target 3000)...
+  Eligible top 3000 CON prezzo Leeway: 3000
+  Scartati per mancanza prezzo Leeway: 49 (es. ['AFIP.A', 'TYID.Y', 'FWON.K', 'FCNC.A', 'BSP', 'DIDI.Y', 'GMXT.F', 'LKNC.Y', 'LLYV.K', 'SWDR'])
+  FAIL inserimento batch 0: 409 {"code":"23505","details":"Key (ticker, exchange)=(SPCX, US) already exists.","hint":null,"message":
+  FAIL inserimento batch 100: 409 {"code":"23505","details":"Key (ticker, exchange)=(TXT, US) already exists.","hint":null,"message":"
+  FAIL inserimento batch 200: 409 {"code":"23505","details":"Key (ticker, exchange)=(SYM, US) already exists.","hint":null,"message":"
+  FAIL inserimento batch 300: 409 {"code":"23505","details":"Key (ticker, exchange)=(SRCE, US) already exists.","hint":null,"message":
+  FAIL inserimento batch 600: 409 {"code":"23505","details":"Key (ticker, exchange)=(ROOT, US) already exists.","hint":null,"message":
+  FAIL inserimento batch 700: 409 {"code":"23505","details":"Key (ticker, exchange)=(SOC, US) already exists.","hint":null,"message":"
+  FAIL inserimento batch 800: 409 {"code":"23505","details":"Key (ticker, exchange)=(WHK, US) already exists.","hint":null,"message":"
+  Inseriti 865 nuovi titoli
+  in_universe=true: 3000/3000
+
+--- TSX ---
+  Nel DB: 464
+  Nel TIKR: 500 — esclusi ETF/fondi: 8
+  Verifico presenza su Leeway (target 400)...
+  Eligible top 400 CON prezzo Leeway: 400
+  Scartati per mancanza prezzo Leeway: 52 (es. ['PVF.UN', 'TOI', 'ARTG', 'LMN', 'LUNR', 'GTII', 'AFM', 'PNG', 'HG', 'OMG'])
+  in_universe=true: 400/400
+
+=== TOTALE NA IN UNIVERSE: 3400 ===
+Atteso: US=3000 + TSX=400 = 3400
+
+Verifica finale dal DB:
+  US in_universe (DB): 0-0/2792
+  TSX in_universe (DB): 0-0/400
