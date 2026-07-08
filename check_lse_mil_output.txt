@@ -1,0 +1,6 @@
+LSE in_universe: 0-0/424
+MIL in_universe: 0-0/117
+LSE fundamentals.price NOT NULL: 0-0/500
+MIL fundamentals.price NOT NULL: 0-0/230
+VOD.LSE ultima data prices_eod: [{'date': '2026-07-03'}]
+ENI.MIL ultima data prices_eod: [{'date': '2026-07-03'}]
