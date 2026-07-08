@@ -152,7 +152,8 @@ def try_fetch_stock(stock, start_dt, to_d):
         return None, "nessun dato su Leeway (ticker/Yahoo/fallback)"
     return data_l, None
 
-MAX_ROUNDS = 5
+WEEK_AGO = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
+MAX_ROUNDS = 10
 ok_leeway = fail_leeway = 0
 price_buf = []
 pending = list(all_stocks)
@@ -165,10 +166,11 @@ for round_num in range(1, MAX_ROUNDS + 1):
     for stock in pending:
         ticker, exchange = stock["ticker"], stock["exchange"]
         last = last_date_map.get((ticker, exchange), "2021-01-01")
-        if last >= TODAY:
-            ok_leeway += 1
-            continue
+        # Forza sempre almeno 7 giorni di margine (non solo il delta dall'ultima
+        # data nota) per recuperare eventuali buchi passati, non solo il giorno
+        # mancante di oggi. Nessun titolo viene piu' "saltato" per essere gia' fresco.
         start_dt = (datetime.strptime(last, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+        start_dt = min(start_dt, WEEK_AGO)
         data_l, reason = try_fetch_stock(stock, start_dt, TODAY)
         if data_l is None:
             still_pending.append(stock)
