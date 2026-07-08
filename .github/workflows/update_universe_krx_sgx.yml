@@ -3,6 +3,10 @@ name: Update Universe KRX SGX
 on:
   workflow_dispatch:
 
+concurrency:
+  group: update-universe-krx-sgx
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -16,4 +20,13 @@ jobs:
       - name: Update
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python update_universe_krx_sgx.py
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python update_universe_krx_sgx.py | tee update_output_krx_sgx.txt
+      - name: Commit output
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add update_output_krx_sgx.txt
+          git commit -m "output update KRX/SGX" || echo "nothing to commit"
+          git pull --rebase
+          git push
