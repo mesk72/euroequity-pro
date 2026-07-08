@@ -1,0 +1,81 @@
+name: Weekend Full Refresh
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: weekend-full-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests pandas numpy yfinance
+
+      - name: "1/8 - Universo EU"
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python update_universe_eu_all.py
+
+      - name: "2/8 - Universo NA (US+Canada)"
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python update_universe_na.py
+
+      - name: "3/8 - Universo APAC (5 mercati unificato)"
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python universe_apac_unified.py
+
+      - name: "4/8 - Storico 5Y EU (solo nuovi titoli)"
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+          REGION: EU
+        run: python rebuild_prices_5y.py
+
+      - name: "5/8 - Storico 5Y US (solo nuovi titoli)"
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+          REGION: US
+        run: python rebuild_prices_5y.py
+
+      - name: "6/8 - Storico 5Y APAC (solo nuovi titoli)"
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+          REGION: APAC
+        run: python rebuild_prices_5y.py
+
+      - name: "7/8 - Beta + Website US da Yahoo"
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python fetch_beta_us.py
+
+      - name: "8/8 - Riepilogo finale"
+        if: always()
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python weekend_summary.py | tee weekend_summary_output.txt
+
+      - name: Commit riepilogo
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add weekend_summary_output.txt
+          git commit -m "weekend refresh summary" || echo "nothing to commit"
+          git pull --rebase
+          git push
