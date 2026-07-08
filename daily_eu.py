@@ -122,13 +122,6 @@ for stock in all_stocks:
     ticker   = stock["ticker"]
     exchange = stock["exchange"]
     last = last_date_map.get((ticker, exchange), "2021-01-01")
-    if True:  # mantieni struttura try/except
-        try:
-            last = last  # già calcolato
-        except Exception as e:
-            print(f"  WARN lettura ultima data {ticker}.{exchange}: {e}")
-        fail_leeway += 1
-        continue
     if last >= TODAY:
         ok_leeway += 1
         continue
