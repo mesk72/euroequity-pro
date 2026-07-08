@@ -3,6 +3,10 @@ name: Update Universe APAC (5 mercati unificato)
 on:
   workflow_dispatch:
 
+concurrency:
+  group: apac-pipeline
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
