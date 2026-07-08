@@ -74,7 +74,7 @@ def is_excluded(company):
 def parse_mktcap(v):
     if not v: return None
     s = str(v).replace("USDMM","").replace("MM","").strip()
-    s = s.replace(".","").replace(",",".")
+    s = s.replace(",", "")  # formato americano: virgola=migliaia
     try:
         f = float(s)
         return f if f > 0 and not math.isnan(f) else None
