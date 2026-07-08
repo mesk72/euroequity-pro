@@ -3,6 +3,10 @@ name: Update Universe EU All
 on:
   workflow_dispatch:
 
+concurrency:
+  group: update-universe-eu-all
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
