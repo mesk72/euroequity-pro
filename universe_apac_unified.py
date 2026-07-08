@@ -60,27 +60,41 @@ EXCHANGE_CRITERIA = {
     "SGX":  {"top_n": 100},
 }
 
-def leeway_ticker(ticker, exchange):
+def leeway_ticker(ticker, exchange, ex_raw=""):
     if exchange == "TSE":  return ticker + ".TSE"
     if exchange == "SEHK": return ticker.zfill(4) + ".HK"
     if exchange == "ASX":  return ticker + ".AU"
-    if exchange == "KRX":  return ticker.lstrip("A").zfill(6) + ".KO"
+    if exchange == "KRX":
+        # KOSPI = .KO, KOSDAQ = .KQ (verificato 06/07/2026)
+        base = ticker.lstrip("A").zfill(6)
+        return base + (".KQ" if ex_raw == "KOSDAQ" else ".KO")
     if exchange == "SGX":  return ticker + ".SG"
     return ticker
 
-def ha_prezzo_su_leeway(ticker, exchange):
+def ha_prezzo_su_leeway(ticker, exchange, ex_raw=""):
     to_d = datetime.now().strftime("%Y-%m-%d")
     from_d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-    lt = leeway_ticker(ticker, exchange)
-    try:
-        url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
-        resp = requests.get(url, timeout=15)
-        if resp.status_code == 200:
-            data = resp.json()
-            if isinstance(data, list) and data:
-                return True
-    except Exception:
-        pass
+    lt = leeway_ticker(ticker, exchange, ex_raw)
+
+    def _check(t):
+        url = f"{LEEWAY_BASE}/historicalquotes/{t}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
+        for attempt in range(3):
+            try:
+                resp = requests.get(url, timeout=20)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    return isinstance(data, list) and bool(data)
+                if resp.status_code in (429, 500, 502, 503, 504):
+                    time.sleep(2 * (attempt + 1)); continue
+                return False
+            except Exception:
+                if attempt < 2: time.sleep(2 * (attempt + 1))
+        return False
+
+    if _check(lt): return True
+    if exchange == "KRX":
+        alt = lt[:-3] + (".KO" if lt.endswith(".KQ") else ".KQ")
+        return _check(alt)
     return False
 
 def is_excluded(company):
@@ -175,7 +189,7 @@ for exchange, criteria in EXCHANGE_CRITERIA.items():
     esclusi_no_leeway = []
     for t, mc in candidati:
         if len(eligible) >= top_n: break
-        if ha_prezzo_su_leeway(t, exchange):
+        if ha_prezzo_su_leeway(t, exchange, tikr[t].get("ex_raw", "")):
             eligible.append((t, mc))
         else:
             esclusi_no_leeway.append(t)
