@@ -37,3 +37,18 @@ jobs:
           git commit -m "log daily_eu output" || echo "nothing to commit"
           git pull --rebase
           git push
+
+      - name: Health check
+        if: always()
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python health_check.py | tee health_status.txt
+      - name: Commit health status
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add health_status.txt
+          git commit -m "health check 2026-07-08T19:54:13Z" || echo "nothing to commit"
+          git pull --rebase
+          git push
