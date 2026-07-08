@@ -7,10 +7,13 @@ concurrency:
   group: update-universe-eu-all
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -20,4 +23,14 @@ jobs:
       - name: Update
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python update_universe_eu_all.py
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python update_universe_eu_all.py | tee update_eu_output.txt
+      - name: Commit output
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add update_eu_output.txt
+          git commit -m "log update_universe_eu_all output" || echo "nothing to commit"
+          git pull --rebase
+          git push
