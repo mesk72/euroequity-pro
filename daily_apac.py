@@ -82,25 +82,23 @@ for s in all_stocks:
 # ── 2. SCARICA PREZZI EOD DA LEEWAY ──────────────────────────
 print("\n[2/5] Download prezzi EOD da Leeway...")
 
-# Ultime date in bulk — una query per exchange invece di N query singole
+# Ultima data per titolo — query diretta per ticker (indicizzata, veloce,
+# affidabile), sostituisce la paginazione bulk che si esauriva dopo pochi
+# titoli su universi con storico profondo.
 last_date_map = {}
-apac_exchanges = list(set(s["exchange"] for s in all_stocks))
-for exch in apac_exchanges:
-    offset_p = 0
-    while True:
+for s in all_stocks:
+    ticker, exchange = s["ticker"], s["exchange"]
+    try:
         rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "ticker,date", "exchange": "eq." + exch,
-                    "order": "ticker.asc,date.desc", "limit": "2000", "offset": str(offset_p)},
-            timeout=20)
-        batch = rp.json()
-        if not isinstance(batch, list) or not batch: break
-        for row in batch:
-            key = (row["ticker"], exch)
-            if key not in last_date_map:
-                last_date_map[key] = row["date"]
-        offset_p += 2000
-        if len(batch) < 2000: break
+            params={"select": "date", "ticker": "eq." + ticker, "exchange": "eq." + exchange,
+                    "order": "date.desc", "limit": "1"}, timeout=15)
+        d = rp.json()
+        if isinstance(d, list) and d:
+            last_date_map[(ticker, exchange)] = d[0]["date"]
+    except Exception:
+        pass
 print(f"  Ultime date caricate: {len(last_date_map)} titoli")
+
 
 def _fetch_leeway_apac(lt, from_d, to_d):
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + from_d + "&to=" + to_d
