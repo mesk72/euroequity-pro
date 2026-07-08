@@ -140,25 +140,25 @@ def safe_post(url, headers, json_data, retries=2):
             print(f"  WARN salvataggio fallito dopo {retries+1} tentativi: {e}")
             return None
 
-# Leggi ultima data prezzi — in bulk, una query per exchange invece di N query singole
-print("  Carico ultime date prezzi (bulk)...")
+# Ultima data per titolo — query diretta per ticker (indicizzata, veloce,
+# affidabile). La versione bulk precedente paginava su tutta la storia
+# invece che sull'ultima riga, esaurendosi dopo pochi titoli su universi
+# grandi e facendo credere che quasi tutto fosse da riscaricare da zero.
+print("  Carico ultime date prezzi...")
 last_date_map = {}
-for exch in ['US', 'TSX']:
-    offset_p = 0
-    while True:
+for s in all_stocks:
+    ticker, exchange = s['ticker'], s['exchange']
+    try:
         rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-            params={"select": "ticker,date", "exchange": "eq." + exch,
-                    "order": "ticker.asc,date.desc", "limit": "2000", "offset": str(offset_p)},
-            timeout=20)
-        batch = rp.json()
-        if not isinstance(batch, list) or not batch: break
-        for row in batch:
-            key = (row["ticker"], exch)
-            if key not in last_date_map:
-                last_date_map[key] = row["date"]
-        offset_p += 2000
-        if len(batch) < 2000: break
+            params={"select": "date", "ticker": "eq." + ticker, "exchange": "eq." + exchange,
+                    "order": "date.desc", "limit": "1"}, timeout=15)
+        d = rp.json()
+        if isinstance(d, list) and d:
+            last_date_map[(ticker, exchange)] = d[0]["date"]
+    except Exception:
+        pass
 print(f"  Ultime date caricate: {len(last_date_map)} titoli")
+
 
 def _fetch_leeway(lt, from_d, to_d):
     url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from={from_d}&to={to_d}"
