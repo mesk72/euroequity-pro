@@ -78,7 +78,7 @@ all_stocks = []
 offset = 0
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
-        params={"select": "ticker,exchange,yahoo_ticker", "in_universe": "eq.true",
+        params={"select": "ticker,exchange,yahoo_ticker,company", "in_universe": "eq.true",
                 "exchange": "not.in.(US,TSX,TSE,SEHK,ASX,KRX,SGX)",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
@@ -197,8 +197,21 @@ if price_buf:
 
 fail_leeway = len(pending)
 if pending:
-    falliti_desc = [s["ticker"] + "." + s["exchange"] for s in pending]
-    print(f"  FALLITI DEFINITIVI dopo {MAX_ROUNDS} giri ({fail_leeway}): {falliti_desc}")
+    print(f"  FALLITI DEFINITIVI dopo {MAX_ROUNDS} giri ({fail_leeway}) — diagnosi automatica:")
+    for s in pending:
+        ticker, exchange = s["ticker"], s["exchange"]
+        company = s.get("company", "?")
+        lt = leeway_ticker(ticker, exchange)
+        wide_url = f"{LEEWAY_BASE}/historicalquotes/{lt}?apitoken={LEEWAY_KEY}&from=2020-01-01&to={TODAY}"
+        try:
+            wr = requests.get(wide_url, timeout=20)
+            wd = wr.json() if wr.status_code == 200 else []
+            if isinstance(wd, list) and wd:
+                print(f"    {ticker}.{exchange} ({company}): Leeway si ferma al {wd[-1]['date']} — gap dati sul fornitore, non recuperabile da noi")
+            else:
+                print(f"    {ticker}.{exchange} ({company}): Leeway non ha MAI avuto dati per questo ticker con suffisso {lt} — verificare formato ticker")
+        except Exception as e:
+            print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
 
 print("  Prezzi Leeway: ok=" + str(ok_leeway) + " fail=" + str(fail_leeway))
 ok_prices = ok_leeway; fail_prices = fail_leeway
