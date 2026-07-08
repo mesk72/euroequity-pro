@@ -1,0 +1,31 @@
+name: Check TIKR NA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Check
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python check_tikr_na.py | tee check_tikr_na_output.txt
+      - name: Commit output
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add check_tikr_na_output.txt
+          git commit -m "check tikr na output" || echo "nothing to commit"
+          git pull --rebase
+          git push
