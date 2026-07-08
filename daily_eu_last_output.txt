@@ -1,0 +1,58 @@
+============================================================
+FORWARDALPHA DAILY EU LOAD — 2026-07-08
+============================================================
+
+[1/5] Caricamento universo EU...
+  Universo EU: 2132 titoli
+
+[2/5] Download prezzi EOD da Leeway...
+  Ultime date caricate: 19 titoli
+  Prezzi Leeway: ok=2109 fail=23
+
+[3/5] Lettura prezzi da prices_eod...
+  Prezzi caricati: 2128 titoli
+
+[4/5] Calcolo momentum...
+  Momentum ok=2128 fail=4
+
+  Aggiornamento FX...
+  FX salvati
+
+[5/5] Ricalcolo rank EU...
+  Fundamentals: 2132
+  ITA: 116 rankati
+  DEU: 210 rankati
+  FRA: 217 rankati
+  GBR: 423 rankati
+  SWE: 206 rankati
+  NOR: 100 rankati
+  CHE: 159 rankati
+  NLD: 98 rankati
+  BEL: 100 rankati
+  FIN: 100 rankati
+  ESP: 100 rankati
+  DNK: 100 rankati
+  Rank EU: 2029/2029
+  Combined rank EU: 1597/1597
+
+  Aggiornamento indici EU...
+  ERR DAX: HTTP 400
+  CAC 40: 1.79 (0.0%)
+  AEX: 9.08 (0.0%)
+  IBEX 35: 33.23 (1.87%)
+  BEL 20: 0.07 (-0.59%)
+  ERR SMI: HTTP 400
+  OMX Stockholm: 478.55 (-0.9%)
+  ERR OMX Copenhagen: HTTP 400
+  ATX: 0.14 (-6.67%)
+  ERR Euro Stoxx 50: HTTP 400
+  ERR STOXX 600: HTTP 400
+  ERR OMX Helsinki: HTTP 400
+  ERR PSI 20: HTTP 400
+  Indici EU: 6/13
+
+Log: leeway=2109 fail=23 momentum=2128 rank=1597 durata=5531s
+
+============================================================
+DAILY EU LOAD COMPLETATO
+============================================================
