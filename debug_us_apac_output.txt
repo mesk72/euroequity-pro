@@ -1,0 +1,63 @@
+============================================================
+[A] STATO PREZZI US ATTUALE (diretto da DB)
+============================================================
+  JPM.US ultime 3 date: ['2026-07-02', '2026-07-01', '2026-06-30']
+  AAPL.US ultime 3 date: ['2026-07-02', '2026-07-01', '2026-06-30']
+  MSFT.US ultime 3 date: ['2026-07-07', '2026-07-06', '2026-07-02']
+  TSLA.US ultime 3 date: ['2026-07-02', '2026-07-01', '2026-06-30']
+
+============================================================
+[B] TEST DIRETTO LEEWAY per JPM (indipendente dallo script)
+============================================================
+  HTTP 200
+  Body: [{"date":"2026-06-29","open":328.28,"high":332.39,"low":327.2,"close":329.39,"adjusted_close":327.9128,"volume":7981800},{"date":"2026-06-30","open":328.89,"high":330.44,"low":326.68,"close":327.33,"adjusted_close":325.862,"volume":8080100},{"date":"2026-07-01","open":328.37,"high":335.64,"low":325.01,"close":334.07,"adjusted_close":332.5718,"volume":15210200},{"date":"2026-07-02","open":338.02,"high":340,"low":331.77,"close":334.47,"adjusted_close":332.97,"volume":8413900},{"date":"2026-07-06",
+
+============================================================
+[C] MARKET CAP APAC — sample piu' ampio da fundamentals
+============================================================
+  --- TSE (campione) ---
+    1305.TSE: fundamentals=[{'ticker': '1305', 'exchange': 'TSE', 'mkt_cap': None}]
+    1320.TSE: fundamentals=[{'ticker': '1320', 'exchange': 'TSE', 'mkt_cap': None}]
+    1332.TSE: fundamentals=[{'ticker': '1332', 'exchange': 'TSE', 'mkt_cap': None}]
+    1333.TSE: fundamentals=[{'ticker': '1333', 'exchange': 'TSE', 'mkt_cap': None}]
+    1377.TSE: fundamentals=[{'ticker': '1377', 'exchange': 'TSE', 'mkt_cap': None}]
+  --- SEHK (campione) ---
+    1.SEHK: fundamentals=[{'ticker': '1', 'exchange': 'SEHK', 'mkt_cap': None}]
+    10.SEHK: fundamentals=[{'ticker': '10', 'exchange': 'SEHK', 'mkt_cap': None}]
+    100.SEHK: fundamentals=[{'ticker': '100', 'exchange': 'SEHK', 'mkt_cap': None}]
+    101.SEHK: fundamentals=[{'ticker': '101', 'exchange': 'SEHK', 'mkt_cap': None}]
+    1021.SEHK: fundamentals=[{'ticker': '1021', 'exchange': 'SEHK', 'mkt_cap': None}]
+  --- ASX (campione) ---
+    360.ASX: fundamentals=[{'ticker': '360', 'exchange': 'ASX', 'mkt_cap': None}]
+    4DX.ASX: fundamentals=[{'ticker': '4DX', 'exchange': 'ASX', 'mkt_cap': None}]
+    A1M.ASX: fundamentals=[{'ticker': 'A1M', 'exchange': 'ASX', 'mkt_cap': None}]
+    A4N.ASX: fundamentals=[{'ticker': 'A4N', 'exchange': 'ASX', 'mkt_cap': None}]
+    AAC.ASX: fundamentals=[{'ticker': 'AAC', 'exchange': 'ASX', 'mkt_cap': None}]
+  --- KRX (campione) ---
+    A000080.KRX: fundamentals=[{'ticker': 'A000080', 'exchange': 'KRX', 'mkt_cap': None}]
+    A000100.KRX: fundamentals=[{'ticker': 'A000100', 'exchange': 'KRX', 'mkt_cap': None}]
+    A000120.KRX: fundamentals=[{'ticker': 'A000120', 'exchange': 'KRX', 'mkt_cap': None}]
+    A000150.KRX: fundamentals=[{'ticker': 'A000150', 'exchange': 'KRX', 'mkt_cap': None}]
+    A000210.KRX: fundamentals=[{'ticker': 'A000210', 'exchange': 'KRX', 'mkt_cap': None}]
+  --- SGX (campione) ---
+    544.SGX: fundamentals=[{'ticker': '544', 'exchange': 'SGX', 'mkt_cap': 748.49}]
+    558.SGX: fundamentals=[{'ticker': '558', 'exchange': 'SGX', 'mkt_cap': None}]
+    5E2.SGX: fundamentals=[{'ticker': '5E2', 'exchange': 'SGX', 'mkt_cap': None}]
+    8C8U.SGX: fundamentals=[{'ticker': '8C8U', 'exchange': 'SGX', 'mkt_cap': None}]
+    8YZ.SGX: fundamentals=[{'ticker': '8YZ', 'exchange': 'SGX', 'mkt_cap': None}]
+
+============================================================
+[D] RAW TIKR APAC per lo stesso campione — per capire se il
+    problema e' nel merge/join ticker o nel valore stesso
+============================================================
+    1305.TSE: presente in TIKR=True, raw mktcap='$95,329.32MM', PrimaryExch='TSE'
+    1320.TSE: presente in TIKR=True, raw mktcap='$51,397.72MM', PrimaryExch='TSE'
+    1332.TSE: presente in TIKR=True, raw mktcap='$2,392.94MM', PrimaryExch='TSE'
+    1.SEHK: presente in TIKR=True, raw mktcap='$32,350.53MM', PrimaryExch='SEHK'
+    10.SEHK: presente in TIKR=True, raw mktcap='$2,183.87MM', PrimaryExch='SEHK'
+    100.SEHK: presente in TIKR=True, raw mktcap='$16,674.50MM', PrimaryExch='SEHK'
+    360.ASX: presente in TIKR=True, raw mktcap='$4,474.19MM', PrimaryExch='ASX'
+    4DX.ASX: presente in TIKR=True, raw mktcap='$1,859.09MM', PrimaryExch='ASX'
+    A1M.ASX: presente in TIKR=True, raw mktcap='$398.62MM', PrimaryExch='ASX'
+
+FATTO.
