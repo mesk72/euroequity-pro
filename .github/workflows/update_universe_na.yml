@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: update-universe-na
+  group: na-pipeline
   cancel-in-progress: false
 
 permissions:
