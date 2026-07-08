@@ -24,7 +24,7 @@ jobs:
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
-        run: python update_universe_eu_all.py
+        run: python universe_eu_unified.py
 
       - name: "2/8 - Universo NA (US+Canada)"
         env:
