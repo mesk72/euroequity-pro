@@ -1,0 +1,31 @@
+============================================================
+DIAGNOSTICA KRX/SGX
+============================================================
+
+KRX TOTALE righe (qualsiasi in_universe): 0-0/447 status=206
+KRX in_universe=true: */0 status=200
+KRX in_universe=false: 0-0/447 status=206
+KRX in_universe=NULL: */0 status=200
+KRX campione 5 righe: [{"ticker":"A000080","in_universe":false,"primary_exchange":"KOSE"}, 
+ {"ticker":"A000100","in_universe":false,"primary_exchange":"KOSE"}, 
+ {"ticker":"A000120","in_universe":false,"primary_exchange":"KOSE"}, 
+ {"ticker":"A000150","in_universe":false,"primary_exchange":"KOSE"}, 
+ {"ticker":"A000210","in_universe":false,"primary_exchange":"KOSE"}]
+
+SGX TOTALE righe (qualsiasi in_universe): 0-0/109 status=206
+SGX in_universe=true: */0 status=200
+SGX in_universe=false: 0-0/109 status=206
+SGX in_universe=NULL: */0 status=200
+SGX campione 5 righe: [{"ticker":"1869","in_universe":false,"primary_exchange":"NSE"}, 
+ {"ticker":"2902","in_universe":false,"primary_exchange":"NSE"}, 
+ {"ticker":"2928","in_universe":false,"primary_exchange":"SPSE"}, 
+ {"ticker":"544","in_universe":false,"primary_exchange":"SGX"}, 
+ {"ticker":"558","in_universe":false,"primary_exchange":"SGX"}]
+
+============================================================
+VALORI DISTINTI DI exchange NELLA TABELLA stocks
+============================================================
+['ASX', 'BR', 'LSE', 'MC', 'OB', 'OM', 'SEHK', 'SGX', 'TSE', 'TSX', 'XETRA']
+(status=200, campione 1000 righe)
+
+FATTO.
