@@ -143,7 +143,7 @@ for exchange in ["TSE", "SEHK", "ASX", "KRX", "SGX"]:
     while True:
         try:
             r = requests.get(SUPABASE_URL+"/rest/v1/stocks", headers=headers_r,
-                params={"select":"ticker","exchange":f"eq.{exchange}",
+                params={"select":"ticker","exchange":f"eq.{exchange}","in_universe":"eq.true",
                         "limit":"1000","offset":str(offset)}, timeout=20)
             batch = r.json()
         except Exception as e:
@@ -152,7 +152,7 @@ for exchange in ["TSE", "SEHK", "ASX", "KRX", "SGX"]:
         for d in batch: stocks_tickers[exchange].add(d["ticker"])
         offset += 1000
         if len(batch) < 1000: break
-    print(f" {exchange}: {len(stocks_tickers[exchange])} nel DB")
+    print(f" {exchange}: {len(stocks_tickers[exchange])} in_universe=true nel DB")
 
 # ── TIKR APAC ────────────────────────────────────────────────
 print("\n Legge file TIKR APAC...")
@@ -219,9 +219,12 @@ try:
     print(f" DEBUG: primi 5 ticker SGX in stocks: {list(stocks_tickers['SGX'])[:5]}")
 
     for exchange, target in TARGETS.items():
-        rows = sorted(by_ex[exchange], key=lambda x: x["mktcap"], reverse=True)[:target]
+        # stocks_tickers ora contiene SOLO in_universe=true (la selezione
+        # ufficiale di universe_apac_unified.py) — non si ricalcola piu'
+        # una top-N indipendente qui, si usano esattamente quei titoli.
+        rows = sorted(by_ex[exchange], key=lambda x: x["mktcap"], reverse=True)
         tikr_rows.extend(rows)
-        print(f" TIKR {exchange}: {len(rows)}/{len(by_ex[exchange])} (target={target})")
+        print(f" TIKR {exchange}: {len(rows)} (in_universe ufficiale, target di riferimento={target})")
     # Log Canada se presente nel CSV (viene ignorato)
     if by_ex.get("TSX"):
         print(f" TIKR TSX: ignorato ({len(by_ex['TSX'])} righe) — Canada va in tikr_us_latest.csv")
