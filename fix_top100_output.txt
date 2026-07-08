@@ -1,0 +1,124 @@
+============================================================
+CARICAMENTO TIKR EU
+============================================================
+TIKR EU: HTTP 200 — 3926 righe
+
+============================================================
+MERCATO: MC (TIKR: BME)
+============================================================
+Candidati (dopo filtro fondi/ETF): 321
+Eligible con prezzo Leeway: 100 (target 100)
+Primi scartati senza prezzo (fino a 10):
+  SCHLR (Helios RE Socimi, S.A.) mkt_cap=795MM
+  SCHST (Nordeste Properties SOCIMI, S.A.) mkt_cap=674MM
+  SCHI (Saint Croix Holding Immobilier, SOCIMI, S.A.) mkt_cap=349MM
+Nel DB: 167 titoli, in_universe attuali: 100
+Nuovi da aggiungere: ['TSK']
+  TSK: scaricate 40 righe storico
+MC in_universe finale (DB): 0-0/100
+
+============================================================
+MERCATO: BR (TIKR: ENXTBR)
+============================================================
+Candidati (dopo filtro fondi/ETF): 181
+Eligible con prezzo Leeway: 100 (target 100)
+Primi scartati senza prezzo (fino a 10):
+  017250539 (BNP Paribas Fortis SA) mkt_cap=25,341MM
+  009789111 (BGL BNP Paribas S.A.) mkt_cap=2,848MM
+  094426466 (SCR-Sibelco N.V.) mkt_cap=1,780MM
+  094124352 (Aliaxis SA) mkt_cap=1,446MM
+  094124453 (Etex N.V.) mkt_cap=1,198MM
+  009915016 (Total Petrochemicals & Refining S.A./N.V.) mkt_cap=759MM
+  626591203 (Infrabel S.A.) mkt_cap=407MM
+  002278082 (vdk bank nv) mkt_cap=177MM
+  001062148 (SNCB SA) mkt_cap=101MM
+  DEXB (Dexia Holding SA/NV) mkt_cap=63MM
+Nel DB: 122 titoli, in_universe attuali: 100
+Nuovi da aggiungere: ['TESB', 'RET']
+  TESB: scaricate 1279 righe storico
+  RET: scaricate 1279 righe storico
+BR in_universe finale (DB): 0-0/100
+
+============================================================
+MERCATO: HE (TIKR: HLSE)
+============================================================
+Candidati (dopo filtro fondi/ETF): 181
+Eligible con prezzo Leeway: 100 (target 100)
+Primi scartati senza prezzo (fino a 10):
+  NDA FI (Nordea Bank Abp) mkt_cap=65,969MM
+  SAVOX (Savox Communications Oyj) mkt_cap=229MM
+  KPYOSK (KPY osk) mkt_cap=132MM
+  ILKKA (Ilkka Oyj) mkt_cap=119MM
+Nel DB: 155 titoli, in_universe attuali: 100
+Nuovi da aggiungere: []
+HE in_universe finale (DB): 0-0/100
+
+============================================================
+MERCATO: CPSE (TIKR: CPSE)
+============================================================
+Candidati (dopo filtro fondi/ETF): 598
+Eligible con prezzo Leeway: 100 (target 100)
+Primi scartati senza prezzo (fino a 10):
+  IG (InstallatÃ¸rGruppen A/S) mkt_cap=601MM
+  BIAEJD (BI Erhvervsejendomme A/S) mkt_cap=534MM
+  ARAOPT (Investeringsselskabet Artha Optimum A/S) mkt_cap=496MM
+  ACACIGDKK (Kapitalforeningen Accunia Invest European Investment Grade Credit Kl) mkt_cap=350MM
+  NYIKA (Nykredit Invest - Kreditobligationer Akk) mkt_cap=227MM
+Nel DB: 139 titoli, in_universe attuali: 100
+Nuovi da aggiungere: ['NOVO B', 'MAERSK B', 'NSIS B', 'CARL B', 'COLO B', 'ALK B', 'ALSYDB', 'ROCK B', 'HLUN B', 'TRMD A', 'AMBU B', 'PAAL B', 'BAIGAA', 'AOJ B', 'SOLAR B', 'FLUG B', 'GYLD B']
+  NOVO B: scaricate 1251 righe storico
+  MAERSK B: scaricate 1251 righe storico
+  NSIS B: scaricate 1251 righe storico
+  CARL B: scaricate 1250 righe storico
+  COLO B: scaricate 1251 righe storico
+  ALK B: scaricate 1251 righe storico
+  ALSYDB: scaricate 1251 righe storico
+  ROCK B: scaricate 1251 righe storico
+  HLUN B: scaricate 1251 righe storico
+  TRMD A: scaricate 1251 righe storico
+  AMBU B: scaricate 1251 righe storico
+  PAAL B: scaricate 1251 righe storico
+  BAIGAA: scaricate 792 righe storico
+  AOJ B: scaricate 1251 righe storico
+  SOLAR B: scaricate 1251 righe storico
+  FLUG B: scaricate 1211 righe storico
+  GYLD B: scaricate 930 righe storico
+CPSE in_universe finale (DB): 0-0/100
+
+============================================================
+MERCATO: OB (TIKR: OB)
+============================================================
+Candidati (dopo filtro fondi/ETF): 288
+Eligible con prezzo Leeway: 100 (target 100)
+Primi scartati senza prezzo (fino a 10):
+  SNM (ShaMaran Petroleum Ltd.) mkt_cap=388MM
+Nel DB: 227 titoli, in_universe attuali: 100
+Nuovi da aggiungere: ['SNTIA']
+  SNTIA: scaricate 267 righe storico
+OB in_universe finale (DB): 0-0/100
+
+============================================================
+MERCATO: GR (TIKR: ATSE)
+============================================================
+Candidati (dopo filtro fondi/ETF): 142
+Eligible con prezzo Leeway: 100 (target 100)
+Primi scartati senza prezzo (fino a 10):
+  DOTSOFT (DOTSOFT SA) mkt_cap=130MM
+  EX (Euroxx Securities S.A.) mkt_cap=85MM
+Nel DB: 103 titoli, in_universe attuali: 100
+Nuovi da aggiungere: ['PLAKR', 'ADPS']
+Inseriti 1 nuovi titoli: HTTP 201
+  PLAKR: scaricate 1239 righe storico
+  ADPS: scaricate 4 righe storico
+GR in_universe finale (DB): 0-0/100
+
+============================================================
+RIEPILOGO FINALE
+============================================================
+  MC: 0-0/100
+  BR: 0-0/100
+  HE: 0-0/100
+  CPSE: 0-0/100
+  OB: 0-0/100
+  GR: 0-0/100
+FATTO.
