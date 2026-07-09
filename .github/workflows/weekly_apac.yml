@@ -27,4 +27,13 @@ jobs:
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
-        run: python weekly_apac.py
+        run: python weekly_apac.py | tee weekly_apac_last_output.txt
+      - name: Commit output log
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add weekly_apac_last_output.txt
+          git commit -m "log weekly_apac output" || echo "nothing to commit"
+          git pull --rebase
+          git push
