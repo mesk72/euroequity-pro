@@ -1,0 +1,3 @@
+Riga di test trovata: [{'ticker': 'TESTXYZ', 'fetched_at': '2026-07-09T19:41:10.930569'}]
+Filtro '2026-07-09T18:42:17': Content-Range=0-0/1  status=200
+Righe piu' recenti: [{'ticker': 'TESTXYZ', 'fetched_at': '2026-07-09T19:41:10.930569'}, {'ticker': '9044', 'fetched_at': '2026-07-09T16:22:48.988424'}, {'ticker': 'FBP', 'fetched_at': '2026-07-09T16:22:48.988424'}]
