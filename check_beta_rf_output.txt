@@ -1,0 +1,2 @@
+Beta popolato US: 0-0/1825
+macro_rates ultimi 3: [{'region': 'US', 'rate_10y': 4.372, 'updated_at': '2026-07-05T07:41:39+00:00'}]
