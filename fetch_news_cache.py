@@ -182,12 +182,30 @@ for region, exchanges in REGIONS.items():
             except:
                 fail += 1
 
-    # Salva in batch
+    # Salva in batch — con verifica reale della scrittura (prima un fallimento
+    # silenzioso qui faceva credere che le notizie fossero salvate quando
+    # in realta' il batch veniva rifiutato da Supabase)
+    write_ok = write_fail = 0
     for i in range(0, len(all_rows), 200):
         batch = all_rows[i:i+200]
-        requests.post(SUPABASE_URL + "/rest/v1/news_cache", headers=headers_up, json=batch)
-        news_count += len(batch)
+        success = False
+        for attempt in range(3):
+            try:
+                resp = requests.post(SUPABASE_URL + "/rest/v1/news_cache", headers=headers_up, json=batch, timeout=30)
+                if resp.status_code in (200, 201, 204):
+                    success = True
+                    break
+                print(f"  WARN batch news rifiutato: HTTP {resp.status_code} — {resp.text[:200]}")
+            except Exception as e:
+                print(f"  WARN errore rete batch news: {e}")
+            time.sleep(2 * (attempt + 1))
+        if success:
+            write_ok += len(batch)
+            news_count += len(batch)
+        else:
+            write_fail += len(batch)
+            print(f"  FALLITO DEFINITIVO: batch di {len(batch)} righe non scritto dopo 3 tentativi")
 
-    print(f"  ok={ok} fail={fail} notizie={news_count}")
+    print(f"  ok={ok} fail={fail} notizie_scritte={write_ok} notizie_fallite={write_fail}")
 
 print("\nFetch news cache completato")
