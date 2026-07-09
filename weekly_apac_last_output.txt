@@ -16,7 +16,7 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-09
  DEBUG: candidati SGX nel file TIKR (raw_rows): 508
  DEBUG: ticker SGX in stocks_tickers: 100
  DEBUG: primi 5 ticker SGX dal TIKR: ['7485', '2928', '6623', '9357', '1869']
- DEBUG: primi 5 ticker SGX in stocks: ['D05', 'AU8U', 'E28', 'DCRU', 'AWX']
+ DEBUG: primi 5 ticker SGX in stocks: ['CJLU', 'JYEU', 'Z74', 'O39', 'ME8U']
  TIKR TSE: 1000 (in_universe ufficiale, target di riferimento=1000)
  TIKR SEHK: 500 (in_universe ufficiale, target di riferimento=500)
  TIKR ASX: 350 (in_universe ufficiale, target di riferimento=350)
