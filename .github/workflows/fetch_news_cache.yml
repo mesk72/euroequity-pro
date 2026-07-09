@@ -18,4 +18,13 @@ jobs:
       - name: Fetch news cache
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python fetch_news_cache.py
+        run: python fetch_news_cache.py | tee fetch_news_cache_last_output.txt
+      - name: Commit log
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add fetch_news_cache_last_output.txt
+          git commit -m "log news cache output" || echo "nothing to commit"
+          git pull --rebase
+          git push
