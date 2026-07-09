@@ -203,7 +203,11 @@ for round_num in range(1, MAX_ROUNDS + 1):
             still_pending.append(stock)
             continue
         new_max_date = max((row2['date'] for row2 in data_l), default=None)
-        if not new_max_date or new_max_date <= last:
+        if not new_max_date:
+            still_pending.append(stock)
+            continue
+        FRESH_CUTOFF = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=2)).strftime("%Y-%m-%d")
+        if new_max_date <= last and new_max_date < FRESH_CUTOFF:
             still_pending.append(stock)
             continue
         for row2 in data_l:
@@ -211,7 +215,7 @@ for round_num in range(1, MAX_ROUNDS + 1):
             if adj is None: continue
             price_buf.append({"ticker": ticker, "exchange": exchange,
                                "date": row2['date'], "adj_close": float(adj)})
-        last_date_map[(ticker, exchange)] = new_max_date
+        last_date_map[(ticker, exchange)] = max(new_max_date, last)
         ok_leeway += 1
         if len(price_buf) >= 500:
             safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
