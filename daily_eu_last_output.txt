@@ -6,7 +6,7 @@ FORWARDALPHA DAILY EU LOAD — 2026-07-08
   Universo EU: 2137 titoli
 
 [2/5] Download prezzi EOD da Leeway...
-  Ultime date caricate: 14 titoli
+  Ultime date caricate: 19 titoli
   --- Giro 1/5: 2137 titoli da scaricare ---
   1 ancora falliti — pausa 20s prima del prossimo giro...
   --- Giro 2/5: 1 titoli da scaricare ---
@@ -16,7 +16,8 @@ FORWARDALPHA DAILY EU LOAD — 2026-07-08
   --- Giro 4/5: 1 titoli da scaricare ---
   1 ancora falliti — pausa 80s prima del prossimo giro...
   --- Giro 5/5: 1 titoli da scaricare ---
-  FALLITI DEFINITIVI dopo 5 giri (1): ['ADKO.VI']
+  FALLITI DEFINITIVI dopo 5 giri (1) — diagnosi automatica:
+    ADKO.VI (Addiko Bank AG): Leeway si ferma al 2026-07-03 — gap dati sul fornitore, non recuperabile da noi
   Prezzi Leeway: ok=2136 fail=1
 
 [3/5] Lettura prezzi da prices_eod...
@@ -61,7 +62,7 @@ FORWARDALPHA DAILY EU LOAD — 2026-07-08
   ERR PSI 20: HTTP 400
   Indici EU: 6/13
 
-Log: leeway=2136 fail=1 momentum=2133 rank=1590 durata=6018s
+Log: leeway=2136 fail=1 momentum=2133 rank=1590 durata=4388s
 
 ============================================================
 DAILY EU LOAD COMPLETATO
