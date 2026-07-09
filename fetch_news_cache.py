@@ -25,28 +25,19 @@ YAHOO_SUFFIX = {
     'TSE':'.T','SEHK':'.HK','ASX':'.AX','TSX':'.TO','US':''
 }
 
-# Limiti ticker: TOP aggiornati ogni ora, REST ogni 3 ore
-TOP_LIMITS = {
-    'americas': 200,  # top 200 ogni ora, restanti 1300 ogni 3 ore
-    'europe':   50,   # top 50 ogni ora, restanti 1450 ogni 3 ore
-    'asia':     50,   # top 50 ogni ora, restanti 1450 ogni 3 ore
-}
-
-FULL_LIMITS = {
-    'americas': 1500,
-    'europe':   1500,
-    'asia':     1500,
-}
-
+# Nessun taglio artificiale: si processa SEMPRE l'intero universo per
+# regione, ogni ora. Il filtro "ultime 24h" e' gia' garantito dalla pulizia
+# automatica sotto (DELETE fetched_at < 24h fa) + dal fatto che ogni run
+# scarica solo le notizie correnti via RSS, non uno storico.
 REGIONS = {
     'americas': ['US','TSX'],
     'europe':   ['PA','XETRA','MIL','MC','AS','BR','LSE','SWX','OM','OB','HE','IR','VI','CPSE'],
-    'asia':     ['TSE','SEHK','ASX'],
+    'asia':     ['TSE','SEHK','ASX','KRX','SGX'],
+    # 'gcc': [...]  # da aggiungere non appena l'universo GCC e i codici
+    #               # exchange sono definiti (in attesa del file TIKR)
 }
 
 import sys
-# Se lanciato con argomento 'all' processa tutti i ticker, altrimenti solo top
-PROCESS_ALL = 'all' in sys.argv
 
 import xml.etree.ElementTree as ET
 
@@ -144,25 +135,14 @@ for region, exchanges in REGIONS.items():
             offset += 1000
             if len(batch) < 1000: break
 
-    # 3. Ordina per mktcap, prendi top 1500
+    # 3. Ordina per mktcap (solo per ordine di priorita' in caso di
+    # rallentamenti — ma si processa comunque l'intero universo)
     sorted_tickers = sorted(
         [(k, v) for k, v in funds_map.items()],
         key=lambda x: x[1].get('mkt_cap') or 0,
         reverse=True
-    )  # tutti i ticker, filtro sotto
-
-    # TOP: primi N per mktcap (ogni ora)
-    # REST: dal N+1 in poi (ogni 3 ore) — no duplicati
-    top_n  = TOP_LIMITS.get(region, 200)
-    full_n = FULL_LIMITS.get(region, 1500)
-    if PROCESS_ALL:
-        to_process = sorted_tickers[top_n:full_n]  # solo i restanti
-        print(f"  Modalità REST: {len(to_process)} ticker (dal {top_n+1} al {full_n})")
-    else:
-        to_process = sorted_tickers[:top_n]  # solo top
-        print(f"  Modalità TOP: {len(to_process)} ticker")
-    sorted_tickers = to_process
-    print(f"  Top ticker: {len(sorted_tickers)}")
+    )
+    print(f"  Da processare: {len(sorted_tickers)} titoli (intero universo, nessun taglio)")
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
