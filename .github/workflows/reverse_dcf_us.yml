@@ -3,7 +3,7 @@ name: Reverse Earnings Model US
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Daily US Update"]
+    workflows: ["Fetch Beta US (Yahoo Finance)"]
     types:
       - completed
 
