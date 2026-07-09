@@ -1,4 +1,5 @@
-import os, time, requests
+import os, time, re, requests
+from datetime import datetime
 
 # ============================================================
 # FORWARDALPHA — BETA (Yahoo Finance) + RISK-FREE RATE US
@@ -33,23 +34,34 @@ def safe_get(url, **kwargs):
 
 
 print("=" * 60)
-print("BETA + RISK-FREE RATE US — via Yahoo Finance")
+print("BETA (Yahoo Finance) + RISK-FREE RATE (US Treasury, fonte ufficiale)")
 print("=" * 60)
 
-# ── 1. RISK-FREE RATE: Treasury 10Y (^TNX) ──────────────────
-print("\n[1/2] Scarico rendimento Treasury 10Y (^TNX)...")
+# ── 1. RISK-FREE RATE: Treasury 10Y — direttamente dal Tesoro USA, non
+# da Yahoo. Fonte pubblica ufficiale, nessuna chiave richiesta, nessun
+# problema di licenza/ToS: home.treasury.gov/.../pages/xml
+print("\n[1/2] Scarico rendimento Treasury 10Y da fonte ufficiale (Tesoro USA)...")
 risk_free_10y = None
 try:
-    tnx = yf.Ticker("^TNX")
-    hist = tnx.history(period="5d")
-    if not hist.empty:
-        last_close = float(hist["Close"].dropna().iloc[-1])
-        risk_free_10y = round(last_close, 4)  # ^TNX gia' in percentuale diretta (es. 4.46 = 4.46%)
-        print(f"  Treasury 10Y: {risk_free_10y}% (quotazione grezza ^TNX: {last_close})")
+    year = datetime.now().year
+    url = (f"https://home.treasury.gov/resource-center/data-chart-center/"
+           f"interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value={year}")
+    resp = requests.get(url, timeout=20)
+    if resp.status_code == 200:
+        # Ultima voce nel feed = data piu' recente disponibile
+        dates_rates = re.findall(
+            r'<d:NEW_DATE[^>]*>([^<]+)</d:NEW_DATE>.*?<d:BC_10YEAR[^>]*>([^<]+)</d:BC_10YEAR>',
+            resp.text, re.DOTALL)
+        if dates_rates:
+            last_date, last_rate = dates_rates[-1]
+            risk_free_10y = round(float(last_rate), 4)
+            print(f"  Treasury 10Y: {risk_free_10y}% (data: {last_date[:10]}, fonte: home.treasury.gov)")
+        else:
+            print("  WARN: nessuna voce trovata nel feed del Tesoro")
     else:
-        print("  WARN: nessun dato storico per ^TNX")
+        print(f"  WARN: HTTP {resp.status_code} dal Tesoro")
 except Exception as e:
-    print(f"  WARN lettura ^TNX: {e}")
+    print(f"  WARN lettura feed Tesoro: {e}")
 
 if risk_free_10y is not None:
     # Salva in una piccola tabella macro_rates (va creata se non esiste, vedi nota)
