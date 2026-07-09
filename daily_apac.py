@@ -427,9 +427,12 @@ ok_rank = ok
 # ── INDICI APAC ───────────────────────────────────────────────
 print("\n  Aggiornamento indici APAC...")
 APAC_INDICES = [
-    ("N225.INDX",  "TSE",  "N225",  "Nikkei 225"),
-    ("HSI.INDX",   "SEHK", "HSI",   "Hang Seng"),
-    ("AXJO.INDX",  "ASX",  "AXJO",  "ASX 200"),
+    ("N225.INDX",   "TSE",  "N225",     "Nikkei 225"),
+    ("TPX.INDX",    "TSE",  "TPX",      "TOPIX"),        # ticker non confermato da Lars, da verificare
+    ("HSI.INDX",    "SEHK", "HSI",      "Hang Seng"),
+    ("AXJO.INDX",   "ASX",  "AXJO",     "ASX 200"),
+    ("KOSPI200",    "KRX",  "KOSPI200", "KOSPI 200"),     # confermato da Lars (Leeway) 09/07/2026
+    ("FTAS.SG",     "SGX",  "FTAS",     "FTSE ST All-Share"),  # confermato da Lars (Leeway) 09/07/2026
 ]
 ok_idx = 0
 FROM_12M = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
