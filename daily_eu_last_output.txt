@@ -1,29 +1,64 @@
 ============================================================
-FORWARDALPHA DAILY EU LOAD — 2026-07-08
+FORWARDALPHA DAILY EU LOAD — 2026-07-09
 ============================================================
 
 [1/5] Caricamento universo EU...
   Universo EU: 2137 titoli
 
 [2/5] Download prezzi EOD da Leeway...
-  Ultime date caricate: 19 titoli
-  --- Giro 1/5: 2137 titoli da scaricare ---
-  1 ancora falliti — pausa 20s prima del prossimo giro...
-  --- Giro 2/5: 1 titoli da scaricare ---
-  1 ancora falliti — pausa 40s prima del prossimo giro...
-  --- Giro 3/5: 1 titoli da scaricare ---
-  1 ancora falliti — pausa 60s prima del prossimo giro...
-  --- Giro 4/5: 1 titoli da scaricare ---
-  1 ancora falliti — pausa 80s prima del prossimo giro...
-  --- Giro 5/5: 1 titoli da scaricare ---
-  FALLITI DEFINITIVI dopo 5 giri (1) — diagnosi automatica:
-    ADKO.VI (Addiko Bank AG): Leeway si ferma al 2026-07-03 — gap dati sul fornitore, non recuperabile da noi
-  Prezzi Leeway: ok=2136 fail=1
+  Ultime date caricate: 2135 titoli
+  --- Giro 1/20: 2137 titoli da scaricare ---
+  3 ancora falliti — pausa 20s prima del prossimo giro...
+  --- Giro 2/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 40s prima del prossimo giro...
+  --- Giro 3/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 60s prima del prossimo giro...
+  --- Giro 4/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 80s prima del prossimo giro...
+  --- Giro 5/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 6/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 7/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 8/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 9/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 10/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 11/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 12/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 13/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 14/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 15/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 16/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 17/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 18/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 19/20: 3 titoli da scaricare ---
+  3 ancora falliti — pausa 90s prima del prossimo giro...
+  --- Giro 20/20: 3 titoli da scaricare ---
+  FALLITI DEFINITIVI dopo 20 giri (3) — diagnosi automatica:
+    ECT.AS (Eurocastle Investment Limited): Leeway si ferma al 2026-06-18 — gap dati sul fornitore, non recuperabile da noi
+    EISP.OB (Eiendomsspar AS): Leeway si ferma al 2026-06-17 — gap dati sul fornitore, non recuperabile da noi
+    COFB.BR (Cofinimmo SA): Leeway si ferma al 2026-06-30 — gap dati sul fornitore, non recuperabile da noi
+  Prezzi Leeway: ok=2134 fail=3
 
 [3/5] Lettura prezzi da prices_eod...
   Prezzi caricati: 2133 titoli
 
 [4/5] Calcolo momentum...
+
+  Rilevati 1 possibili stock split (variazione 1gg > 20%): ricarico 5 anni di storico...
+    ALVDM.PA: ricaricato (1278 righe), variazione ricalcolata -0.2817%
   Momentum ok=2133 fail=4
 
   Aggiornamento FX...
@@ -50,19 +85,19 @@ FORWARDALPHA DAILY EU LOAD — 2026-07-08
   ERR DAX: HTTP 400
   CAC 40: 1.79 (0.0%)
   AEX: 9.08 (0.0%)
-  IBEX 35: 33.23 (1.87%)
-  BEL 20: 0.07 (-0.59%)
+  IBEX 35: 32.87 (-1.08%)
+  BEL 20: 0.07 (-0.3%)
   ERR SMI: HTTP 400
-  OMX Stockholm: 478.55 (-0.9%)
+  OMX Stockholm: 469.2 (-1.95%)
   ERR OMX Copenhagen: HTTP 400
-  ATX: 0.14 (-6.67%)
+  ATX: 0.14 (-3.57%)
   ERR Euro Stoxx 50: HTTP 400
   ERR STOXX 600: HTTP 400
   ERR OMX Helsinki: HTTP 400
   ERR PSI 20: HTTP 400
   Indici EU: 6/13
 
-Log: leeway=2136 fail=1 momentum=2133 rank=1590 durata=4388s
+Log: leeway=2134 fail=3 momentum=2133 rank=1590 durata=6130s
 
 ============================================================
 DAILY EU LOAD COMPLETATO
