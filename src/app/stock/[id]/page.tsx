@@ -193,7 +193,7 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   )
 }
 
-export default function StockPage() {
+function StockPageInner() {
   const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -671,4 +671,14 @@ function ReverseDCFSection({ stock }: { stock: any }) {
       </div>
     </div>
   )
+}
+
+// Wrapper con key={id}: forza React a smontare e rimontare da zero l'intero
+// componente quando cambia il ticker, cosi' nessuno stato (es. il "from"
+// per il tasto Back) puo' restare "incollato" dalla pagina del titolo
+// precedente — era questa la causa del bug NA/EU/APAC segnalato.
+export default function StockPage() {
+  const params = useParams()
+  const id = (params?.id as string) || ''
+  return <StockPageInner key={id} />
 }
