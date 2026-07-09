@@ -206,6 +206,7 @@ export default function StockPage() {
         window.history.back()
       } else {
         router.push(decoded)
+        router.refresh()  // forza il router a non servire una versione in cache
       }
     } else {
       window.history.back()
