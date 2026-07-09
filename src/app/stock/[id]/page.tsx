@@ -198,9 +198,11 @@ function StockPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const handleBack = () => {
-    const from = searchParams.get('from')
+    let from: string | null = null
+    try { from = sessionStorage.getItem('stockBackTo') } catch {}
+    if (!from) from = searchParams.get('from')
     if (from) {
-      const decoded = decodeURIComponent(from)
+      const decoded = from.startsWith('/') ? from : decodeURIComponent(from)
       // Per /news usa history.back() — evita freeze da Router Cache di Next.js
       if (decoded === '/news') {
         window.history.back()
