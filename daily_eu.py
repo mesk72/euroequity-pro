@@ -494,17 +494,21 @@ EU_INDICES = [
     ("AEX.INDX",   "AS",    "AEX",      "AEX"),
     ("IBEX.INDX",  "MC",    "IBEX",     "IBEX 35"),
     ("BFX.INDX",   "BR",    "BFX",      "BEL 20"),
-    # ("FTSE.INDX", "LSE", "FTSE", "FTSE 100"),  # ticker Leeway da verificare
     ("SSMI.INDX",  "SWX",   "SSMI",     "SMI"),
     ("OMXS30.INDX","OM",    "OMXS30",   "OMX Stockholm"),
     ("OMXC25.INDX","CPSE",  "OMXC25",   "OMX Copenhagen"),
     ("ATX.INDX",   "VI",    "ATX",      "ATX"),
-    # ("ISEQ.INDX", "IR", "IEX", "ISEQ"),  # ticker Leeway da verificare
+    ("IETP",       "IR",    "IETP",     "ISEQ 20"),        # confermato da Lars (Leeway) 09/07/2026
     ("STOXX50E.INDX","EZ",  "STOXX50E", "Euro Stoxx 50"),
     ("SXXP.INDX",  "EZ",    "SXXP",     "STOXX 600"),
     ("OMXH25.INDX", "HE",   "OMXH25",   "OMX Helsinki"),
-    # ("FTSEMIB.MI", "MIL", "MIB", "FTSE MIB"),  # ticker Leeway da verificare
     ("PSI20.INDX", "LS",    "PSI20",    "PSI 20"),
+    # FTSE 100 e FTSE MIB: Leeway non puo' fornirli per licenza FTSE.
+    # Workaround ETF suggerito da Lars — NOTA: questo e' il prezzo per
+    # quota dell'ETF, non il livello a punti dell'indice. La var. %
+    # giornaliera resta comunque rappresentativa.
+    ("LSE.LSE",    "LSE",   "LSE",      "FTSE 100 (proxy ETF)"),
+    ("CMB1.LSE",   "MIL",   "CMB1",     "FTSE MIB (proxy ETF)"),
 ]
 ok_idx = 0
 FROM_12M = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
