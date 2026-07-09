@@ -90,7 +90,7 @@ export default function ValuePage() {
         ⭐ Best Opportunities — All Europe
       </div>
       <div style={{ fontSize:11,color:'#6b7280',marginBottom:20 }}>
-        Top 100 stocks by score · ⚠️ Prices delayed 15-20 min · Ranks calculated per country
+        Top 100 stocks by score · Ranks calculated per country
       </div>
 
       {/* Tabs */}
