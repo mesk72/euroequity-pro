@@ -180,10 +180,16 @@ for round_num in range(1, MAX_ROUNDS + 1):
             still_pending.append(stock)
             continue
         new_max_date = max((row2["date"] for row2 in data_l), default=None) if data_l else None
-        if not new_max_date or new_max_date <= last:
-            # Leeway ha risposto ma non con dati piu' recenti di quelli
-            # che avevamo gia' — non e' un vero successo, ritenta nei
-            # prossimi giri invece di segnarlo "ok" con dati vecchi.
+        if not new_max_date:
+            still_pending.append(stock)
+            continue
+        FRESH_CUTOFF = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=2)).strftime("%Y-%m-%d")
+        if new_max_date <= last and new_max_date < FRESH_CUTOFF:
+            # Non e' avanzato E il dato restituito e' comunque vecchio (oltre
+            # 2 giorni) — vero fallimento, ritenta. Se invece new_max_date e'
+            # gia' recente (es. il titolo era gia' aggiornato ieri da un run
+            # precedente e oggi Leeway non ha ancora pubblicato di piu'),
+            # NON e' un errore: e' semplicemente gia' a posto.
             still_pending.append(stock)
             continue
         for row2 in data_l:
@@ -191,7 +197,7 @@ for round_num in range(1, MAX_ROUNDS + 1):
             if adj is None: continue
             price_buf.append({"ticker": ticker, "exchange": exchange,
                                "date": row2["date"], "adj_close": float(adj)})
-        last_date_map[(ticker, exchange)] = new_max_date
+        last_date_map[(ticker, exchange)] = max(new_max_date, last)
         ok_leeway += 1
         if len(price_buf) >= 500:
             requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
