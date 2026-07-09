@@ -1,0 +1,43 @@
+[
+  {
+    "symbol": "2222.SR",
+    "price": 26.72,
+    "marketCap": 6463765728000,
+    "beta": 0.015,
+    "lastDividend": 1.341,
+    "range": "23.04-27.96",
+    "change": -0.12,
+    "changePercentage": -0.44709,
+    "volume": 9663954,
+    "averageVolume": 12612483,
+    "companyName": "Saudi Arabian Oil Company",
+    "currency": "SAR",
+    "cik": null,
+    "isin": "SA14TG012N13",
+    "cusip": null,
+    "exchangeFullName": "Saudi Exchange",
+    "exchange": "SAU",
+    "industry": "Oil & Gas Integrated",
+    "website": "https://www.aramco.com",
+    "description": "Saudi Arabian Oil Company, widely known as Aramco, operates as a globally integrated energy and chemicals enterprise, with its core activities centered in the Kingdom of Saudi Arabia. The company's operations are categorized into two primary divisions: Upstream and Downstream. The Upstream division is responsible for the exploration, development, production, and sale of crude oil, condensate, natural gas, and natural gas liquids (NGLs). As of December 31, 2021, Aramco reported significant proven reserves, totaling 253.6 billion barrels of oil equivalent. This included 196.9 billion barrels of crude oil and condensate, 25.2 billion barrels of NGLs, and 194.5 trillion standard cubic feet of natural gas. These resources are distributed across 530 reservoirs within 137 distinct fields located throughout the Kingdom and its territorial waters. The Downstream segment is involved in the manufacturing of diverse chemical products, such as olefins, methanol, MTBE, aromatics, glycols, linear alpha olefins, polyethylene, polypropylene, polyethylene terephthalate, polyvinyl chloride, polystyrene, polycarbonate, and various engineering thermoplastics and their blends. This segment also produces base oils and engages in refining and retail operations. Additionally, it supplies petroleum products and conducts trading activities for refined petroleum, liquid chemical products, and polymers. Beyond these endeavors, the company develops, manufactures, and markets high-performance rubber. Aramco also offers a range of services including crude oil storage, investment management, consulting, specialized oil field services, insurance, marketing and sales support, financing, and marine management and transportation solutions. Established in 1933, Saudi Arabian Oil Company is headquartered in Dhahran, Kingdom of Saudi Arabia.",
+    "ceo": "Amin H. Nasser",
+    "sector": "Energy",
+    "country": "SA",
+    "fullTimeEmployees": "67947",
+    "phone": "966 13 872 0115",
+    "address": "PO Box 5000",
+    "city": "Dhahran",
+    "state": "Eastern Province",
+    "zip": "31311",
+    "image": "https://images.financialmodelingprep.com/symbol/2222.SR.png",
+    "ipoDate": "2019-12-11",
+    "defaultImage": false,
+    "isEtf": false,
+    "isActivelyTrading": true,
+    "isAdr": false,
+    "isFund": false
+  }
+]
+
+=== Chiavi disponibili ===
+['symbol', 'price', 'marketCap', 'beta', 'lastDividend', 'range', 'change', 'changePercentage', 'volume', 'averageVolume', 'companyName', 'currency', 'cik', 'isin', 'cusip', 'exchangeFullName', 'exchange', 'industry', 'website', 'description', 'ceo', 'sector', 'country', 'fullTimeEmployees', 'phone', 'address', 'city', 'state', 'zip', 'image', 'ipoDate', 'defaultImage', 'isEtf', 'isActivelyTrading', 'isAdr', 'isFund']
