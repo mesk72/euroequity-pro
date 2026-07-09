@@ -78,7 +78,7 @@ export default function SectorsPage() {
         🏭 Sector Analysis
       </div>
       <div style={{ fontSize:11,color:'#6b7280',marginBottom:20 }}>
-        ⚠️ Prices delayed 15-20 min · Fundamentals updated daily
+        Fundamentals updated daily
       </div>
 
       {/* Filter */}
