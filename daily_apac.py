@@ -100,18 +100,21 @@ for s in all_stocks:
 print(f"  Ultime date caricate: {len(last_date_map)} titoli")
 
 
+STATUS_COUNTS = {}
 def _fetch_leeway_apac(lt, from_d, to_d):
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + from_d + "&to=" + to_d
     for attempt in range(3):
         try:
             resp = requests.get(url, timeout=20)
+            STATUS_COUNTS[resp.status_code] = STATUS_COUNTS.get(resp.status_code, 0) + 1
             if resp.status_code == 200:
                 data = resp.json()
                 return data if isinstance(data, list) else []
             if resp.status_code in (429, 500, 502, 503, 504):
                 time.sleep(2 * (attempt + 1)); continue
             return None
-        except Exception:
+        except Exception as e:
+            STATUS_COUNTS["EXCEPTION:" + type(e).__name__] = STATUS_COUNTS.get("EXCEPTION:" + type(e).__name__, 0) + 1
             if attempt < 2: time.sleep(2 * (attempt + 1))
     return None
 
@@ -189,6 +192,7 @@ if pending:
             print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
 if price_buf:
     requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+print(f"  Distribuzione codici HTTP/errori su tutte le chiamate: {STATUS_COUNTS}")
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
 
