@@ -9,7 +9,7 @@
 # - combined NA = US+TSX insieme
 # ============================================================
 
-import os, math, time, time as time_module, requests
+import os, math, time, time as time_module, requests, random
 from datetime import datetime, timedelta
 from collections import defaultdict
 
@@ -183,6 +183,7 @@ MAX_ROUNDS = 20
 ok_leeway = fail_leeway = 0
 price_buf = []
 pending = list(all_stocks)
+random.shuffle(pending)  # evita pattern ripetuti sugli stessi ticker ogni giro
 
 for round_num in range(1, MAX_ROUNDS + 1):
     if not pending: break
