@@ -14,10 +14,11 @@ const COUNTRIES = [
 interface Props {
   onClose: () => void
   onSuccess: () => void
+  initialMode?: 'login' | 'register'
 }
 
-export default function AuthModal({ onClose, onSuccess }: Props) {
-  const [mode,       setMode]       = useState<'login'|'register'>('login')
+export default function AuthModal({ onClose, onSuccess, initialMode = 'login' }: Props) {
+  const [mode,       setMode]       = useState<'login'|'register'>(initialMode)
   const [email,      setEmail]      = useState('')
   const [password,   setPassword]   = useState('')
   const [name,       setName]       = useState('')
