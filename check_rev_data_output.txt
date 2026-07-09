@@ -1,0 +1,12 @@
+7203 (Toyota Motor Corporation, Consumer Discretionary):
+  Rev FY25='$329,207.93MM'  Rev FY26='$323,474.76MM'  Rev FY27='$326,001.29MM'
+  EPS Norm FY25='-'  EPS GAAP FY25='2.46'
+700 (Tencent Holdings Limited, Communication Services):
+  Rev FY25='$109,373.24MM'  Rev FY26='$121,946.42MM'  Rev FY27='$133,392.75MM'
+  EPS Norm FY25='4.06'  EPS GAAP FY25='3.51'
+BHP (BHP Group Limited, Materials):
+  Rev FY25='$51,262.00MM'  Rev FY26='$57,528.31MM'  Rev FY27='$57,577.18MM'
+  EPS Norm FY25='2.00'  EPS GAAP FY25='1.77'
+D05 (DBS Group Holdings Ltd, Financials):
+  Rev FY25='$18,013.91MM'  Rev FY26='$18,150.55MM'  Rev FY27='$19,103.23MM'
+  EPS Norm FY25='3.04'  EPS GAAP FY25='3.00'
