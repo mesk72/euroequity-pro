@@ -1,0 +1,4 @@
+D05.SGX: {'code': '42703', 'details': None, 'hint': None, 'message': 'column fundamentals.rev_fy3 does not exist'}
+700.SEHK: {'code': '42703', 'details': None, 'hint': None, 'message': 'column fundamentals.rev_fy3 does not exist'}
+BHP.ASX: {'code': '42703', 'details': None, 'hint': None, 'message': 'column fundamentals.rev_fy3 does not exist'}
+7203.TSE: {'code': '42703', 'details': None, 'hint': None, 'message': 'column fundamentals.rev_fy3 does not exist'}
