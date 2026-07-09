@@ -72,7 +72,7 @@ export default function DividendsPage() {
         💰 Dividend Stocks
       </div>
       <div style={{ fontSize:11,color:'#6b7280',marginBottom:20 }}>
-        ⚠️ Prices delayed 15-20 min · Fundamentals updated daily
+        Fundamentals updated daily
       </div>
 
       {/* KPI */}
