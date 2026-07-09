@@ -1805,3 +1805,104 @@ di 100, tutti senza punteggi.
 
 
 
+
+
+---
+
+## Sessione 9 luglio 2026 (pomeriggio-sera) — riepilogo
+
+### Cosa ha funzionato, confermato con dati reali (non solo log)
+
+1. **EPS Growth Giappone**: `weekly_apac.py` usava la colonna "EPS Normalized"
+   per calcolare l'eps_growth — per il Giappone questa colonna è quasi
+   sempre vuota (es. Toyota: "EPS Normalized"="-" ma "EPS (GAAP)"="2.46").
+   Cambiata la fonte a EPS (GAAP) come richiesto. Verificato: Toyota ora
+   ha eps_growth=0.016 nel database.
+
+2. **Revenue Growth APAC (tutti i mercati)**: era sempre vuoto. Causa
+   reale trovata: nel file `fiscal_year_end.csv`, alcuni titoli (es. D05/
+   DBS Singapore) avevano `fiscal_month=0` — un mese invalido che mandava
+   in crash silenzioso il calcolo della data solo per il ramo revenue
+   (l'EPS aveva un fallback diverso che lo nascondeva). Aggiunta una
+   guardia: mese invalido → default a dicembre. Verificato: D05 ora ha
+   rev_growth=0.0237, Toyota 0.0116, Tencent 0.1069, tutti popolati.
+
+3. **Market cap NA e APAC**: `parse_num()` non toglieva mai il suffisso
+   "MM" dai valori tipo "$143.382,02MM" — restava testo non convertibile,
+   quindi sempre None. Bug indipendente per ciascuno script weekly
+   (EU/US/APAC), corretto in tutti e tre.
+
+4. **Universo APAC**: confermato a 2.350/2.350 esatti (TSE 1000, SEHK
+   500, ASX 350, KRX 400, SGX 100) — nessun titolo perso.
+
+5. **Weekly US — fondamentali e rank**: 3.400 fondamentali calcolati
+   (USA 3.000 + Canada 400 rankati separatamente), nessun errore. Questo
+   è il calcolo di value/growth score, **non** l'aggiornamento prezzi
+   giornaliero (vedi sotto — sono due script diversi, uno ha funzionato
+   bene, l'altro no).
+
+6. **Pagine titolo**: uniformate EU/US/APAC — un solo box "Official
+   Links" (rimosso il doppione "Official Listing" + "Local Exchange"
+   separati per i mercati asiatici), le News non spariscono più quando
+   mancano dati opzionali, link diretti alla borsa locale per 6 mercati
+   GCC su 7 (Kuwait resta generico, nessun pattern trovabile nel loro
+   sistema).
+
+7. **Nuova home su forwardalpha.pro**: sostituita la vecchia dashboard EU
+   come pagina di default su "/" — ora è una vera home con 3 continenti
+   (NA/EU/APAC, GCC escluso finché Leeway non lo copre), ~8.500 titoli,
+   CTA "Create free account" collegato davvero alla registrazione. La
+   vecchia dashboard EU resta raggiungibile internamente su
+   `?page=dashboard`. Dato che le dashboard non sono ancora affidabili,
+   i 3 box regione della home puntano agli screener funzionanti
+   (`nascreen`, `screener`, `asiapacific`) invece che alle dashboard.
+
+8. **About page**: "Our Philosophy" riscritta con i numeri reali a 3
+   continenti; Growth Score, i due momentum (6m/12m) ora dicono solo
+   "adjusted for overbought".
+
+9. **Sitemap**: i titoli "esempio" per Google (quelli che decidono i
+   sitelink) erano scritti a mano tempo fa e probabilmente ormai
+   sbagliati/obsoleti — causa più probabile dei risultati "senza senso"
+   nella ricerca Google. Sostituiti con una query reale sul database per
+   market cap, per regione. Aggiunti anche i mercati mancanti dal
+   sitemap (Corea, Singapore, Atene).
+
+### Il problema aperto, serio: aggiornamento prezzi giornaliero inaffidabile
+
+**US è il peggiore**: su un campione di 20 titoli, 13 fermi al 2 luglio,
+nessuno all'8. **Canada, stesso script (`daily_us.py`), stesso run**: 19/20
+al 7 luglio — molto meglio. **EU**: ogni mercato (Germania, UK, Olanda,
+Francia, Italia, Svizzera, Spagna) ha un mix delle stesse tre date (3, 7,
+8 luglio) in proporzioni diverse — non è un mercato sì e uno no, è un
+continuo. **APAC resta l'unico completamente pulito** (20/20 o 19/20
+all'8 luglio su tutti e 5 i mercati).
+
+Confermato con test diretti a Leeway (bypassando i nostri script): il
+dato più recente esiste sempre sul loro sistema. **Non è un problema di
+Leeway.**
+
+Bug reale trovato e corretto durante questa sessione: la scrittura su
+Supabase non veniva mai verificata (né in `daily_eu.py`/`daily_us.py` né
+in `fetch_news_cache.py`) — un batch rifiutato dal database passava per
+riuscito in silenzio. Corretto in tutti e tre gli script: ora la
+scrittura viene confermata prima di contare un titolo come aggiornato.
+
+**Ipotesi più probabile per la staleness residua, non ancora
+confermata al 100%**: Leeway (comunicato da Lars) ha un limite tecnico
+duro di 7 richieste al secondo, nessun limite orario/giornaliero
+stringente oltre 100.000/giorno. La nostra pipeline principale rispetta
+già 2 richieste/secondo (il ritmo consigliato da Lars) — ma durante
+questa sessione sono stati lanciati **molti script diagnostici in
+parallelo sullo stesso token**, che sommati al traffico dei job
+principali possono aver superato il tetto di 7/sec in certi momenti,
+causando throttling non pulito (non sempre un 429 esplicito).
+Correlazione osservata a favore di questa ipotesi: più titoli deve
+gestire una regione in un run, peggio va (US 3.000 = peggiore, Canada
+400 nello stesso run = molto meglio, APAC ben distribuito = ottimo).
+
+**Soluzione in corso di implementazione**: schedulare EU/US/APAC in
+sequenza rigorosa (mai in parallelo tra loro) nella finestra
+00:00–09:00, ed evitare di lanciare script diagnostici extra durante
+quella finestra.
+
