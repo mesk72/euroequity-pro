@@ -1,0 +1,5 @@
+7203.TSE: [{'ticker': '7203', 'exchange': 'TSE', 'mkt_cap': 198285.93, 'eps_growth': 0.016, 'rev_growth': 0.0116}]
+700.SEHK: [{'ticker': '700', 'exchange': 'SEHK', 'mkt_cap': 493571.75, 'eps_growth': 0.1036, 'rev_growth': 0.1069}]
+BHP.ASX: [{'ticker': 'BHP', 'exchange': 'ASX', 'mkt_cap': 208032.67, 'eps_growth': 0.0728, 'rev_growth': 0.0162}]
+A005930.KRX: [{'ticker': 'A005930', 'exchange': 'KRX', 'mkt_cap': 1368066.09, 'eps_growth': 1.4739, 'rev_growth': 0.6009}]
+D05.SGX: [{'ticker': 'D05', 'exchange': 'SGX', 'mkt_cap': 143382.02, 'eps_growth': 0.0319, 'rev_growth': 0.0237}]
