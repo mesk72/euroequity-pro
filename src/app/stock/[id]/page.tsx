@@ -469,6 +469,28 @@ export default function StockPage() {
           } else if (exch === 'KRX') {
             const noA = tk.replace(/^A/, '')
             asiaListing = `https://finance.naver.com/item/main.naver?code=${noA}`
+          } else if (exch === 'GCC') {
+            const pex = (stock as any).primaryExchange as string
+            if (pex === 'DFM') {
+              asiaListing = `https://www.dfm.ae/the-exchange/market-information/company/${tk}/trading`
+            } else if (pex === 'ADX') {
+              asiaListing = `https://www.adx.ae/en/main-market/company-profile/overview?symbols=${tk}&secCode=${tk}`
+            } else if (pex === 'DSM') {
+              asiaListing = `https://www.qe.com.qa/web/guest/company-profile?InformationCategory=Company&InformationType=News&FromLocalSite=N&MoreNewsTitle=1&CompanyCode=${tk}`
+            } else if (pex === 'MSM') {
+              asiaListing = `https://www.msx.om/snapshot.aspx?s=${tk}`
+            } else if (pex === 'BAX') {
+              asiaListing = `https://bahrainbourse.com/en/companyprofile?CompanyNameSymbol=${tk}`
+            } else if (pex === 'SASE') {
+              // Il link diretto al titolo su Tadawul e' un URL di portale con
+              // il ticker codificato dentro un blob illeggibile, non
+              // riproducibile per titolo — link alla borsa in generale.
+              asiaListing = 'https://www.saudiexchange.sa/'
+            } else if (pex === 'KWSE') {
+              // Boursa Kuwait usa un ID numerico interno, non il ticker —
+              // non ancora mappato, link alla borsa in generale.
+              asiaListing = 'https://www.boursakuwait.com.kw/'
+            }
           }
           const borseUrl = asiaListing || getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
           const companyUrl = (stock as any).website || null
