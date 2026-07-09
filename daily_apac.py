@@ -159,7 +159,7 @@ for round_num in range(1, MAX_ROUNDS + 1):
             continue
         for row2 in data_l:
             adj = row2.get("adjusted_close") or row2.get("close")
-            if adj is None: continue
+            if adj is None or float(adj) >= 999999: continue  # placeholder/errore fornitore
             price_buf.append({"ticker": ticker, "exchange": exchange,
                                "date": row2["date"], "adj_close": float(adj)})
         last_date_map[(ticker, exchange)] = max(row2["date"] for row2 in data_l)
@@ -281,7 +281,7 @@ if split_suspects:
             new_rows = []
             for row2 in data_l:
                 adj = row2.get("adjusted_close") or row2.get("close")
-                if adj is None: continue
+                if adj is None or float(adj) >= 999999: continue  # placeholder/errore fornitore
                 new_rows.append({"ticker": ticker, "exchange": exchange,
                                   "date": row2["date"], "adj_close": float(adj)})
             for i in range(0, len(new_rows), 500):
