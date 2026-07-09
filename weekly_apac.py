@@ -47,6 +47,8 @@ def parse_num(v):
     if s.startswith('(') and s.endswith(')'):
         negative = True; s = s[1:-1]
     s = s.replace('$','').replace(',','').replace('x','').replace('%','').strip()
+    for suf in ['USDMM','EURMM','MM','B','bn']:
+        s = s.replace(suf,'').strip()
     if s in ['-','','N/A','nm',chr(8212)]: return None
     try:
         f = float(s)
