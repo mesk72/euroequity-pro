@@ -129,10 +129,20 @@ print("\n[2/5] Download prezzi EOD da Leeway...")
 CHUNK = 20
 
 def safe_post(url, headers, json_data, retries=2):
-    """POST con retry: una connessione persa non deve far crashare tutto lo script."""
+    """POST con retry: sia su errori di rete SIA su risposte HTTP di errore.
+    Prima catturava solo le eccezioni di rete e ignorava lo status code —
+    un batch rifiutato da Supabase (400/409/422/5xx) passava per riuscito
+    in silenzio, mentre i dati non venivano mai scritti davvero."""
     for attempt in range(retries + 1):
         try:
-            return requests.post(url, headers=headers, json=json_data, timeout=30)
+            resp = requests.post(url, headers=headers, json=json_data, timeout=30)
+            if resp.status_code in (200, 201, 204):
+                return resp
+            print(f"  WARN scrittura rifiutata da Supabase: HTTP {resp.status_code} — {resp.text[:200]}")
+            if attempt < retries:
+                time.sleep(2 * (attempt + 1))
+                continue
+            return None
         except Exception as e:
             if attempt < retries:
                 time.sleep(2 * (attempt + 1))
@@ -182,8 +192,34 @@ WEEK_AGO = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=7)).strftime("
 MAX_ROUNDS = 20
 ok_leeway = fail_leeway = 0
 price_buf = []
+batch_owners = []   # (stock, new_max_date) per ogni riga in price_buf, stesso ordine
 pending = list(all_stocks)
 random.shuffle(pending)  # evita pattern ripetuti sugli stessi ticker ogni giro
+
+def flush_batch():
+    """Scrive il batch corrente e conferma SOLO i titoli il cui scrive e'
+    davvero andata a buon fine. Se la scrittura fallisce, i titoli tornano
+    in coda per il prossimo giro invece di essere contati come riusciti."""
+    global price_buf, batch_owners, ok_leeway
+    if not price_buf:
+        return []
+    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
+    owners_this_batch = batch_owners
+    price_buf = []
+    batch_owners = []
+    if resp is not None:
+        seen = set()
+        for stock, new_max_date in owners_this_batch:
+            key = (stock['ticker'], stock['exchange'])
+            if key in seen: continue
+            seen.add(key)
+            last_date_map[key] = max(new_max_date, last_date_map.get(key, "2021-01-01"))
+            ok_leeway += 1
+        return []
+    else:
+        # scrittura fallita davvero (dopo i retry interni di safe_post):
+        # questi titoli tornano in coda, NON sono un successo
+        return [s for s, _ in owners_this_batch]
 
 for round_num in range(1, MAX_ROUNDS + 1):
     if not pending: break
@@ -215,12 +251,13 @@ for round_num in range(1, MAX_ROUNDS + 1):
             if adj is None: continue
             price_buf.append({"ticker": ticker, "exchange": exchange,
                                "date": row2['date'], "adj_close": float(adj)})
-        last_date_map[(ticker, exchange)] = max(new_max_date, last)
-        ok_leeway += 1
+            batch_owners.append((stock, new_max_date))
         if len(price_buf) >= 500:
-            safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
-            price_buf = []
+            write_failed = flush_batch()
+            still_pending.extend(write_failed)
         time.sleep(0.5)
+    write_failed = flush_batch()  # svuota il resto del batch a fine giro
+    still_pending.extend(write_failed)
     pending = still_pending
     if pending and round_num < MAX_ROUNDS:
         pausa = min(20 * round_num, 90)
