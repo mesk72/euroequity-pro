@@ -1,0 +1,26 @@
+SK Hynix trovato: [{'ticker': 'A000660', 'exchange': 'KRX', 'company': 'SK hynix Inc.'}]
+
+Ultimi 10 prezzi A000660.KRX:
+  {'date': '2026-07-08', 'adj_close': 2076000.0}
+  {'date': '2026-07-07', 'adj_close': 2201000.0}
+  {'date': '2026-07-06', 'adj_close': 2343000.0}
+  {'date': '2026-07-03', 'adj_close': 999999.9999}
+  {'date': '2026-07-02', 'adj_close': 999999.9999}
+  {'date': '2026-07-01', 'adj_close': 999999.9999}
+  {'date': '2026-06-30', 'adj_close': 999999.9999}
+  {'date': '2026-06-29', 'adj_close': 999999.9999}
+  {'date': '2026-06-26', 'adj_close': 999999.9999}
+  {'date': '2026-06-25', 'adj_close': 999999.9999}
+
+==================================================
+J36 Singapore - dati grezzi TIKR
+==================================================
+  Company Name: 'Jardine Matheson Holdings Limited'
+  EPS Normalized (FY 2025): '5.72'
+  Mean EPS Normalized (FY 2026): '5.55'
+  Mean EPS Normalized (FY 2027): '6.12'
+  Mean EPS Normalized (FY 2028): '6.52'
+  EPS (GAAP) (FY 2025): '3.77'
+  Mean EPS (GAAP) (FY 2026): '5.63'
+  Mean EPS (GAAP) (FY 2027): '6.24'
+  Mean EPS (GAAP) (FY 2028): '6.54'
