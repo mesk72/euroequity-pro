@@ -1,0 +1,21 @@
+Righe totali in 'indices': 20
+{'ticker': '^DJI', 'name': 'Dow Jones', 'exchange': None, 'country': None, 'price': 21.9, 'change1d': None, 'ytd': None, 'date': '2026-06-25'}
+{'ticker': '^GSPC', 'name': 'S&P 500', 'exchange': None, 'country': None, 'price': 12.38, 'change1d': None, 'ytd': None, 'date': '2026-06-25'}
+{'ticker': '^IXIC', 'name': 'Nasdaq', 'exchange': None, 'country': None, 'price': 8.45, 'change1d': None, 'ytd': None, 'date': '2026-06-24'}
+{'ticker': '^GSPTSE', 'name': 'TSX', 'exchange': None, 'country': None, 'price': 34850.2109, 'change1d': None, 'ytd': None, 'date': '2026-06-25'}
+{'ticker': 'ISEQ.INDX', 'name': 'ISEQ', 'exchange': 'IR', 'country': 'IE', 'price': 228.07, 'change1d': 2.66, 'ytd': 4.09, 'date': '2026-06-25'}
+{'ticker': 'OMXHPI.INDX', 'name': 'OMX Helsinki', 'exchange': 'HE', 'country': 'FI', 'price': 8.34, 'change1d': -2.23, 'ytd': 9.96, 'date': '2026-06-26'}
+{'ticker': 'FTSEMIB.MI', 'name': 'FTSE MIB', 'exchange': None, 'country': None, 'price': 52.43, 'change1d': -1.02, 'ytd': None, 'date': '2026-06-26'}
+{'ticker': 'GDAXI.INDX', 'name': 'DAX', 'exchange': 'XETRA', 'country': 'DE', 'price': 45.25, 'change1d': 2.25, 'ytd': 1.51, 'date': '2026-07-02'}
+{'ticker': 'SSMI.INDX', 'name': 'SMI', 'exchange': 'SWX', 'country': 'CH', 'price': 0.475, 'change1d': 3.26, 'ytd': 3.88, 'date': '2026-07-03'}
+{'ticker': 'OMXC25.INDX', 'name': 'OMX Copenhagen', 'exchange': 'CPSE', 'country': 'DK', 'price': 263.6, 'change1d': 0.23, 'ytd': -4.46, 'date': '2026-07-03'}
+{'ticker': 'STOXX50E.INDX', 'name': 'Euro Stoxx 50', 'exchange': 'EZ', 'country': 'EU', 'price': 166.22, 'change1d': 1.42, 'ytd': 5.63, 'date': '2026-07-02'}
+{'ticker': 'PSI20.INDX', 'name': 'PSI 20', 'exchange': None, 'country': None, 'price': 10700.0, 'change1d': 5.94, 'ytd': None, 'date': '2026-07-03'}
+{'ticker': 'FCHI.INDX', 'name': 'CAC 40', 'exchange': 'PA', 'country': 'FR', 'price': 1.79, 'change1d': 0.0, 'ytd': 3.08, 'date': '2026-07-08'}
+{'ticker': 'AEX.INDX', 'name': 'AEX', 'exchange': 'AS', 'country': 'NL', 'price': 9.08, 'change1d': 0.0, 'ytd': 10.59, 'date': '2026-07-08'}
+{'ticker': 'IBEX.INDX', 'name': 'IBEX 35', 'exchange': 'MC', 'country': 'ES', 'price': 32.87, 'change1d': -1.08, 'ytd': 9.55, 'date': '2026-07-08'}
+{'ticker': 'BFX.INDX', 'name': 'BEL 20', 'exchange': 'BR', 'country': 'BE', 'price': 0.067, 'change1d': -0.3, 'ytd': 10.8, 'date': '2026-07-08'}
+{'ticker': 'OMXS30.INDX', 'name': 'OMX Stockholm', 'exchange': 'OM', 'country': 'SE', 'price': 469.2, 'change1d': -1.95, 'ytd': 9.04, 'date': '2026-07-08'}
+{'ticker': 'ATX.INDX', 'name': 'ATX', 'exchange': 'VI', 'country': 'AT', 'price': 0.135, 'change1d': -3.57, 'ytd': 20.43, 'date': '2026-07-09'}
+{'ticker': '^FTSE', 'name': 'FTSE 100', 'exchange': 'LSE', 'country': 'GB', 'price': 71.16, 'change1d': 1.25, 'ytd': 5.46, 'date': '2026-06-25'}
+{'ticker': 'SXXP.INDX', 'name': 'STOXX 600', 'exchange': 'EZ', 'country': 'EU', 'price': 632.5, 'change1d': -1.2, 'ytd': 5.69, 'date': '2026-06-26'}
