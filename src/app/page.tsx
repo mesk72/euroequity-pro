@@ -124,7 +124,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'KRX' | 'SGX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
+type Page = 'home' | 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'KRX' | 'SGX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -2126,11 +2126,11 @@ function AppContent() {
   const pathname = usePathname()
   const appRouter = useRouter()
   // Deriva page direttamente dall'URL — unica sorgente di verità
-  const page = (searchParams.get('page') as Page) ?? 'dashboard'
+  const page = (searchParams.get('page') as Page) ?? 'home'
 
   // Cambia schermata aggiornando solo l'URL
   const navigateTo = (newPage: Page) => {
-    if (newPage === 'dashboard') {
+    if (newPage === 'home') {
       appRouter.replace('/', { scroll: false })
     } else {
       appRouter.replace(`/?page=${newPage}`, { scroll: false })
@@ -2138,6 +2138,13 @@ function AppContent() {
   }
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
   const [showAuth,    setShowAuth]    = useState(false)
+  const [authMode,    setAuthMode]    = useState<'login'|'register'>('login')
+  useEffect(() => {
+    if (searchParams.get('auth') === 'signup') {
+      setAuthMode('register')
+      setShowAuth(true)
+    }
+  }, [])
   const [sidebarOpen, setSidebar]     = useState(false)
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['dashboard']))
   const toggleMenu = (id: string) => setExpandedMenus(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
@@ -2361,6 +2368,78 @@ function AppContent() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
+          {page === 'home' && (
+            <div style={{ maxWidth: 980, margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', padding: '48px 12px 40px' }}>
+                <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 10,
+                  letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--orange)', marginBottom: 18 }}>
+                  Institutional-grade equity research, built for one
+                </div>
+                <h1 style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 'clamp(30px, 5.5vw, 52px)',
+                  lineHeight: 1.08, letterSpacing: '-0.02em', margin: '0 0 20px', color: 'var(--text)' }}>
+                  Value and growth,<br />
+                  <span style={{ color: 'var(--orange)' }}>ranked across three continents.</span>
+                </h1>
+                <p style={{ fontSize: 15, color: 'var(--text3)', maxWidth: 540, margin: '0 auto 30px', lineHeight: 1.6 }}>
+                  ForwardAlpha percentile-ranks approximately 8,500 stocks across North America, Europe
+                  and Asia Pacific on valuation and growth — the same methodology used by institutional
+                  portfolio managers, rebuilt as a transparent, always-on screener.
+                </p>
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button onClick={() => { setAuthMode('register'); setShowAuth(true) }}
+                    style={{ background: 'var(--orange)', color: '#07101f', fontFamily: 'IBM Plex Sans Condensed',
+                    fontWeight: 700, fontSize: 13, padding: '13px 26px', borderRadius: 4, border: 'none', cursor: 'pointer' }}>
+                    Create free account →
+                  </button>
+                  <button onClick={() => navigateTo('about')}
+                    style={{ border: '1px solid var(--border2)', color: 'var(--text2)', background: 'transparent',
+                    fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 13, padding: '13px 26px',
+                    borderRadius: 4, cursor: 'pointer' }}>
+                    How the scoring works
+                  </button>
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text4)', marginTop: 14 }}>
+                  Free during Beta · No card required
+                </div>
+              </div>
+
+              <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 10,
+                letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text4)',
+                textAlign: 'center', marginBottom: 18 }}>
+                Three markets, one framework
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 40 }}>
+                {[
+                  { code: 'NA', name: 'North America', detail: 'US + Canada', count: '~3,400 stocks', go: 'northamerica' as Page },
+                  { code: 'EU', name: 'Europe', detail: '16 exchanges', count: '~2,100 stocks', go: 'dashboard' as Page },
+                  { code: 'AP', name: 'Asia Pacific', detail: 'Japan · Hong Kong · Australia · Korea · Singapore', count: '~2,350 stocks', go: 'apdashboard' as Page },
+                ].map(r => (
+                  <button key={r.code} onClick={() => navigateTo(r.go)} style={{ textAlign: 'left', background: 'var(--surface)',
+                    border: '1px solid var(--border)', borderRadius: 6, padding: '20px 18px', cursor: 'pointer' }}>
+                    <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 11,
+                      color: 'var(--orange)', letterSpacing: '0.08em', marginBottom: 8 }}>{r.code}</div>
+                    <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 16,
+                      color: 'var(--text)', marginBottom: 5 }}>{r.name}</div>
+                    <div style={{ fontSize: 11.5, color: 'var(--text3)', lineHeight: 1.5, marginBottom: 10 }}>{r.detail}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text4)', fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700 }}>{r.count}</div>
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
+                {[
+                  { t: 'Value Score', d: 'PE trailing, PE forward, and Price/Book ranked against same-market peers.' },
+                  { t: 'Growth Score', d: 'EPS growth, revenue growth, and 6/12-month price momentum, combined.' },
+                  { t: 'Best Score', d: 'Value + Growth, re-ranked — the shortlist of what deserves a closer look.' },
+                ].map(x => (
+                  <div key={x.t} style={{ borderLeft: '2px solid var(--orange)', paddingLeft: 14 }}>
+                    <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 13, color: 'var(--text)', marginBottom: 5 }}>{x.t}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text3)', lineHeight: 1.55 }}>{x.d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
           {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'GR' || page === 'CPSE' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'bestvalue'  && (user
@@ -2479,7 +2558,7 @@ function AppContent() {
       </main>
 
       {showAuth && (
-        <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} />
+        <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} initialMode={authMode} />
       )}
 
       <CookieBanner />
