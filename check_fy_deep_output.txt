@@ -1,0 +1,9 @@
+  Rev (FY 2025): '$18,013.91MM'
+  Mean Rev (FY 2026): '$18,150.55MM'
+  Mean Rev (FY 2027): '$19,103.23MM'
+  Mean Rev (FY 2028): '$20,278.91MM'
+  EPS Normalized (FY 2025): '3.04'
+  Mean EPS Normalized (FY 2026): '3.04'
+  Mean EPS Normalized (FY 2027): '3.23'
+  Mean EPS Normalized (FY 2028): '3.48'
+  fiscal_year_end.csv D05: {'ticker': 'D05', 'exchange': 'SGX', 'fiscal_month': '0'}
