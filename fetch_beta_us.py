@@ -130,7 +130,7 @@ for i, stock in enumerate(all_stocks):
         beta_batch = []
 
     if len(website_batch) >= 100:
-        rw = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, json=website_batch)
+        rw = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, params={"on_conflict":"ticker,exchange"}, json=website_batch)
         if rw.status_code not in (200, 201, 204):
             print(f"    WARN salvataggio batch website: HTTP {rw.status_code} — {rw.text[:200]}")
         website_batch = []
@@ -146,7 +146,7 @@ if beta_batch:
     if rr.status_code not in (200, 201, 204):
         print(f"  WARN salvataggio ultimo batch beta: HTTP {rr.status_code} — {rr.text[:200]}")
 if website_batch:
-    rw = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, json=website_batch)
+    rw = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, params={"on_conflict":"ticker,exchange"}, json=website_batch)
     if rw.status_code not in (200, 201, 204):
         print(f"  WARN salvataggio ultimo batch website: HTTP {rw.status_code} — {rw.text[:200]}")
 
