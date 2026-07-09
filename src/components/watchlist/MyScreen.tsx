@@ -244,7 +244,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
       ) : (
         <div className="overflow-x-auto rounded border border-border" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
-            Prices delayed 15-20 min · Ranks calculated vs country universe
+            Ranks calculated vs country universe
           </div>
           <table className="data-table" style={{ minWidth: 1100, width: 'max-content' }}>
             <thead><tr>
