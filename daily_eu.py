@@ -116,19 +116,22 @@ for s in all_stocks:
         pass
 print("  Ultime date caricate: " + str(len(last_date_map)) + " titoli")
 
+STATUS_COUNTS = {}
 def _fetch_leeway(lt, from_d, to_d):
     """Singola chiamata con retry immediato (errori transitori)."""
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + from_d + "&to=" + to_d
     for attempt in range(3):
         try:
             resp = requests.get(url, timeout=20)
+            STATUS_COUNTS[resp.status_code] = STATUS_COUNTS.get(resp.status_code, 0) + 1
             if resp.status_code == 200:
                 data = resp.json()
                 return data if isinstance(data, list) else []
             if resp.status_code in (429, 500, 502, 503, 504):
                 time.sleep(2 * (attempt + 1)); continue
             return None  # 404 e simili: risposta definitiva, non ritentare
-        except Exception:
+        except Exception as e:
+            STATUS_COUNTS["EXCEPTION:" + type(e).__name__] = STATUS_COUNTS.get("EXCEPTION:" + type(e).__name__, 0) + 1
             if attempt < 2: time.sleep(2 * (attempt + 1))
     return None
 
@@ -215,6 +218,7 @@ if pending:
         except Exception as e:
             print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
 
+print("  Distribuzione codici HTTP/errori su tutte le chiamate: " + str(STATUS_COUNTS))
 print("  Prezzi Leeway: ok=" + str(ok_leeway) + " fail=" + str(fail_leeway))
 ok_prices = ok_leeway; fail_prices = fail_leeway
 
