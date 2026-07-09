@@ -1,0 +1,10 @@
+Toyota (7203.TSE): [{'ticker': '7203', 'exchange': 'TSE', 'mkt_cap': None}]
+Tencent (700.SEHK): [{'ticker': '700', 'exchange': 'SEHK', 'mkt_cap': None}]
+BHP (BHP.ASX): [{'ticker': 'BHP', 'exchange': 'ASX', 'mkt_cap': None}]
+Samsung (A005930.KRX): [{'ticker': 'A005930', 'exchange': 'KRX', 'mkt_cap': None}]
+DBS (D05.SGX): [{'ticker': 'D05', 'exchange': 'SGX', 'mkt_cap': None}]
+TSE: 10/10 campione con mkt_cap NULL
+SEHK: 10/10 campione con mkt_cap NULL
+ASX: 10/10 campione con mkt_cap NULL
+KRX: 10/10 campione con mkt_cap NULL
+SGX: 10/10 campione con mkt_cap NULL
