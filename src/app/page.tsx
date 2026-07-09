@@ -2410,9 +2410,9 @@ function AppContent() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 40 }}>
                 {[
-                  { code: 'NA', name: 'North America', detail: 'US + Canada', count: '~3,400 stocks', go: 'northamerica' as Page },
-                  { code: 'EU', name: 'Europe', detail: '16 exchanges', count: '~2,100 stocks', go: 'dashboard' as Page },
-                  { code: 'AP', name: 'Asia Pacific', detail: 'Japan · Hong Kong · Australia · Korea · Singapore', count: '~2,350 stocks', go: 'apdashboard' as Page },
+                  { code: 'NA', name: 'North America', detail: 'US + Canada', count: '~3,400 stocks', go: 'nascreen' as Page },
+                  { code: 'EU', name: 'Europe', detail: '16 exchanges', count: '~2,100 stocks', go: 'screener' as Page },
+                  { code: 'AP', name: 'Asia Pacific', detail: 'Japan · Hong Kong · Australia · Korea · Singapore', count: '~2,350 stocks', go: 'asiapacific' as Page },
                 ].map(r => (
                   <button key={r.code} onClick={() => navigateTo(r.go)} style={{ textAlign: 'left', background: 'var(--surface)',
                     border: '1px solid var(--border)', borderRadius: 6, padding: '20px 18px', cursor: 'pointer' }}>
