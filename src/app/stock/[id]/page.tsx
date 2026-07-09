@@ -21,10 +21,10 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null, prim
   if (['OM','HE','CPSE','NGM'].includes(exchange)) return `https://www.nasdaq.com/european-market-activity/shares/${ticker.toLowerCase()}`
   if (exchange === 'VI' && isin) return `https://www.wienerborse.at/aktien-prime-market/${ticker.toLowerCase()}-${isin}/`
   if (exchange === 'SWX') return 'https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html'
-  if (exchange === 'TSE') { const code = ticker.padStart(4, '0'); return `https://www.jpx.co.jp/english/listing/stocks/detail/${code}/` }
-  if (exchange === 'SEHK') { const code = ticker.padStart(4, '0'); return `https://www.hkex.com.hk/Market-Data/Securities-Prices/Equities?sym=${code}&sc_lang=en` }
   if (exchange === 'TSX') return `https://www.tsx.com/listings/listing-with-us/listed-company-directory/company-directory-details?ticker=${ticker}`
-  if (exchange === 'ASX') return `https://www.asx.com.au/markets/company/${ticker.toLowerCase()}`
+  // TSE/SEHK/ASX/SGX/KRX: un solo link alla borsa locale, gestito dalla
+  // sezione "Local Exchange" (Kabutan/HKEX/ASX/SGX/Naver) piu' sotto —
+  // niente "Official Listing" duplicato per questi 5 mercati.
   if (exchange === 'US') {
     const pe = primaryExchange || ''
     if (['NYSE','NYSEAM','ARCA','BATS'].includes(pe)) return `https://www.nyse.com/quote/XNYS:${ticker}`
@@ -453,7 +453,10 @@ export default function StockPage() {
           const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
           const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
           const companyUrl = (stock as any).website || null
-          if (!borseUrl && !companyUrl && !researchSlug && !(stock as any).yahooTicker) return null
+          // Niente early-return qui: le News funzionano per qualsiasi titolo
+          // (query Google News costruita da ticker/company, nessun dato
+          // opzionale richiesto) — la sezione deve comparire sempre, i
+          // singoli pulsanti restano condizionati ai propri dati.
           return (
             <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
               borderRadius:4, padding:'14px 20px', display:'flex', alignItems:'center',
@@ -468,7 +471,7 @@ export default function StockPage() {
                 {borseUrl && <a href={borseUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--surface2)', color:'var(--text2)', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, border:'1px solid var(--border)', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📊 Official Listing ↗</a>}
                 {companyUrl && <a href={companyUrl} target="_blank" rel="noopener noreferrer" style={{ background:'var(--orange)', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>🌐 Company Website ↗</a>}
                 {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
-                {(stock as any).sector && <button onClick={() => { window.location.href = `/?page=${['TSE','SEHK','ASX'].includes((stock as any).exchange) ? 'asiapacific' : (stock as any).exchange === 'TSX' ? 'nascreen' : (stock as any).exchange === 'US' ? 'nascreen' : 'screener'}&sector=${encodeURIComponent((stock as any).sector)}` }} style={{ background:'var(--surface2)', color:'var(--text3)', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, border:'1px solid var(--border)', cursor:'pointer' }}>🏭 {(stock as any).sector}</button>}
+                {(stock as any).sector && <button onClick={() => { window.location.href = `/?page=${['TSE','SEHK','ASX','SGX','KRX'].includes((stock as any).exchange) ? 'asiapacific' : (stock as any).exchange === 'TSX' ? 'nascreen' : (stock as any).exchange === 'US' ? 'nascreen' : 'screener'}&sector=${encodeURIComponent((stock as any).sector)}` }} style={{ background:'var(--surface2)', color:'var(--text3)', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, border:'1px solid var(--border)', cursor:'pointer' }}>🏭 {(stock as any).sector}</button>}
                 <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent(((stock as any).yahooTicker || ticker) + ' ' + (((stock as any).company || '').split(' ').slice(0,2).join(' ')) + ' stock') : encodeURIComponent(((stock as any).company || ticker).split(' ').slice(0,2).join(' '))}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
                 {(stock as any).yahooTicker && <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/analysis/?p=${(stock as any).yahooTicker}`} target="_blank" rel="noopener noreferrer" style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, textDecoration:'none' }}>📊 Estimates</a>}
               </div>
