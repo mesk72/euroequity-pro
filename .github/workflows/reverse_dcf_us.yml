@@ -1,11 +1,18 @@
-name: Reverse DCF US
+name: Reverse Earnings Model US
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Daily US Update"]
+    types:
+      - completed
 
 jobs:
   compute:
     runs-on: ubuntu-latest
+    # Gira sia su dispatch manuale sia dopo daily_us — ma solo se daily_us
+    # e' andato a buon fine (non ha senso ricalcolare su prezzi non aggiornati)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -16,4 +23,13 @@ jobs:
       - name: Compute
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python reverse_dcf_us.py
+        run: python reverse_dcf_us.py | tee reverse_dcf_us_last_output.txt
+      - name: Commit log
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add reverse_dcf_us_last_output.txt
+          git commit -m "log reverse earnings model output" || echo "nothing to commit"
+          git pull --rebase
+          git push
