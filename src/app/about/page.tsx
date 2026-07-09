@@ -4,7 +4,7 @@ export default function AboutPage() {
       title: 'Our Philosophy',
       content: `ForwardAlpha applies a quantitative methodology used by institutional portfolio managers to analyse global equities.
 
-We currently cover approximately 2,100 stocks across 16 European exchanges and approximately 2,000 stocks in North America. We are building our Asia Pacific universe, which will include approximately 1,000 stocks in Japan, plus Hong Kong, Korea, Australia and Singapore.
+We cover approximately 8,500 stocks across three continents: roughly 2,100 stocks across 16 European exchanges, approximately 3,400 stocks in North America (US and Canada), and approximately 2,350 stocks across Asia Pacific (Japan, Hong Kong, Australia, Korea and Singapore).
 
 We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`,
     },
@@ -44,8 +44,8 @@ Our Growth Score combines four rank components, each calculated relative to all 
 
 • EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months.
 • Revenue Growth Rank — ranks stocks by top-line growth momentum using a time-weighted blend of fiscal year estimates.
-• Price Momentum 6M — 6-month price return, market-cap weighted.
-• Price Momentum 12M — 12-month price return, market-cap weighted.
+• Price Momentum 6M — 6-month price return, adjusted for overbought.
+• Price Momentum 12M — 12-month price return, adjusted for overbought.
 
 The four components are averaged and re-ranked to produce the final Growth Score.
 
