@@ -1,0 +1,5 @@
+JCI.US: DB=2026-07-02  Leeway diretto=2026-07-08
+HONA.US: DB=VUOTO  Leeway diretto=2026-07-08
+KKR.US: DB=2026-07-06  Leeway diretto=2026-07-08
+SHW.US: DB=2026-07-02  Leeway diretto=2026-07-08
+KMI.US: DB=2026-07-02  Leeway diretto=2026-07-08
