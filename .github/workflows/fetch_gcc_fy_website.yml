@@ -1,0 +1,31 @@
+name: Fetch GCC FY Website
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests yfinance
+      - name: Fetch
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python fetch_gcc_fy_website.py
+      - name: Commit CSVs
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add fiscal_year_end_gcc.csv website_gcc.csv
+          git commit -m "fiscal year end + website GCC" || echo "nothing to commit"
+          git pull --rebase
+          git push
