@@ -116,6 +116,8 @@ def calendarize(ticker, exchange, fy2025, fy2026, fy2027, fy2028, today_dt):
     sul ciclo precedente invece di saltare in avanti — elimina il salto not_yet."""
     if fy2025 is None and fy2026 is None: return None, None, True
     fm = get_fy_month(ticker, exchange)
+    if not isinstance(fm, int) or fm < 1 or fm > 12:
+        fm = 12  # valore invalido (es. 0) nel file fiscal_year_end — fallback sicuro
     last_day = 28 if fm==2 else 30 if fm in [4,6,9,11] else 31
     fy_end = datetime(today_dt.year, fm, last_day)
     if fy_end > today_dt:
@@ -182,10 +184,10 @@ try:
             "pe_trailing": parse_num(row.get("LTM P/E LTM","")),
             "pe_forward":  parse_num(row.get("Mean Fwd P/E NTM","")),
             "pb":          parse_num(row.get("LTM P/BVPS LTM","")),
-            "eps_fy0": parse_num(row.get("EPS Normalized (FY 2025)","")),
-            "eps_fy1": parse_num(row.get("Mean EPS Normalized (FY 2026)","")),
-            "eps_fy2": parse_num(row.get("Mean EPS Normalized (FY 2027)","")),
-            "eps_fy3": parse_num(row.get("Mean EPS Normalized (FY 2028)","")),
+            "eps_fy0": parse_num(row.get("EPS (GAAP) (FY 2025)","")),
+            "eps_fy1": parse_num(row.get("Mean EPS (GAAP) (FY 2026)","")),
+            "eps_fy2": parse_num(row.get("Mean EPS (GAAP) (FY 2027)","")),
+            "eps_fy3": parse_num(row.get("Mean EPS (GAAP) (FY 2028)","")),
             "rev_fy0": parse_num(row.get("Rev (FY 2025)","")),
             "rev_fy1": parse_num(row.get("Mean Rev (FY 2026)","")),
             "rev_fy2": parse_num(row.get("Mean Rev (FY 2027)","")),
@@ -244,18 +246,23 @@ fund_updates = []
 for r in tikr_rows:
     ticker   = r["ticker"]
     exchange = r["exchange"]
-    eps_ltm, eps_ntm, not_yet = calendarize(
-        ticker, exchange,
-        r["eps_fy0"], r["eps_fy1"], r["eps_fy2"], r["eps_fy3"], TODAY_DT)
-    rev_ltm, rev_ntm, _ = calendarize(
-        ticker, exchange,
-        r["rev_fy0"], r["rev_fy1"], r["rev_fy2"], r["rev_fy3"], TODAY_DT)
-    if not_yet:
-        eps_growth = (r["eps_fy3"]/abs(r["eps_fy2"])-1) if r["eps_fy3"] and r["eps_fy2"] and r["eps_fy2"]!=0 else None
-        rev_growth = (r["rev_fy3"]/r["rev_fy2"]-1)     if r["rev_fy3"] and r["rev_fy2"] and r["rev_fy2"]!=0 else None
-    else:
-        eps_growth = (eps_ntm/abs(eps_ltm)-1) if eps_ntm and eps_ltm and eps_ltm!=0 else None
-        rev_growth = (rev_ntm/abs(rev_ltm)-1) if rev_ntm and rev_ltm and rev_ltm!=0 else None
+    try:
+        eps_ltm, eps_ntm, not_yet = calendarize(
+            ticker, exchange,
+            r["eps_fy0"], r["eps_fy1"], r["eps_fy2"], r["eps_fy3"], TODAY_DT)
+        rev_ltm, rev_ntm, _ = calendarize(
+            ticker, exchange,
+            r["rev_fy0"], r["rev_fy1"], r["rev_fy2"], r["rev_fy3"], TODAY_DT)
+        if not_yet:
+            eps_growth = (r["eps_fy3"]/abs(r["eps_fy2"])-1) if r["eps_fy3"] and r["eps_fy2"] and r["eps_fy2"]!=0 else None
+            rev_growth = (r["rev_fy3"]/r["rev_fy2"]-1)     if r["rev_fy3"] and r["rev_fy2"] and r["rev_fy2"]!=0 else None
+        else:
+            eps_growth = (eps_ntm/abs(eps_ltm)-1) if eps_ntm and eps_ltm and eps_ltm!=0 else None
+            rev_growth = (rev_ntm/abs(rev_ltm)-1) if rev_ntm and rev_ltm and rev_ltm!=0 else None
+    except Exception as e:
+        print(f"  WARN calendarize fallito per {ticker}.{exchange}: {e} — growth lasciati vuoti")
+        eps_growth = None
+        rev_growth = None
     fund_updates.append({
         "ticker": ticker, "exchange": exchange,
         "mkt_cap": round(r["mktcap"], 2) if r["mktcap"] else None,
