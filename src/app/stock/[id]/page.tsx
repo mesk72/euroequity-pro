@@ -536,7 +536,7 @@ function StockPageInner() {
             <div style={{ fontSize:12, color:'var(--text3)', lineHeight:1.6, marginBottom:10 }}>
               Full business description and company profile available on Yahoo Finance.
             </div>
-            <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/profile`}
+            <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/profile?hl=en-US&guccounter=1`}
               target="_blank" rel="noopener noreferrer"
               style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed',
                 fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3,
