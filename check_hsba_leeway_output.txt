@@ -1,2 +1,7 @@
-HTTP 404
-{'msg': 'No quotes found for HSBA.L'}
+HTTP 200
+{'date': '2026-07-01', 'open': 1432.2, 'high': 1440.6, 'low': 1418.2, 'close': 1440.4, 'adjusted_close': 1440.4, 'volume': 16364362}
+{'date': '2026-07-02', 'open': 1430.8, 'high': 1457, 'low': 1415.4, 'close': 1445.2, 'adjusted_close': 1445.2, 'volume': 21713087}
+{'date': '2026-07-03', 'open': 1450.6, 'high': 1454.6, 'low': 1437.8, 'close': 1451, 'adjusted_close': 1451, 'volume': 8867891}
+{'date': '2026-07-06', 'open': 1590, 'high': 1590, 'low': 1444.363, 'close': 1465.6, 'adjusted_close': 1465.6, 'volume': 16662068}
+{'date': '2026-07-07', 'open': 1462.6, 'high': 1467, 'low': 1449.6, 'close': 1453.4, 'adjusted_close': 1453.4, 'volume': 23035094}
+{'date': '2026-07-08', 'open': 1454, 'high': 1454.4, 'low': 1417.4, 'close': 1422, 'adjusted_close': 1422, 'volume': 21712208}
