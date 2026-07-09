@@ -893,7 +893,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Status */}
       <div className="text-xs text-muted">
-        <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100 · <span className="text-[10px]">Prices delayed 15-20 min</span>
+        <span className="text-text font-600">{filtered.length}</span> stocks · showing top 100
       </div>
 
       {/* Table */}
