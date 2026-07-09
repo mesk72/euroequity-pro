@@ -1,0 +1,24 @@
+HTTP 200, 85908 bytes
+Righe totali: 500
+Colonne: ['Ticker', 'Company Name', 'Primary Exchange', 'Country', 'Sector', 'Last Price', 'Last Mkt Cap', 'LTM P/E LTM', 'LTM P/BVPS LTM', 'EPS Normalized (FY 2025)', 'Mean EPS Normalized (FY 2026)', 'Mean EPS Normalized (FY 2027)', 'Mean EPS Normalized (FY 2028)', 'EPS (GAAP) (FY 2025)', 'Mean EPS (GAAP) (FY 2026)', 'Mean EPS (GAAP) (FY 2027)', 'Mean EPS (GAAP) (FY 2028)', 'Rev (FY 2025)', 'Mean Rev (FY 2026)', 'Mean Rev (FY 2027)', 'Mean Rev (FY 2028)', 'Mean EPS Normalized (FY 2030)', 'Mean EPS (GAAP) (FY 2029)', 'Mean EPS (GAAP) (FY 2030)', 'Mean Fwd P/E NTM', 'ECS Total Shares Outstanding on Filing Date LTM']
+Distinct Primary Exchange:
+  'SASE': 214
+  'KWSE': 84
+  'ADX': 72
+  'DSM': 42
+  'DFM': 40
+  'MSM': 34
+  'BAX': 13
+  'DIFX': 1
+Distinct Country (se presente):
+  'SAU': 214
+  'ARE': 113
+  'KWT': 84
+  'QAT': 42
+  'OMN': 34
+  'BHR': 13
+
+Prime 3 righe complete:
+  {'Ticker': '2222', 'Company Name': 'Saudi Arabian Oil Company', 'Primary Exchange': 'SASE', 'Country': 'SAU', 'Sector': 'Energy', 'Last Price': '7.15', 'Last Mkt Cap': '$1,728,968.29MM', 'LTM P/E LTM': '17.44x', 'LTM P/BVPS LTM': '4.21x', 'EPS Normalized (FY 2025)': '0.43', 'Mean EPS Normalized (FY 2026)': '0.53', 'Mean EPS Normalized (FY 2027)': '0.50', 'Mean EPS Normalized (FY 2028)': '0.50', 'EPS (GAAP) (FY 2025)': '0.38', 'Mean EPS (GAAP) (FY 2026)': '0.53', 'Mean EPS (GAAP) (FY 2027)': '0.50', 'Mean EPS (GAAP) (FY 2028)': '0.50', 'Rev (FY 2025)': '$445,274.43MM', 'Mean Rev (FY 2026)': '$516,700.27MM', 'Mean Rev (FY 2027)': '$477,108.59MM', 'Mean Rev (FY 2028)': '$488,084.28MM', 'Mean EPS Normalized (FY 2030)': '0.48', 'Mean EPS (GAAP) (FY 2029)': '0.48', 'Mean EPS (GAAP) (FY 2030)': '0.49', 'Mean Fwd P/E NTM': '13.99x', 'ECS Total Shares Outstanding on Filing Date LTM': '240,262.00'}
+  {'Ticker': 'IHC', 'Company Name': 'International Holding Company PJSC', 'Primary Exchange': 'ADX', 'Country': 'ARE', 'Sector': 'Industrials', 'Last Price': '104.55', 'Last Mkt Cap': '$228,029.91MM', 'LTM P/E LTM': '34.74x', 'LTM P/BVPS LTM': '5.52x', 'EPS Normalized (FY 2025)': '-', 'Mean EPS Normalized (FY 2026)': '-', 'Mean EPS Normalized (FY 2027)': '-', 'Mean EPS Normalized (FY 2028)': '-', 'EPS (GAAP) (FY 2025)': '-', 'Mean EPS (GAAP) (FY 2026)': '-', 'Mean EPS (GAAP) (FY 2027)': '-', 'Mean EPS (GAAP) (FY 2028)': '-', 'Rev (FY 2025)': '-', 'Mean Rev (FY 2026)': '-', 'Mean Rev (FY 2027)': '-', 'Mean Rev (FY 2028)': '-', 'Mean EPS Normalized (FY 2030)': '-', 'Mean EPS (GAAP) (FY 2029)': '-', 'Mean EPS (GAAP) (FY 2030)': '-', 'Mean Fwd P/E NTM': '-', 'ECS Total Shares Outstanding on Filing Date LTM': '2,181.13'}
+  {'Ticker': '1120', 'Company Name': 'Al Rajhi Banking and Investment Corporation', 'Primary Exchange': 'SASE', 'Country': 'SAU', 'Sector': 'Financials', 'Last Price': '17.43', 'Last Mkt Cap': '$104,572.20MM', 'LTM P/E LTM': '16.27x', 'LTM P/BVPS LTM': '3.25x', 'EPS Normalized (FY 2025)': '1.04', 'Mean EPS Normalized (FY 2026)': '1.20', 'Mean EPS Normalized (FY 2027)': '1.31', 'Mean EPS Normalized (FY 2028)': '1.45', 'EPS (GAAP) (FY 2025)': '1.04', 'Mean EPS (GAAP) (FY 2026)': '1.19', 'Mean EPS (GAAP) (FY 2027)': '1.30', 'Mean EPS (GAAP) (FY 2028)': '1.44', 'Rev (FY 2025)': '$10,424.79MM', 'Mean Rev (FY 2026)': '$11,695.25MM', 'Mean Rev (FY 2027)': '$12,781.55MM', 'Mean Rev (FY 2028)': '$13,929.16MM', 'Mean EPS Normalized (FY 2030)': '-', 'Mean EPS (GAAP) (FY 2029)': '1.47', 'Mean EPS (GAAP) (FY 2030)': '1.88', 'Mean Fwd P/E NTM': '14.41x', 'ECS Total Shares Outstanding on Filing Date LTM': '6,000.00'}
