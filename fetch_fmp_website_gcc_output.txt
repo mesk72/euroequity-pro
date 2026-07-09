@@ -1,0 +1,40 @@
+============================================================
+[1/3] Elenco 500 candidati GCC dal TIKR
+============================================================
+  Candidati totali: 499
+
+============================================================
+[2/3] Chi ha gia' il website da Yahoo (gap da riempire)
+============================================================
+  Gia' trovati da Yahoo: 0
+  Da recuperare con FMP: 499
+
+============================================================
+[3/3] Download website da FMP per il gap
+============================================================
+  ...25/499 — trovati=15
+  ...50/499 — trovati=33
+  ...75/499 — trovati=49
+  ...100/499 — trovati=66
+  ...125/499 — trovati=79
+  ...150/499 — trovati=94
+  ...175/499 — trovati=108
+  ...200/499 — trovati=124
+  ...225/499 — trovati=133
+  ...250/499 — trovati=140
+  ...275/499 — trovati=140
+  ...300/499 — trovati=140
+  ...325/499 — trovati=140
+  ...350/499 — trovati=140
+  ...375/499 — trovati=140
+  ...400/499 — trovati=140
+  ...425/499 — trovati=140
+  ...450/499 — trovati=140
+  ...475/499 — trovati=140
+
+  Trovati con FMP: 140/499
+  Non trovati (esempio 15): ['IHC.AE', 'TAQA.AE', 'ADNOCGAS.AE', 'FAB.AE', 'EAND.AE', 'ADCB.AE', 'ADNOCDRILL.AE', 'ALPHADHABI.AE', 'ADIB.AE', 'BOROUGE.AE', 'ALDAR.AE', 'EIB.AE', 'ADNOCDIST.AE', 'MODON.AE', 'ADNOCLS.AE']
+
+  Scritto website_gcc_fmp_addon.csv (140 righe)
+  Copertura totale attesa: 0 (Yahoo) + 140 (FMP) = 140/499
+FATTO.
