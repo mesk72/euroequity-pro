@@ -483,10 +483,9 @@ export default function StockPage() {
               asiaListing = `https://bahrainbourse.com/en/companyprofile?CompanyNameSymbol=${tk}`
             } else if (pex === 'SASE') {
               // Il link diretto su Tadawul ha il ticker codificato dentro un
-              // blob illeggibile, non riproducibile — uso TradingView
-              // (come Kabutan per il Giappone: non e' la borsa ufficiale,
-              // ma e' specifico per titolo e affidabile). Verificato su 2222.
-              asiaListing = `https://www.tradingview.com/symbols/TADAWUL-${tk}/`
+              // blob illeggibile, non riproducibile — link alla borsa in
+              // generale in attesa che venga trovato il pattern corretto.
+              asiaListing = 'https://www.saudiexchange.sa/'
             } else if (pex === 'KWSE') {
               // Boursa Kuwait usa un ID numerico interno, non il ticker —
               // non ancora mappato, link alla borsa in generale.
