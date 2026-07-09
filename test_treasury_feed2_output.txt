@@ -1,0 +1,58 @@
+item?data=daily_treasury_yield_curve&amp;id=268</id>
+<title type="text"></title>
+<updated>2026-07-09T15:48:30Z</updated>
+<author><name /></author>
+<link rel="edit" title="DailyTreasuryYieldCurveRateDatum" href="/resource-center/data-chart-center/interest-rates/pages/xml-item?data=daily_treasury_yield_curve&amp;id=268" />
+<category term="TreasuryDataWarehouseModel.DailyTreasuryYieldCurveRateDatum" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
+<content type="application/xml">
+<m:properties>
+<d:Id m:type="Edm.Int32">268</d:Id>
+<d:NEW_DATE m:type="Edm.DateTime">2026-07-08T00:00:00</d:NEW_DATE>
+<d:BC_1MONTH m:type="Edm.Double">3.67</d:BC_1MONTH>
+<d:BC_1_5MONTH m:type="Edm.Double">3.74</d:BC_1_5MONTH>
+<d:BC_2MONTH m:type="Edm.Double">3.82</d:BC_2MONTH>
+<d:BC_3MONTH m:type="Edm.Double">3.87</d:BC_3MONTH>
+<d:BC_4MONTH m:type="Edm.Double">3.94</d:BC_4MONTH>
+<d:BC_6MONTH m:type="Edm.Double">3.99</d:BC_6MONTH>
+<d:BC_1YEAR m:type="Edm.Double">4.06</d:BC_1YEAR>
+<d:BC_2YEAR m:type="Edm.Double">4.21</d:BC_2YEAR>
+<d:BC_3YEAR m:type="Edm.Double">4.21</d:BC_3YEAR>
+<d:BC_5YEAR m:type="Edm.Double">4.31</d:BC_5YEAR>
+<d:BC_7YEAR m:type="Edm.Double">4.43</d:BC_7YEAR>
+<d:BC_10YEAR m:type="Edm.Double">4.56</d:BC_10YEAR>
+<d:BC_20YEAR m:type="Edm.Double">5.07</d:BC_20YEAR>
+<d:BC_30YEAR m:type="Edm.Double">5.06</d:BC_30YEAR>
+<d:BC_30YEARDISPLAY m:type="Edm.Double">5.06</d:BC_30YEARDISPLAY>
+</m:properties>
+</content>
+</entry>
+<entry>
+<id>https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml-item?data=daily_treasury_yield_curve&amp;id=269</id>
+<title type="text"></title>
+<updated>2026-07-09T15:48:30Z</updated>
+<author><name /></author>
+<link rel="edit" title="DailyTreasuryYieldCurveRateDatum" href="/resource-center/data-chart-center/interest-rates/pages/xml-item?data=daily_treasury_yield_curve&amp;id=269" />
+<category term="TreasuryDataWarehouseModel.DailyTreasuryYieldCurveRateDatum" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
+<content type="application/xml">
+<m:properties>
+<d:Id m:type="Edm.Int32">269</d:Id>
+<d:NEW_DATE m:type="Edm.DateTime">2026-07-09T00:00:00</d:NEW_DATE>
+<d:BC_1MONTH m:type="Edm.Double">3.72</d:BC_1MONTH>
+<d:BC_1_5MONTH m:type="Edm.Double">3.72</d:BC_1_5MONTH>
+<d:BC_2MONTH m:type="Edm.Double">3.79</d:BC_2MONTH>
+<d:BC_3MONTH m:type="Edm.Double">3.83</d:BC_3MONTH>
+<d:BC_4MONTH m:type="Edm.Double">3.91</d:BC_4MONTH>
+<d:BC_6MONTH m:type="Edm.Double">3.96</d:BC_6MONTH>
+<d:BC_1YEAR m:type="Edm.Double">4.02</d:BC_1YEAR>
+<d:BC_2YEAR m:type="Edm.Double">4.16</d:BC_2YEAR>
+<d:BC_3YEAR m:type="Edm.Double">4.18</d:BC_3YEAR>
+<d:BC_5YEAR m:type="Edm.Double">4.27</d:BC_5YEAR>
+<d:BC_7YEAR m:type="Edm.Double">4.40</d:BC_7YEAR>
+<d:BC_10YEAR m:type="Edm.Double">4.54</d:BC_10YEAR>
+<d:BC_20YEAR m:type="Edm.Double">5.06</d:BC_20YEAR>
+<d:BC_30YEAR m:type="Edm.Double">5.05</d:BC_30YEAR>
+<d:BC_30YEARDISPLAY m:type="Edm.Double">5.05</d:BC_30YEARDISPLAY>
+</m:properties>
+</content>
+</entry>
+</feed>
