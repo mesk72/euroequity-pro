@@ -22,9 +22,9 @@ function getBorseUrl(ticker: string, exchange: string, isin: string | null, prim
   if (exchange === 'VI' && isin) return `https://www.wienerborse.at/aktien-prime-market/${ticker.toLowerCase()}-${isin}/`
   if (exchange === 'SWX') return 'https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html'
   if (exchange === 'TSX') return `https://www.tsx.com/listings/listing-with-us/listed-company-directory/company-directory-details?ticker=${ticker}`
-  // TSE/SEHK/ASX/SGX/KRX: un solo link alla borsa locale, gestito dalla
-  // sezione "Local Exchange" (Kabutan/HKEX/ASX/SGX/Naver) piu' sotto —
-  // niente "Official Listing" duplicato per questi 5 mercati.
+  // TSE/SEHK/ASX/SGX/KRX: gestiti direttamente nel blocco Official Links
+  // sulla pagina (Kabutan/HKEX/ASX/SGX/Naver) come "Official Listing" —
+  // qui restano fuori per evitare un secondo link duplicato.
   if (exchange === 'US') {
     const pe = primaryExchange || ''
     if (['NYSE','NYSEAM','ARCA','BATS'].includes(pe)) return `https://www.nyse.com/quote/XNYS:${ticker}`
@@ -451,7 +451,26 @@ export default function StockPage() {
 
         {(() => {
           const researchSlug = RESEARCH_INDEX[`${ticker}.${exchangeCode}`] || null
-          const borseUrl = getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
+          const exch = (stock as any).exchange as string
+          const tk = (stock as any).ticker as string
+          // Un solo link "borsa locale" per tutti i mercati — per i 5 mercati
+          // asiatici usa il link specifico (Kabutan/HKEX/ASX/SGX/Naver),
+          // altrove usa getBorseUrl come prima. Mai due bottoni per la stessa cosa.
+          let asiaListing: string | null = null
+          if (exch === 'TSE') {
+            asiaListing = `https://kabutan.jp/stock/?code=${tk}`
+          } else if (exch === 'SEHK') {
+            const noZeros = tk.replace(/^0+/, '')
+            asiaListing = `https://www.hkex.com.hk/Market-Data/Securities-Prices/Equities/Equities-Quote?sym=${noZeros}&sc_lang=en`
+          } else if (exch === 'ASX') {
+            asiaListing = `https://www.asx.com.au/markets/company/${tk}`
+          } else if (exch === 'SGX') {
+            asiaListing = `https://investors.sgx.com/market/security-details/stocks/${tk}?from=/market/securities`
+          } else if (exch === 'KRX') {
+            const noA = tk.replace(/^A/, '')
+            asiaListing = `https://finance.naver.com/item/main.naver?code=${noA}`
+          }
+          const borseUrl = asiaListing || getBorseUrl(ticker, exchangeCode, (stock as any).isin || null, (stock as any).primaryExchange || undefined)
           const companyUrl = (stock as any).website || null
           // Niente early-return qui: le News funzionano per qualsiasi titolo
           // (query Google News costruita da ticker/company, nessun dato
@@ -498,42 +517,6 @@ export default function StockPage() {
             </a>
           </div>
         )}
-
-        {(() => {
-          const asiaExchange = (stock as any).exchange as string
-          const asiaTicker = (stock as any).ticker as string
-          if (!asiaTicker) return null
-          let asiaLink: { url: string, label: string } | null = null
-          if (asiaExchange === 'TSE') {
-            asiaLink = { url: `https://kabutan.jp/stock/?code=${asiaTicker}`, label: 'Kabutan (Japan)' }
-          } else if (asiaExchange === 'SEHK') {
-            const noZeros = asiaTicker.replace(/^0+/, '')
-            asiaLink = { url: `https://www.hkex.com.hk/Market-Data/Securities-Prices/Equities/Equities-Quote?sym=${noZeros}&sc_lang=en`, label: 'HKEX (Hong Kong)' }
-          } else if (asiaExchange === 'ASX') {
-            asiaLink = { url: `https://www.asx.com.au/markets/company/${asiaTicker}`, label: 'ASX (Australia)' }
-          } else if (asiaExchange === 'SGX') {
-            asiaLink = { url: `https://investors.sgx.com/market/security-details/stocks/${asiaTicker}?from=/market/securities`, label: 'SGX (Singapore)' }
-          } else if (asiaExchange === 'KRX') {
-            const noA = asiaTicker.replace(/^A/, '')
-            asiaLink = { url: `https://finance.naver.com/item/main.naver?code=${noA}`, label: 'Naver Finance (Korea)' }
-          }
-          if (!asiaLink) return null
-          return (
-            <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-              borderRadius:4, padding:'16px 20px', marginBottom:12 }}>
-              <div style={{ fontSize:9, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--text4)', marginBottom:8 }}>
-                Local Exchange
-              </div>
-              <a href={asiaLink.url} target="_blank" rel="noopener noreferrer"
-                style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed',
-                  fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3,
-                  textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
-                📈 View on {asiaLink.label} ↗
-              </a>
-            </div>
-          )
-        })()}
 
         {(stock as any).exchange === 'US' && (stock as any).ke != null && (
           user?.id ? (
