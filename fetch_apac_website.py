@@ -8,6 +8,17 @@ try:
 except ImportError:
     raise SystemExit("Manca yfinance")
 
+def safe_write(url, payload, label):
+    try:
+        r = requests.post(url, headers=headers_up, json=payload, timeout=30)
+        if r.status_code not in (200, 201, 204):
+            print(f"  WARN scrittura {label} rifiutata: HTTP {r.status_code} — {r.text[:200]}")
+            return False
+        return True
+    except Exception as e:
+        print(f"  WARN scrittura {label} fallita: {e}")
+        return False
+
 all_stocks = []
 for exch in ["SGX","KRX"]:
     offset = 0
@@ -23,11 +34,12 @@ for exch in ["SGX","KRX"]:
 print(f"Titoli SGX+KRX in_universe: {len(all_stocks)}")
 
 def yahoo_ticker(ticker, exchange):
-    if exchange == "KRX": return ticker.lstrip("A") + ".KS"  # tentativo iniziale, fallback sotto
+    if exchange == "KRX": return ticker.lstrip("A") + ".KS"
     if exchange == "SGX": return ticker + ".SI"
     return ticker
 
 ok_w = ok_beta = fail = 0
+error_samples = []
 website_batch = []
 beta_batch = []
 for i, s in enumerate(all_stocks):
@@ -38,7 +50,6 @@ for i, s in enumerate(all_stocks):
         website = info.get("website")
         beta = info.get("beta")
         if not website and exchange == "KRX":
-            # fallback KOSDAQ
             yt2 = ticker.lstrip("A") + ".KQ"
             info2 = yf.Ticker(yt2).info
             website = website or info2.get("website")
@@ -50,21 +61,36 @@ for i, s in enumerate(all_stocks):
         if beta:
             beta_batch.append({"ticker": ticker, "exchange": exchange, "beta": round(float(beta),3)})
             ok_beta += 1
+        if not website and not beta and len(error_samples) < 10:
+            error_samples.append(f"{ticker}.{exchange} (yt={yt}): info vuoto o senza website/beta, chiavi presenti: {list(info.keys())[:8]}")
         if not s.get("yahoo_ticker") and (website or beta):
             requests.patch(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_up,
                 params={"ticker":f"eq.{ticker}","exchange":f"eq.{exchange}"}, json={"yahoo_ticker": yt})
-    except Exception:
+    except Exception as e:
         fail += 1
+        if len(error_samples) < 10:
+            error_samples.append(f"{ticker}.{exchange} (yt={yt}): ECCEZIONE {type(e).__name__}: {e}")
     if len(website_batch) >= 100:
-        requests.post(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_up, json=website_batch)
+        if safe_write(f"{SUPABASE_URL}/rest/v1/stocks", website_batch, "website"):
+            print(f"  OK scritto batch website ({len(website_batch)} righe)")
         website_batch = []
     if len(beta_batch) >= 100:
-        requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_up, json=beta_batch)
+        if safe_write(f"{SUPABASE_URL}/rest/v1/fundamentals", beta_batch, "beta"):
+            print(f"  OK scritto batch beta ({len(beta_batch)} righe)")
         beta_batch = []
     if (i+1) % 100 == 0:
         print(f"  ...{i+1}/{len(all_stocks)} — website={ok_w} beta={ok_beta} fail={fail}")
     time.sleep(0.2)
 
-if website_batch: requests.post(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_up, json=website_batch)
-if beta_batch: requests.post(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_up, json=beta_batch)
+if website_batch:
+    if safe_write(f"{SUPABASE_URL}/rest/v1/stocks", website_batch, "website finale"):
+        print(f"  OK scritto ultimo batch website ({len(website_batch)} righe)")
+if beta_batch:
+    if safe_write(f"{SUPABASE_URL}/rest/v1/fundamentals", beta_batch, "beta finale"):
+        print(f"  OK scritto ultimo batch beta ({len(beta_batch)} righe)")
+
 print(f"\nFinale: website={ok_w}/{len(all_stocks)} beta={ok_beta}/{len(all_stocks)} fail={fail}")
+if error_samples:
+    print("\nEsempi di titoli senza dati (primi 10):")
+    for e in error_samples:
+        print(f"  {e}")
