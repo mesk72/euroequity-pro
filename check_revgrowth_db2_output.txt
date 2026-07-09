@@ -1,0 +1,4 @@
+D05.SGX: [{'ticker': 'D05', 'exchange': 'SGX', 'rev_growth': None, 'eps_growth': 0.0223, 'eps_fy0': 3.04, 'eps_fy1': 3.04}]
+700.SEHK: [{'ticker': '700', 'exchange': 'SEHK', 'rev_growth': None, 'eps_growth': 0.0901, 'eps_fy0': 4.06, 'eps_fy1': 4.39}]
+BHP.ASX: [{'ticker': 'BHP', 'exchange': 'ASX', 'rev_growth': None, 'eps_growth': 0.0444, 'eps_fy0': 2.0, 'eps_fy1': 2.62}]
+7203.TSE: [{'ticker': '7203', 'exchange': 'TSE', 'rev_growth': None, 'eps_growth': None, 'eps_fy0': None, 'eps_fy1': None}]
