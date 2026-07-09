@@ -178,14 +178,19 @@ for round_num in range(1, MAX_ROUNDS + 1):
         if data_l is None:
             still_pending.append(stock)
             continue
+        new_max_date = max((row2["date"] for row2 in data_l), default=None) if data_l else None
+        if not new_max_date or new_max_date <= last:
+            # Leeway ha risposto ma non con dati piu' recenti di quelli
+            # che avevamo gia' — non e' un vero successo, ritenta nei
+            # prossimi giri invece di segnarlo "ok" con dati vecchi.
+            still_pending.append(stock)
+            continue
         for row2 in data_l:
             adj = row2.get("adjusted_close") or row2.get("close")
             if adj is None: continue
             price_buf.append({"ticker": ticker, "exchange": exchange,
                                "date": row2["date"], "adj_close": float(adj)})
-        # aggiorna la mappa in memoria cosi' un giro successivo non riparte da zero
-        if data_l:
-            last_date_map[(ticker, exchange)] = max(row2["date"] for row2 in data_l)
+        last_date_map[(ticker, exchange)] = new_max_date
         ok_leeway += 1
         if len(price_buf) >= 500:
             requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
