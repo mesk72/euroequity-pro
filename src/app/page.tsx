@@ -18,6 +18,19 @@ import toast from 'react-hot-toast'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import StockDetailPage from '@/components/dashboard/StockDetailPage'
 import WatchlistButton from '@/components/watchlist/WatchlistButton'
+
+// Funzione globale (fuori da ogni componente): naviga a una pagina titolo
+// salvando la provenienza in sessionStorage, cosi' e' richiamabile da
+// qualsiasi sotto-componente senza bisogno di router/pathname nello scope
+// locale. Usa window.location.href (ricarica pagina) invece del router
+// client-side di Next.js — meno fluido ma elimina alla radice il problema
+// di cache del router che ha causato tre tentativi di fix falliti.
+function goToStock(ticker: string, exchange: string) {
+  const origin = window.location.pathname + window.location.search
+  try { sessionStorage.setItem('stockBackTo', origin) } catch {}
+  window.location.href = `/stock/${ticker}-${exchange}?from=${encodeURIComponent(origin)}`
+}
+
 import MyScreen from '@/components/watchlist/MyScreen'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
@@ -2135,17 +2148,6 @@ function AppContent() {
     } else {
       appRouter.replace(`/?page=${newPage}`, { scroll: false })
     }
-  }
-  // Naviga a una pagina titolo salvando la provenienza in sessionStorage
-  // (non nell'URL): il parametro ?from= si e' dimostrato inaffidabile per
-  // via di una cache del router Next.js che non lo ricalcolava sempre
-  // correttamente da titolo a titolo. sessionStorage e' una API del
-  // browser diretta, sincrona, indipendente da React/Next — non soggetta
-  // allo stesso problema.
-  const goToStock = (ticker: string, exchange: string) => {
-    const origin = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '')
-    try { sessionStorage.setItem('stockBackTo', origin) } catch {}
-    appRouter.push(`/stock/${ticker}-${exchange}?from=${encodeURIComponent(origin)}`)
   }
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
   const [showAuth,    setShowAuth]    = useState(false)
