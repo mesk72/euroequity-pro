@@ -482,11 +482,16 @@ export default function StockPage() {
             } else if (pex === 'BAX') {
               asiaListing = `https://bahrainbourse.com/en/companyprofile?CompanyNameSymbol=${tk}`
             } else if (pex === 'SASE') {
-              // Il link diretto su Tadawul ha il ticker codificato dentro un
-              // blob illeggibile, non riproducibile — link alla borsa in
-              // generale in attesa che venga trovato il pattern corretto.
-              asiaListing = 'https://www.saudiexchange.sa/'
+              // Pattern confermato: il blob prima di "?companySymbol=" e'
+              // fisso (stato di navigazione del portale), il ticker e' un
+              // parametro pulito alla fine. Il portale WebSphere di Tadawul
+              // a volte non risponde bene ai link diretti (comune per
+              // questi sistemi) — non e' un problema del pattern in se'.
+              asiaListing = `https://www.saudiexchange.sa/wps/portal/saudiexchange/hidden/company-profile-main/!ut/p/z1/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziTR3NDIw8LAz83d2MXA0C3SydAl1c3Q0NvE30I4EKzBEKDMKcTQzMDPxN3H19LAzdTU31w8syU8v1wwkpK8hOMgUA-oskdg!!/?companySymbol=${tk}`
             } else if (pex === 'KWSE') {
+              // Confermato: nessun pattern trovabile — Boursa Kuwait usa un
+              // ID interno arbitrario (verificato su due esempi, 635 e 402,
+              // senza relazione con il ticker). Resta il link generico.
               // Boursa Kuwait usa un ID numerico interno, non il ticker —
               // non ancora mappato, link alla borsa in generale.
               asiaListing = 'https://www.boursakuwait.com.kw/'
