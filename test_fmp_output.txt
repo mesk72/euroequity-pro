@@ -1,0 +1,130 @@
+============================================================
+[1] Search per 'Saudi Aramco' / 'DBS' / aziende note GCC
+============================================================
+  Query 'Saudi Arabian Oil': HTTP 200
+    []
+  Query 'Al Rajhi': HTTP 200
+    []
+  Query 'Emirates NBD': HTTP 200
+    []
+  Query 'Qatar National Bank': HTTP 200
+    []
+
+============================================================
+[2] Test diretto profilo su ticker ipotizzati (stile Yahoo)
+============================================================
+  2222.SR: HTTP 200
+    [
+  {
+    "symbol": "2222.SR",
+    "price": 26.72,
+    "marketCap": 6463765728000,
+    "beta": 0.015,
+    "lastDividend": 1.341,
+    "range": "23.04-27.96",
+    "change": -0.12,
+    "changePercentage": -0.44709,
+    "volume": 9663954,
+    "averageVolume": 12612483,
+    "companyName": "Saudi Arabian Oil Company",
+    "currency": "SAR",
+    "cik": null,
+    "isin": "SA14TG012N13",
+    "cusip": null,
+    "exchangeFullName": "Saudi Exchange",
+    "exchange": "SAU",
+    "industry": "Oil & Gas Integrated",
+    "website": "https://www.aramco.com",
+    "description": "Saudi Arabian Oil Company, widely
+  1120.SR: HTTP 200
+    [
+  {
+    "symbol": "1120.SR",
+    "price": 65.2,
+    "marketCap": 391200000000,
+    "beta": 0.322,
+    "lastDividend": 1.6667,
+    "range": "60.1-73.4",
+    "change": -0.25,
+    "changePercentage": -0.38197,
+    "volume": 3283633,
+    "averageVolume": 6072036,
+    "companyName": "Al Rajhi Banking and Investment Corporation",
+    "currency": "SAR",
+    "cik": null,
+    "isin": "SA0007879113",
+    "cusip": null,
+    "exchangeFullName": "Saudi Exchange",
+    "exchange": "SAU",
+    "industry": "Banks - Regional",
+    "website": "https://www.alrajhibank.com.sa",
+    "description": "Al Rajhi Bankin
+  QNBK.QA: HTTP 200
+    [
+  {
+    "symbol": "QNBK.QA",
+    "price": 17.4,
+    "marketCap": 158571898222,
+    "beta": 0.364,
+    "lastDividend": 0.725,
+    "range": "16.34-20.49",
+    "change": -0.12,
+    "changePercentage": -0.68493,
+    "volume": 2276534,
+    "averageVolume": 2260509,
+    "companyName": "Qatar National Bank (Q.P.S.C.)",
+    "currency": "QAR",
+    "cik": null,
+    "isin": "QA0006929895",
+    "cusip": null,
+    "exchangeFullName": "Qatar Stock Exchange",
+    "exchange": "DOH",
+    "industry": "Banks - Diversified",
+    "website": "https://www.qnb.com",
+    "description": "Qatar National Bank (Q.P.S.C.
+  EMIRATESNBD.AE: HTTP 200
+    [
+  {
+    "symbol": "EMIRATESNBD.AE",
+    "price": 30.9,
+    "marketCap": 195182886018,
+    "beta": 0.426,
+    "lastDividend": 1,
+    "range": "24-37.4",
+    "change": -0.1,
+    "changePercentage": -0.32258,
+    "volume": 2010107,
+    "averageVolume": 2757913,
+    "companyName": "Emirates NBD Bank PJSC",
+    "currency": "AED",
+    "cik": null,
+    "isin": "AEE000801010",
+    "cusip": null,
+    "exchangeFullName": "Dubai Financial Market",
+    "exchange": "DFM",
+    "industry": "Banks - Regional",
+    "website": "https://www.emiratesnbd.com",
+    "description": "Emirates NBD Bank PJSC, founded 
+  KFH.KW: HTTP 200
+    [
+  {
+    "symbol": "KFH.KW",
+    "price": 774,
+    "marketCap": 14248720230,
+    "beta": 0.229,
+    "lastDividend": 14.025,
+    "range": "714.953-807",
+    "change": 2,
+    "changePercentage": 0.25907,
+    "volume": 6163245,
+    "averageVolume": 14467966,
+    "companyName": "Kuwait Finance House K.S.C.P.",
+    "currency": "KWF",
+    "cik": null,
+    "isin": "KW0EQ0100085",
+    "cusip": null,
+    "exchangeFullName": "Kuwait Stock Exchange",
+    "exchange": "KUW",
+    "industry": "Banks - Diversified",
+    "website": "https://www.kfh.com",
+    "description": "Kuwait Finance House K.S.C.P. (KFH)
