@@ -1,0 +1,1 @@
+J36 stored: [{'ticker': 'J36', 'exchange': 'SGX', 'eps_growth': 0.3192, 'eps_fy0': 3.77, 'eps_fy1': 5.63, 'eps_fy2': 6.24, 'eps_fy3': 6.54}]
