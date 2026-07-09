@@ -2,13 +2,8 @@ name: Fetch News Cache
 
 on:
   schedule:
-    - cron: '0 * * * *'   # ogni ora
+    - cron: '0 * * * *'   # ogni ora, intero universo
   workflow_dispatch:
-    inputs:
-      mode:
-        description: 'top = solo top 300, all = restanti 4200, vuoto = auto'
-        required: false
-        default: ''
 
 jobs:
   fetch-news:
@@ -23,17 +18,4 @@ jobs:
       - name: Fetch news cache
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          MODE: ${{ github.event.inputs.mode }}
-        run: |
-          HOUR=$(date -u +%H)
-          if [ "$MODE" = "all" ]; then
-            python fetch_news_cache.py all
-          elif [ "$MODE" = "top" ]; then
-            python fetch_news_cache.py
-          elif [ $((HOUR % 3)) -eq 0 ]; then
-            echo "Ora $HOUR — modalità REST (ogni 3 ore)"
-            python fetch_news_cache.py all
-          else
-            echo "Ora $HOUR — modalità TOP (ogni ora)"
-            python fetch_news_cache.py
-          fi
+        run: python fetch_news_cache.py
