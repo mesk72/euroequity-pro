@@ -520,7 +520,7 @@ function StockPageInner() {
                 {researchSlug && <a href={`/research/${researchSlug}`} style={{ background:'#f97316', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📋 Read Analysis ↗</a>}
                 {(stock as any).sector && <button onClick={() => { window.location.href = `/?page=${['TSE','SEHK','ASX','SGX','KRX'].includes((stock as any).exchange) ? 'asiapacific' : (stock as any).exchange === 'TSX' ? 'nascreen' : (stock as any).exchange === 'US' ? 'nascreen' : 'screener'}&sector=${encodeURIComponent((stock as any).sector)}` }} style={{ background:'var(--surface2)', color:'var(--text3)', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, border:'1px solid var(--border)', cursor:'pointer' }}>🏭 {(stock as any).sector}</button>}
                 <a href={`https://news.google.com/search?q=${(stock as any).exchange === 'US' ? encodeURIComponent(((stock as any).yahooTicker || ticker) + ' ' + (((stock as any).company || '').split(' ').slice(0,2).join(' ')) + ' stock') : encodeURIComponent(((stock as any).company || ticker).split(' ').slice(0,2).join(' '))}&hl=en&gl=${(stock as any).exchange === 'US' ? 'US' : 'GB'}&ceid=${(stock as any).exchange === 'US' ? 'US' : 'GB'}:en`} target="_blank" rel="noopener noreferrer" style={{ background:'#1a73e8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>📰 News ↗</a>
-                {(stock as any).yahooTicker && <a href={`https://us.finance.yahoo.com/quote/${(stock as any).yahooTicker}/analysis/?p=${(stock as any).yahooTicker}`} target="_blank" rel="noopener noreferrer" style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, textDecoration:'none' }}>📊 Estimates</a>}
+                {(stock as any).yahooTicker && <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/analysis/?p=${(stock as any).yahooTicker}`} target="_blank" rel="noopener noreferrer" style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed', fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:3, textDecoration:'none' }}>📊 Estimates</a>}
               </div>
             </div>
           )
@@ -536,7 +536,7 @@ function StockPageInner() {
             <div style={{ fontSize:12, color:'var(--text3)', lineHeight:1.6, marginBottom:10 }}>
               Full business description and company profile available on Yahoo Finance.
             </div>
-            <a href={`https://us.finance.yahoo.com/quote/${(stock as any).yahooTicker}/profile`}
+            <a href={`https://finance.yahoo.com/quote/${(stock as any).yahooTicker}/profile`}
               target="_blank" rel="noopener noreferrer"
               style={{ background:'#6b21a8', color:'#fff', fontFamily:'IBM Plex Sans Condensed',
                 fontWeight:700, fontSize:12, padding:'7px 14px', borderRadius:3,
