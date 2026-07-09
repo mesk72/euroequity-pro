@@ -16,7 +16,7 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-09
  DEBUG: candidati SGX nel file TIKR (raw_rows): 508
  DEBUG: ticker SGX in stocks_tickers: 100
  DEBUG: primi 5 ticker SGX dal TIKR: ['7485', '2928', '6623', '9357', '1869']
- DEBUG: primi 5 ticker SGX in stocks: ['CJLU', 'JYEU', 'Z74', 'O39', 'ME8U']
+ DEBUG: primi 5 ticker SGX in stocks: ['C09', '544', 'S59', '8C8U', 'O5RU']
  TIKR TSE: 1000 (in_universe ufficiale, target di riferimento=1000)
  TIKR SEHK: 500 (in_universe ufficiale, target di riferimento=500)
  TIKR ASX: 350 (in_universe ufficiale, target di riferimento=350)
@@ -34,7 +34,7 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-09
  KOR: 400
  SGP: 100
  Rank APAC paese: 2350/2350
- Combined APAC (TSE+SEHK+ASX+KRX+SGX): 1040/1040
+ Combined APAC (TSE+SEHK+ASX+KRX+SGX): 1978/1978
 
-Weekly APAC completato in 18s
+Weekly APAC completato in 20s
 ============================================================
