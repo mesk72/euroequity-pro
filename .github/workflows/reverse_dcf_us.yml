@@ -10,8 +10,6 @@ on:
 jobs:
   compute:
     runs-on: ubuntu-latest
-    # Gira sia su dispatch manuale sia dopo daily_us — ma solo se daily_us
-    # e' andato a buon fine (non ha senso ricalcolare su prezzi non aggiornati)
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 60
     steps:
@@ -24,12 +22,18 @@ jobs:
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: python reverse_dcf_us.py | tee reverse_dcf_us_last_output.txt
-      - name: Commit log
+      - name: Commit log via API (evita conflitti git tra script paralleli)
         if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "debug-bot"
-          git config user.email "debug-bot@users.noreply.github.com"
-          git add reverse_dcf_us_last_output.txt
-          git commit -m "log reverse earnings model output" || echo "nothing to commit"
-          git pull --rebase
-          git push
+          CONTENT=$(base64 -w0 reverse_dcf_us_last_output.txt)
+          SHA=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/${{ github.repository }}/contents/reverse_dcf_us_last_output.txt" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))")
+          python3 -c "
+import json
+payload = {'message': 'log reverse earnings model output', 'content': '''$CONTENT'''}
+if '$SHA':
+    payload['sha'] = '$SHA'
+print(json.dumps(payload))
+" > /tmp/payload.json
+          curl -s -X PUT -H "Authorization: token $GH_TOKEN" -H "Content-Type: application/json" --data @/tmp/payload.json "https://api.github.com/repos/${{ github.repository }}/contents/reverse_dcf_us_last_output.txt"
