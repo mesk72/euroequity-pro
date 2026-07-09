@@ -1,0 +1,5 @@
+7203.TSE: [{'ticker': '7203', 'exchange': 'TSE', 'mkt_cap': None}]
+700.SEHK: [{'ticker': '700', 'exchange': 'SEHK', 'mkt_cap': None}]
+BHP.ASX: [{'ticker': 'BHP', 'exchange': 'ASX', 'mkt_cap': None}]
+A005930.KRX: [{'ticker': 'A005930', 'exchange': 'KRX', 'mkt_cap': None}]
+D05.SGX: [{'ticker': 'D05', 'exchange': 'SGX', 'mkt_cap': None}]
