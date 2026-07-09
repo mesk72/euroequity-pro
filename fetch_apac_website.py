@@ -8,9 +8,9 @@ try:
 except ImportError:
     raise SystemExit("Manca yfinance")
 
-def safe_write(url, payload, label):
+def safe_write(url, payload, label, params=None):
     try:
-        r = requests.post(url, headers=headers_up, json=payload, timeout=30)
+        r = requests.post(url, headers=headers_up, json=payload, params=params, timeout=30)
         if r.status_code not in (200, 201, 204):
             print(f"  WARN scrittura {label} rifiutata: HTTP {r.status_code} — {r.text[:200]}")
             return False
@@ -71,7 +71,7 @@ for i, s in enumerate(all_stocks):
         if len(error_samples) < 10:
             error_samples.append(f"{ticker}.{exchange} (yt={yt}): ECCEZIONE {type(e).__name__}: {e}")
     if len(website_batch) >= 100:
-        if safe_write(f"{SUPABASE_URL}/rest/v1/stocks", website_batch, "website"):
+        if safe_write(f"{SUPABASE_URL}/rest/v1/stocks", website_batch, "website", params={"on_conflict":"ticker,exchange"}):
             print(f"  OK scritto batch website ({len(website_batch)} righe)")
         website_batch = []
     if len(beta_batch) >= 100:
@@ -83,7 +83,7 @@ for i, s in enumerate(all_stocks):
     time.sleep(0.2)
 
 if website_batch:
-    if safe_write(f"{SUPABASE_URL}/rest/v1/stocks", website_batch, "website finale"):
+    if safe_write(f"{SUPABASE_URL}/rest/v1/stocks", website_batch, "website finale", params={"on_conflict":"ticker,exchange"}):
         print(f"  OK scritto ultimo batch website ({len(website_batch)} righe)")
 if beta_batch:
     if safe_write(f"{SUPABASE_URL}/rest/v1/fundamentals", beta_batch, "beta finale"):
