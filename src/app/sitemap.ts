@@ -6,6 +6,17 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+// Tutti i mercati coperti — EU (16), NA (2), APAC (5). GCC escluso finche'
+// non e' live con copertura Leeway confermata.
+const ALL_EXCHANGES = [
+  // Europa
+  'MIL','XETRA','PA','LSE','SWX','OM','AS','MC','BR','HE','CPSE','OB','GR','VI','IR','LS',
+  // Nord America
+  'US','TSX',
+  // Asia Pacifico
+  'TSE','SEHK','ASX','KRX','SGX',
+]
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://forwardalpha.pro'
 
@@ -22,52 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/legal`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ]
 
-  // Top titoli per mktcap hardcodati — Google li vede come sitelink principali
-  // US: Nvidia, Apple, Microsoft, Alphabet, Amazon, Meta, Tesla, Berkshire, JPM, Visa
-  // EU: ASML, LVMH, SAP, Nestle, Novo Nordisk, HSBC, Shell, Roche, AstraZeneca, Siemens
-  // APAC: Tencent, Samsung, TSMC, Alibaba, Meituan, Toyota, BHP, Softbank
-  const TOP_TICKERS: MetadataRoute.Sitemap = [
-    // US — top per mktcap
-    { url: `${baseUrl}/stock/NVDA-US`,  lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/AAPL-US`,  lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/MSFT-US`,  lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/GOOGL-US`, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/AMZN-US`,  lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/META-US`,  lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/TSLA-US`,  lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/BRK.B-US`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/JPM-US`,   lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/V-US`,     lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    // EU — top per mktcap
-    { url: `${baseUrl}/stock/ASML-AS`,     lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/MC-PA`,        lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/SAP-XETRA`,   lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/NESN-SWX`,    lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/NOVO-B-CPSE`, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/HSBA-LSE`,    lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/SHEL-LSE`,    lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/ROG-SWX`,     lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/AZN-LSE`,     lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/SIE-XETRA`,   lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    // APAC — top per mktcap
-    { url: `${baseUrl}/stock/700-SEHK`,    lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/9984-TSE`,    lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/stock/7203-TSE`,    lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/BHP-ASX`,     lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/941-SEHK`,    lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    // CA — top per mktcap
-    { url: `${baseUrl}/stock/RY-TSX`,      lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/stock/TD-TSX`,      lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-  ]
-
   // Tutti i titoli in universe — tutte le borse
-  const ALL_EXCHANGES = [
-    'MIL','XETRA','PA','OM','SWX','LSE','OB','MC','AS','BR',
-    'CPSE','HE','VI','IR','LS','AIM','NGM','AT',
-    'US','TSX',
-    'TSE','SEHK','ASX',
-  ]
-
   let stocks: any[] = []
   let from = 0
   const PAGE = 1000
@@ -84,14 +50,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     from += PAGE
   }
 
-  // Top ticker hardcodati già inclusi — escludi duplicati
-  const topUrls = new Set(TOP_TICKERS.map(p => p.url))
+  // Top per market cap DAVVERO dal database, per regione separatamente (un
+  //'top 60 globale' rischierebbe di sbilanciarsi tutto su una sola area).
+  // Non piu' una lista scritta a mano che invecchia e puo' contenere ticker
+  // sbagliati o non piu' esistenti — causa piu' probabile dei risultati
+  // "senza senso" su Google.
+  const REGION_EXCHANGES: Record<string, string[]> = {
+    eu:   ['MIL','XETRA','PA','LSE','SWX','OM','AS','MC','BR','HE','CPSE','OB','GR','VI','IR','LS'],
+    na:   ['US','TSX'],
+    apac: ['TSE','SEHK','ASX','KRX','SGX'],
+  }
+
+  let topByMktCap: any[] = []
+  for (const exchanges of Object.values(REGION_EXCHANGES)) {
+    const { data } = await supabase
+      .from('fundamentals')
+      .select('ticker,exchange,mkt_cap')
+      .in('exchange', exchanges)
+      .not('mkt_cap', 'is', null)
+      .order('mkt_cap', { ascending: false })
+      .limit(20)
+    if (data) topByMktCap = topByMktCap.concat(data)
+  }
+
+  const topTickerKeys = new Set(
+    topByMktCap.map((t: any) => `${t.ticker}-${t.exchange}`)
+  )
+
+  const TOP_TICKERS: MetadataRoute.Sitemap = topByMktCap.map((t: any) => ({
+    url: `${baseUrl}/stock/${t.ticker}-${t.exchange}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 1.0,
+  }))
 
   const stockPages: MetadataRoute.Sitemap = stocks
-    .map((s: any) => `${baseUrl}/stock/${s.ticker}-${s.exchange}`)
-    .filter(url => !topUrls.has(url))
-    .map(url => ({
-      url,
+    .filter((s: any) => !topTickerKeys.has(`${s.ticker}-${s.exchange}`))
+    .map((s: any) => ({
+      url: `${baseUrl}/stock/${s.ticker}-${s.exchange}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 0.6,
