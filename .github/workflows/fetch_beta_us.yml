@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install requests yfinance
+      - run: pip install requests yfinance pandas
       - name: Fetch
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
@@ -30,5 +30,20 @@ jobs:
           git config user.email "debug-bot@users.noreply.github.com"
           git add fetch_beta_us_last_output.txt
           git commit -m "log beta+rf output" || echo "nothing to commit"
+          git pull --rebase
+          git push
+      - name: Reverse Earnings Model (incatenato qui, il workflow dedicato e' bloccato)
+        continue-on-error: true
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python reverse_dcf_us.py | tee reverse_dcf_us_last_output.txt
+      - name: Commit log REM
+        continue-on-error: true
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add reverse_dcf_us_last_output.txt
+          git commit -m "log reverse earnings model output" || echo "nothing to commit"
           git pull --rebase
           git push
