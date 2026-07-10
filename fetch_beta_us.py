@@ -98,11 +98,13 @@ print(f"  Titoli US in universo: {len(all_stocks)}")
 ok = fail = skip_no_yahoo = 0
 beta_batch = []
 website_batch = []
+stocks_batch = []  # yahoo_ticker (+ website se trovato) da salvare per i titoli che non lo avevano gia'
 t0 = time.time()
 
 for i, stock in enumerate(all_stocks):
     ticker = stock["ticker"]
     exchange = stock["exchange"]
+    had_yahoo_ticker = bool(stock.get("yahoo_ticker"))
     # Fallback: se yahoo_ticker non e' popolato (es. titoli appena inseriti),
     # usa il ticker stesso (US: '.' -> '-', es. BRK.B -> BRK-B)
     yahoo_ticker = stock.get("yahoo_ticker") or ticker.replace(".", "-")
@@ -118,6 +120,14 @@ for i, stock in enumerate(all_stocks):
             ok += 1
         if website:
             website_batch.append({"ticker": ticker, "exchange": exchange, "website": website})
+        # Salva yahoo_ticker se non c'era gia' — prima veniva calcolato e
+        # usato solo per questa chiamata, mai persistito: per questo il link
+        # Yahoo sulla pagina titolo restava vuoto per i titoli aggiunti dopo
+        # il primo giro (~1.050 titoli US).
+        if not had_yahoo_ticker:
+            row = {"ticker": ticker, "exchange": exchange, "yahoo_ticker": yahoo_ticker}
+            if website: row["website"] = website
+            stocks_batch.append(row)
     except Exception as e:
         fail += 1
         if fail <= 5:
@@ -135,6 +145,12 @@ for i, stock in enumerate(all_stocks):
             print(f"    WARN salvataggio batch website: HTTP {rw.status_code} — {rw.text[:200]}")
         website_batch = []
 
+    if len(stocks_batch) >= 100:
+        rs = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, params={"on_conflict":"ticker,exchange"}, json=stocks_batch)
+        if rs.status_code not in (200, 201, 204):
+            print(f"    WARN salvataggio batch yahoo_ticker: HTTP {rs.status_code} — {rs.text[:200]}")
+        stocks_batch = []
+
     if (i + 1) % 200 == 0:
         elapsed = time.time() - t0
         print(f"    ... {i+1}/{len(all_stocks)} processati ({elapsed/60:.1f} min) — ok={ok} fail={fail}")
@@ -149,6 +165,10 @@ if website_batch:
     rw = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, params={"on_conflict":"ticker,exchange"}, json=website_batch)
     if rw.status_code not in (200, 201, 204):
         print(f"  WARN salvataggio ultimo batch website: HTTP {rw.status_code} — {rw.text[:200]}")
+if stocks_batch:
+    rs = requests.post(SUPABASE_URL + "/rest/v1/stocks", headers=headers_up, params={"on_conflict":"ticker,exchange"}, json=stocks_batch)
+    if rs.status_code not in (200, 201, 204):
+        print(f"  WARN salvataggio ultimo batch yahoo_ticker: HTTP {rs.status_code} — {rs.text[:200]}")
 
 print(f"\n  Beta salvati: ok={ok} fail={fail} su {len(all_stocks)}")
 print("\n" + "=" * 60)
