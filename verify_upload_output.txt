@@ -1,0 +1,2 @@
+Righe totali: 14929
+8309: {'ticker': '8309', 'exchange': 'TSE', 'fiscal_month': '3'}
