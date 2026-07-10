@@ -3,7 +3,7 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-10
 ============================================================
 
  Legge fiscal year end...
- FY end: 14216
+ FY end: 14355
 
  Legge stocks APAC dal DB...
  TSE: 1000 in_universe=true nel DB
@@ -16,7 +16,7 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-10
  DEBUG: candidati SGX nel file TIKR (raw_rows): 508
  DEBUG: ticker SGX in stocks_tickers: 100
  DEBUG: primi 5 ticker SGX dal TIKR: ['7485', '2928', '6623', '9357', '1869']
- DEBUG: primi 5 ticker SGX in stocks: ['P8Z', 'Z74', 'J85', '5E2', 'J36']
+ DEBUG: primi 5 ticker SGX in stocks: ['Z25', 'S63', 'G13', 'C6L', 'F99']
  TIKR TSE: 1000 (in_universe ufficiale, target di riferimento=1000)
  TIKR SEHK: 500 (in_universe ufficiale, target di riferimento=500)
  TIKR ASX: 350 (in_universe ufficiale, target di riferimento=350)
@@ -34,7 +34,7 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-10
  KOR: 400
  SGP: 100
  Rank APAC paese: 2350/2350
- Combined APAC (TSE+SEHK+ASX+KRX+SGX): 1965/1965
+ Combined APAC (TSE+SEHK+ASX+KRX+SGX): 1964/1964
 
-Weekly APAC completato in 30s
+Weekly APAC completato in 29s
 ============================================================
