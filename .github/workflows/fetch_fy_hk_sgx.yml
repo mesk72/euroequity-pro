@@ -3,6 +3,9 @@ name: Fetch FY HK SGX
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
