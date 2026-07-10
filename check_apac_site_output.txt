@@ -1,0 +1,8 @@
+7203.TSE: [{'date': '2026-07-08'}]
+700.SEHK: [{'date': '2026-07-08'}]
+BHP.ASX: [{'date': '2026-07-07'}]
+A005930.KRX: [{'date': '2026-07-07'}]
+D05.SGX: [{'date': '2026-07-03'}]
+Universo ASX: 0-0/350
+Universo KRX: 0-0/400
+Universo SGX: 0-0/100
