@@ -1,0 +1,4 @@
+Righe US nel file: 0
+Universo US totale: 0-0/3000
+Distribuzione mesi (primi 15): []
+Invalidi (0/vuoto): 0
