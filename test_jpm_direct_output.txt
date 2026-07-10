@@ -1,0 +1,12 @@
+JPM: HTTP 200
+   {'date': '2026-07-02', 'open': 338.02, 'high': 340, 'low': 331.77, 'close': 334.47, 'adjusted_close': 332.97, 'volume': 8413900}
+   {'date': '2026-07-06', 'open': 335, 'high': 339.715, 'low': 334.11, 'close': 337.72, 'adjusted_close': 337.72, 'volume': 4380667}
+   {'date': '2026-07-07', 'open': 340.975, 'high': 341.4, 'low': 337.09, 'close': 339.22, 'adjusted_close': 339.22, 'volume': 6792111}
+   {'date': '2026-07-08', 'open': 336.53, 'high': 336.53, 'low': 330.13, 'close': 330.62, 'adjusted_close': 330.62, 'volume': 17422087}
+   {'date': '2026-07-09', 'open': 331.46, 'high': 337, 'low': 330.8053, 'close': 335.47, 'adjusted_close': 335.47, 'volume': 5193451}
+AAPL: HTTP 200
+   {'date': '2026-07-02', 'open': 294.085, 'high': 309.42, 'low': 293.68, 'close': 308.63, 'adjusted_close': 308.63, 'volume': 71900726}
+   {'date': '2026-07-06', 'open': 307.68, 'high': 314.2, 'low': 307.01, 'close': 312.66, 'adjusted_close': 312.66, 'volume': 49130304}
+   {'date': '2026-07-07', 'open': 315.29, 'high': 315.48, 'low': 310.15, 'close': 310.66, 'adjusted_close': 310.66, 'volume': 42097217}
+   {'date': '2026-07-08', 'open': 311.66, 'high': 314.81, 'low': 307.0515, 'close': 313.39, 'adjusted_close': 313.39, 'volume': 38466049}
+   {'date': '2026-07-09', 'open': 310.445, 'high': 316.53, 'low': 308.16, 'close': 316.22, 'adjusted_close': 316.22, 'volume': 44882363}
