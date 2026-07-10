@@ -138,8 +138,33 @@ WEEK_AGO = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=7)).strftime("
 MAX_ROUNDS = 20
 ok_leeway = fail_leeway = 0
 price_buf = []
+batch_owners = []
 pending = list(all_stocks)
 random.shuffle(pending)  # evita pattern ripetuti sugli stessi ticker ogni giro
+
+def flush_batch_apac():
+    """Conferma come riusciti SOLO i titoli la cui scrittura e' verificata —
+    prima un batch rifiutato da Supabase passava per riuscito in silenzio,
+    stesso bug gia' trovato e corretto in daily_eu.py/daily_us.py."""
+    global price_buf, batch_owners, ok_leeway
+    if not price_buf:
+        return []
+    resp = requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+    owners_this_batch = batch_owners
+    price_buf = []
+    batch_owners = []
+    if resp.status_code in (200, 201, 204):
+        seen = set()
+        for stock, new_max_date in owners_this_batch:
+            key = (stock["ticker"], stock["exchange"])
+            if key in seen: continue
+            seen.add(key)
+            last_date_map[key] = max(new_max_date, last_date_map.get(key, "2021-01-01"))
+            ok_leeway += 1
+        return []
+    else:
+        print(f"  WARN scrittura batch rifiutata: HTTP {resp.status_code} — {resp.text[:200]}")
+        return [s for s, _ in owners_this_batch]
 
 for round_num in range(1, MAX_ROUNDS + 1):
     if not pending: break
@@ -157,17 +182,26 @@ for round_num in range(1, MAX_ROUNDS + 1):
         if not data_l:
             still_pending.append(stock)
             continue
+        new_max_date = max((row2["date"] for row2 in data_l), default=None)
+        if not new_max_date:
+            still_pending.append(stock)
+            continue
+        FRESH_CUTOFF = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=2)).strftime("%Y-%m-%d")
+        if new_max_date <= last and new_max_date < FRESH_CUTOFF:
+            still_pending.append(stock)
+            continue
         for row2 in data_l:
             adj = row2.get("adjusted_close") or row2.get("close")
             if adj is None or float(adj) >= 999999: continue  # placeholder/errore fornitore
             price_buf.append({"ticker": ticker, "exchange": exchange,
                                "date": row2["date"], "adj_close": float(adj)})
-        last_date_map[(ticker, exchange)] = max(row2["date"] for row2 in data_l)
-        ok_leeway += 1
+            batch_owners.append((stock, new_max_date))
         if len(price_buf) >= 500:
-            requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
-            price_buf = []
+            write_failed = flush_batch_apac()
+            still_pending.extend(write_failed)
         time.sleep(0.5)
+    write_failed = flush_batch_apac()
+    still_pending.extend(write_failed)
     pending = still_pending
     if pending and round_num < MAX_ROUNDS:
         pausa = min(20 * round_num, 90)
@@ -191,8 +225,6 @@ if pending:
                 print(f"    {ticker}.{exchange} ({company}): Leeway non ha MAI avuto dati per questo ticker con suffisso {lt} — verificare formato ticker")
         except Exception as e:
             print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
-if price_buf:
-    requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
 print(f"  Distribuzione codici HTTP/errori su tutte le chiamate: {STATUS_COUNTS}")
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
