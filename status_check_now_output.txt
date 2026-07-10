@@ -1,0 +1,2 @@
+DCF US: 0-0/2472
+AAPL: [{'ticker': 'AAPL', 'eps_ntm_dcf': 9.2754}]
