@@ -2453,6 +2453,23 @@ function AppContent() {
               </div>
 
               <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6,
+                borderLeft: '2px solid var(--orange)', padding: '20px 24px', marginBottom: 24 }}>
+                <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 14,
+                  color: 'var(--text)', marginBottom: 8 }}>
+                  Reverse Earnings Model — US stocks only, for now
+                </div>
+                <div style={{ fontSize: 12.5, color: 'var(--text3)', lineHeight: 1.6 }}>
+                  Starting from the current price and the next-twelve-month EPS estimate, and holding
+                  a 2.5% terminal growth rate constant, the model solves backward for the earnings
+                  growth rate the market would need over the next ten years to justify today's price.
+                  You can then compare that implied rate against faster or slower growth assumptions
+                  and see how the resulting price would change. It's a way to read what growth the
+                  market is currently pricing in — not a price target, a projection, or a
+                  recommendation to buy or sell.
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6,
                 padding: '22px 24px', marginBottom: 24, display: 'flex', alignItems: 'center',
                 justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                 <div>
