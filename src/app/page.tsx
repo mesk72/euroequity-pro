@@ -2461,7 +2461,7 @@ function AppContent() {
                     📰 News — last 24 hours only
                   </div>
                   <div style={{ fontSize: 12.5, color: 'var(--text3)', lineHeight: 1.55, maxWidth: 520 }}>
-                    We scan the full universe every hour — all ~8,500 stocks across North America,
+                    Scan run on demand — all ~8,500 stocks across North America,
                     Europe and Asia Pacific, not just the largest names — and keep only what was
                     published in the last 24 hours. No stale headlines, no gaps in coverage.
                   </div>
