@@ -2458,7 +2458,7 @@ function AppContent() {
                 <div>
                   <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 15,
                     color: 'var(--text)', marginBottom: 6 }}>
-                    📰 News, refreshed hourly — last 24 hours only
+                    📰 News — last 24 hours only
                   </div>
                   <div style={{ fontSize: 12.5, color: 'var(--text3)', lineHeight: 1.55, maxWidth: 520 }}>
                     We scan the full universe every hour — all ~8,500 stocks across North America,
