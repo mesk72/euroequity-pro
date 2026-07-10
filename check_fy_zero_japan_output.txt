@@ -1,0 +1,4 @@
+Titoli TSE in universo: 1000
+fiscal_month = 0 (invalido): 980
+Non presenti affatto in fiscal_year_end.csv: 20
+Distribuzione mesi validi: {}
