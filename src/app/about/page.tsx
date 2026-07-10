@@ -60,6 +60,16 @@ It is calculated as the sum of the Value Score and Growth Score, then re-ranked 
 A Best Score of 80 or above places a stock in the top 20% of its universe — combining both attractive valuation and strong growth momentum.`,
     },
     {
+      title: 'The Reverse Earnings Model',
+      content: `Currently available for US stocks only.
+
+Starting from the current price and the next-twelve-month EPS estimate, and holding a 2.5% terminal growth rate constant, the model solves backward for the earnings growth rate the market would need over the next ten years to justify today's price.
+
+You can then compare that implied rate against faster or slower growth assumptions and see how the resulting price would change.
+
+It is a way to read what growth the market is currently pricing in — not a price target, a projection, or a recommendation to buy or sell.`,
+    },
+    {
       title: 'How to Use ForwardAlpha',
       content: `Key parameters to focus on:
 
