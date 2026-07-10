@@ -1906,3 +1906,115 @@ sequenza rigorosa (mai in parallelo tra loro) nella finestra
 00:00–09:00, ed evitare di lanciare script diagnostici extra durante
 quella finestra.
 
+
+
+---
+
+## Sessione notte 9-10 luglio 2026 — bug gravi trovati e corretti
+
+### Bug critico trovato: on_conflict mancante nelle scritture su "stocks"
+
+**Sintomo**: `fetch_beta_us.py` scaricava beta E website nella stessa chiamata
+Yahoo, ma solo il beta migliorava (1.825→2.717→oltre) mentre il website
+restava fermo a 1.945/3.000 run dopo run.
+
+**Causa reale, trovata con un test diretto**: la scrittura su `stocks`
+usava `Prefer: resolution=merge-duplicates` ma **senza il parametro
+`on_conflict=ticker,exchange`** nella query string. Senza questo parametro,
+PostgREST non sa quali colonne definiscono il conflitto su una chiave
+composita, e il POST fallisce con HTTP 409 "duplicate key" su ogni riga
+già esistente — silenziosamente, perché lo script non controllava lo
+status code prima del fix di stanotte.
+
+**Stesso bug, identico, in `fetch_apac_website.py`** — spiegava perché
+Corea e Singapore restavano a 0/500 nonostante il codice sembrasse corretto.
+
+**Corretto in entrambi gli script.** Risultato reale dopo il fix:
+- Website Corea+Singapore: da 0/500 a **456/500** (356 KRX + 100 SGX)
+- Website US: da 1.945/3.000 a **2.938/3.000** (in corso, ancora in salita)
+
+**Questo bug va cercato in qualsiasi altro script che scrive su `stocks`
+con `resolution=merge-duplicates`** — non ancora auditati sistematicamente
+tutti gli altri script della pipeline per lo stesso pattern.
+
+### EPS Growth APAC — correzione della correzione
+
+Avevo esteso per errore l'uso di EPS GAAP (invece di Normalized) a TUTTI
+i mercati APAC, quando la regola corretta (comunicata dall'inizio) è:
+**GAAP solo per il Giappone (TSE)**, Normalized per Hong Kong, Singapore,
+Corea, Australia. Corretto in `weekly_apac.py` con un branch esplicito
+su `exchange == "TSE"`. Rilanciato per applicare ai dati reali — verificare
+al prossimo controllo che i valori siano cambiati per SEHK/ASX/KRX/SGX.
+
+### SK Hynix — prezzo placeholder
+
+Il fornitore dati aveva restituito il valore sentinella `999999.9999`
+per 6 giorni consecutivi (25/06–3/07), causando un momentum a 1 settimana
+falsato (+107%). Rimosso dal database e aggiunto un filtro permanente in
+`daily_apac.py`: qualsiasi prezzo ≥999.999 viene ora scartato come
+placeholder/errore, non scritto.
+
+### Back button NA/EU/APAC — quattro tentativi, causa vera trovata
+
+Tentativi falliti: (1) verifica extra sui dati, (2) `router.refresh()`,
+(3) `key={id}` per forzare il remount del componente. Nessuno ha
+funzionato — il sintomo era sempre "tutti i titoli tornano all'origine
+del PRIMO titolo aperto nella sessione".
+
+**Causa vera, quarto tentativo**: il meccanismo usava il parametro URL
+`?from=`, letto/scritto tramite `window.location` e gli hook di
+Next.js — entrambi si sono rivelati inaffidabili per ragioni di cache del
+router non completamente diagnosticate. **Sostituito con `sessionStorage`**,
+una API del browser diretta e sincrona, completamente indipendente da
+React/Next.js. La funzione `goToStock()` è stata inoltre spostata a
+livello di modulo (fuori da ogni componente) dopo che una versione
+precedente, definita dentro il componente principale, ha rotto la build
+di Vercel (`Cannot find name 'pathname'`) perché veniva chiamata anche da
+sotto-componenti (StockTable, Screener, SectorScreen) che non avevano
+quella variabile nello scope. **Non ancora confermato dall'utente che il
+quarto tentativo funzioni.**
+
+### Reverse Earnings Model — problema di infrastruttura GitHub, non di codice
+
+Il workflow `reverse_dcf_us.yml` ha smesso di accettare dispatch manuali
+(HTTP 422 "Workflow does not have workflow_dispatch trigger") nonostante
+il file fosse corretto — confermato non essere un problema del codice
+provando: rinominare il file, ricrearlo da zero, cancellarlo e
+ricrearlo. Il sospetto più probabile: un limite di GitHub sulla
+registrazione di nuovi/modificati workflow, dopo aver creato oltre 120
+file workflow diagnostici usa-e-getta in una notte. Ripulit 56 di questi
+file per liberare margine. La catena automatica (Daily US → Fetch Beta
+US → Reverse Earnings Model, tramite `workflow_run`) dovrebbe comunque
+attivarsi da sola quando Fetch Beta US completa, indipendentemente dal
+dispatch manuale.
+
+### Yahoo — link descrizione in italiano
+
+Tentativo con `us.finance.yahoo.com`: dominio inesistente, ha rotto il
+link per tutti i titoli — **reverted**. Tentativo a basso rischio con
+`?hl=en-US&guccounter=1` in coda all'URL esistente — confermato
+funzionante dall'utente.
+
+### Sitemap e nuova home
+
+Sitemap riscritto per pescare i titoli "esempio" (quelli piu' probabili
+come sitelink Google) dinamicamente dal database per market cap reale,
+invece di una lista scritta a mano ormai obsoleta — probabile causa dei
+risultati "senza senso" su Google. Home page reale creata su
+forwardalpha.pro/ (3 continenti, ~8.500 titoli, no GCC), con CTA
+registrazione funzionante. I box regione puntano agli screener
+funzionanti (nascreen/screener/asiapacific), non alle dashboard che non
+sono ancora affidabili.
+
+### Ancora aperto a fine sessione
+
+- Company description e stime Yahoo mancanti per ~1.050 titoli US
+  aggiunti di recente — il backfill website (vedi sopra, 2.938/3.000) sta
+  risolvendo la causa di base; da riverificare sulle pagine una volta
+  che il backfill e' completo al 100%.
+- Reverse Earnings Model — dispatch manuale bloccato da GitHub, in attesa
+  che la catena automatica scatti o che il limite di registrazione si
+  risolva da solo.
+- Back button — fix implementato, non ancora testato/confermato.
+- EU/US aggiornamento prezzi giornaliero — resta il problema di fondo
+  della sessione, non risolto stanotte, in attesa della risposta di Lars.
