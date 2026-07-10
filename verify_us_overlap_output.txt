@@ -1,0 +1,5 @@
+Universo US reale: 3000
+Ticker US nel file fiscal_year_end: 3004
+In comune (overlap reale): 2876
+Titoli del nostro universo SENZA dato fiscale: 124
+Esempio mancanti: ['HNST', 'MYGN', 'VREX', 'QNT', 'EVH', 'BOC', 'AADX', 'VSTM', 'FINS', 'SGU', 'ELMT', 'SSMR', 'NRC', 'GCBC', 'KBON']
