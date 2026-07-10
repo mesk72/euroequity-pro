@@ -1,4 +1,4 @@
-import os, requests, time
+import os, requests, time, csv
 from datetime import datetime, timezone
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -13,7 +13,15 @@ def yahoo_ticker(ticker, exchange):
     if exchange == "SGX": return ticker + ".SI"
     return ticker
 
-results = {"SEHK": [], "SGX": []}
+# Scrive il CSV MAN MANO, non solo alla fine — se lo script si interrompe
+# a meta' (crash, timeout), il progresso fatto fino a quel punto resta
+# comunque salvato su disco invece di andare perso.
+csv_file = open("fiscal_month_hk_sgx.csv", "w", newline="")
+csv_writer = csv.DictWriter(csv_file, fieldnames=["ticker","exchange","fiscal_month"])
+csv_writer.writeheader()
+csv_file.flush()
+
+ok_count = 0
 fail = 0
 for exch in ["SEHK","SGX"]:
     tickers = []
@@ -36,24 +44,19 @@ for exch in ["SEHK","SGX"]:
             ts = info.get("lastFiscalYearEnd") or info.get("nextFiscalYearEnd")
             if ts:
                 month = datetime.fromtimestamp(ts, tz=timezone.utc).month
-                results[exch].append({"ticker": ticker, "exchange": exch, "fiscal_month": str(month)})
+                csv_writer.writerow({"ticker": ticker, "exchange": exch, "fiscal_month": str(month)})
+                ok_count += 1
             else:
                 fail += 1
         except Exception:
             fail += 1
-        if (i+1) % 100 == 0:
-            print(f"  ...{i+1}/{len(tickers)} — trovati finora {len(results[exch])}")
+        if (i+1) % 50 == 0:
+            csv_file.flush()
+            print(f"  ...{i+1}/{len(tickers)} — trovati finora {ok_count}")
         time.sleep(0.2)
+    csv_file.flush()
 
-print(f"\nSEHK trovati: {len(results['SEHK'])}")
-print(f"SGX trovati: {len(results['SGX'])}")
+csv_file.close()
+print(f"\nTotale trovati: {ok_count}")
 print(f"Falliti: {fail}")
-
-import csv
-with open("fiscal_month_hk_sgx.csv", "w", newline="") as f:
-    w = csv.DictWriter(f, fieldnames=["ticker","exchange","fiscal_month"])
-    w.writeheader()
-    for exch in results:
-        for row in results[exch]:
-            w.writerow(row)
 print("Scritto fiscal_month_hk_sgx.csv")
