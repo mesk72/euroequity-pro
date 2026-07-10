@@ -80,7 +80,7 @@ It is a way to read what growth the market is currently pricing in — not a pri
 
 Prices are updated automatically every trading day. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates and is updated weekly.
 
-Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (GR), Copenhagen (CPSE), Toronto (TSX — coming soon), Tokyo (JPX — coming soon), Hong Kong (HKEX — coming soon), Seoul (KRX — coming soon), Sydney (ASX — coming soon) and Singapore (SGX — coming soon). We are evaluating whether to add further markets in the future.
+Coverage note: Value Score, Growth Score and Best Score are available for the following exchanges: London (LSE), Stockholm (OM), Paris (PA), Frankfurt (XETRA), Milan (MIL), Oslo (OB), Zurich (SWX), Helsinki (HE), Madrid (MC), Amsterdam (AS), Brussels (BR), Athens (GR), Copenhagen (CPSE), Vienna (VI), Dublin (IR), Lisbon (LS), New York/Nasdaq (US), Toronto (TSX), Tokyo (JPX), Hong Kong (HKEX), Seoul (KRX), Sydney (ASX) and Singapore (SGX). We are evaluating whether to add further markets in the future.
 
 For smaller markets — Vienna (VI), Lisbon (LS) and Dublin (IR) — individual rank components are available but aggregate scores are not calculated.`,
     },
