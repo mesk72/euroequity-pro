@@ -23,6 +23,7 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: python reverse_dcf_us.py | tee reverse_dcf_us_last_output.txt
       - name: Commit log via API (evita conflitti git tra script paralleli)
+        continue-on-error: true
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
