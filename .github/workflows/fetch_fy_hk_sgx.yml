@@ -1,0 +1,25 @@
+name: Fetch FY HK SGX
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests yfinance
+      - name: Fetch
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python fetch_fy_hk_sgx.py | tee fetch_fy_hk_sgx_output.txt
+      - name: Commit via API
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: python commit_via_api.py fiscal_month_hk_sgx.csv fetch_fy_hk_sgx_output.txt
