@@ -1,0 +1,1 @@
+J36: [{'ticker': 'J36', 'exchange': 'SGX', 'eps_fy0': 5.72, 'eps_growth': 0.0169}]
