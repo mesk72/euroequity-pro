@@ -2451,6 +2451,28 @@ function AppContent() {
                   </div>
                 ))}
               </div>
+
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6,
+                padding: '22px 24px', marginBottom: 24, display: 'flex', alignItems: 'center',
+                justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+                <div>
+                  <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 15,
+                    color: 'var(--text)', marginBottom: 6 }}>
+                    📰 News, refreshed hourly — last 24 hours only
+                  </div>
+                  <div style={{ fontSize: 12.5, color: 'var(--text3)', lineHeight: 1.55, maxWidth: 520 }}>
+                    We scan the full universe every hour — all ~8,500 stocks across North America,
+                    Europe and Asia Pacific, not just the largest names — and keep only what was
+                    published in the last 24 hours. No stale headlines, no gaps in coverage.
+                  </div>
+                </div>
+                <button onClick={() => navigateTo('news')}
+                  style={{ background: 'var(--orange)', color: '#07101f', fontFamily: 'IBM Plex Sans Condensed',
+                  fontWeight: 700, fontSize: 12.5, padding: '11px 22px', borderRadius: 4, border: 'none',
+                  cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  View latest news →
+                </button>
+              </div>
             </div>
           )}
           {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
