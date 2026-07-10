@@ -13,13 +13,9 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests yfinance
-      - name: Fetch
+      - name: Fetch and commit
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python fetch_fy_hk_sgx.py
-      - name: Commit via API
-        if: always()
-        env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-        run: python commit_via_api.py fiscal_month_hk_sgx.csv
+        run: python fetch_fy_hk_sgx.py
