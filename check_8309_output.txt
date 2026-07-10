@@ -1,0 +1,10 @@
+Company: Sumitomo Mitsui Trust Group, Inc.
+  EPS (GAAP) (FY 2025): '1.43'
+  Mean EPS (GAAP) (FY 2026): '2.85'
+  Mean EPS (GAAP) (FY 2027): '3.36'
+  Mean EPS (GAAP) (FY 2028): '3.44'
+  EPS Normalized (FY 2025): '-'
+  Mean EPS Normalized (FY 2026): '-'
+  Mean EPS Normalized (FY 2027): '-'
+  Mean EPS Normalized (FY 2028): '-'
+fiscal_year_end.csv: {'ticker': '8309', 'exchange': 'TSE', 'fiscal_month': '0'}
