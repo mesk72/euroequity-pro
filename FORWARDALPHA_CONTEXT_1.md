@@ -2058,3 +2058,44 @@ L'ultimo tentativo non è stato testato/confermato dall'utente all'ultimo contro
 ### Riepilogo per chi legge questo file in futuro
 
 La causa di fondo della scarsa affidabilità di EU/US **non è stata identificata con certezza in questa sessione**, nonostante multipli fix reali applicati (scrittura verificata, filtri sentinella, orari separati, on_conflict). Alcuni miglioramenti misurabili ci sono stati (APAC, in particolare Giappone/Hong Kong). US in particolare resta il pipeline più problematico, senza una spiegazione definitiva a fine sessione.
+
+---
+
+## NOTA DI CONSEGNA — 11 luglio 2026, mezzogiorno
+
+Andrea ha posto una scadenza: il sito deve essere sistemato entro il 16 luglio.
+Se non si ottengono risultati, valuterà il passaggio ad un altro assistente
+AI (Gemini o ChatGPT). È stato preparato un documento PDF completo
+("ForwardAlpha_Technical_Handbook.pdf") con l'intera struttura tecnica del
+progetto — repository GitHub, database Supabase, tutti i workflow, le regole
+di business — pensato per essere leggibile da chiunque riprenda il progetto,
+umano o AI.
+
+**Stato reale a mezzogiorno dell'11 luglio, verificato con dati live (non
+etichette dei workflow):**
+- US: JPM e AAPL fermi al 2 luglio — NESSUN miglioramento nonostante il fix
+  di scrittura (on_conflict/verifica) applicato stanotte a daily_us.py.
+- EU: ASML e SAP fermi al 3 luglio, VOD all'8 — misto, in gran parte fermo.
+  Il run era stato CANCELLATO per ore senza che nessuno se ne accorgesse
+  (non da un intervento manuale registrato) — motivo per cui EU non
+  avanzava semplicemente perché non stava girando, non per un bug nei dati.
+- APAC: Giappone e Hong Kong genuinamente migliorati (8 luglio, prima
+  fermi). Corea/Australia a un giorno di ritardo. Singapore resta fermo
+  al 3 luglio nonostante il fix.
+
+**Il problema centrale, onestamente, non è risolto**: il fix di
+write-verification (stesso schema replicato su EU/US/APAC stanotte) ha
+prodotto miglioramenti misurabili SOLO su APAC (in parte). Su EU/US il
+fix non ha cambiato nulla di visibile, e non è stata trovata una
+spiegazione definitiva sul perché — l'ipotesi più forte resta il rate
+limit di Leeway combinato al volume di titoli per regione (US worst,
+~3.000 in un solo run), ma non è stata confermata con la distribuzione
+reale dei codici HTTP (mai ottenuta con successo, nonostante più
+tentativi, per limiti dell'ambiente di chi scrive nel leggere i log
+grezzi di GitHub Actions).
+
+**Se chi legge questo è un nuovo assistente AI**: il prossimo passo più
+utile è probabilmente ottenere la distribuzione HTTP reale (STATUS_COUNTS,
+già presente nel codice di daily_eu.py/daily_us.py/daily_apac.py) da un
+run completo, e da lì decidere se il problema è rate limiting lato
+Leeway o qualcos'altro di ancora non diagnosticato.
