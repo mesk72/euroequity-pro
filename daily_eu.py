@@ -393,13 +393,14 @@ if split_suspects:
 
 # Salva copia prima del pop — serve per mom_maps dopo
 mom_updates_copy = [dict(u) for u in mom_updates]
-for upd in mom_updates:
-    ticker   = upd.pop("ticker")
-    exchange = upd.pop("exchange")
-    requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{ticker}", "exchange": f"eq.{exchange}"},
-        json=upd)
+# Batch POST con on_conflict invece di un PATCH separato per ogni titolo —
+# la versione precedente faceva migliaia di chiamate HTTP individuali,
+# troppo lenta per completare in tempo utile ogni notte.
+for i in range(0, len(mom_updates), 100):
+    safe_post = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+        headers=headers_up, json=mom_updates[i:i+100], timeout=30)
+    if safe_post.status_code not in (200, 201, 204):
+        print(f"  WARN batch momentum: HTTP {safe_post.status_code} — {safe_post.text[:200]}")
 mom_updates = mom_updates_copy  # ripristina con ticker/exchange
 print("  Momentum ok=" + str(ok) + " fail=" + str(fail))
 ok_momentum = ok
