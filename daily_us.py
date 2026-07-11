@@ -159,7 +159,7 @@ last_date_map = {}
 for s in all_stocks:
     ticker, exchange = s['ticker'], s['exchange']
     try:
-        rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+        rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_r,
             params={"select": "date", "ticker": "eq." + ticker, "exchange": "eq." + exchange,
                     "order": "date.desc", "limit": "1"}, timeout=15)
         d = rp.json()
@@ -203,7 +203,7 @@ def flush_batch():
     global price_buf, batch_owners, ok_leeway
     if not price_buf:
         return []
-    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
+    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers_up, price_buf)
     owners_this_batch = batch_owners
     price_buf = []
     batch_owners = []
@@ -283,7 +283,7 @@ if pending:
             print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
 if price_buf:
 
-    safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
+    safe_post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers_up, price_buf)
 print(f"  Distribuzione codici HTTP/errori su tutte le chiamate: {STATUS_COUNTS}")
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
@@ -297,7 +297,7 @@ for exchange, tickers in by_exchange.items():
         from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
         while True:
             try:
-                rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+                rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_r,
                     params={"select": "ticker,date,adj_close",
                             "exchange": f"eq.{exchange}",
                             "ticker": f"in.({','.join(chunk)})",
@@ -365,7 +365,7 @@ if split_suspects:
             if not isinstance(data_l, list) or not data_l:
                 print(f"    {ticker}.{exchange}: nessun dato storico da Leeway (variazione era {old_chg}%), salto")
                 continue
-            requests.delete(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up,
+            requests.delete(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up,
                 params={"ticker": f"eq.{ticker}", "exchange": f"eq.{exchange}"})
             new_rows = []
             for row2 in data_l:
@@ -374,7 +374,7 @@ if split_suspects:
                 new_rows.append({"ticker": ticker, "exchange": exchange,
                                   "date": row2['date'], "adj_close": float(adj)})
             for i in range(0, len(new_rows), 500):
-                requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=new_rows[i:i+500])
+                requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=new_rows[i:i+500])
             new_sorted = sorted(new_rows, key=lambda x: x["date"], reverse=True)
             if len(new_sorted) >= 2:
                 last_px2   = new_sorted[0]["adj_close"]
