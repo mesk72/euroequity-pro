@@ -28,27 +28,21 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
         run: python daily_eu.py | tee daily_eu_last_output.txt
-      - name: Commit output log
+      - name: Commit output log via API
         if: always()
-        run: |
-          git config user.name "debug-bot"
-          git config user.email "debug-bot@users.noreply.github.com"
-          git add daily_eu_last_output.txt
-          git commit -m "log daily_eu output" || echo "nothing to commit"
-          git pull --rebase
-          git push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: python commit_via_api.py daily_eu_last_output.txt
 
       - name: Health check
         if: always()
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: python health_check.py | tee health_status_eu.txt
-      - name: Commit health status
+      - name: Commit health status via API
         if: always()
-        run: |
-          git config user.name "debug-bot"
-          git config user.email "debug-bot@users.noreply.github.com"
-          git add health_status_eu.txt
-          git commit -m "health check 2026-07-08T19:54:13Z" || echo "nothing to commit"
-          git pull --rebase
-          git push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: python commit_via_api.py health_status_eu.txt
