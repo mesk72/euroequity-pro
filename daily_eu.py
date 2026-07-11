@@ -164,13 +164,13 @@ pending = list(all_stocks)
 random.shuffle(pending)  # evita pattern ripetuti sugli stessi ticker ogni giro
 definitive_failures = []
 
-def safe_post(url, headers, json_data, retries=2):
+def safe_post(url, headers, json_data, retries=2, params=None):
     """POST con retry: sia su errori di rete SIA su risposte HTTP di errore.
     Prima si usava requests.post diretto, senza controllare lo status code —
     un batch rifiutato da Supabase passava per riuscito in silenzio."""
     for attempt in range(retries + 1):
         try:
-            resp = requests.post(url, headers=headers, json=json_data, timeout=30)
+            resp = requests.post(url, headers=headers, json=json_data, params=params, timeout=30)
             if resp.status_code in (200, 201, 204):
                 return resp
             print(f"  WARN scrittura rifiutata da Supabase: HTTP {resp.status_code} — {resp.text[:200]}")
@@ -188,7 +188,7 @@ def flush_batch():
     global price_buf, batch_owners, ok_leeway
     if not price_buf:
         return []
-    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
+    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf, params={"on_conflict":"ticker,exchange,date"})
     owners_this_batch = batch_owners
     price_buf = []
     batch_owners = []
