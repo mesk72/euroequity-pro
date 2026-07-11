@@ -73,7 +73,9 @@ for i, ticker in enumerate(all_tickers):
 
         def pct(new, old):
             if old is None or old == 0: return None
-            return round((new/old - 1) * 100, 4)
+            val = round((new/old - 1), 6)
+            if abs(val) > 50: return None  # valore anomalo (probabile split/dato corrotto), scartato invece di rompere il batch
+            return val
 
         row = {"ticker": ticker, "exchange": "US", "price": latest_price,
                "change1d": pct(latest_price, prev_price),
