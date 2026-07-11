@@ -138,14 +138,25 @@ export async function GET(req: NextRequest) {
     }
 
     if (ticker && exchange) {
-      const [stockRes, fundRes] = await Promise.all([
+      const [stockRes, fundRes, priceRes] = await Promise.all([
         supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf').eq('ticker', ticker).eq('exchange', exchange).limit(1),
+        // Prezzo reale piu' recente da prices_eod — fundamentals.price e' un
+        // campo statico aggiornato solo dagli script weekly, non riflette
+        // l'aggiornamento giornaliero. Era la causa del prezzo mostrato
+        // fermo di giorni rispetto al dato vero gia' presente nel database.
+        supabase.from('prices_eod').select('date,adj_close').eq('ticker', ticker).eq('exchange', exchange).order('date', { ascending: false }).limit(1),
       ])
       const s: any = stockRes.data?.[0] || {}
       const f: any = fundRes.data?.[0] || {}
+      const p: any = priceRes.data?.[0] || {}
       if (!s.ticker) return NextResponse.json({ stocks: [] })
-      return NextResponse.json({ stocks: [mapStock(s, f)], source: 'supabase' })
+      const mapped = mapStock(s, f)
+      if (p.adj_close != null) {
+        mapped.price = p.adj_close
+        mapped.lastPriceDate = p.date
+      }
+      return NextResponse.json({ stocks: [mapped], source: 'supabase' })
     }
 
     if (search) {
