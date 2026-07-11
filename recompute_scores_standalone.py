@@ -49,8 +49,21 @@ def pct_rank(arr, val):
     below = sum(1 for x in arr_sorted if x < val)
     return 100 * below / n if n > 0 else None
 
-# Leggi TUTTI i fundamentals US con il momentum ORA corretto
-all_data = []
+# Universo vero (in_universe=true) — 3000 titoli, non tutto fundamentals
+universe_tickers = set()
+offset = 0
+while True:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+        params={"select":"ticker","exchange":"eq.US","in_universe":"eq.true","limit":"1000","offset":str(offset)}, timeout=30)
+    batch = r.json()
+    if not isinstance(batch,list) or not batch: break
+    universe_tickers.update(s["ticker"] for s in batch)
+    offset += 1000
+    if len(batch) < 1000: break
+log(f"Universo reale (in_universe=true): {len(universe_tickers)}")
+
+# Leggi fundamentals US, poi filtra SOLO chi e' davvero in universo
+all_data_raw = []
 offset = 0
 while True:
     r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
@@ -58,10 +71,11 @@ while True:
                 "exchange":"eq.US","limit":"1000","offset":str(offset)}, timeout=30)
     data = r.json()
     if not isinstance(data, list) or not data: break
-    all_data.extend(data)
+    all_data_raw.extend(data)
     offset += 1000
     if len(data) < 1000: break
-log(f"Fundamentals US letti: {len(all_data)}")
+all_data = [d for d in all_data_raw if d["ticker"] in universe_tickers]
+log(f"Fundamentals US letti (grezzo): {len(all_data_raw)} — filtrati a in_universe: {len(all_data)}")
 
 ey_trail_g = [ey(d['pe_trailing']) for d in all_data if ey(d['pe_trailing']) is not None]
 ey_fwd_g   = [ey(d['pe_forward'])  for d in all_data if ey(d['pe_forward'])  is not None]
