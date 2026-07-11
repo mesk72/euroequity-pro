@@ -1,0 +1,3 @@
+JPM ultimi 5: [{'date': '2026-07-10', 'adj_close': 336.47}, {'date': '2026-07-09', 'adj_close': 335.47}, {'date': '2026-07-08', 'adj_close': 330.62}, {'date': '2026-07-02', 'adj_close': 334.47}, {'date': '2026-07-01', 'adj_close': 334.07}]
+Query eq.2026-07-10 (primi 5 risultati): [{'ticker': 'AADX'}, {'ticker': 'AAPL'}, {'ticker': 'AB'}, {'ticker': 'ADEA'}, {'ticker': 'ADPT'}]
+Status: 200
