@@ -149,7 +149,7 @@ def flush_batch_apac():
     global price_buf, batch_owners, ok_leeway
     if not price_buf:
         return []
-    resp = requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+    resp = requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, params={"on_conflict":"ticker,exchange,date"}, json=price_buf)
     owners_this_batch = batch_owners
     price_buf = []
     batch_owners = []
@@ -317,7 +317,7 @@ if split_suspects:
                 new_rows.append({"ticker": ticker, "exchange": exchange,
                                   "date": row2["date"], "adj_close": float(adj)})
             for i in range(0, len(new_rows), 500):
-                requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=new_rows[i:i+500])
+                requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, params={"on_conflict":"ticker,exchange,date"}, json=new_rows[i:i+500])
             new_sorted = sorted(new_rows, key=lambda x: x["date"], reverse=True)
             if len(new_sorted) >= 2:
                 last_px2   = new_sorted[0]["adj_close"]
