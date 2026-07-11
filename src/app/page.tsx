@@ -159,7 +159,7 @@ async function apiExchange(code: string): Promise<Stock[]> {
           : isMulti
             ? `/api/db/stocks?exchanges=${encodeURIComponent(code)}`
             : `/api/db/stocks?exchange=${encodeURIComponent(code)}`
-      const r = await fetch(url)
+      const r = await fetch(url, { cache: 'no-store' })
       if (r.ok) {
         const d = await r.json()
         return d.stocks || []
@@ -170,7 +170,7 @@ async function apiExchange(code: string): Promise<Stock[]> {
     const codes = code === 'EZ' ? Object.keys(EXCHANGES) : [code]
     const results = await Promise.all(
       codes.map(c =>
-        fetch(`/api/exchange?code=${c}`)
+        fetch(`/api/exchange?code=${c}`, { cache: 'no-store' })
           .then(r => r.ok ? r.json() : { stocks: [] })
           .then(d => (d.stocks || []) as Stock[])
           .catch(() => [] as Stock[])
