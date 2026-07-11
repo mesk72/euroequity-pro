@@ -1,0 +1,20 @@
+Test su 100 titoli reali
+  ...25/100 processati
+  ...50/100 processati
+  ...75/100 processati
+  ...100/100 processati
+
+Fetch completato in 79.2s
+OK con dato al 10 luglio: 97
+FALLITI o senza 10 luglio: 3
+Distribuzione HTTP: {429: 3, 200: 97}
+
+Dettaglio primi 20 falliti:
+  DMLP (DMLP.US): HTTP 429 - {"error":"Too many requests. Please slow down.","errorCode":"RATE_LIMIT_EXCEEDED"}
+  GLP (GLP.US): HTTP 429 - {"error":"Too many requests. Please slow down.","errorCode":"RATE_LIMIT_EXCEEDED"}
+  FOXF (FOXF.US): HTTP 429 - {"error":"Too many requests. Please slow down.","errorCode":"RATE_LIMIT_EXCEEDED"}
+
+Scrittura 289 righe: HTTP 409
+  ERRORE SCRITTURA: {"code":"23505","details":"Key (ticker, exchange, date)=(WLDN, US, 2026-07-08) already exists.","hint":null,"message":"duplicate key value violates unique constraint \"prices_eod_ticker_exchange_date_key\""}
+
+=== FINE TEST ===
