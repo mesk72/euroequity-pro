@@ -222,7 +222,18 @@ export async function GET(req: NextRequest) {
         .in('ticker', tickers)
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
-      const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+      const searchExchanges = Array.from(new Set(stocksData.map((s: any) => s.exchange))) as string[]
+      const searchPriceMap = await fetchLatestPrices(searchExchanges)
+      const stocks = stocksData.map((s: any) => {
+        const mapped = mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {})
+        const p = searchPriceMap[`${s.ticker}.${s.exchange}`]
+        if (p) {
+          mapped.price = p.price
+          mapped.lastPriceDate = p.date
+          if (p.change1d != null) mapped.change1d = p.change1d
+        }
+        return mapped
+      })
       return NextResponse.json({ stocks, source: 'supabase' })
     }
 
