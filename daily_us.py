@@ -128,14 +128,14 @@ for ex, tks in by_exchange.items():
 print("\n[2/5] Download prezzi EOD da Leeway...")
 CHUNK = 20
 
-def safe_post(url, headers, json_data, retries=2):
+def safe_post(url, headers, json_data, retries=2, params=None):
     """POST con retry: sia su errori di rete SIA su risposte HTTP di errore.
     Prima catturava solo le eccezioni di rete e ignorava lo status code —
     un batch rifiutato da Supabase (400/409/422/5xx) passava per riuscito
     in silenzio, mentre i dati non venivano mai scritti davvero."""
     for attempt in range(retries + 1):
         try:
-            resp = requests.post(url, headers=headers, json=json_data, timeout=30)
+            resp = requests.post(url, headers=headers, json=json_data, params=params, timeout=30)
             if resp.status_code in (200, 201, 204):
                 return resp
             print(f"  WARN scrittura rifiutata da Supabase: HTTP {resp.status_code} — {resp.text[:200]}")
@@ -203,7 +203,7 @@ def flush_batch():
     global price_buf, batch_owners, ok_leeway
     if not price_buf:
         return []
-    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
+    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf, params={"on_conflict":"ticker,exchange,date"})
     owners_this_batch = batch_owners
     price_buf = []
     batch_owners = []
@@ -283,7 +283,7 @@ if pending:
             print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
 if price_buf:
 
-    safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
+    safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf, params={"on_conflict":"ticker,exchange,date"})
 print(f"  Distribuzione codici HTTP/errori su tutte le chiamate: {STATUS_COUNTS}")
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
