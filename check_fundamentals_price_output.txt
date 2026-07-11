@@ -1,0 +1,1 @@
+fundamentals.price per JPM: [{'ticker': 'JPM', 'price': 334.47}]
