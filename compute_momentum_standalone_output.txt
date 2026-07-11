@@ -1,0 +1,14 @@
+Universo US: 3000 titoli
+  ...300/3000 — ok=292 fail=8
+  ...600/3000 — ok=590 fail=10
+  ...900/3000 — ok=888 fail=12
+  ...1200/3000 — ok=1183 fail=17
+  WARN batch: HTTP 400 {"code":"22003","details":"A field with precision 10, scale 4 must round to an absolute value less than 10^6.","hint":null,"message":"numeric field overflow"}
+  ...1500/3000 — ok=1478 fail=22
+  ...1800/3000 — ok=1777 fail=23
+  ...2100/3000 — ok=2072 fail=28
+  ...2400/3000 — ok=2369 fail=31
+  ...2700/3000 — ok=2657 fail=43
+  ...3000/3000 — ok=2957 fail=43
+
+FINALE: ok=2957 fail=43 su 3000
