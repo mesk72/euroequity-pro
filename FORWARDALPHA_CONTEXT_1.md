@@ -2018,3 +2018,43 @@ sono ancora affidabili.
 - Back button — fix implementato, non ancora testato/confermato.
 - EU/US aggiornamento prezzi giornaliero — resta il problema di fondo
   della sessione, non risolto stanotte, in attesa della risposta di Lars.
+
+
+---
+
+## Sessione 10-11 luglio 2026 — stato onesto: cosa funziona, cosa no
+
+### FUNZIONA, verificato con dati reali
+
+- **EPS Growth Giappone**: GAAP solo per TSE, Normalized per Hong Kong/Singapore/Corea/Australia. Verificato su J36 (Singapore): valore cambiato da 31,92% a 1,69% dopo il fix — la correzione ha inciso davvero sui numeri.
+- **Bug fiscal_month=0 Giappone**: era invalido per il 98% dei titoli TSE (980/1000). Causa reale trovata: il file caricato dall'utente aveva il dato corretto ma sotto l'etichetta "JPX", non "TSE" — il nostro sistema cercava solo sotto "TSE". Unito i due, ora solo 2% invalido.
+- **Fiscal year end USA**: era 0/3.000 (tutti su default dicembre). Recuperato a 3.004/3.000 usando il file caricato dall'utente (fonte: in parte Leeway stesso, in parte Yahoo) + backfill mirato per i 124 mancanti via Yahoo.
+- **Fiscal year end Hong Kong+Singapore**: era 0/875 in ENTRAMBI i file forniti (non solo il nostro). Recuperato 599/875 (SEHK quasi completo 499/500, SGX solo 100/375) via Yahoo. **Verificato che i primi 100 per market cap su entrambi i mercati hanno il dato** — il buco residuo è tutto in small cap, non nei titoli principali.
+- **Bug on_conflict mancante**: causa reale (non ipotesi) del perché website/beta si aggiornavano a metà — mancava `on_conflict=ticker,exchange` nelle scritture upsert su `stocks`, causando HTTP 409 silenziosi. Corretto in `fetch_beta_us.py` e `fetch_apac_website.py`. Risultato verificato: website Corea+Singapore da 0 a 456/500, website US da 1.945 a 2.938/3.000.
+- **yahoo_ticker mai persistito**: bug reale trovato — veniva calcolato per i titoli nuovi ma solo usato per la chiamata, mai salvato nel database. Corretto.
+- **Reverse Earnings Model USA**: da 1.771 a 2.472/3.000 dopo i fix su beta/fiscal year.
+- **SK Hynix**: valore placeholder 999999.9999 rimosso, filtro permanente aggiunto in daily_apac.py.
+- **Sentinel filter + write verification in daily_apac.py**: stesso bug di scrittura-non-verificata di EU/US, mai applicato lì prima di stanotte. Corretto.
+- **Sito**: sezione News in home page, sezione Reverse Earnings Model in home e About, coverage note About corretta, link Yahoo con parametro lingua.
+- **CV professionale**: creato e corretto su richiesta (PDF, EN, 2 pagine).
+
+### NON FUNZIONA — onestamente, a fine sessione
+
+- **Prezzi giornalieri EU**: il run schedulato di ieri sera è risultato "cancelled" senza intervento mio — per ore EU non ha semplicemente girato. Causa non trovata con certezza.
+- **Prezzi giornalieri US**: rimasto fermo a titoli chiave (JPM, AAPL) risalenti al 2 luglio anche dopo il fix di scrittura-verificata di EU/US applicato ore prima. **Il fix non ha risolto il problema per US in modo visibile** — non ho una spiegazione nuova da offrire, solo lo stesso codice già corretto che evidentemente non basta da solo.
+- **Non sono mai riuscito a ottenere la distribuzione reale dei codici HTTP** (STATUS_COUNTS) durante un run EU/US completo, nonostante il tracciamento fosse già nel codice — il meccanismo di log (`git commit` diretto) falliva sistematicamente per conflitti quando più script giravano insieme. **Corretto ora** (sostituito con commit via API, stesso meccanismo che funziona per altri script) — non ancora verificato su un run completo.
+- **Singapore prezzi**: fermo al 3 luglio anche dopo il fix di scrittura in daily_apac.py.
+- **GitHub Actions — problema di registrazione nuovi workflow**: per un periodo, i workflow nuovi o modificati di recente non accettavano dispatch manuale (HTTP 422) nonostante il codice fosse corretto — confermato non essere un problema nostro (creato file identici con nomi diversi, stesso errore). Aggirato incatenando script in un workflow già funzionante. Causa profonda non risolta, solo aggirata.
+
+### Tentativi falliti sul bug "torna indietro" NA/EU/APAC (4 tentativi, nessuno confermato dall'utente come risolto)
+
+1. Verifica extra sui dati passati nell'URL
+2. `router.refresh()` dopo la navigazione
+3. `key={id}` per forzare il remount del componente React
+4. Sostituito il parametro URL con `sessionStorage` + funzione `goToStock` a livello di modulo (non dentro il componente, dopo che una versione precedente ha rotto la build Vercel per una variabile fuori scope)
+
+L'ultimo tentativo non è stato testato/confermato dall'utente all'ultimo controllo.
+
+### Riepilogo per chi legge questo file in futuro
+
+La causa di fondo della scarsa affidabilità di EU/US **non è stata identificata con certezza in questa sessione**, nonostante multipli fix reali applicati (scrittura verificata, filtri sentinella, orari separati, on_conflict). Alcuni miglioramenti misurabili ci sono stati (APAC, in particolare Giappone/Hong Kong). US in particolare resta il pipeline più problematico, senza una spiegazione definitiva a fine sessione.
