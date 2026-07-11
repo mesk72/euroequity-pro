@@ -499,16 +499,20 @@ for country, exchanges in RANK_GROUPS.items():
         print(f"  {country}: {len(res)} rankati")
 
 ok = 0
-for upd in rank_updates:
-    body = {k: v for k, v in upd.items() if k not in ("ticker", "exchange")}
+# Scrittura BATCH invece di un PATCH per ogni titolo — la versione precedente
+# faceva migliaia di chiamate HTTP individuali, causa primaria dei run che
+# non riuscivano a completare in tempo utile ogni notte.
+for i in range(0, len(rank_updates), 200):
+    batch = rank_updates[i:i+200]
     try:
-        r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-            headers=headers_up,
-            params={"ticker": f"eq.{upd['ticker']}", "exchange": f"eq.{upd['exchange']}"},
-            json=body, timeout=20)
-        if r.status_code in (200, 201, 204): ok += 1
+        r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+            headers=headers_up, json=batch, timeout=30)
+        if r.status_code in (200, 201, 204):
+            ok += len(batch)
+        else:
+            print(f"  WARN batch rank: HTTP {r.status_code} — {r.text[:200]}")
     except Exception as e:
-        print(f"  WARN PATCH rank {upd['ticker']}.{upd['exchange']}: {e}")
+        print(f"  WARN batch rank: {e}")
 print(f"  Rank US+CA: {ok}/{len(rank_updates)}")
 
 # Combined rank NA = US+TSX insieme
@@ -525,16 +529,17 @@ combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
                      "combined_rank": min(99, int(round(pct_rank(comb_arr, d['value_score'] + d['growth_score']))))}
                     for d in all_scores]
 ok = 0
-for upd in combined_updates:
-    body = {k: v for k, v in upd.items() if k not in ("ticker", "exchange")}
+for i in range(0, len(combined_updates), 200):
+    batch = combined_updates[i:i+200]
     try:
-        r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-            headers=headers_up,
-            params={"ticker": f"eq.{upd['ticker']}", "exchange": f"eq.{upd['exchange']}"},
-            json=body, timeout=20)
-        if r.status_code in (200, 201, 204): ok += 1
+        r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+            headers=headers_up, json=batch, timeout=30)
+        if r.status_code in (200, 201, 204):
+            ok += len(batch)
+        else:
+            print(f"  WARN batch combined: HTTP {r.status_code} — {r.text[:200]}")
     except Exception as e:
-        print(f"  WARN PATCH combined {upd['ticker']}.{upd['exchange']}: {e}")
+        print(f"  WARN batch combined: {e}")
 print(f"  Combined rank NA (US+TSX): {ok}/{len(combined_updates)}")
 ok_rank = ok
 
