@@ -186,7 +186,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (ticker && exchange) {
-      const [stockRes, fundRes, priceRes] = await Promise.all([
+      const [stockRes, fundRes, priceRes, histRes] = await Promise.all([
         supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         // Prezzo reale piu' recente da prices_eod — fundamentals.price e' un
@@ -194,6 +194,11 @@ export async function GET(req: NextRequest) {
         // l'aggiornamento giornaliero. Era la causa del prezzo mostrato
         // fermo di giorni rispetto al dato vero gia' presente nel database.
         supabase.from('prices_eod').select('date,adj_close').eq('ticker', ticker).eq('exchange', exchange).order('date', { ascending: false }).limit(1),
+        // Storico ~400 giorni per calcolare il momentum reale (1d/1w/1m/6m/12m)
+        // dal prezzo vero, invece che da fundamentals.mom* — stesso problema
+        // del prezzo: quei campi restano fermi finche' il run settimanale/
+        // notturno non li ricalcola con successo.
+        supabase.from('prices_eod').select('date,adj_close').eq('ticker', ticker).eq('exchange', exchange).order('date', { ascending: false }).limit(400),
       ])
       const s: any = stockRes.data?.[0] || {}
       const f: any = fundRes.data?.[0] || {}
@@ -203,6 +208,33 @@ export async function GET(req: NextRequest) {
       if (p.adj_close != null) {
         mapped.price = p.adj_close
         mapped.lastPriceDate = p.date
+      }
+      const hist: any[] = histRes.data || []
+      if (hist.length > 1) {
+        const latest = hist[0]
+        const latestDate = new Date(latest.date)
+        const findClosest = (daysAgo: number) => {
+          const target = new Date(latestDate)
+          target.setDate(target.getDate() - daysAgo)
+          let best = null, bestDiff = Infinity
+          for (const row of hist) {
+            const diff = Math.abs(new Date(row.date).getTime() - target.getTime())
+            if (diff < bestDiff) { bestDiff = diff; best = row }
+          }
+          return best
+        }
+        const pctChange = (base: any) => (base && base.adj_close ? (latest.adj_close / base.adj_close - 1) * 100 : null)
+        const prevDay = hist[1]
+        const c1d = pctChange(prevDay)
+        if (c1d != null) mapped.change1d = c1d
+        const m1w = pctChange(findClosest(7))
+        const m1m = pctChange(findClosest(30))
+        const m6m = pctChange(findClosest(182))
+        const m12m = pctChange(findClosest(365))
+        if (m1w != null) mapped.mom1w = m1w
+        if (m1m != null) mapped.mom1m = m1m
+        if (m6m != null) mapped.mom6m = m6m
+        if (m12m != null) mapped.mom12m = m12m
       }
       return NextResponse.json({ stocks: [mapped], source: 'supabase' })
     }
