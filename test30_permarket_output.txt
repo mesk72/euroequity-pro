@@ -3,3 +3,8 @@ US: 30/30
 TSX: 29/30 — falliti: ['MRG.UN']
 MIL: 30/30
 XETRA: 29/30 — falliti: ['MNV6']
+PA: 30/30
+LSE: 29/30 — falliti: ['BT.A']
+SWX: 30/30
+OM: 30/30
+AS: 30/30
