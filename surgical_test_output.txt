@@ -1,0 +1,20 @@
+
+=== JPM.US ===
+Ultima data nel DB (prima del test): 2026-07-10
+Leeway ticker: JPM.US | HTTP 200
+Leeway restituisce 5 righe, ultima_data=2026-07-10
+Righe pronte per la scrittura: 5
+Esempio riga: {'ticker': 'JPM', 'exchange': 'US', 'date': '2026-07-10', 'adj_close': 336.47}
+Scrittura: HTTP 409
+Corpo risposta scrittura: {"code":"23505","details":"Key (ticker, exchange, date)=(JPM, US, 2026-07-08) already exists.","hint":null,"message":"duplicate key value violates unique constraint \"prices_eod_ticker_exchange_date_key\""}
+Ultima data nel DB (DOPO il test): 2026-07-10
+
+=== AAPL.US ===
+Ultima data nel DB (prima del test): 2026-07-02
+Leeway ticker: AAPL.US | HTTP 200
+Leeway restituisce 5 righe, ultima_data=2026-07-10
+Righe pronte per la scrittura: 5
+Esempio riga: {'ticker': 'AAPL', 'exchange': 'US', 'date': '2026-07-10', 'adj_close': 315.32}
+Scrittura: HTTP 201
+Corpo risposta scrittura: 
+Ultima data nel DB (DOPO il test): 2026-07-10
