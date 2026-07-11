@@ -1,0 +1,24 @@
+Fundamentals US letti: 3963
+Titoli rankati: 3963
+  WARN batch 0: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"50.26776151374509\""}
+  WARN batch 200: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"58.229203855765796\""}
+  WARN batch 400: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"53.8379150303463\""}
+  WARN batch 600: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"80.22134951802927\""}
+  WARN batch 800: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"81.43520171367369\""}
+  WARN batch 1000: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"76.57979293109604\""}
+  WARN batch 1200: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"15.387361656551231\""}
+  WARN batch 1400: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"32.666904676901105\""}
+  WARN batch 1600: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"64.36986790431989\""}
+  WARN batch 1800: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"45.662263477329525\""}
+  WARN batch 2000: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"50.446269189575155\""}
+  WARN batch 2200: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"81.39950017850768\""}
+  WARN batch 2400: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"14.066404855408782\""}
+  WARN batch 2600: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"1.7850767583006069\""}
+  WARN batch 2800: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"0.5588543485854\""}
+  WARN batch 3000: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"69.18957515173152\""}
+  WARN batch 3200: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"12.245626561942164\""}
+  WARN batch 3400: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"42.59193145305248\""}
+  WARN batch 3600: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"21.52802570510532\""}
+  WARN batch 3800: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type integer: \"5.5694394858978935\""}
+
+FINALE: scritti ok=0 fail=3963 su 3963
