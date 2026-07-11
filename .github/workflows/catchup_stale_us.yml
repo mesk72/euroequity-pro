@@ -1,0 +1,23 @@
+name: Catchup Stale US
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  catchup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Catchup
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          LEEWAY_KEY: ${{ secrets.LEEWAY_KEY }}
+        run: python catchup_stale_us.py
