@@ -78,7 +78,7 @@ for d in fail_detail[:20]:
     log(f"  {d}")
 
 if price_buf:
-    resp = requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf, timeout=30)
+    resp = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers={**headers_up, "Prefer":"resolution=merge-duplicates,return=minimal"}, json=price_buf, timeout=30)
     log(f"\nScrittura {len(price_buf)} righe: HTTP {resp.status_code}")
     if resp.status_code not in (200,201,204):
         log(f"  ERRORE SCRITTURA: {resp.text[:500]}")
