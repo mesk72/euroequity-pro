@@ -23,31 +23,25 @@ def log(msg):
 def ey(pe):
     try:
         pe = float(pe)
-        return 1.0/pe if pe != 0 else None
+        if pe == 0: return None
+        return 1.0 / pe  # formula esatta copiata da daily_us.py, PE negativi inclusi sempre
     except Exception:
         return None
 
 def book_yield(pb):
     try:
         pb = float(pb)
-        return 100 - (100*pb) if False else None  # placeholder, sostituito sotto correttamente
-    except Exception:
-        return None
-
-# book_yield reale: 100 - pct_rank(pb) va applicato dopo — qui serve solo un valore
-# invertito coerente con "piu' basso e' meglio": usiamo -pb come proxy per il rank
-def book_yield(pb):
-    try:
-        return -float(pb)
+        if pb == 0: return None
+        return 1.0 / pb  # formula esatta copiata da daily_us.py, PB negativi inclusi
     except Exception:
         return None
 
 def pct_rank(arr, val):
     if val is None or not arr: return None
-    arr_sorted = sorted(arr)
-    n = len(arr_sorted)
-    below = sum(1 for x in arr_sorted if x < val)
-    return 100 * below / n if n > 0 else None
+    valid = [x for x in arr if x is not None]
+    if not valid: return None
+    below = sum(1 for x in valid if x < val)
+    return int(round(below / len(valid) * 100))
 
 # Universo vero (in_universe=true) — 3000 titoli, non tutto fundamentals
 universe_tickers = set()
