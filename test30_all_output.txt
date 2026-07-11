@@ -1,0 +1,26 @@
+
+=== US: campione di 30 titoli ===
+  Tentativo 1: 30 da processare
+  Tentativo 2: 2 da processare
+  RISULTATO US: 30/30
+
+=== EU: campione di 30 titoli ===
+  Tentativo 1: 30 da processare
+  Tentativo 2: 2 da processare
+  Tentativo 3: 1 da processare
+  Tentativo 4: 1 da processare
+  RISULTATO EU: 29/30
+  Ancora falliti dopo 4 tentativi: [('LEC', 'XETRA')]
+
+=== APAC: campione di 30 titoli ===
+  Tentativo 1: 30 da processare
+  Tentativo 2: 10 da processare
+  Tentativo 3: 10 da processare
+  Tentativo 4: 10 da processare
+  RISULTATO APAC: 20/30
+  Ancora falliti dopo 4 tentativi: [('A005380', 'KRX'), ('A036930', 'KRX'), ('A036460', 'KRX'), ('A011070', 'KRX'), ('A036830', 'KRX'), ('A000210', 'KRX'), ('A000990', 'KRX'), ('A030610', 'KRX'), ('A006280', 'KRX'), ('A022100', 'KRX')]
+
+=== RIEPILOGO FINALE ===
+US: 30/30
+EU: 29/30
+APAC: 20/30
