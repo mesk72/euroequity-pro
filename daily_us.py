@@ -344,7 +344,7 @@ for stock in all_stocks:
 
     mom_updates.append({
         "ticker": ticker, "exchange": exchange,
-        "mom1w": mom_cal(7), "mom1m": mom_cal(31),
+        "mom1w": mom_cal(7), "mom1m": mom_cal(30),
         "mom6m": mom_cal(182), "mom12m": mom_cal(365),
         "change1d": chg1d, "price": last_px,
     })
@@ -391,7 +391,7 @@ if split_suspects:
                 key = (ticker, exchange)
                 if key in mom_by_key:
                     mom_by_key[key].update({
-                        "mom1w": mom_cal2(7), "mom1m": mom_cal2(31),
+                        "mom1w": mom_cal2(7), "mom1m": mom_cal2(30),
                         "mom6m": mom_cal2(182), "mom12m": mom_cal2(365),
                         "change1d": new_chg1d, "price": last_px2,
                     })
