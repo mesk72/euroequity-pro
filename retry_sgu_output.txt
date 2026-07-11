@@ -1,0 +1,3 @@
+Fetch SGU: HTTP 200
+Scrittura: HTTP 201
+Verifica SGU: [{'date': '2026-07-10'}]
