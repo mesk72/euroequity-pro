@@ -1,5 +1,5 @@
 ======================================================================
-HEALTH CHECK — 2026-07-11 16:46 UTC
+HEALTH CHECK — 2026-07-11 22:48 UTC
 ======================================================================
 US       count= 3000/3000   campione_fresco=20/20  eta_max_campione=1gg  [OK]
 TSX      count=  400/400    campione_fresco=20/20  eta_max_campione=1gg  [OK]
