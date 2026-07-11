@@ -16,6 +16,54 @@ const NO_FILTER = new Set(['VI','IR','LS'])
 // APAC + North America: top N per market cap, solo titoli con company e sector
 const APAC_TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, TSX: 400, ASX: 350, KRX: 400, SGX: 100, US: 2000 }
 
+async function fetchLatestPrices(exchangeList: string[]) {
+  // Legge gli ultimi ~6 giorni di prezzi per calcolare prezzo corrente e
+  // variazione reale da prices_eod, invece di affidarsi a fundamentals.price
+  // / change1d — campi statici aggiornati solo dai run settimanali, causa
+  // reale del "prezzo fermo" segnalato su JPM e su tutti gli screener.
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - 6)
+  const cutoffStr = cutoff.toISOString().slice(0, 10)
+
+  const byTicker: Record<string, { date: string; adj_close: number }[]> = {}
+  for (const exchange of exchangeList) {
+    const PAGE = 1000
+    let from = 0
+    while (true) {
+      const { data, error } = await supabase
+        .from('prices_eod')
+        .select('ticker,date,adj_close')
+        .eq('exchange', exchange)
+        .gte('date', cutoffStr)
+        .order('date', { ascending: false })
+        .range(from, from + PAGE - 1)
+        .limit(PAGE)
+      if (error || !data || data.length === 0) break
+      for (const row of data) {
+        const key = `${row.ticker}.${exchange}`
+        if (!byTicker[key]) byTicker[key] = []
+        if (byTicker[key].length < 2) byTicker[key].push({ date: row.date, adj_close: row.adj_close })
+      }
+      if (data.length < PAGE) break
+      from += PAGE
+    }
+  }
+
+  const result: Record<string, { price: number; date: string; change1d: number | null }> = {}
+  for (const key of Object.keys(byTicker)) {
+    const rows = byTicker[key]
+    if (!rows.length) continue
+    const latest = rows[0]
+    const prev = rows[1]
+    result[key] = {
+      price: latest.adj_close,
+      date: latest.date,
+      change1d: prev && prev.adj_close ? (latest.adj_close / prev.adj_close - 1) * 100 : null,
+    }
+  }
+  return result
+}
+
 async function fetchAllByExchange(table: string, select: string, exchangeList: string[], universeOnly = false) {
   // Legge un exchange alla volta per evitare il limite di 1000 righe miste
   const all: any[] = []
@@ -184,16 +232,27 @@ export async function GET(req: NextRequest) {
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf'
 
-    const [stocksData, fundData] = await Promise.all([
+    const [stocksData, fundData, priceMap] = await Promise.all([
       fetchAllByExchange('stocks', stocksSelect, exList, true),
       fetchAll('fundamentals', fundSelect, exList),
+      fetchLatestPrices(exList),
     ])
+
+    function applyRealPrice(stock: any) {
+      const p = priceMap[`${stock.ticker}.${stock.exchange}`]
+      if (p) {
+        stock.price = p.price
+        stock.lastPriceDate = p.date
+        if (p.change1d != null) stock.change1d = p.change1d
+      }
+      return stock
+    }
 
     let stocks: any[]
     if (isUSOnly) {
       const fundMap: Record<string, any> = {}
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
-      stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+      stocks = stocksData.map((s: any) => applyRealPrice(mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {})))
     } else {
       // Unificato su applyUniverseFilter: si fida di in_universe=true, ora
       // affidabile su tutti i continenti grazie alla verifica Leeway
@@ -202,7 +261,7 @@ export async function GET(req: NextRequest) {
       // quindi anche titoli ormai esclusi rimasti nei fondamentali) non
       // serve piu' ed era la causa dello scarto tra "US" (corretto) e
       // "North America"/"Asia Pacific" combinati (gonfiati).
-      stocks = applyUniverseFilter(fundData, stocksData)
+      stocks = applyUniverseFilter(fundData, stocksData).map(applyRealPrice)
     }
     return NextResponse.json({ stocks, source: 'supabase' })
 
