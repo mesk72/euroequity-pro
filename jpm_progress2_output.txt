@@ -1,0 +1,4 @@
+JPM: [{'ticker': 'JPM', 'price': 334.47, 'change1d': 0.1197}]
+AAPL: [{'ticker': 'AAPL', 'price': 308.63}]
+MSFT: [{'ticker': 'MSFT', 'price': 388.84}]
+GOOGL: [{'ticker': 'GOOGL', 'price': 359.91}]
