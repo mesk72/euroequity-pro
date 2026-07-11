@@ -24,3 +24,8 @@ KRX: 0/30 — falliti: ['A088980', 'A011790', 'A358570', 'A383220', 'A298050', '
 SGX: 0/30 — falliti: ['S63', 'AP4', '8C8U', 'V03', 'D05', 'CJLU', 'C52', 'B61', 'AJBU', 'TQ5', 'OYY', 'AGS', 'Q5T', 'J36', '8YZ', 'Y92', 'U06', 'C38U', 'C6L', 'NTDU', 'S41', 'T6I', 'P40U', 'C09', 'U10', 'HMN', 'ULG', 'JYEU', 'VC2', '544']
 
 === RIEPILOGO ===
+US: 30/30
+TSX: 29/30
+MIL: 30/30
+XETRA: 29/30
+PA: 30/30
