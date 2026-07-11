@@ -222,18 +222,7 @@ export async function GET(req: NextRequest) {
         .in('ticker', tickers)
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
-      const searchExchanges = Array.from(new Set(stocksData.map((s: any) => s.exchange))) as string[]
-      const searchPriceMap = await fetchLatestPrices(searchExchanges)
-      const stocks = stocksData.map((s: any) => {
-        const mapped = mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {})
-        const p = searchPriceMap[`${s.ticker}.${s.exchange}`]
-        if (p) {
-          mapped.price = p.price
-          mapped.lastPriceDate = p.date
-          if (p.change1d != null) mapped.change1d = p.change1d
-        }
-        return mapped
-      })
+      const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
       return NextResponse.json({ stocks, source: 'supabase' })
     }
 
@@ -243,27 +232,16 @@ export async function GET(req: NextRequest) {
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf'
 
-    const [stocksData, fundData, priceMap] = await Promise.all([
+    const [stocksData, fundData] = await Promise.all([
       fetchAllByExchange('stocks', stocksSelect, exList, true),
       fetchAll('fundamentals', fundSelect, exList),
-      fetchLatestPrices(exList),
     ])
-
-    const applyRealPrice = (stock: any) => {
-      const p = priceMap[`${stock.ticker}.${stock.exchange}`]
-      if (p) {
-        stock.price = p.price
-        stock.lastPriceDate = p.date
-        if (p.change1d != null) stock.change1d = p.change1d
-      }
-      return stock
-    }
 
     let stocks: any[]
     if (isUSOnly) {
       const fundMap: Record<string, any> = {}
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
-      stocks = stocksData.map((s: any) => applyRealPrice(mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {})))
+      stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
     } else {
       // Unificato su applyUniverseFilter: si fida di in_universe=true, ora
       // affidabile su tutti i continenti grazie alla verifica Leeway
@@ -272,7 +250,7 @@ export async function GET(req: NextRequest) {
       // quindi anche titoli ormai esclusi rimasti nei fondamentali) non
       // serve piu' ed era la causa dello scarto tra "US" (corretto) e
       // "North America"/"Asia Pacific" combinati (gonfiati).
-      stocks = applyUniverseFilter(fundData, stocksData).map(applyRealPrice)
+      stocks = applyUniverseFilter(fundData, stocksData)
     }
     return NextResponse.json({ stocks, source: 'supabase' })
 
