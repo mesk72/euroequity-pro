@@ -401,7 +401,7 @@ if split_suspects:
         time.sleep(0.3)
 
 for i in range(0, len(mom_updates), 100):
-    safe_post(SUPABASE_URL + "/rest/v1/fundamentals", headers_up, mom_updates[i:i+100])
+    safe_post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers_up, mom_updates[i:i+100])
 print(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
