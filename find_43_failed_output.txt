@@ -1,0 +1,4 @@
+Universo: 3000
+Con momentum: 2944
+Mancanti: 68
+['AAOI', 'AIR', 'ALHC', 'AORT', 'BLND', 'BOC', 'CCSI', 'CGEM', 'CODI', 'CPAY', 'CTOS', 'CUBI', 'CXII', 'CXM', 'DBCA', 'DCTH', 'DDI', 'DPC', 'DRTS', 'ECVT', 'ELA', 'EVER', 'EVEX', 'FBRX', 'FISV', 'FRPH', 'GDRX', 'GENI', 'GPRE', 'HKD', 'HONA', 'HRTG', 'HYLN', 'IBEX', 'IBRX', 'IHRT', 'IMMX', 'INDI', 'INDV', 'KARD', 'KEYY', 'KRAQ', 'LINC', 'LOT', 'MBGL', 'MLTX', 'MTUS', 'MTW', 'NB', 'NPKI', 'ODD', 'OLMA', 'OPFI', 'PATH', 'PNTG', 'QBTS', 'REAX', 'RZLV', 'SCSC', 'SRAD', 'STTK', 'VLNT', 'VTEX', 'WOLF', 'WOOF', 'XMTR', 'XPRO', 'YSWY']
