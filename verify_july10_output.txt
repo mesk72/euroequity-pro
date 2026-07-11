@@ -1,6 +1,5 @@
 Universo US: 3000
   ERRORE HTTP 500: {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
-Righe con data = 10 luglio: 0
 Ticker unici al 10 luglio: 0
 Mancanti al 10 luglio: 3000
 Esempio mancanti: ['A', 'AA', 'AADX', 'AAL', 'AAMI', 'AAOI', 'AAON', 'AAP', 'AAPL', 'AAT', 'AB', 'ABBV', 'ABCB', 'ABCL', 'ABG', 'ABM', 'ABNB', 'ABR', 'ABSI', 'ABT']
