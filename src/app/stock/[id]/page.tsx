@@ -284,10 +284,10 @@ function StockPageInner() {
     { label:'PB Rank', val: s.rankPb != null ? String(Math.round(s.rankPb)) : '—', color: s.rankPb >= 70 ? 'var(--green)' : s.rankPb <= 30 ? '#e84560' : '#f59e0b' },
     { label:'EPS Gr Rank', val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b' },
     { label:'Rev Gr Rank', val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'Mom 1 Week', val: stock.mom1w != null ? fp(stock.mom1w * 100, 1) : '—', color: clr(stock.mom1w) },
-    { label:'Mom 1 Month', val: stock.mom1m != null ? fp(stock.mom1m * 100, 1) : '—', color: clr(stock.mom1m) },
-    { label:'Mom 6 Months', val: stock.mom6m != null ? fp(stock.mom6m * 100, 1) : '—', color: clr(stock.mom6m) },
-    { label:'Mom 12 Months', val: stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—', color: clr(stock.mom12m) },
+    { label:'Mom 1 Week', val: momentum?.mom1w != null ? fp(momentum.mom1w, 1) : (stock.mom1w != null ? fp(stock.mom1w * 100, 1) : '—'), color: clr(momentum?.mom1w ?? stock.mom1w) },
+    { label:'Mom 1 Month', val: momentum?.mom1m != null ? fp(momentum.mom1m, 1) : (stock.mom1m != null ? fp(stock.mom1m * 100, 1) : '—'), color: clr(momentum?.mom1m ?? stock.mom1m) },
+    { label:'Mom 6 Months', val: momentum?.mom6m != null ? fp(momentum.mom6m, 1) : (stock.mom6m != null ? fp(stock.mom6m * 100, 1) : '—'), color: clr(momentum?.mom6m ?? stock.mom6m) },
+    { label:'Mom 12 Months', val: momentum?.mom12m != null ? fp(momentum.mom12m, 1) : (stock.mom12m != null ? fp(stock.mom12m * 100, 1) : '—'), color: clr(momentum?.mom12m ?? stock.mom12m) },
   ]
 
   return (
