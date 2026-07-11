@@ -44,3 +44,11 @@ Campione: 45 titoli (15 US, resto EU)
  38. AKZA    .AS     (AKZA          ) HTTP 200 in 1.45s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":59.52,"high":59.76,"low":58.72,"close":59.38,"adjusted_close":59.38,"volume":323991},{"date":"2026-07-02","open":59.4,"hi
  39. ALFEN   .AS     (ALFEN         ) HTTP 200 in 1.07s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":15.75,"high":15.75,"low":15.1,"close":15.36,"adjusted_close":15.36,"volume":253578},{"date":"2026-07-02","open":15.18,"hi
  40. ALLFG   .AS     (ALLFG         ) HTTP 200 in 1.01s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":8.46,"high":8.485,"low":8.4,"close":8.445,"adjusted_close":8.445,"volume":993065},{"date":"2026-07-02","open":8.495,"high
+ 41. ALX     .AS     (ALX           ) HTTP 200 in 1.65s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":5.1,"high":5.11,"low":5.09,"close":5.1,"adjusted_close":5.1,"volume":32012210},{"date":"2026-07-02","open":5.1,"high":5.1
+ 42. AMG     .AS     (AMG           ) HTTP 200 in 1.78s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":338.5,"high":348.5,"low":336.83,"close":336.91,"adjusted_close":336.91,"volume":260776},{"date":"2026-07-02","open":340.7
+ 43. AMUND   .AS     (AMUND         ) HTTP 200 in 1.72s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":1,"high":1,"low":1,"close":1,"adjusted_close":1,"volume":46},{"date":"2026-07-02","open":1,"high":1,"low":1,"close":1,"ad
+ 44. APAM    .AS     (APAM          ) HTTP 200 in 1.16s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":34.58,"high":34.88,"low":33.97,"close":33.97,"adjusted_close":33.97,"volume":906227},{"date":"2026-07-02","open":34.5,"hi
+ 45. ARCAD   .AS     (ARCAD         ) HTTP 200 in 1.46s  ultima_data=2026-07-10  body=[{"date":"2026-07-01","open":33.7,"high":34.28,"low":32,"close":32.94,"adjusted_close":32.94,"volume":243517},{"date":"2026-07-02","open":32.76,"high"
+
+--- Distribuzione HTTP status codes ---
+{200: 42, 429: 3}
