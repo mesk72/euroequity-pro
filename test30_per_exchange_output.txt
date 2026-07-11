@@ -1,5 +1,5 @@
 US: campione 30 — piu' recente: 2026-07-10 (30/30) — distribuzione: {'2026-07-10': 30}
-TSX: campione 30 — piu' recente: 2026-07-10 (5/30) — distribuzione: {'2026-07-07': 24, '2026-07-10': 5, '2026-07-03': 1}
+TSX: campione 30 — piu' recente: 2026-07-10 (30/30) — distribuzione: {'2026-07-10': 30}
 MIL: campione 30 — piu' recente: 2026-07-10 (28/30) — distribuzione: {'2026-07-10': 28, '2026-07-08': 2}
 XETRA: campione 30 — piu' recente: 2026-07-10 (20/30) — distribuzione: {'2026-07-08': 3, '2026-07-09': 2, '2026-07-10': 20, '2026-07-07': 1, '2026-07-03': 4}
 PA: campione 30 — piu' recente: 2026-07-10 (18/30) — distribuzione: {'2026-07-10': 18, '2026-07-03': 6, '2026-07-08': 4, '2026-07-07': 2}
@@ -8,7 +8,7 @@ SWX: campione 30 — piu' recente: 2026-07-10 (17/30) — distribuzione: {'2026-
 OM: campione 30 — piu' recente: 2026-07-10 (20/30) — distribuzione: {'2026-07-10': 20, '2026-07-03': 1, '2026-07-07': 7, '2026-07-08': 2}
 AS: campione 30 — piu' recente: 2026-07-10 (27/30) — distribuzione: {'2026-07-10': 27, '2026-07-07': 1, '2026-07-03': 2}
 MC: campione 30 — piu' recente: 2026-07-10 (25/30) — distribuzione: {'2026-07-10': 25, '2026-07-03': 2, '2026-07-07': 2, '2026-07-08': 1}
-BR: campione 30 — piu' recente: VUOTO (1/30) — distribuzione: {'2026-07-10': 21, 'VUOTO': 1, '2026-07-07': 6, '2026-07-09': 1, '2026-06-30': 1}
+BR: campione 30 — piu' recente: 2026-07-10 (28/30) — distribuzione: {'2026-07-10': 28, '2026-07-09': 1, '2026-06-30': 1}
 LS: campione 30 — piu' recente: 2026-07-10 (29/30) — distribuzione: {'2026-07-10': 29, '2026-07-03': 1}
 VI: campione 30 — piu' recente: 2026-07-10 (22/30) — distribuzione: {'2026-07-10': 22, '2026-07-09': 4, '2026-07-03': 3, '2026-07-08': 1}
 HE: campione 30 — piu' recente: 2026-07-10 (23/30) — distribuzione: {'2026-07-10': 23, '2026-07-03': 3, '2026-07-07': 4}
@@ -16,15 +16,15 @@ IR: campione 15 — piu' recente: 2026-07-10 (13/15) — distribuzione: {'2026-0
 GR: campione 30 — piu' recente: 2026-07-10 (22/30) — distribuzione: {'2026-07-10': 22, '2026-07-03': 5, '2026-07-07': 2, '2026-07-09': 1}
 OB: campione 30 — piu' recente: 2026-07-10 (22/30) — distribuzione: {'2026-07-10': 22, '2026-07-03': 5, '2025-06-24': 1, '2026-07-08': 1, '2026-06-17': 1}
 CPSE: campione 30 — piu' recente: 2026-07-10 (24/30) — distribuzione: {'2026-07-10': 24, '2026-07-07': 4, '2026-07-08': 2}
-TSE: campione 30 — piu' recente: 2026-07-10 (10/30) — distribuzione: {'2026-07-08': 20, '2026-07-10': 10}
-SEHK: campione 30 — piu' recente: 2026-07-10 (11/30) — distribuzione: {'2026-07-08': 19, '2026-07-10': 11}
-ASX: campione 30 — piu' recente: 2026-07-10 (7/30) — distribuzione: {'2026-07-08': 23, '2026-07-10': 7}
+TSE: campione 30 — piu' recente: 2026-07-10 (30/30) — distribuzione: {'2026-07-10': 30}
+SEHK: campione 30 — piu' recente: 2026-07-10 (29/30) — distribuzione: {'2026-07-10': 29, '2026-07-08': 1}
+ASX: campione 30 — piu' recente: 2026-07-10 (30/30) — distribuzione: {'2026-07-10': 30}
 KRX: campione 30 — piu' recente: 2026-07-08 (29/30) — distribuzione: {'2026-07-08': 29, '2026-07-07': 1}
 SGX: campione 30 — piu' recente: 2026-07-08 (29/30) — distribuzione: {'2026-07-08': 29, '2026-07-07': 1}
 
 === RIEPILOGO ===
 US: 30/30 alla data piu' recente (2026-07-10) — OK
-TSX: 5/30 alla data piu' recente (2026-07-10) — PROBLEMA
+TSX: 30/30 alla data piu' recente (2026-07-10) — OK
 MIL: 28/30 alla data piu' recente (2026-07-10) — PROBLEMA
 XETRA: 20/30 alla data piu' recente (2026-07-10) — PROBLEMA
 PA: 18/30 alla data piu' recente (2026-07-10) — PROBLEMA
@@ -33,7 +33,7 @@ SWX: 17/30 alla data piu' recente (2026-07-10) — PROBLEMA
 OM: 20/30 alla data piu' recente (2026-07-10) — PROBLEMA
 AS: 27/30 alla data piu' recente (2026-07-10) — PROBLEMA
 MC: 25/30 alla data piu' recente (2026-07-10) — PROBLEMA
-BR: 1/30 alla data piu' recente (VUOTO) — PROBLEMA
+BR: 28/30 alla data piu' recente (2026-07-10) — PROBLEMA
 LS: 29/30 alla data piu' recente (2026-07-10) — PROBLEMA
 VI: 22/30 alla data piu' recente (2026-07-10) — PROBLEMA
 HE: 23/30 alla data piu' recente (2026-07-10) — PROBLEMA
@@ -41,8 +41,8 @@ IR: 13/15 alla data piu' recente (2026-07-10) — PROBLEMA
 GR: 22/30 alla data piu' recente (2026-07-10) — PROBLEMA
 OB: 22/30 alla data piu' recente (2026-07-10) — PROBLEMA
 CPSE: 24/30 alla data piu' recente (2026-07-10) — PROBLEMA
-TSE: 10/30 alla data piu' recente (2026-07-10) — PROBLEMA
-SEHK: 11/30 alla data piu' recente (2026-07-10) — PROBLEMA
-ASX: 7/30 alla data piu' recente (2026-07-10) — PROBLEMA
+TSE: 30/30 alla data piu' recente (2026-07-10) — OK
+SEHK: 29/30 alla data piu' recente (2026-07-10) — PROBLEMA
+ASX: 30/30 alla data piu' recente (2026-07-10) — OK
 KRX: 29/30 alla data piu' recente (2026-07-08) — PROBLEMA
 SGX: 29/30 alla data piu' recente (2026-07-08) — PROBLEMA
