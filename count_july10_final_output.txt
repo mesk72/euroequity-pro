@@ -1,0 +1,3 @@
+Universo US: 3000
+Al 10 luglio in prices_eod: 0
+Mancanti: 3000
