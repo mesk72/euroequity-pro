@@ -21,11 +21,11 @@ def fetch_all(table, params):
         if len(batch) < 1000: break
     return results
 
-universe = fetch_all("stocks", {"select":"ticker","exchange":"eq.US","in_universe":"eq.true","order":"ticker"})
+# NIENTE order-by costoso — solo filtro, la tabella e' indicizzata su (ticker,exchange,date)
+universe = fetch_all("stocks", {"select":"ticker","exchange":"eq.US","in_universe":"eq.true"})
 print(f"Universo US: {len(universe)}")
 
-at_10 = fetch_all("prices_eod", {"select":"ticker","exchange":"eq.US","date":"eq.2026-07-10","order":"ticker"})
-print(f"Righe con data = 10 luglio: {len(at_10)}")
+at_10 = fetch_all("prices_eod", {"select":"ticker","exchange":"eq.US","date":"eq.2026-07-10"})
 tickers_at_10 = set(row["ticker"] for row in at_10)
 print(f"Ticker unici al 10 luglio: {len(tickers_at_10)}")
 
