@@ -1,1 +1,1 @@
-NVDA completo: [{'ticker': 'NVDA', 'mom1w': 0.0828, 'mom1m': 0.0133, 'mom6m': 0.1426, 'mom12m': 0.2873, 'value_score': 30, 'growth_score': 90, 'combined_rank': 70, 'rank_mom6_adj': 45, 'rank_mom12_adj': 65}]
+NVDA completo: [{'ticker': 'NVDA', 'mom1w': 0.0828, 'mom1m': 0.0133, 'mom6m': 0.1426, 'mom12m': 0.2873, 'value_score': 34, 'growth_score': 90, 'combined_rank': 73, 'rank_mom6_adj': 45, 'rank_mom12_adj': 65}]
