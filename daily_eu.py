@@ -364,7 +364,7 @@ if split_suspects:
                 new_rows.append({"ticker": ticker, "exchange": exchange,
                                   "date": row2["date"], "adj_close": float(adj)})
             for i in range(0, len(new_rows), 500):
-                requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=new_rows[i:i+500])
+                requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=new_rows[i:i+500])
             # Ricalcola il momentum sulla serie fresca appena ricaricata
             new_sorted = sorted(new_rows, key=lambda x: x["date"], reverse=True)
             if len(new_sorted) >= 2:
