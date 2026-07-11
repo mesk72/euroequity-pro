@@ -1,0 +1,1 @@
+NVDA: [{'ticker': 'NVDA', 'price': 210.96, 'change1d': 4.0339, 'mom1w': 8.279, 'mom1m': 1.3305, 'mom6m': 14.258, 'mom12m': 28.727}]
