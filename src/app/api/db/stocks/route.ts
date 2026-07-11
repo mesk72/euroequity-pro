@@ -249,7 +249,7 @@ export async function GET(req: NextRequest) {
       fetchLatestPrices(exList),
     ])
 
-    function applyRealPrice(stock: any) {
+    const applyRealPrice = (stock: any) => {
       const p = priceMap[`${stock.ticker}.${stock.exchange}`]
       if (p) {
         stock.price = p.price
