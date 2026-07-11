@@ -1,0 +1,5 @@
+Test su 23 mercati, 30 titoli ciascuno
+US: 30/30
+TSX: 29/30 — falliti: ['MRG.UN']
+MIL: 30/30
+XETRA: 29/30 — falliti: ['MNV6']
