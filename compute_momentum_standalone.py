@@ -67,7 +67,7 @@ for i, ticker in enumerate(all_tickers):
         prev_price = prices_by_date[prev_date_sorted[1]] if len(prev_date_sorted) > 1 else None
 
         p1w = nearest_price(prices_by_date, latest_dt - timedelta(days=7), 4)
-        p1m = nearest_price(prices_by_date, latest_dt - timedelta(days=31), 6)
+        p1m = nearest_price(prices_by_date, latest_dt - timedelta(days=30), 6)
         p6m = nearest_price(prices_by_date, latest_dt - timedelta(days=182), 12)
         p12m = nearest_price(prices_by_date, latest_dt - timedelta(days=365), 15)
 
