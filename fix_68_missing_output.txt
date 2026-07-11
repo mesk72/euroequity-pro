@@ -1,0 +1,72 @@
+AAOI: 16 righe, piu' recente 2025-06-30=25.69
+AIR: 21 righe, piu' recente 2026-07-10=135.67
+ALHC: 16 righe, piu' recente 2025-06-30=14.0
+AORT: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+BLND: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+BOC: 5 righe, piu' recente 2026-07-10=14.09
+CCSI: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+CGEM: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+CODI: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+CPAY: 16 righe, piu' recente 2025-06-30=331.82
+CTOS: 16 righe, piu' recente 2025-06-30=4.94
+CUBI: 16 righe, piu' recente 2025-06-30=58.74
+CXII: 16 righe, piu' recente 2026-07-10=10.65
+CXM: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+DBCA: 5 righe, piu' recente 2026-07-10=9.995
+DCTH: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+DDI: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+DPC: 11 righe, piu' recente 2026-07-10=48.88
+DRTS: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+ECVT: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+ELA: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+EVER: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+EVEX: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+FBRX: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+FISV: 19 righe, piu' recente 2026-07-10=50.45
+FRPH: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+GDRX: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+GENI: 16 righe, piu' recente 2025-06-30=10.4
+GPRE: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+HKD: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+HONA: 3 righe, piu' recente 2026-07-10=220.75
+HRTG: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+HYLN: 5 righe, piu' recente 2026-07-10=4.13
+IBEX: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+IBRX: 16 righe, piu' recente 2025-06-30=2.64
+IHRT: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+IMMX: 5 righe, piu' recente 2026-07-10=11.11
+INDI: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+INDV: 16 righe, piu' recente 2025-06-30=14.74
+KARD: 10 righe, piu' recente 2026-07-02=24.35
+KEYY: 14 righe, piu' recente 2026-07-10=9.865
+KRAQ: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+LINC: 16 righe, piu' recente 2025-06-30=23.05
+LOT: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+MBGL: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+MLTX: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+MTUS: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+MTW: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+NB: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+NPKI: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+ODD: 3 righe, piu' recente 2026-07-10=17.08
+OLMA: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+OPFI: 5 righe, piu' recente 2026-07-10=9.44
+PATH: 16 righe, piu' recente 2025-06-30=12.8
+PNTG: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+QBTS: 21 righe, piu' recente 2026-07-10=20.09
+REAX: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+RZLV: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+SCSC: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+SRAD: 67 righe, piu' recente 2026-07-10=15.45
+STTK: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+VLNT: 15 righe, piu' recente 2026-07-09=22.65
+VTEX: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+WOLF: 16 righe, piu' recente 2025-06-30=0.3988
+WOOF: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+XMTR: 19 righe, piu' recente 2026-07-10=96.07
+XPRO: 16 righe, piu' recente 2025-06-30=8.59
+YSWY: NESSUN PREZZO in prices_eod per gli ultimi 400 giorni — dato mancante a monte, non un bug di calcolo
+
+Scrittura 29 righe: HTTP 200
+
+FINALE: ok=29 fail=39 su 68
