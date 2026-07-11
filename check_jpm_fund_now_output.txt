@@ -1,0 +1,1 @@
+JPM fundamentals ora: [{'ticker': 'JPM', 'price': 334.47, 'change1d': 0.1197, 'mom1w': -0.0019, 'mom1m': 0.1278, 'mom6m': 0.0375, 'mom12m': 0.1677}]
