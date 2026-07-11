@@ -2099,3 +2099,54 @@ utile è probabilmente ottenere la distribuzione HTTP reale (STATUS_COUNTS,
 già presente nel codice di daily_eu.py/daily_us.py/daily_apac.py) da un
 run completo, e da lì decidere se il problema è rate limiting lato
 Leeway o qualcos'altro di ancora non diagnosticato.
+
+---
+
+## Sessione pomeriggio 11 luglio 2026 — trovata la causa vera dei "prezzi fermi"
+
+**Scoperta chiave**: il sito non ha MAI letto prezzo/variazione/momentum da `prices_eod`
+(la tabella che correggevo dalla notte) per la visualizzazione. Legge da campi statici
+dentro `fundamentals` (price, change1d, mom1w, mom1m, mom6m, mom12m), aggiornati SOLO
+dal passo [4/5] "Calcolo momentum" dei daily script — passo che aveva lo stesso bug
+`on_conflict` mancante (US/APAC) o una scrittura troppo lenta un-PATCH-per-titolo (EU).
+
+**Fix applicati**:
+- `daily_us.py`, `daily_apac.py`: aggiunto `on_conflict=ticker,exchange` alla scrittura
+  batch del momentum su `fundamentals` (stesso bug gia' trovato per `prices_eod`).
+- `daily_eu.py`: sostituito un loop con un PATCH separato per ogni titolo (troppo lento,
+  migliaia di round-trip) con lo stesso batch veloce POST+on_conflict.
+- `route.ts` (pagina titolo singolo): ora legge prezzo/data dal record piu' recente di
+  `prices_eod` invece che da `fundamentals.price` statico. Confermato funzionante,
+  verificato contro Yahoo (JPM 336.47 = 336,47 identico).
+
+**ERRORE FATTO E CORRETTO**: avevo esteso lo stesso fix "prezzo in tempo reale" anche
+agli SCREENER (liste di molti titoli), aggiungendo una funzione che per ogni richiesta
+faceva query paginate su `prices_eod` per OGNI borsa nella lista (16 per l'Europa).
+Troppo pesante — ha mandato in timeout EU e APAC (restituivano zero titoli) e troncato
+US a 1400/3000. **Ripristinato** il percorso screener al comportamento precedente
+(legge da fundamentals, veloce ma non ancora in tempo reale) finche' non si trova un
+metodo efficiente per farlo in blocco senza timeout.
+
+**Conseguenza logica, non ancora verificata**: dato che il fix on_conflict per il
+momentum ora scrive correttamente anche `fundamentals.price`/`change1d`/`mom*` ogni
+notte (stesso step che gia' esisteva, solo la scrittura era rotta), UNA VOLTA CHE UN
+RUN COMPLETO SI ESEGUE CON QUESTO FIX, gli screener dovrebbero tornare ad essere
+corretti SENZA bisogno del fix rischioso in tempo reale — perche' la fonte che leggono
+(fundamentals) sara' finalmente tenuta aggiornata alla radice.
+
+**Test di verifica sistematico eseguito** (30 titoli campione per singola borsa,
+controllando `prices_eod`, non ancora `fundamentals`): US 30/30 perfetto. EU 70-97%
+sulla maggior parte, ma TSX 5/30 e BR 1/30 chiaramente rotti. APAC: KRX/SGX 29/30
+(quasi perfetti), TSE 10/30, SEHK 11/30, ASX 7/30 chiaramente rotti. Fetch diretto da
+Leeway per questi 5 mercati problematici: 73/75 riusciti puliti — quindi NON e' un
+problema di formato ticker o di disponibilita' dati, e' insufficiente tempo/round nel
+run notturno per quei titoli specifici. Catchup mirato lanciato per recuperarli.
+
+**Pulizia**: eliminato `reverse_earnings_model_us.yml`, workflow ridondante e rotto
+(non registrava piu' `workflow_dispatch`) che generava decine di email di errore —
+il calcolo del Reverse Earnings Model gira comunque correttamente incatenato dentro
+`fetch_beta_us.yml`.
+
+**Prossimo passo in corso**: dispatch reale di `daily_us.py` per verificare end-to-end
+che il fix on_conflict al momentum funzioni in un vero run notturno, non solo nei test
+isolati.
