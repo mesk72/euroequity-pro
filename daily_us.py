@@ -128,14 +128,14 @@ for ex, tks in by_exchange.items():
 print("\n[2/5] Download prezzi EOD da Leeway...")
 CHUNK = 20
 
-def safe_post(url, headers, json_data, retries=2, params=None):
+def safe_post(url, headers, json_data, retries=2):
     """POST con retry: sia su errori di rete SIA su risposte HTTP di errore.
     Prima catturava solo le eccezioni di rete e ignorava lo status code —
     un batch rifiutato da Supabase (400/409/422/5xx) passava per riuscito
     in silenzio, mentre i dati non venivano mai scritti davvero."""
     for attempt in range(retries + 1):
         try:
-            resp = requests.post(url, headers=headers, json=json_data, params=params, timeout=30)
+            resp = requests.post(url, headers=headers, json=json_data, timeout=30)
             if resp.status_code in (200, 201, 204):
                 return resp
             print(f"  WARN scrittura rifiutata da Supabase: HTTP {resp.status_code} — {resp.text[:200]}")
@@ -189,7 +189,7 @@ def _fetch_leeway(lt, from_d, to_d):
     return None
 
 WEEK_AGO = (datetime.strptime(TODAY, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
-MAX_ROUNDS = 20
+MAX_ROUNDS = 6
 ok_leeway = fail_leeway = 0
 price_buf = []
 batch_owners = []   # (stock, new_max_date) per ogni riga in price_buf, stesso ordine
@@ -203,7 +203,7 @@ def flush_batch():
     global price_buf, batch_owners, ok_leeway
     if not price_buf:
         return []
-    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf, params={"on_conflict":"ticker,exchange,date"})
+    resp = safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
     owners_this_batch = batch_owners
     price_buf = []
     batch_owners = []
@@ -260,7 +260,7 @@ for round_num in range(1, MAX_ROUNDS + 1):
     still_pending.extend(write_failed)
     pending = still_pending
     if pending and round_num < MAX_ROUNDS:
-        pausa = min(20 * round_num, 90)
+        pausa = min(10 * round_num, 30)
         print(f"  {len(pending)} ancora falliti — pausa {pausa}s prima del prossimo giro...")
         time.sleep(pausa)
 
@@ -283,7 +283,7 @@ if pending:
             print(f"    {ticker}.{exchange} ({company}): impossibile diagnosticare ({e})")
 if price_buf:
 
-    safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf, params={"on_conflict":"ticker,exchange,date"})
+    safe_post(SUPABASE_URL + "/rest/v1/prices_eod", headers_up, price_buf)
 print(f"  Distribuzione codici HTTP/errori su tutte le chiamate: {STATUS_COUNTS}")
 print(f"  Prezzi Leeway: ok={ok_leeway} fail={fail_leeway}")
 ok_prices = ok_leeway; fail_prices = fail_leeway
