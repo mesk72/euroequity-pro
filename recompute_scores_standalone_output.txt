@@ -1,4 +1,5 @@
-Fundamentals US letti: 3963
-Titoli rankati: 3963
+Universo reale (in_universe=true): 3000
+Fundamentals US letti (grezzo): 3963 — filtrati a in_universe: 3000
+Titoli rankati: 3000
 
-FINALE: scritti ok=3963 fail=0 su 3963
+FINALE: scritti ok=3000 fail=0 su 3000
