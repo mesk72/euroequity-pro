@@ -1,46 +1,43 @@
 ======================================================================
-HEALTH CHECK — 2026-07-11 10:36 UTC
+HEALTH CHECK — 2026-07-11 11:19 UTC
 ======================================================================
 US       count= 3000/3000   campione_fresco=17/20  eta_max_campione=9gg  [PROBLEMA]
 TSX      count=  400/400    campione_fresco=19/20  eta_max_campione=8gg  [OK]
-LSE      count=  424/-      campione_fresco=11/20  eta_max_campione=8gg  [PROBLEMA]
-XETRA    count=  211/-      campione_fresco=13/20  eta_max_campione=8gg  [PROBLEMA]
-PA       count=  217/-      campione_fresco=9/20  eta_max_campione=8gg  [PROBLEMA]
-OM       count=  206/-      campione_fresco=15/20  eta_max_campione=8gg  [PROBLEMA]
-SWX      count=  161/-      campione_fresco=17/20  eta_max_campione=8gg  [PROBLEMA]
-MIL      count=  117/-      campione_fresco=10/20  eta_max_campione=9gg  [PROBLEMA]
-AS       count=   98/100    campione_fresco=8/20  eta_max_campione=8gg  [PROBLEMA]
-MC       count=  100/100    campione_fresco=11/20  eta_max_campione=8gg  [PROBLEMA]
-BR       count=  100/100    campione_fresco=14/20  eta_max_campione=8gg  [PROBLEMA]
-HE       count=  100/100    campione_fresco=13/20  eta_max_campione=8gg  [PROBLEMA]
-CPSE     count=  100/100    campione_fresco=17/20  eta_max_campione=8gg  [PROBLEMA]
-OB       count=  100/100    campione_fresco=8/20  eta_max_campione=382gg  [PROBLEMA]
-GR       count=  100/100    campione_fresco=9/20  eta_max_campione=9gg  [PROBLEMA]
-VI       count=   53/-      campione_fresco=3/20  eta_max_campione=8gg  [PROBLEMA]
-IR       count=   15/-      campione_fresco=5/15  eta_max_campione=8gg  [PROBLEMA]
-LS       count=   35/-      campione_fresco=4/20  eta_max_campione=8gg  [PROBLEMA]
+LSE      count=  424/-      campione_fresco=13/20  eta_max_campione=8gg  [PROBLEMA]
+XETRA    count=  211/-      campione_fresco=15/20  eta_max_campione=8gg  [PROBLEMA]
+PA       count=  217/-      campione_fresco=10/20  eta_max_campione=8gg  [PROBLEMA]
+OM       count=  206/-      campione_fresco=18/20  eta_max_campione=8gg  [OK]
+SWX      count=  161/-      campione_fresco=18/20  eta_max_campione=8gg  [OK]
+MIL      count=  117/-      campione_fresco=14/20  eta_max_campione=8gg  [PROBLEMA]
+AS       count=   98/100    campione_fresco=13/20  eta_max_campione=8gg  [PROBLEMA]
+MC       count=  100/100    campione_fresco=14/20  eta_max_campione=8gg  [PROBLEMA]
+BR       count=  100/100    campione_fresco=16/20  eta_max_campione=8gg  [PROBLEMA]
+HE       count=  100/100    campione_fresco=16/20  eta_max_campione=8gg  [PROBLEMA]
+CPSE     count=  100/100    campione_fresco=20/20  eta_max_campione=4gg  [OK]
+OB       count=  100/100    campione_fresco=13/20  eta_max_campione=382gg  [PROBLEMA]
+GR       count=  100/100    campione_fresco=13/20  eta_max_campione=8gg  [PROBLEMA]
+VI       count=   53/-      campione_fresco=12/20  eta_max_campione=8gg  [PROBLEMA]
+IR       count=   15/-      campione_fresco=8/15  eta_max_campione=8gg  [PROBLEMA]
+LS       count=   35/-      campione_fresco=8/20  eta_max_campione=8gg  [PROBLEMA]
 TSE      count= 1000/1000   campione_fresco=20/20  eta_max_campione=3gg  [OK]
 SEHK     count=  500/500    campione_fresco=20/20  eta_max_campione=3gg  [OK]
 ASX      count=  350/350    campione_fresco=20/20  eta_max_campione=3gg  [OK]
 KRX      count=  400/400    campione_fresco=20/20  eta_max_campione=3gg  [OK]
 SGX      count=  100/100    campione_fresco=20/20  eta_max_campione=4gg  [OK]
 ----------------------------------------------------------------------
-STATO GENERALE: PROBLEMA (17 mercati)
+STATO GENERALE: PROBLEMA (14 mercati)
   - US: count=3000/3000 fresh=17/20 eta_max=9gg
-  - LSE: count=424/- fresh=11/20 eta_max=8gg
-  - XETRA: count=211/- fresh=13/20 eta_max=8gg
-  - PA: count=217/- fresh=9/20 eta_max=8gg
-  - OM: count=206/- fresh=15/20 eta_max=8gg
-  - SWX: count=161/- fresh=17/20 eta_max=8gg
-  - MIL: count=117/- fresh=10/20 eta_max=9gg
-  - AS: count=98/100 fresh=8/20 eta_max=8gg
-  - MC: count=100/100 fresh=11/20 eta_max=8gg
-  - BR: count=100/100 fresh=14/20 eta_max=8gg
-  - HE: count=100/100 fresh=13/20 eta_max=8gg
-  - CPSE: count=100/100 fresh=17/20 eta_max=8gg
-  - OB: count=100/100 fresh=8/20 eta_max=382gg
-  - GR: count=100/100 fresh=9/20 eta_max=9gg
-  - VI: count=53/- fresh=3/20 eta_max=8gg
-  - IR: count=15/- fresh=5/15 eta_max=8gg
-  - LS: count=35/- fresh=4/20 eta_max=8gg
+  - LSE: count=424/- fresh=13/20 eta_max=8gg
+  - XETRA: count=211/- fresh=15/20 eta_max=8gg
+  - PA: count=217/- fresh=10/20 eta_max=8gg
+  - MIL: count=117/- fresh=14/20 eta_max=8gg
+  - AS: count=98/100 fresh=13/20 eta_max=8gg
+  - MC: count=100/100 fresh=14/20 eta_max=8gg
+  - BR: count=100/100 fresh=16/20 eta_max=8gg
+  - HE: count=100/100 fresh=16/20 eta_max=8gg
+  - OB: count=100/100 fresh=13/20 eta_max=382gg
+  - GR: count=100/100 fresh=13/20 eta_max=8gg
+  - VI: count=53/- fresh=12/20 eta_max=8gg
+  - IR: count=15/- fresh=8/15 eta_max=8gg
+  - LS: count=35/- fresh=8/20 eta_max=8gg
 ======================================================================
