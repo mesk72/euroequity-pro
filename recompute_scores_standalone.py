@@ -103,9 +103,13 @@ for p in pre:
     growth_score = int(round(pct_rank(gr_sums,  sum(gr_inputs))))  if len(gr_inputs) >= 3 and gr_sums  else None
     results.append({"ticker": p['ticker'], "exchange": p['exchange'],
                     "value_score": value_score, "growth_score": growth_score,
-                    "rank_pe_ltm": p['r_eyt'], "rank_pe_ntm": p['r_eyf'], "rank_pb": p['r_pb'],
-                    "rank_eps_gr": p['r_epsg'], "rank_rev_gr": p['r_revg'],
-                    "rank_mom6_adj": p['r_m6'], "rank_mom12_adj": p['r_m12']})
+                    "rank_pe_ltm": round(p['r_eyt']) if p['r_eyt'] is not None else None,
+                    "rank_pe_ntm": round(p['r_eyf']) if p['r_eyf'] is not None else None,
+                    "rank_pb": round(p['r_pb']) if p['r_pb'] is not None else None,
+                    "rank_eps_gr": round(p['r_epsg']) if p['r_epsg'] is not None else None,
+                    "rank_rev_gr": round(p['r_revg']) if p['r_revg'] is not None else None,
+                    "rank_mom6_adj": round(p['r_m6']) if p['r_m6'] is not None else None,
+                    "rank_mom12_adj": round(p['r_m12']) if p['r_m12'] is not None else None})
 
 # combined_rank
 scored = [r for r in results if r['value_score'] is not None and r['growth_score'] is not None]
