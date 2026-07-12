@@ -1,0 +1,1 @@
+ASML: [{'ticker': 'ASML', 'price': 1569.0, 'change1d': -0.021088, 'mom1w': -0.04, 'mom1m': 0.041, 'mom6m': 0.4558, 'mom12m': 1.2921}]
