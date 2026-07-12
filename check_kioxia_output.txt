@@ -1,0 +1,33 @@
+Kioxia ultimi 20 prezzi:
+  {'date': '2026-07-10', 'adj_close': 77000.0}
+  {'date': '2026-07-09', 'adj_close': 77860.0}
+  {'date': '2026-07-08', 'adj_close': 71870.0}
+  {'date': '2026-07-07', 'adj_close': 72400.0}
+  {'date': '2026-07-06', 'adj_close': 81590.0}
+  {'date': '2026-07-03', 'adj_close': 83300.0}
+  {'date': '2026-07-02', 'adj_close': 76260.0}
+  {'date': '2026-07-01', 'adj_close': 88130.0}
+  {'date': '2026-06-30', 'adj_close': 89680.0}
+  {'date': '2026-06-29', 'adj_close': 88450.0}
+  {'date': '2026-06-26', 'adj_close': 92180.0}
+  {'date': '2026-06-25', 'adj_close': 103850.0}
+  {'date': '2026-06-24', 'adj_close': 92500.0}
+  {'date': '2026-06-23', 'adj_close': 92290.0}
+  {'date': '2026-06-22', 'adj_close': 108700.0}
+  {'date': '2026-06-19', 'adj_close': 108600.0}
+  {'date': '2026-06-18', 'adj_close': 96900.0}
+  {'date': '2026-06-17', 'adj_close': 96000.0}
+  {'date': '2026-06-16', 'adj_close': 94720.0}
+  {'date': '2026-06-15', 'adj_close': 90910.0}
+
+Kioxia intorno a un anno fa:
+  {'date': '2025-07-01', 'adj_close': 2363.0}
+  {'date': '2025-07-02', 'adj_close': 2412.0}
+  {'date': '2025-07-03', 'adj_close': 2548.0}
+  {'date': '2025-07-04', 'adj_close': 2380.0}
+  {'date': '2025-07-07', 'adj_close': 2460.0}
+  {'date': '2025-07-08', 'adj_close': 2554.0}
+  {'date': '2025-07-09', 'adj_close': 2708.0}
+  {'date': '2025-07-10', 'adj_close': 2557.0}
+  {'date': '2025-07-11', 'adj_close': 2488.0}
+  {'date': '2025-07-14', 'adj_close': 2437.0}
