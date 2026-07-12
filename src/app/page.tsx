@@ -2707,11 +2707,20 @@ function AppContent() {
             ? <Screener key="bestgrowth_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth Asia Pacific" />
           )}
-          {page === 'usscreen' && <Screener key={'usscreen-'+scrSectorUS} initExchange='US' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
+          {page === 'usscreen' && <Screener key={'usscreen-'+scrSectorUS} initExchange='US,TSX' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
-          {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
-          {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); navigateTo('northamerica') }} />}
-          {page === 'sectors_ap' && <SectorScreenAP onSectorClick={(s) => { setScrSectorAP(s); navigateTo('asiapacific') }} />}
+          {page === 'sectors'   && (user
+            ? <SectorScreen onSectorClick={goSector} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Sector Heatmap — All Europe" />
+          )}
+          {page === 'sectors_us' && (user
+            ? <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); navigateTo('usscreen') }} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Sector Heatmap — North America" />
+          )}
+          {page === 'sectors_ap' && (user
+            ? <SectorScreenAP onSectorClick={(s) => { setScrSectorAP(s); navigateTo('asiapacific') }} />
+            : <LoginGate onLogin={() => setShowAuth(true)} title="Sector Heatmap — Asia Pacific" />
+          )}
           {page === 'about' && (
             <div className="flex-1 overflow-y-auto">
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
