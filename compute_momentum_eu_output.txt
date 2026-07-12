@@ -1,0 +1,34 @@
+=== MIL: 117 titoli ===
+  MIL FINALE: ok=117 fail=0
+=== XETRA: 211 titoli ===
+  XETRA FINALE: ok=210 fail=1
+=== PA: 217 titoli ===
+  PA FINALE: ok=216 fail=1
+=== LSE: 424 titoli ===
+  LSE FINALE: ok=424 fail=0
+=== SWX: 161 titoli ===
+  SWX FINALE: ok=161 fail=0
+=== OM: 206 titoli ===
+  OM FINALE: ok=206 fail=0
+=== AS: 98 titoli ===
+  AS FINALE: ok=98 fail=0
+=== MC: 100 titoli ===
+  MC FINALE: ok=100 fail=0
+=== BR: 100 titoli ===
+  BR FINALE: ok=100 fail=0
+=== HE: 100 titoli ===
+  HE FINALE: ok=100 fail=0
+=== CPSE: 100 titoli ===
+  CPSE FINALE: ok=100 fail=0
+=== OB: 100 titoli ===
+  OB FINALE: ok=100 fail=0
+=== GR: 100 titoli ===
+  GR FINALE: ok=100 fail=0
+=== VI: 53 titoli ===
+  VI FINALE: ok=53 fail=0
+=== IR: 15 titoli ===
+  IR FINALE: ok=15 fail=0
+=== LS: 35 titoli ===
+  LS FINALE: ok=35 fail=0
+
+TOTALE EU: ok=2135 fail=2
