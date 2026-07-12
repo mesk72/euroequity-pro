@@ -45,7 +45,10 @@ function computeSectors(stocks: Stock[], field: string): SectorData[] {
   for (const [sector, ss] of Array.from(map.entries())) {
     const valid = ss.filter(s => s.mktCap && (s as any)[field] != null)
     const totalMkt = valid.reduce((a, s) => a + (s.mktCap || 0), 0)
-    const multiplier = field === 'change1d' ? 1 : 100
+    // change1d ora e' salvato come decimale grezzo, stessa convenzione di
+    // mom1w/mom1m/mom6m/mom12m — l'eccezione (moltiplicatore 1) risale a
+    // quando change1d aveva una scala diversa, non piu' valida.
+    const multiplier = 100
     const mcwReturn = totalMkt > 0
       ? valid.reduce((a, s) => a + ((s as any)[field] || 0) * (s.mktCap || 0), 0) / totalMkt * multiplier
       : 0
