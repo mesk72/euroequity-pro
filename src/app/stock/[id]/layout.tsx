@@ -23,9 +23,18 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       'ForwardAlpha quantitative equity research.',
     ].filter(Boolean).join(' ')
 
+    // Titoli esclusi dall'universo (market cap troppo basso, settore escluso,
+    // ecc.) non devono essere indicizzati da Google — evita che pagine con
+    // dati incompleti/vecchi (es. senza Growth Score) vengano proposte come
+    // risultati di ricerca prominenti.
+    const robots = stock.inUniverse === false
+      ? { index: false, follow: false }
+      : undefined
+
     return {
       title,
       description: desc,
+      robots,
       openGraph: {
         title,
         description: desc,
