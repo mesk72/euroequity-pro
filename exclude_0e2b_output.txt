@@ -1,0 +1,2 @@
+Trovato: [{'ticker': '0E2B', 'exchange': 'LSE', 'company': 'Multi Units Luxembourg - Amundi Smart Overnight Return'}]
+Esclusione: HTTP 204
