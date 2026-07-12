@@ -1,0 +1,22 @@
+SAF fundamentals: [{'price': 356.7, 'mom1m': 0.2141, 'mom1w': 0.0721}]
+
+Ultimi prezzi (piu' recenti in cima):
+  {'date': '2026-07-03', 'adj_close': 356.7}
+  {'date': '2026-07-02', 'adj_close': 353.3}
+  {'date': '2026-07-01', 'adj_close': 349.9}
+  {'date': '2026-06-30', 'adj_close': 345.0}
+  {'date': '2026-06-29', 'adj_close': 336.5}
+  {'date': '2026-06-26', 'adj_close': 332.7}
+  {'date': '2026-06-25', 'adj_close': 343.7}
+  {'date': '2026-06-24', 'adj_close': 338.4}
+  {'date': '2026-06-23', 'adj_close': 331.1}
+  {'date': '2026-06-22', 'adj_close': 331.2}
+
+Data piu' recente: 2026-07-03
+Target 30 giorni fa: 2026-06-03
+Target 31 giorni fa: 2026-06-02
+
+Prezzo trovato vicino a target 30gg: 293.8
+Prezzo trovato vicino a target 31gg: 298.0
+mom1m con finestra 30gg: 21.41%
+mom1m con finestra 31gg: 19.70%
