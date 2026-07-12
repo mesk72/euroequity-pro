@@ -690,6 +690,9 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
   // Filters
   const [search,   setSearch]   = useState('')
+  const [gSearch,    setGSearch]    = useState('')
+  const [gSearchRes, setGSearchRes] = useState<any[]>([])
+  const gSearchTimer = useRef<any>(null)
   const [sector,   setSector]   = useState(initSector)
   const [valMin,      setValMin]      = useState(initValMin)
   const [growMin,     setGrowMin]     = useState(initGrowMin)
@@ -794,8 +797,49 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     new Set(stocks.map(s => s.sector).filter(Boolean) as string[])
   ).sort()]
 
+  useEffect(() => {
+    clearTimeout(gSearchTimer.current)
+    if (gSearch.length < 2) { setGSearchRes([]); return }
+    gSearchTimer.current = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(gSearch)}&limit=10`)
+        if (r.ok) {
+          const d = await r.json()
+          setGSearchRes(d.stocks || [])
+        }
+      } catch {}
+    }, 200)
+  }, [gSearch])
+
   return (
     <div className="space-y-3 p-3">
+
+      {/* Ricerca globale — qualsiasi titolo, qualsiasi mercato */}
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+        <input
+          value={gSearch}
+          onChange={e => setGSearch(e.target.value)}
+          placeholder="Search any ticker or company, any market…"
+          className="input-field pl-9 text-sm"
+        />
+        {gSearchRes.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-surface border border-border rounded-lg mt-1 z-30 shadow-xl overflow-hidden">
+            {gSearchRes.map((r: any) => (
+              <div key={`${r.ticker}.${r.exchange}`}
+                onClick={() => { setGSearch(''); setGSearchRes([]); goToStock(r.ticker, r.exchange) }}
+                className="px-4 py-2.5 text-sm hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-border last:border-0">
+                <span style={{ fontSize:15 }}>{r.flag || ''}</span>
+                <span className="font-700 text-text w-24 truncate">{r.ticker}</span>
+                <span className="text-sub flex-1 truncate">{r.company}</span>
+                <span style={{ fontFamily:'IBM Plex Mono', fontSize:11, color:'var(--text3)' }}>{r.price?.toFixed(2)||'-'}</span>
+                <span className="badge badge-delay text-[9px]">{r.exchange}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Exchange tabs */}
       <div className="flex gap-1.5 flex-wrap pb-1">
         {[
