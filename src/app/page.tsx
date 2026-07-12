@@ -137,7 +137,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
   )
 }
 
-type Page = 'home' | 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'KRX' | 'SGX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
+type Page = 'home' | 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'globalscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'KRX' | 'SGX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
 
 // - API CALLS -
 async function apiExchange(code: string): Promise<Stock[]> {
@@ -712,7 +712,8 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
   useEffect(() => {
     setStocks([]); setSelected(null); setLoading(true)
-    const exchToLoad = initEpsMom ? 'EZ' : exchange
+    const ALL_GLOBAL_EXCHANGES = 'US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX'
+    const exchToLoad = initEpsMom ? 'EZ' : (exchange === 'GLOBAL' ? ALL_GLOBAL_EXCHANGES : exchange)
     apiExchange(exchToLoad).then(data => {
       // Calcola euroRank su All Europe usando metriche raw
       const ey = (pe: number | null) => (pe && pe !== 0 && Math.abs(pe) <= 200) ? 1/pe : null
@@ -843,6 +844,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       {/* Exchange tabs */}
       <div className="flex gap-1.5 flex-wrap pb-1">
         {[
+          { code: 'GLOBAL',        label: '🌐 Global' },
           { code: 'US,TSX',        label: '🌎 North America' },
           { code: 'EZ',            label: '🌍 All Europe' },
           { code: 'EMU',           label: '🇪🇺 Eurozone' },
@@ -2395,6 +2397,7 @@ function AppContent() {
 
   const singleMarkets = [
     { id: 'myscreen' as Page, label: '⭐ My Screen' },
+    { id: 'globalscreen' as Page, label: '🌐 Global' },
     { id: 'nascreen' as Page, label: '🌎 North America' },
     { id: 'screener' as Page, label: '🌍 All Europe' },
     { id: 'eurozone' as Page, label: '🇪🇺 Eurozone' },
@@ -2686,6 +2689,7 @@ function AppContent() {
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
           {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); navigateTo('northamerica') }} onSelectStock={setDetailStock} />}
+          {page === 'globalscreen' && <Screener key="globalscreen" initExchange="US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={1000} />}
           {page === 'nascreen' && <Screener key={`nascreen-${scrSectorUS}`} initExchange="US,TSX" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
           {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { navigateTo('asiapacific') }} onSelectStock={setDetailStock} />}
           {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX,KRX,SGX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
