@@ -1,0 +1,21 @@
+Titoli Healthcare APAC con dati: 170
+Media ponderata 12M (cap attuale): 19.86%
+
+Top 10 per market cap:
+  4519 (Chugai Pharmaceutical Co., Ltd): mktcap=76195.3B mom12m=10.6%
+  7741 (HOYA Corporation): mktcap=53344.2B mom12m=42.2%
+  4502 (Takeda Pharmaceutical Company ): mktcap=50047.9B mom12m=28.6%
+  A207940 (Samsung Biologics Co.,Ltd.): mktcap=41498.2B mom12m=36.3%
+  CSL (CSL Limited): mktcap=37878.5B mom12m=-48.0%
+  4578 (Otsuka Holdings Co., Ltd.): mktcap=34960.4B mom12m=71.9%
+  4568 (Daiichi Sankyo Company, Limite): mktcap=28665.1B mom12m=-12.8%
+  A068270 (Celltrion, Inc.): mktcap=24544.7B mom12m=6.2%
+  4503 (Astellas Pharma Inc.): mktcap=23944.7B mom12m=61.8%
+  3692 (Hansoh Pharmaceutical Group Co): mktcap=22896.1B mom12m=1.4%
+
+Peggiori 5 per mom12m:
+  4974 (Takara Bio Inc.): mktcap=846.5B mom12m=-99.9%
+  A358570 (GI Innovation, Inc.): mktcap=427.8B mom12m=-60.2%
+  1952 (Everest Medicines Limited): mktcap=1097.9B mom12m=-59.2%
+  COH (Cochlear Limited): mktcap=5488.6B mom12m=-59.0%
+  6855 (Ascentage Pharma Group Interna): mktcap=1557.9B mom12m=-54.8%
