@@ -224,29 +224,14 @@ export async function GET(req: NextRequest) {
       const hist: any[] = histRes.data || []
       if (hist.length > 1) {
         const latest = hist[0]
-        const latestDate = new Date(latest.date)
-        const findClosest = (daysAgo: number) => {
-          const target = new Date(latestDate)
-          target.setDate(target.getDate() - daysAgo)
-          let best = null, bestDiff = Infinity
-          for (const row of hist) {
-            const diff = Math.abs(new Date(row.date).getTime() - target.getTime())
-            if (diff < bestDiff) { bestDiff = diff; best = row }
-          }
-          return best
-        }
-        const pctChange = (base: any) => (base && base.adj_close ? (latest.adj_close / base.adj_close - 1) * 100 : null)
         const prevDay = hist[1]
-        const c1d = pctChange(prevDay)
+        const c1d = prevDay && prevDay.adj_close ? (latest.adj_close / prevDay.adj_close - 1) * 100 : null
         if (c1d != null) mapped.change1d = c1d
-        const m1w = pctChange(findClosest(7))
-        const m1m = pctChange(findClosest(30))
-        const m6m = pctChange(findClosest(182))
-        const m12m = pctChange(findClosest(365))
-        if (m1w != null) mapped.mom1w = m1w
-        if (m1m != null) mapped.mom1m = m1m
-        if (m6m != null) mapped.mom6m = m6m
-        if (m12m != null) mapped.mom12m = m12m
+        // mom1w/mom1m/mom6m/mom12m NON vengono piu' ricalcolati qui — quel blocco
+        // duplicato sovrascriveva il valore corretto (decimale) letto da
+        // fundamentals con un valore gia' moltiplicato per 100, causando la
+        // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
+        // fonte per il momentum, gia' corretta e verificata.
       }
       return jsonNoCache({ stocks: [mapped], source: 'supabase' })
     }
