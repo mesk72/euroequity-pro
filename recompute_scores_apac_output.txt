@@ -1,0 +1,12 @@
+TSE: universo 1000, fundamentals filtrati 1000
+  TSE: scritti ok=1000 fail=0
+SEHK: universo 500, fundamentals filtrati 500
+  SEHK: scritti ok=500 fail=0
+ASX: universo 350, fundamentals filtrati 350
+  ASX: scritti ok=350 fail=0
+KRX: universo 400, fundamentals filtrati 400
+  KRX: scritti ok=400 fail=0
+SGX: universo 100, fundamentals filtrati 100
+  SGX: scritti ok=100 fail=0
+
+TOTALE EU: ok=2350 fail=0
