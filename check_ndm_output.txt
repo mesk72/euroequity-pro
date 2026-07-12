@@ -1,0 +1,1 @@
+NDM ora: [{'ticker': 'NDM', 'price': 2.4, 'change1d': -0.02834, 'value_score': 2, 'growth_score': 2}]
