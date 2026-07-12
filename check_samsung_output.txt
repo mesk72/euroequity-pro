@@ -1,1 +1,1 @@
-Samsung: []
+Samsung: [{'ticker': 'A005930', 'price': 296000.0, 'change1d': -0.069182, 'mom1w': -0.1138, 'mom1m': 0.0028, 'mom6m': 1.1378, 'mom12m': 3.8575, 'value_score': 59, 'growth_score': 100, 'combined_rank': 98}]
