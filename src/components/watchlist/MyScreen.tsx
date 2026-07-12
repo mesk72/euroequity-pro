@@ -72,7 +72,18 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
   const router = useRouter()
   const [allStocks, setAllStocks] = useState<WatchStock[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeWallet, setActiveWallet] = useState(0)
+  // Ripristina il wallet attivo da sessionStorage — senza questo, tornare
+  // indietro da una pagina titolo faceva ripartire sempre dal Wallet 1
+  // invece di restare sul wallet da cui si era partiti.
+  const [activeWallet, setActiveWalletState] = useState(() => {
+    if (typeof window === 'undefined') return 0
+    const saved = sessionStorage.getItem('myScreenActiveWallet')
+    return saved != null ? parseInt(saved, 10) : 0
+  })
+  const setActiveWallet = (idx: number) => {
+    setActiveWalletState(idx)
+    if (typeof window !== 'undefined') sessionStorage.setItem('myScreenActiveWallet', String(idx))
+  }
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
