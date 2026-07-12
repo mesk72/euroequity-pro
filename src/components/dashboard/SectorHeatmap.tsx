@@ -59,7 +59,14 @@ function computeSectors(stocks: Stock[], field: string): SectorData[] {
     for (const s of valid) {
       const ret = (s as any)[field] || 0
       const currentCap = s.mktCap || 0
-      const startCap = (1 + ret) > 0 ? currentCap / (1 + ret) : currentCap
+      // Limite di sicurezza: un rendimento vicino a -100% (spesso un errore
+      // nei dati piuttosto che un crollo reale) farebbe esplodere la cap di
+      // partenza implicita verso l'infinito, dominando l'intera media del
+      // settore. Limitiamo il rapporto cap_partenza/cap_attuale a un
+      // intervallo ragionevole [1/10, 10].
+      const ratio = 1 + ret
+      const clampedRatio = Math.max(0.1, Math.min(10, ratio))
+      const startCap = currentCap / clampedRatio
       weightedSum += ret * startCap
       startMktTotal += startCap
     }
