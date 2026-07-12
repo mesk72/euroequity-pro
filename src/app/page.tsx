@@ -1013,7 +1013,9 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
     let ws = 0, tw = 0
     for (const s of v) {
       const ret = s[field] || 0
-      const startCap = (1 + ret) > 0 ? (s.mktCap || 0) / (1 + ret) : (s.mktCap || 0)
+      const ratio = 1 + ret
+      const clampedRatio = Math.max(0.1, Math.min(10, ratio))
+      const startCap = (s.mktCap || 0) / clampedRatio
       ws += ret * startCap
       tw += startCap
     }
@@ -1134,7 +1136,7 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
 
   useEffect(() => {
     setLoading(true)
-    apiExchange('US,TSX').then(data => { setStocks(data); setLoading(false) })
+    apiExchange('US').then(data => { setStocks(data); setLoading(false) })
   }, [])
 
   const stocksUS = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
@@ -1160,7 +1162,9 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
     let ws = 0, tw = 0
     for (const s of v) {
       const ret = s[field] || 0
-      const startCap = (1 + ret) > 0 ? (s.mktCap || 0) / (1 + ret) : (s.mktCap || 0)
+      const ratio = 1 + ret
+      const clampedRatio = Math.max(0.1, Math.min(10, ratio))
+      const startCap = (s.mktCap || 0) / clampedRatio
       ws += ret * startCap
       tw += startCap
     }
@@ -1587,7 +1591,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
 
     setLoading(true)
     // Carica da tutti gli exchange - EMU + ex-EMU
-    apiExchange('US,TSX').then(stocks => {
+    apiExchange('US').then(stocks => {
       const seen = new Set()
       const deduped = stocks.filter((s: any) => {
         const key = `${s.ticker}.${s.exchange}`
@@ -2045,7 +2049,9 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
     let ws = 0, tw = 0
     for (const s of v) {
       const ret = s[field] || 0
-      const startCap = (1 + ret) > 0 ? (s.mktCap || 0) / (1 + ret) : (s.mktCap || 0)
+      const ratio = 1 + ret
+      const clampedRatio = Math.max(0.1, Math.min(10, ratio))
+      const startCap = (s.mktCap || 0) / clampedRatio
       ws += ret * startCap
       tw += startCap
     }
@@ -2123,10 +2129,10 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                     <td className="font-800" style={{ color: 'var(--gold)' }}>TOTAL — Asia Pacific</td>
                     <td className="font-mono font-700">{totalRow.count}</td>
                     <td className="font-mono font-700">{fvs(totalRow.mktCap, 0)}</td>
-                    <td className="font-mono font-700" style={clrS(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
-                    <td className="font-mono font-700" style={clrS(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
-                    <td className="font-mono font-700" style={clrS(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
-                    <td className="font-mono font-800" style={clrS(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
+                    <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fvs(totalRow.valueScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fvs(totalRow.growthScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.combinedRank)}>{fvs(totalRow.combinedRank, 0)}</td>
@@ -2703,18 +2709,9 @@ function AppContent() {
           )}
           {page === 'usscreen' && <Screener key={'usscreen-'+scrSectorUS} initExchange='US' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'eurozone'  && <Screener key="eurozone"  initExchange="EMU" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} />}
-          {page === 'sectors'   && (user
-            ? <SectorScreen onSectorClick={goSector} />
-            : <LoginGate onLogin={() => setShowAuth(true)} title="Sector Heatmap — All Europe" />
-          )}
-          {page === 'sectors_us' && (user
-            ? <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); navigateTo('northamerica') }} />
-            : <LoginGate onLogin={() => setShowAuth(true)} title="Sector Heatmap — North America" />
-          )}
-          {page === 'sectors_ap' && (user
-            ? <SectorScreenAP onSectorClick={(s) => { setScrSectorAP(s); navigateTo('asiapacific') }} />
-            : <LoginGate onLogin={() => setShowAuth(true)} title="Sector Heatmap — Asia Pacific" />
-          )}
+          {page === 'sectors'   && <SectorScreen onSectorClick={goSector} />}
+          {page === 'sectors_us' && <SectorScreenUS onSectorClick={(s) => { setScrSectorUS(s); setScrSector('All'); navigateTo('northamerica') }} />}
+          {page === 'sectors_ap' && <SectorScreenAP onSectorClick={(s) => { setScrSectorAP(s); navigateTo('asiapacific') }} />}
           {page === 'about' && (
             <div className="flex-1 overflow-y-auto">
               <iframe src="/about" style={{ width:'100%', height:'100%', border:'none', minHeight:'calc(100vh - 60px)' }} />
