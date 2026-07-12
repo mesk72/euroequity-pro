@@ -1,0 +1,42 @@
+
+NORTH AMERICA (US+TSX): universo totale 1400, campione 200
+  Al 10 luglio: 150/200 = 75.0%
+  Stima su tutto l'universo: ~1050/1400
+    2026-07-10: 150
+    2026-07-09: 3
+    2026-07-08: 1
+    2026-07-07: 25
+    2026-07-06: 9
+    2026-07-02: 12
+
+ALL EUROPE: universo totale 2137, campione 200
+  Al 10 luglio: 156/200 = 78.0%
+  Stima su tutto l'universo: ~1666/2137
+    2026-07-10: 156
+    2026-07-09: 3
+    2026-07-08: 7
+    2026-07-07: 11
+    2026-07-06: 1
+    2026-07-03: 19
+    2026-06-17: 1
+    2025-06-20: 1
+    2022-01-03: 1
+
+=== INTC ===
+  price: 109.84
+  change1d: -0.023991
+  mom1w: -0.0873
+  mom1m: 0.0262
+  mom6m: 1.4114
+  mom12m: 3.6113
+  value_score: 18
+  growth_score: 98
+  combined_rank: 65
+  rank_eps_gr: 95
+  rank_rev_gr: 64
+  rank_mom6_adj: 98
+  rank_mom12_adj: 98
+  eps_growth: 0.8991
+  rev_growth: 0.1135
+  CALCOLO mom12_adj = mom12m - mom1m = 3.6113 - 0.0262 = 3.5850999999999997
+  CALCOLO mom6_adj  = mom6m - mom1w  = 1.4114 - -0.0873 = 1.4987
