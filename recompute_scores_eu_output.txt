@@ -1,0 +1,34 @@
+MIL: universo 117, fundamentals filtrati 117
+  MIL: scritti ok=117 fail=0
+XETRA: universo 211, fundamentals filtrati 211
+  XETRA: scritti ok=211 fail=0
+PA: universo 217, fundamentals filtrati 217
+  PA: scritti ok=217 fail=0
+LSE: universo 424, fundamentals filtrati 424
+  LSE: scritti ok=424 fail=0
+SWX: universo 161, fundamentals filtrati 161
+  SWX: scritti ok=161 fail=0
+OM: universo 206, fundamentals filtrati 206
+  OM: scritti ok=206 fail=0
+AS: universo 98, fundamentals filtrati 98
+  AS: scritti ok=98 fail=0
+MC: universo 100, fundamentals filtrati 100
+  MC: scritti ok=100 fail=0
+BR: universo 100, fundamentals filtrati 100
+  BR: scritti ok=100 fail=0
+HE: universo 100, fundamentals filtrati 100
+  HE: scritti ok=100 fail=0
+CPSE: universo 100, fundamentals filtrati 100
+  CPSE: scritti ok=100 fail=0
+OB: universo 100, fundamentals filtrati 100
+  OB: scritti ok=100 fail=0
+GR: universo 100, fundamentals filtrati 100
+  GR: scritti ok=100 fail=0
+VI: universo 53, fundamentals filtrati 53
+  VI: scritti ok=53 fail=0
+IR: universo 15, fundamentals filtrati 15
+  IR: scritti ok=15 fail=0
+LS: universo 35, fundamentals filtrati 35
+  LS: scritti ok=35 fail=0
+
+TOTALE EU: ok=2137 fail=0
