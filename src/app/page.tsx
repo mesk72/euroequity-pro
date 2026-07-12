@@ -1035,6 +1035,18 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
+  const totalRow = {
+    count: stocksEur.length,
+    mktCap: stocksEur.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
+    change1d: mcwReturn(stocksEur, 'change1d'),
+    epsGrowth: mcw(stocksEur, 'epsGrowth'),
+    revGrowth: mcw(stocksEur, 'revGrowth'),
+    mom12m: mcwReturn(stocksEur, 'mom12m'),
+    valueScore: mcw(stocksEur, 'valueScore'),
+    growthScore: mcw(stocksEur, 'growthScore'),
+    combinedRank: mcw(stocksEur, 'combinedRank'),
+  }
+
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
   const fpDec = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
   const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
@@ -1093,6 +1105,18 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       <td className="font-mono font-600" style={clrScore(s.combinedRank)}>{fv(s.combinedRank, 0)}</td>
                     </tr>
                   ))}
+                  <tr style={{ borderTop: '2px solid var(--gold)', background: 'rgba(249,115,22,0.08)' }}>
+                    <td className="font-800" style={{ color: 'var(--gold)' }}>TOTAL — All Europe</td>
+                    <td className="font-mono font-700">{totalRow.count}</td>
+                    <td className="font-mono font-700">{fv(totalRow.mktCap, 0)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
+                    <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fv(totalRow.valueScore, 0)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fv(totalRow.growthScore, 0)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.combinedRank)}>{fv(totalRow.combinedRank, 0)}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -1158,6 +1182,18 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
+  const totalRow = {
+    count: stocksUS.length,
+    mktCap: stocksUS.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
+    change1d: mcwReturn(stocksUS, 'change1d'),
+    epsGrowth: mcw(stocksUS, 'epsGrowth'),
+    revGrowth: mcw(stocksUS, 'revGrowth'),
+    mom12m: mcwReturn(stocksUS, 'mom12m'),
+    valueScore: mcw(stocksUS, 'valueScore'),
+    growthScore: mcw(stocksUS, 'growthScore'),
+    combinedRank: mcw(stocksUS, 'combinedRank'),
+  }
+
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
   const fpDec = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
   const fv = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
@@ -1216,6 +1252,18 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td className="font-mono font-600" style={clrScore(s.combinedRank)}>{fv(s.combinedRank, 0)}</td>
                     </tr>
                   ))}
+                  <tr style={{ borderTop: '2px solid var(--gold)', background: 'rgba(249,115,22,0.08)' }}>
+                    <td className="font-800" style={{ color: 'var(--gold)' }}>TOTAL — North America</td>
+                    <td className="font-mono font-700">{totalRow.count}</td>
+                    <td className="font-mono font-700">{fv(totalRow.mktCap, 0)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
+                    <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fv(totalRow.valueScore, 0)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fv(totalRow.growthScore, 0)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.combinedRank)}>{fv(totalRow.combinedRank, 0)}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -2014,6 +2062,18 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
+  const totalRow = {
+    count: stocksAP.length,
+    mktCap: stocksAP.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
+    change1d: mcwReturn(stocksAP, 'change1d'),
+    epsGrowth: mcw(stocksAP, 'epsGrowth'),
+    revGrowth: mcw(stocksAP, 'revGrowth'),
+    mom12m: mcwReturn(stocksAP, 'mom12m'),
+    valueScore: mcw(stocksAP, 'valueScore'),
+    growthScore: mcw(stocksAP, 'growthScore'),
+    combinedRank: mcw(stocksAP, 'combinedRank'),
+  }
+
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
   const fpDec = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '-'
   const fvs = (v: number | null, d = 1) => v != null ? v.toFixed(d) : '-'
@@ -2059,6 +2119,18 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td className="font-mono font-600" style={clrScore(s.combinedRank)}>{fvs(s.combinedRank, 0)}</td>
                     </tr>
                   ))}
+                  <tr style={{ borderTop: '2px solid var(--gold)', background: 'rgba(249,115,22,0.08)' }}>
+                    <td className="font-800" style={{ color: 'var(--gold)' }}>TOTAL — Asia Pacific</td>
+                    <td className="font-mono font-700">{totalRow.count}</td>
+                    <td className="font-mono font-700">{fvs(totalRow.mktCap, 0)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
+                    <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fvs(totalRow.valueScore, 0)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fvs(totalRow.growthScore, 0)}</td>
+                    <td className="font-mono font-700" style={clrScore(totalRow.combinedRank)}>{fvs(totalRow.combinedRank, 0)}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
