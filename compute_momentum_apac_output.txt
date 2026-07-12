@@ -1,0 +1,15 @@
+=== TSE: 1000 titoli ===
+  ...500/1000 — ok=500 fail=0
+  ...1000/1000 — ok=1000 fail=0
+  TSE FINALE: ok=1000 fail=0
+=== SEHK: 500 titoli ===
+  ...500/500 — ok=500 fail=0
+  SEHK FINALE: ok=500 fail=0
+=== ASX: 350 titoli ===
+  ASX FINALE: ok=350 fail=0
+=== KRX: 400 titoli ===
+  KRX FINALE: ok=400 fail=0
+=== SGX: 100 titoli ===
+  SGX FINALE: ok=100 fail=0
+
+TOTALE APAC: ok=2350 fail=0
