@@ -199,7 +199,7 @@ export async function GET(req: NextRequest) {
 
     if (ticker && exchange) {
       const [stockRes, fundRes, priceRes, histRes] = await Promise.all([
-        supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker').eq('ticker', ticker).eq('exchange', exchange).limit(1),
+        supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker,in_universe').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         // Prezzo reale piu' recente da prices_eod — fundamentals.price e' un
         // campo statico aggiornato solo dagli script weekly, non riflette
@@ -294,6 +294,7 @@ function mapStock(s: any, f: any) {
     exchange: s.exchange ?? f.exchange,
     isin: s.isin ?? null,
     company: s.company ?? f.company ?? null,
+    inUniverse: s.in_universe ?? null,
     sector: s.sector ?? f.sector ?? null,
     country: s.country ?? null,
     flag: s.flag ?? null,
