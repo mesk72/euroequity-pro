@@ -1,0 +1,4 @@
+Takara Bio ultimi prezzi: [{'date': '2026-06-12', 'adj_close': 1144.0}, {'date': '2026-06-11', 'adj_close': 1144.0}, {'date': '2026-06-10', 'adj_close': 1143.0}, {'date': '2026-06-09', 'adj_close': 1143.0}, {'date': '2026-06-08', 'adj_close': 1143.0}]
+Fundamentals: [{'price': 1144.0, 'mom12m': -0.9989, 'mkt_cap': 846.53}]
+
+Cap di partenza implicita con la formula attuale: 846500.0B (assurda)
