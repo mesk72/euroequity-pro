@@ -1,0 +1,4 @@
+Universo: 3000
+Al 10 luglio: 0
+Mancanti: 3000
+Esempio: ['A', 'AA', 'AADX', 'AAL', 'AAMI', 'AAOI', 'AAON', 'AAP', 'AAPL', 'AAT', 'AB', 'ABBV', 'ABCB', 'ABCL', 'ABG', 'ABM', 'ABNB', 'ABR', 'ABSI', 'ABT', 'ABTC', 'ABUS', 'ABX', 'ACA', 'ACAD', 'ACDC', 'ACEL', 'ACGL', 'ACGP', 'ACHC']
