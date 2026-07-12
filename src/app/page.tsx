@@ -1025,7 +1025,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       </td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d*100)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
                       <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
@@ -1133,7 +1133,7 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
                       </td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d*100)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
                       <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
@@ -1364,7 +1364,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d*100)}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d != null ? s.change1d*100 : null)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1655,7 +1655,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d*100)}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d != null ? s.change1d*100 : null)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1838,7 +1838,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
                     <tr key={i} onClick={() => goToStock(s.ticker, s.exchange)} className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d*100)}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d != null ? s.change1d*100 : null)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1961,7 +1961,7 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td><span className="text-[11px] font-600" style={{ color: getSectorColor(s.name) }}>{s.name}</span></td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fvs(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clrS(s.change1d)}>{fpPct(s.change1d*100)}</td>
+                      <td className="font-mono font-600" style={clrS(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
                       <td className="font-mono font-600" style={clrS(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clrS(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clrS(s.mom12m)}>{fpDec(s.mom12m)}</td>
