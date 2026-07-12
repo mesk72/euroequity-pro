@@ -1,0 +1,110 @@
+import os, requests, time, base64
+from datetime import datetime, timedelta
+GH_TOKEN = os.environ.get("GH_TOKEN", "")
+GH_REPO = os.environ.get("GH_REPO", "mesk72/euroequity-pro")
+SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
+SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
+headers_up = {**headers_r, "Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"}
+
+def commit_log(text, path="compute_momentum_apac_output.txt"):
+    gh_headers = {"Authorization": f"token {GH_TOKEN}"}
+    content_b64 = base64.b64encode(text.encode()).decode()
+    r = requests.get(f"https://api.github.com/repos/{GH_REPO}/contents/{path}", headers=gh_headers)
+    sha = r.json().get("sha") if r.status_code == 200 else None
+    payload = {"message": "momentum apac output", "content": content_b64}
+    if sha: payload["sha"] = sha
+    requests.put(f"https://api.github.com/repos/{GH_REPO}/contents/{path}", headers=gh_headers, json=payload)
+
+log_lines = []
+def log(msg):
+    print(msg); log_lines.append(msg)
+
+TODAY = datetime.now()
+APAC_EXCHANGES = ['TSE','SEHK','ASX','KRX','SGX']
+
+def nearest_price(prices_by_date, target_date, tolerance_days):
+    best = None; best_diff = None
+    for d, p in prices_by_date.items():
+        dt = datetime.strptime(d, "%Y-%m-%d")
+        diff = abs((dt - target_date).days)
+        if diff <= tolerance_days and (best_diff is None or diff < best_diff):
+            best = p; best_diff = diff
+    return best
+
+def pct(new, old):
+    if old is None or old == 0: return None
+    val = round((new/old - 1), 6)
+    if abs(val) > 50: return None
+    return val
+
+FROM_DATE = (TODAY - timedelta(days=400)).strftime("%Y-%m-%d")
+grand_ok = grand_fail = 0
+
+for exchange in APAC_EXCHANGES:
+    all_tickers = []
+    offset = 0
+    while True:
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+            params={"select":"ticker","exchange":f"eq.{exchange}","in_universe":"eq.true","limit":"1000","offset":str(offset)})
+        batch = r.json()
+        if not isinstance(batch,list) or not batch: break
+        all_tickers.extend(s["ticker"] for s in batch)
+        offset += 1000
+        if len(batch) < 1000: break
+    log(f"=== {exchange}: {len(all_tickers)} titoli ===")
+
+    ok = fail = 0
+    mom_batch = []
+    for i, ticker in enumerate(all_tickers):
+        try:
+            r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+                params={"select":"date,adj_close","ticker":f"eq.{ticker}","exchange":f"eq.{exchange}",
+                         "date":f"gte.{FROM_DATE}","order":"date.desc","limit":"400"}, timeout=20)
+            if r.status_code != 200:
+                fail += 1; continue
+            rows = r.json()
+            if not rows:
+                fail += 1; continue
+            prices_by_date = {row["date"]: row["adj_close"] for row in rows}
+            latest_date = max(prices_by_date.keys())
+            latest_price = prices_by_date[latest_date]
+            latest_dt = datetime.strptime(latest_date, "%Y-%m-%d")
+
+            prev_sorted = sorted(prices_by_date.keys(), reverse=True)
+            prev_price = prices_by_date[prev_sorted[1]] if len(prev_sorted) > 1 else None
+
+            p1w = nearest_price(prices_by_date, latest_dt - timedelta(days=7), 4)
+            p1m = nearest_price(prices_by_date, latest_dt - timedelta(days=30), 6)
+            p6m = nearest_price(prices_by_date, latest_dt - timedelta(days=182), 12)
+            p12m = nearest_price(prices_by_date, latest_dt - timedelta(days=365), 15)
+
+            row = {"ticker": ticker, "exchange": exchange, "price": latest_price,
+                   "change1d": pct(latest_price, prev_price),
+                   "mom1w": pct(latest_price, p1w), "mom1m": pct(latest_price, p1m),
+                   "mom6m": pct(latest_price, p6m), "mom12m": pct(latest_price, p12m)}
+            mom_batch.append(row)
+            ok += 1
+        except Exception:
+            fail += 1
+
+        if len(mom_batch) >= 100:
+            resp = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+                headers=headers_up, json=mom_batch, timeout=30)
+            if resp.status_code not in (200,201,204):
+                log(f"  WARN batch: HTTP {resp.status_code} {resp.text[:150]}")
+            mom_batch = []
+        if (i+1) % 500 == 0:
+            log(f"  ...{i+1}/{len(all_tickers)} — ok={ok} fail={fail}")
+
+    if mom_batch:
+        resp = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+            headers=headers_up, json=mom_batch, timeout=30)
+        if resp.status_code not in (200,201,204):
+            log(f"  WARN ultimo batch: HTTP {resp.status_code} {resp.text[:150]}")
+    log(f"  {exchange} FINALE: ok={ok} fail={fail}")
+    grand_ok += ok; grand_fail += fail
+
+log(f"\nTOTALE APAC: ok={grand_ok} fail={grand_fail}")
+commit_log("\n".join(log_lines))
+print("Fatto")
