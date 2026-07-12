@@ -141,6 +141,28 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
 
   const stocks = allStocks.filter(s => (s.wallet ?? 0) === activeWallet)
 
+  // Ordinamento per colonna — clic sull'intestazione per Settore, Market
+  // Cap, 1D/1W/1M/6M/12M, Value/Growth/Best
+  const [sortField, setSortField] = useState<keyof WatchStock | null>(null)
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const toggleSort = (field: keyof WatchStock) => {
+    if (sortField === field) setSortDir(d => d === 'desc' ? 'asc' : 'desc')
+    else { setSortField(field); setSortDir('desc') }
+  }
+  const sortedStocks = sortField ? [...stocks].sort((a, b) => {
+    const av = a[sortField], bv = b[sortField]
+    if (av == null && bv == null) return 0
+    if (av == null) return 1
+    if (bv == null) return -1
+    if (typeof av === 'string' || typeof bv === 'string') {
+      return sortDir === 'asc'
+        ? String(av).localeCompare(String(bv))
+        : String(bv).localeCompare(String(av))
+    }
+    return sortDir === 'asc' ? (av as number) - (bv as number) : (bv as number) - (av as number)
+  }) : stocks
+  const sortArrow = (field: keyof WatchStock) => sortField === field ? (sortDir === 'desc' ? ' ▼' : ' ▲') : ''
+
   const avg = (field: keyof WatchStock) => {
     const vals = stocks.map(s => s[field] as number | null).filter(v => v != null && !isNaN(v as number)) as number[]
     if (vals.length === 0) return null
@@ -192,10 +214,32 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
         </div>
       ) : isMobile ? (
         <div className="border border-border rounded overflow-hidden">
-          <div className="text-[9px] text-muted px-3 py-1 border-b border-border bg-surface/50">
-            Tap a stock to view details
+          <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-surface/50">
+            <span className="text-[9px] text-muted">Sort:</span>
+            <select
+              value={sortField || ''}
+              onChange={(e) => { const f = e.target.value as keyof WatchStock | ''; if (f) toggleSort(f); else setSortField(null) }}
+              className="text-[10px] bg-transparent border border-border rounded px-1.5 py-0.5 text-text flex-1"
+            >
+              <option value="">Default (added order)</option>
+              <option value="sector">Sector</option>
+              <option value="mktCap">Market Cap</option>
+              <option value="change1d">1D %</option>
+              <option value="mom1w">1W %</option>
+              <option value="mom1m">1M %</option>
+              <option value="mom6m">6M %</option>
+              <option value="mom12m">12M %</option>
+              <option value="valueScore">Value Score</option>
+              <option value="growthScore">Growth Score</option>
+              <option value="combinedRank">Best Score</option>
+            </select>
+            {sortField && (
+              <button onClick={() => setSortDir(d => d === 'desc' ? 'asc' : 'desc')} className="text-[10px] text-gold px-1">
+                {sortDir === 'desc' ? '▼' : '▲'}
+              </button>
+            )}
           </div>
-          {stocks.map((s) => (
+          {sortedStocks.map((s) => (
             <a key={s.id}
               href={`/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/')}`}
               style={{ display:'block', textDecoration:'none', color:'inherit' }}
@@ -261,27 +305,27 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
             <thead><tr>
               <th style={{ position: 'sticky', left: 0, background: '#0d1017', zIndex: 2, minWidth: 90 }}>Ticker</th>
               <th style={{ minWidth: 130 }}>Company</th>
-              <th style={{ minWidth: 120 }}>Sector</th>
+              <th style={{ minWidth: 120, cursor: 'pointer' }} onClick={() => toggleSort('sector')}>Sector{sortArrow('sector')}</th>
               <th style={{ width: 70 }}>Price</th>
-              <th style={{ width: 65 }}>1D %</th>
-              <th style={{ width: 75 }}>MktCap $B</th>
+              <th style={{ width: 65, cursor: 'pointer' }} onClick={() => toggleSort('change1d')}>1D %{sortArrow('change1d')}</th>
+              <th style={{ width: 75, cursor: 'pointer' }} onClick={() => toggleSort('mktCap')}>MktCap $B{sortArrow('mktCap')}</th>
               <th style={{ width: 65 }}>PE LTM Rk</th>
               <th style={{ width: 65 }}>PE NTM Rk</th>
               <th style={{ width: 60 }}>PB Rk</th>
               <th style={{ width: 60 }}>EPS Rk</th>
               <th style={{ width: 60 }}>Rev Rk</th>
-              <th style={{ width: 65 }}>1W %</th>
-              <th style={{ width: 65 }}>1M %</th>
-              <th style={{ width: 65 }}>6M %</th>
-              <th style={{ width: 72 }}>12M %</th>
-              <th style={{ width: 55 }}>Value</th>
-              <th style={{ width: 55 }}>Growth</th>
-              <th style={{ width: 55 }}>Best</th>
+              <th style={{ width: 65, cursor: 'pointer' }} onClick={() => toggleSort('mom1w')}>1W %{sortArrow('mom1w')}</th>
+              <th style={{ width: 65, cursor: 'pointer' }} onClick={() => toggleSort('mom1m')}>1M %{sortArrow('mom1m')}</th>
+              <th style={{ width: 65, cursor: 'pointer' }} onClick={() => toggleSort('mom6m')}>6M %{sortArrow('mom6m')}</th>
+              <th style={{ width: 72, cursor: 'pointer' }} onClick={() => toggleSort('mom12m')}>12M %{sortArrow('mom12m')}</th>
+              <th style={{ width: 55, cursor: 'pointer' }} onClick={() => toggleSort('valueScore')}>Value{sortArrow('valueScore')}</th>
+              <th style={{ width: 55, cursor: 'pointer' }} onClick={() => toggleSort('growthScore')}>Growth{sortArrow('growthScore')}</th>
+              <th style={{ width: 55, cursor: 'pointer' }} onClick={() => toggleSort('combinedRank')}>Best{sortArrow('combinedRank')}</th>
               <th style={{ width: 60 }}>Move</th>
               <th style={{ width: 36 }}></th>
             </tr></thead>
             <tbody>
-              {stocks.map((s) => (
+              {sortedStocks.map((s) => (
                 <tr key={s.id}
                   onClick={() => router.push(`/stock/${s.ticker}-${s.exchange}?from=${encodeURIComponent(window.location.pathname + window.location.search)}`)}
                   className="cursor-pointer">
