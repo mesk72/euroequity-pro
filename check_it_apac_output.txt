@@ -1,0 +1,16 @@
+Titoli IT APAC in universo: 289
+
+Top 10 per market cap (quelli che pesano di piu' nella media):
+  A005930 (Samsung Electronics Co., Ltd.): mktcap=1368066.1B mom12m=385.8%
+  A000660 (SK hynix Inc.): mktcap=1209671.7B mom12m=639.2%
+  285A (Kioxia Holdings Corporation): mktcap=300948.3B mom12m=2911.3%
+  8035 (Tokyo Electron Limited): mktcap=215644.8B mom12m=177.9%
+  6857 (Advantest Corporation): mktcap=144046.1B mom12m=166.2%
+  6981 (Murata Manufacturing Co., Ltd.): mktcap=127464.9B mom12m=372.1%
+  6861 (Keyence Corporation): mktcap=120808.7B mom12m=40.1%
+  981 (Semiconductor Manufacturing In): mktcap=115289.8B mom12m=77.2%
+  A009150 (Samsung Electro-Mechanics Co.,): mktcap=103780.9B mom12m=991.8%
+  1810 (Xiaomi Corporation): mktcap=70974.1B mom12m=-54.6%
+
+Totale mkt cap (tutti i 268 con dati): 5040002.9B
+Media ponderata mom12m manuale: 520.40%
