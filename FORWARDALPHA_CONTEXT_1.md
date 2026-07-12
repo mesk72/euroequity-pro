@@ -2150,3 +2150,60 @@ il calcolo del Reverse Earnings Model gira comunque correttamente incatenato den
 **Prossimo passo in corso**: dispatch reale di `daily_us.py` per verificare end-to-end
 che il fix on_conflict al momentum funzioni in un vero run notturno, non solo nei test
 isolati.
+
+---
+
+## Aggiornamento sessione pomeriggio/notte 11-12 luglio 2026
+
+### COSA È RIUSCITO
+
+**Bug del momentum sullo screener/pagina titolo — RISOLTO, causa trovata dopo ore di diagnosi sbagliate.**
+Sintomo: momentum (1w/1m/6m/12m) mostrato moltiplicato per 100 in più punti del sito (es. 8% mostrato come 800%).
+Tentativi falliti prima di trovare la causa vera: sospettata cache browser (esclusa con test in incognito e desktop pulito), sospettata `StockDetailPage.tsx` (componente duplicato trovato ma poi verificato essere codice morto, mai renderizzato), sospettate formule di formattazione diverse tra file (`fp`/`fpd`/`fpDec` — verificate tutte coerenti).
+**Causa reale trovata leggendo la risposta JSON grezza dell'API** (`/api/db/stocks?ticker=X&exchange=Y`) fornita dall'utente: un blocco di codice residuo e dimenticato in `route.ts`, nel percorso a singolo titolo, ricalcolava mom1w/1m/6m/12m dal vivo dalla cronologia prezzi (`histRes`), **già moltiplicato per 100**, e sovrascriveva silenziosamente il valore corretto (decimale) appena letto da `fundamentals` via `mapStock()`. Il frontend poi moltiplicava di nuovo per 100. **Rimosso il blocco duplicato** — ora l'unica fonte per il momentum è `mapStock()` dai `fundamentals`. Non ancora riverificato dall'utente con un secondo controllo della risposta JSON dopo il fix.
+
+**Formula del momentum a 1 mese — bug reale trovato e corretto.**
+Il calcolo usava "31 giorni indietro" invece di "30", causando un errore misurabile (per NVDA: 1,33% calcolato vs 5,26% reale). Verificato con fonte esterna (Investing.com, +5,26% esatto per il periodo 11/06-11/07). Corretto in tutti e 4 gli script (`daily_us.py`, `daily_eu.py`, `daily_apac.py`, script standalone) da `mom_cal(31)`/`timedelta(days=31)` a `30`.
+
+**Scala change1d/momentum uniformata.** Prima: `change1d` calcolato dal vivo per il singolo titolo era già in formato percentuale, mentre `fundamentals.change1d` (letto dallo screener) era decimale grezzo — due convenzioni diverse per lo stesso campo, causa della discrepanza "1D% giusto sulla pagina titolo, sbagliato/zero sullo screener". Standardizzato tutto a decimale grezzo (come mom1w/mom6m). Corretti **13 punti di visualizzazione diversi** nello screener (`page.tsx`) che non moltiplicavano per 100, inclusi top gainers/losers, tabelle multiple, medie di mercato (MCW 1D Return).
+
+**Bug `on_conflict` mancante — stesso pattern trovato in più punti, tutti corretti:**
+- Scrittura prezzi (`prices_eod`): già noto da sessione precedente, confermato applicato.
+- Scrittura momentum (`fundamentals`): stesso bug trovato in `daily_us.py` e `daily_apac.py` (batch POST senza on_conflict, causa di scritture rifiutate in silenzio).
+- EU: bug diverso — non mancava on_conflict, ma la scrittura usava un PATCH separato per OGNI titolo (migliaia di chiamate sequenziali) invece che un batch. Sostituito con lo stesso schema batch veloce.
+
+**Bug identico trovato nel calcolo dei RANK dentro `daily_us.py`** (non solo il momentum): due sezioni diverse (`rank_updates` e `combined_updates` per NA=US+TSX) scrivevano con un PATCH per titolo invece che in batch. Probabile causa primaria del blocco di 5+ ore osservato su un run reale di `daily_us.py` stanotte. Sostituito con batch da 200 + on_conflict.
+
+**Bug di formula nello script standalone di ricalcolo punteggi** (creato stanotte per bypassare `daily_us.py` bloccato):
+- Filtrava `fundamentals` solo per `exchange=US`, senza controllare `in_universe=true` → usava un gruppo di confronto di 3.963 titoli invece dei 3.000 reali, alterando tutti i percentile rank compreso il Value Score (che non dovrebbe mai cambiare da un ricalcolo giornaliero, dipende solo da PE/PB che lo script non tocca). Corretto filtrando esplicitamente su `in_universe=true`.
+- `book_yield()` usava una formula improvvisata (`-pb`) invece di quella reale (`1/pb`, copiata da `daily_us.py`).
+- `pct_rank()` non arrotondava a intero immediatamente come l'originale, causando derive nei calcoli a cascata (value/growth score costruiti sommando rank intermedi).
+- Dopo tutte e tre le correzioni: Value Score di NVDA tornato esattamente a 34 (identico al valore pre-intervento), confermando che le formule sono ora vere copie esatte di `daily_us.py`, non approssimazioni.
+
+**Bug di build TypeScript — 3 episodi, tutti risolti:**
+1. `function` dichiarata dentro un blocco (non ammesso in strict mode) — convertita in `const` arrow function.
+2. `stock.change1d*100` e `ewReturn*100` su campi tipizzati `number | null` — TS blocca la moltiplicazione diretta. Corretto con controlli null-safe espliciti su tutte le 8 istanze totali nel file.
+3. Nota di processo: build falliti mostrati dall'utente più volte corrispondevano a commit VECCHI ancora in coda di deploy su Vercel (causati dal volume enorme di push per gli script diagnostici), non al fix più recente — verificare sempre il commit hash esatto nel log di build contro l'ultimo commit reale su GitHub prima di modificare altro.
+
+**Pulizia:** eliminato `reverse_earnings_model_us.yml`, workflow rotto che generava decine di email di errore (il calcolo del REM gira comunque, incatenato dentro `fetch_beta_us.yml`).
+
+### PROBLEMI ANCORA APERTI
+
+**BLOCCO ATTUALE — quota Leeway esaurita.** Verificato con chiamata diretta: risposta `"Your limit of 0 requests per day has been reached"`. Lo screenshot dell'account Leeway mostra "cancellation confirmed, access until 16 July 2026" — quindi c'è una contraddizione tra quello che promette l'interfaccia (accesso fino al 16/7) e quello che applica davvero l'API (0 richieste). Non risolvibile da codice. Andrea aspetta risposta di Leeway (probabile lentezza, è domenica) prima di riprovare il recupero completo nel pomeriggio.
+
+**Copertura reale USA — ultima misura affidabile 65,5%, non risolta.** Campione ampio (200 titoli, metodo a query singole verificato affidabile) prima del blocco Leeway: 131/200 al 10 luglio, il resto sparso su 2/6/7 luglio. Un tentativo di recupero completo (`final_full_catchup.py`) è partito ma ha fallito al 100% (0/3000) proprio a causa del blocco quota Leeway scoperto in quel momento. **Da rilanciare quando Leeway sblocca.**
+
+**Copertura EU — non affrontata in questa sessione, resta al livello precedente.** Ultimo dato sistematico (30 titoli/borsa): nessuna borsa europea a 30/30, la maggior parte tra 57% e 80%.
+
+**Bug di performance nel database — mai risolto, solo aggirato.** Query aggregate su `prices_eod` filtrate per `(exchange, date)` vanno sistematicamente in timeout Postgres (HTTP 500 "canceling statement due to statement timeout"). Il codice che tenta queste query silenziosamente interpreta l'errore come "zero risultati" invece di segnalarlo — causa di almeno due conteggi falsi ("0/3000 al 10 luglio") dati per buoni erroneamente durante la notte, poi smentiti da un metodo più lento ma affidabile (query singole per titolo, campione casuale). **Servirebbe un indice su `prices_eod(exchange, date)`** per risolvere alla radice — non ancora creato.
+
+**`daily_us.py` — i fix strutturali (batch invece di PATCH per titolo, sia per momentum sia per rank) non sono mai stati verificati in un run di produzione reale completato con successo.** L'unico tentativo di run con questi fix si è bloccato per 5+ ore ed è stato infine reso irrilevante dal blocco quota Leeway. Da verificare alla prima occasione utile.
+
+**Cache — capitolo chiuso ma vale la pena ricordare cosa NON era la causa**, per non riaprire la stessa pista in futuro: browser, CDN Vercel, stato React del client sono stati tutti esclusi con test rigorosi (incognito, desktop pulito, sessione nuova). La causa era sempre codice server-side dimenticato, non cache.
+
+### PROSSIMI PASSI CONCORDATI CON ANDREA
+
+- Martedì: colloquio Twelvedata, migrazione con 12 giorni di prova.
+- Nel frattempo: gestione parallela del progetto tra Claude e Gemini per un mese, "chi fa meglio vince" — Andrea userà Gemini per il grosso del lavoro, interpellerà Claude solo se Gemini si blocca.
+- Richiesto un backup del repo (tag/branch Git che congela lo stato attuale) prima dell'inizio della transizione — non ancora creato, Andrea ha detto di aspettare.
+- Pomeriggio 12 luglio: nuovo tentativo di recupero titoli USA, condizionato allo sblocco di Leeway.
