@@ -1134,7 +1134,7 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
 
   useEffect(() => {
     setLoading(true)
-    apiExchange('US').then(data => { setStocks(data); setLoading(false) })
+    apiExchange('US,TSX').then(data => { setStocks(data); setLoading(false) })
   }, [])
 
   const stocksUS = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
@@ -1587,7 +1587,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
 
     setLoading(true)
     // Carica da tutti gli exchange - EMU + ex-EMU
-    apiExchange('US').then(stocks => {
+    apiExchange('US,TSX').then(stocks => {
       const seen = new Set()
       const deduped = stocks.filter((s: any) => {
         const key = `${s.ticker}.${s.exchange}`
