@@ -1,0 +1,67 @@
+Totale titoli con settore numerico: 66
+  HABA.XETRA (Hamborner REIT AG): sector='76' yahoo_ticker=None
+  MLMTP.PA (Montepino LogÃ­stica, SOCIMI, S.A.): sector='73' yahoo_ticker=None
+  INEA.PA (Fonciere Inea S.A.): sector='74' yahoo_ticker=None
+  SOHO.LSE (Social Housing REIT plc): sector='75' yahoo_ticker=None
+  NRR.LSE (NewRiver REIT plc): sector='76' yahoo_ticker=None
+  YHTI.MC (Hotei Properties Group Socimi S.A.): sector='72' yahoo_ticker=None
+  YCPS.MC (Castellana Properties Socimi, S.A.): sector='76' yahoo_ticker=None
+  YEPSA.MC (Emperador Properties SOCIMI, S.A.): sector='74' yahoo_ticker=None
+  YVIV.MC (Vivenio Residencial SOCIMI, S.A.): sector='75' yahoo_ticker=None
+  YZBL.MC (Zambal Spain Socimi, S.A.): sector='74' yahoo_ticker=None
+  YATO.MC (Atom Hoteles SOCIMI, S.A.): sector='72' yahoo_ticker=None
+  YTST.MC (Testa Residencial SOCIMI, S.A.): sector='75' yahoo_ticker=None
+  YFID.MC (Fidere Patrimonio Socimi, S.A.): sector='75' yahoo_ticker=None
+  COL.MC (Colonial SFL, Socimi S. A.): sector='74' yahoo_ticker=None
+  TRESTATES.GR (Trade Estates REIC): sector='76' yahoo_ticker=None
+  CMRF.US (CIM Group, Inc.): sector='76' yahoo_ticker=CMRF
+  PSTL.US (Postal Realty Trust, Inc.): sector='74' yahoo_ticker=PSTL
+  BXDC.US (Blackstone Digital Infrastructure Trust Inc.): sector='77' yahoo_ticker=None
+  NXRT.US (NexPoint Residential Trust, Inc.): sector='75' yahoo_ticker=None
+  CHCT.US (Community Healthcare Trust Incorporated): sector='71' yahoo_ticker=None
+  CLDT.US (Chatham Lodging Trust): sector='72' yahoo_ticker=None
+  ESRT.US (Empire State Realty Trust, Inc.): sector='74' yahoo_ticker=None
+  WSR.US (Whitestone REIT): sector='76' yahoo_ticker=WSR
+  CBL.US (CBL & Associates Properties, Inc.): sector='76' yahoo_ticker=None
+  CSR.US (Centerspace): sector='75' yahoo_ticker=None
+  HPP.US (Hudson Pacific Properties, Inc.): sector='74' yahoo_ticker=None
+  BDN.US (Brandywine Realty Trust): sector='74' yahoo_ticker=None
+  JBGS.US (JBG SMITH Properties): sector='74' yahoo_ticker=JBGS
+  INN.US (Summit Hotel Properties, Inc.): sector='72' yahoo_ticker=None
+  UMH.US (UMH Properties, Inc.): sector='75' yahoo_ticker=None
+  OLP.US (One Liberty Properties, Inc.): sector='73' yahoo_ticker=None
+  BFS.US (Saul Centers, Inc.): sector='76' yahoo_ticker=None
+  XRN.US (Chiron Real Estate Inc.): sector='71' yahoo_ticker=None
+  NHP.US (National Healthcare Properties, Inc.): sector='71' yahoo_ticker=None
+  ALX.US (Alexander's, Inc.): sector='76' yahoo_ticker=None
+  ILPT.US (Industrial Logistics Properties Trust): sector='73' yahoo_ticker=None
+  PDM.US (Piedmont Realty Trust, Inc.): sector='74' yahoo_ticker=None
+  DEA.US (Easterly Government Properties, Inc.): sector='74' yahoo_ticker=None
+  SAFE.US (Safehold Inc.): sector='77' yahoo_ticker=None
+  SVC.US (Service Properties Trust): sector='72' yahoo_ticker=None
+  UHT.US (Universal Health Realty Income Trust): sector='71' yahoo_ticker=None
+  FVR.US (FrontView REIT, Inc.): sector='76' yahoo_ticker=None
+  RFF.ASX (Rural Funds Group): sector='77' yahoo_ticker=None
+  A330590.KRX (LOTTE REIT Co., Ltd.): sector='76' yahoo_ticker=330590.KS
+  A451800.KRX (Hanwha REIT Co., Ltd.): sector='74' yahoo_ticker=451800.KS
+  A365550.KRX (ESR Kendall Square REIT Co., Ltd.): sector='73' yahoo_ticker=365550.KS
+  8C8U.SGX (Centurion Accommodation REIT): sector='75' yahoo_ticker=8C8U.SI
+  9A4U.SGX (ESR-REIT): sector='73' yahoo_ticker=9A4U.SI
+  A17U.SGX (CapitaLand Ascendas REIT): sector='73' yahoo_ticker=A17U.SI
+  AJBU.SGX (Keppel DC REIT): sector='77' yahoo_ticker=AJBU.SI
+  AU8U.SGX (CapitaLand China Trust): sector='76' yahoo_ticker=AU8U.SI
+  BUOU.SGX (Frasers Logistics & Commercial Trust): sector='73' yahoo_ticker=BUOU.SI
+  C2PU.SGX (Parkway Life Real Estate Investment Trust): sector='71' yahoo_ticker=C2PU.SI
+  CRPU.SGX (Sasseur Real Estate Investment Trust): sector='76' yahoo_ticker=CRPU.SI
+  DCRU.SGX (Digital Core REIT): sector='77' yahoo_ticker=DCRU.SI
+  HMN.SGX (CapitaLand Ascott Trust): sector='72' yahoo_ticker=HMN.SI
+  J69U.SGX (Frasers Centrepoint Trust): sector='76' yahoo_ticker=J69U.SI
+  J85.SGX (CDL Hospitality Trusts): sector='72' yahoo_ticker=J85.SI
+  JYEU.SGX (Lendlease Global Commercial REIT): sector='76' yahoo_ticker=JYEU.SI
+  K71U.SGX (Keppel REIT): sector='74' yahoo_ticker=K71U.SI
+  M44U.SGX (Mapletree Logistics Trust): sector='73' yahoo_ticker=M44U.SI
+  ME8U.SGX (Mapletree Industrial Trust): sector='73' yahoo_ticker=ME8U.SI
+  NTDU.SGX (NTT DC REIT): sector='77' yahoo_ticker=NTDU.SI
+  O5RU.SGX (AIMS APAC REIT): sector='73' yahoo_ticker=O5RU.SI
+  P40U.SGX (Starhill Global Real Estate Investment Trust): sector='76' yahoo_ticker=P40U.SI
+  Q5T.SGX (Far East Hospitality Trust): sector='72' yahoo_ticker=Q5T.SI
