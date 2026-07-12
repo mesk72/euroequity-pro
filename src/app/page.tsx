@@ -576,7 +576,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 
   const metrics: [string, string, string][] = [
     ['Price',        fv(stock.price, 2),       ''],
-    ['1D %',         fp(stock.change1d*100),        clr(stock.change1d)],
+    ['1D %',         fp(stock.change1d != null ? stock.change1d*100 : null),        clr(stock.change1d)],
     ['Mkt Cap B',    fv(stock.mktCap, 1),       ''],
     ['P/E Trailing', fv(stock.peTrail, 1),      ''],
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
@@ -596,7 +596,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
         <div>
           <div className="font-700 text-base text-text">
             {stock.flag} {stock.ticker}
-            <span className={`ml-2 font-mono text-sm ${clr(stock.change1d)}`}>{fp(stock.change1d*100)}</span>
+            <span className={`ml-2 font-mono text-sm ${clr(stock.change1d)}`}>{fp(stock.change1d != null ? stock.change1d*100 : null)}</span>
           </div>
           <div className="text-xs text-muted">{stock.company} · {stock.exchange}</div>
           {stock.sector && (
@@ -1331,7 +1331,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : '2,111' },
-          { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn*100) },
+          { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn != null ? ewReturn*100 : null) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
@@ -1622,7 +1622,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : '1,972' },
-          { label: 'MCW 1D Return (top 500 North America)', value: loading ? '…' : fp(ewReturn*100) },
+          { label: 'MCW 1D Return (top 500 North America)', value: loading ? '…' : fp(ewReturn != null ? ewReturn*100 : null) },
           { label: 'V+G Best Combined (top 500)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 500)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
@@ -1809,7 +1809,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks', value: loading ? '…' : allStocks.length.toString() },
-          { label: 'MCW 1D Return (top 600 Asia Pacific)', value: loading ? '…' : fp(ewReturn*100) },
+          { label: 'MCW 1D Return (top 600 Asia Pacific)', value: loading ? '…' : fp(ewReturn != null ? ewReturn*100 : null) },
           { label: 'V+G Best Combined ≥80 (top 600)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 600)', value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
