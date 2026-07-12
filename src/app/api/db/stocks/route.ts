@@ -58,7 +58,7 @@ async function fetchLatestPrices(exchangeList: string[]) {
     result[key] = {
       price: latest.adj_close,
       date: latest.date,
-      change1d: prev && prev.adj_close ? (latest.adj_close / prev.adj_close - 1) * 100 : null,
+      change1d: prev && prev.adj_close ? (latest.adj_close / prev.adj_close - 1) : null,
     }
   }
   return result
