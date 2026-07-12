@@ -1,0 +1,3 @@
+Titoli NA (US+TSX) con value+growth score: 2929
+
+FINALE: ok=2929 fail=0
