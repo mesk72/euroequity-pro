@@ -1004,16 +1004,31 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
     const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
     return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
   }
+  // Per i rendimenti di prezzo (change1d, mom12m ecc.) pesa per la market
+  // cap di PARTENZA stimata, non quella attuale — altrimenti i titoli che
+  // sono saliti di piu' pesano di piu' proprio perche' saliti, gonfiando
+  // la media a loro favore (bias circolare, piu' forte su periodi lunghi).
+  const mcwReturn = (list: any[], field: string) => {
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    let ws = 0, tw = 0
+    for (const s of v) {
+      const ret = s[field] || 0
+      const startCap = (1 + ret) > 0 ? (s.mktCap || 0) / (1 + ret) : (s.mktCap || 0)
+      ws += ret * startCap
+      tw += startCap
+    }
+    return tw > 0 ? ws / tw : null
+  }
 
   const sectors = Object.entries(sectorMap)
     .map(([name, list]) => ({
       name,
       count: list.length,
       mktCap: list.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
-      change1d: mcw(list, 'change1d'),
+      change1d: mcwReturn(list, 'change1d'),
       epsGrowth: mcw(list, 'epsGrowth'),
       revGrowth: mcw(list, 'revGrowth'),
-      mom12m: mcw(list, 'mom12m'),
+      mom12m: mcwReturn(list, 'mom12m'),
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
@@ -1112,16 +1127,31 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
     const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
     return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
   }
+  // Per i rendimenti di prezzo (change1d, mom12m ecc.) pesa per la market
+  // cap di PARTENZA stimata, non quella attuale — altrimenti i titoli che
+  // sono saliti di piu' pesano di piu' proprio perche' saliti, gonfiando
+  // la media a loro favore (bias circolare, piu' forte su periodi lunghi).
+  const mcwReturn = (list: any[], field: string) => {
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    let ws = 0, tw = 0
+    for (const s of v) {
+      const ret = s[field] || 0
+      const startCap = (1 + ret) > 0 ? (s.mktCap || 0) / (1 + ret) : (s.mktCap || 0)
+      ws += ret * startCap
+      tw += startCap
+    }
+    return tw > 0 ? ws / tw : null
+  }
 
   const sectors = Object.entries(sectorMap)
     .map(([name, list]) => ({
       name,
       count: list.length,
       mktCap: list.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
-      change1d: mcw(list, 'change1d'),
+      change1d: mcwReturn(list, 'change1d'),
       epsGrowth: mcw(list, 'epsGrowth'),
       revGrowth: mcw(list, 'revGrowth'),
-      mom12m: mcw(list, 'mom12m'),
+      mom12m: mcwReturn(list, 'mom12m'),
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
@@ -1958,12 +1988,27 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
     const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
     return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
   }
+  // Per i rendimenti di prezzo (change1d, mom12m ecc.) pesa per la market
+  // cap di PARTENZA stimata, non quella attuale — altrimenti i titoli che
+  // sono saliti di piu' pesano di piu' proprio perche' saliti, gonfiando
+  // la media a loro favore (bias circolare, piu' forte su periodi lunghi).
+  const mcwReturn = (list: any[], field: string) => {
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    let ws = 0, tw = 0
+    for (const s of v) {
+      const ret = s[field] || 0
+      const startCap = (1 + ret) > 0 ? (s.mktCap || 0) / (1 + ret) : (s.mktCap || 0)
+      ws += ret * startCap
+      tw += startCap
+    }
+    return tw > 0 ? ws / tw : null
+  }
   const sectors = Object.entries(sectorMap)
     .map(([name, list]) => ({
       name, count: list.length,
       mktCap: list.reduce((a:number, s:any) => a + (s.mktCap || 0), 0),
-      change1d: mcw(list, 'change1d'), epsGrowth: mcw(list, 'epsGrowth'),
-      revGrowth: mcw(list, 'revGrowth'), mom12m: mcw(list, 'mom12m'),
+      change1d: mcwReturn(list, 'change1d'), epsGrowth: mcw(list, 'epsGrowth'),
+      revGrowth: mcw(list, 'revGrowth'), mom12m: mcwReturn(list, 'mom12m'),
       valueScore: mcw(list, 'valueScore'), growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
     }))
