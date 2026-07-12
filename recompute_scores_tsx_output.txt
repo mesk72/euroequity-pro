@@ -1,0 +1,4 @@
+TSX: universo 400, fundamentals filtrati 400
+  TSX: scritti ok=400 fail=0
+
+TOTALE EU: ok=400 fail=0
