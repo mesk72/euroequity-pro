@@ -279,7 +279,7 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
     case 'country':     return { val: s.country  || '-',   cls: 'text-[10px] text-muted' }
     case 'sector':      return { val: s.sector  || '-',   cls: 'text-[10px]', sectorColor: getSectorColor(s.sector) }
     case 'price':       return { val: v != null ? fv(v, 2)  : '-', cls: v != null ? 'text-text'  : 'text-muted' }
-    case 'change1d':    return { val: v != null ? fp(v)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
+    case 'change1d':    return { val: v != null ? fp(v*100)     : '-', cls: v != null ? clr(v)        : 'text-muted', style: v != null ? clrStyle(v) : undefined }
     case 'mktCap':      return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peTrail':     return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
     case 'peFwd':       return { val: v != null ? fv(v, 1)  : '-', cls: v != null ? 'text-sub'    : 'text-muted' }
@@ -373,7 +373,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
  {s.price != null ? s.price.toFixed(2) : '-'}
  </span>
  <span className={`font-mono text-xs font-600 ${s.change1d != null ? (s.change1d >= 0 ? 'text-[#22d48a]' : 'text-[#e84560]') : 'text-muted'}`}>
- {s.change1d != null ? fpd(s.change1d/100) : '-'}
+ {s.change1d != null ? fpd(s.change1d) : '-'}
  </span>
  </div>
  </div>
@@ -576,7 +576,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 
   const metrics: [string, string, string][] = [
     ['Price',        fv(stock.price, 2),       ''],
-    ['1D %',         fp(stock.change1d),        clr(stock.change1d)],
+    ['1D %',         fp(stock.change1d*100),        clr(stock.change1d)],
     ['Mkt Cap B',    fv(stock.mktCap, 1),       ''],
     ['P/E Trailing', fv(stock.peTrail, 1),      ''],
     ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
@@ -596,7 +596,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
         <div>
           <div className="font-700 text-base text-text">
             {stock.flag} {stock.ticker}
-            <span className={`ml-2 font-mono text-sm ${clr(stock.change1d)}`}>{fp(stock.change1d)}</span>
+            <span className={`ml-2 font-mono text-sm ${clr(stock.change1d)}`}>{fp(stock.change1d*100)}</span>
           </div>
           <div className="text-xs text-muted">{stock.company} · {stock.exchange}</div>
           {stock.sector && (
@@ -1025,7 +1025,7 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       </td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d*100)}</td>
                       <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
@@ -1133,7 +1133,7 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
                       </td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d*100)}</td>
                       <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
@@ -1331,7 +1331,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : '2,111' },
-          { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'MCW 1D Return (top 600 Europe)', value: loading ? '…' : fp(ewReturn*100) },
           { label: 'V+G Best Combined (top 600)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 600)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
@@ -1364,7 +1364,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d*100)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1622,7 +1622,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks',              value: loading ? '…' : '1,972' },
-          { label: 'MCW 1D Return (top 500 North America)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'MCW 1D Return (top 500 North America)', value: loading ? '…' : fp(ewReturn*100) },
           { label: 'V+G Best Combined (top 500)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 500)',  value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
@@ -1655,7 +1655,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
                       className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d*100)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1809,7 +1809,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Stocks', value: loading ? '…' : allStocks.length.toString() },
-          { label: 'MCW 1D Return (top 600 Asia Pacific)', value: loading ? '…' : fp(ewReturn) },
+          { label: 'MCW 1D Return (top 600 Asia Pacific)', value: loading ? '…' : fp(ewReturn*100) },
           { label: 'V+G Best Combined ≥80 (top 600)', value: loading ? '…' : highVG.toString() },
           { label: 'Gainers/Losers (top 600)', value: loading ? '…' : `${allGainers.length} / ${allLosers.length}` },
         ].map(({ label, value }) => (
@@ -1838,7 +1838,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
                     <tr key={i} onClick={() => goToStock(s.ticker, s.exchange)} className="cursor-pointer">
                       <td className="font-700 text-[12px] text-text whitespace-nowrap">{s.flag} {s.ticker}</td>
                       <td className="text-sub text-[11px]" style={{maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.company||'').length > 22 ? (s.company||'').slice(0,22)+'…' : s.company}</td>
-                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d)}</td>
+                      <td className="font-mono font-700 text-right whitespace-nowrap" style={clrStyle(s.change1d)}>{fp(s.change1d*100)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1961,7 +1961,7 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td><span className="text-[11px] font-600" style={{ color: getSectorColor(s.name) }}>{s.name}</span></td>
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fvs(s.mktCap, 0)}</td>
-                      <td className="font-mono font-600" style={clrS(s.change1d)}>{fpPct(s.change1d)}</td>
+                      <td className="font-mono font-600" style={clrS(s.change1d)}>{fpPct(s.change1d*100)}</td>
                       <td className="font-mono font-600" style={clrS(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
                       <td className="font-mono font-600" style={clrS(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clrS(s.mom12m)}>{fpDec(s.mom12m)}</td>
