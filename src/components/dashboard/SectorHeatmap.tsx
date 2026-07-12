@@ -44,14 +44,27 @@ function computeSectors(stocks: Stock[], field: string): SectorData[] {
   const result: SectorData[] = []
   for (const [sector, ss] of Array.from(map.entries())) {
     const valid = ss.filter(s => s.mktCap && (s as any)[field] != null)
+    // Peso di visualizzazione (dimensione del riquadro): market cap ATTUALE,
+    // rappresenta quanto e' grande il settore oggi — corretto per questo scopo.
     const totalMkt = valid.reduce((a, s) => a + (s.mktCap || 0), 0)
-    // change1d ora e' salvato come decimale grezzo, stessa convenzione di
-    // mom1w/mom1m/mom6m/mom12m — l'eccezione (moltiplicatore 1) risale a
-    // quando change1d aveva una scala diversa, non piu' valida.
+
+    // Peso per il calcolo del rendimento: market cap di PARTENZA stimata
+    // (cap_oggi / (1 + rendimento)), non quella attuale. Usare la cap
+    // attuale crea un bias circolare — i titoli che sono saliti di piu'
+    // pesano di piu' proprio perche' sono saliti, gonfiando ulteriormente
+    // la media a loro favore. Piu' il periodo e' lungo, piu' l'effetto e'
+    // marcato (es. un titolo +2900% pesa oggi ~30x quanto pesava un anno fa).
+    let weightedSum = 0
+    let startMktTotal = 0
+    for (const s of valid) {
+      const ret = (s as any)[field] || 0
+      const currentCap = s.mktCap || 0
+      const startCap = (1 + ret) > 0 ? currentCap / (1 + ret) : currentCap
+      weightedSum += ret * startCap
+      startMktTotal += startCap
+    }
     const multiplier = 100
-    const mcwReturn = totalMkt > 0
-      ? valid.reduce((a, s) => a + ((s as any)[field] || 0) * (s.mktCap || 0), 0) / totalMkt * multiplier
-      : 0
+    const mcwReturn = startMktTotal > 0 ? (weightedSum / startMktTotal) * multiplier : 0
     result.push({ sector, count: ss.length, mcwReturn, totalMktCap: totalMkt })
   }
   return result.sort((a, b) => b.totalMktCap - a.totalMktCap)
