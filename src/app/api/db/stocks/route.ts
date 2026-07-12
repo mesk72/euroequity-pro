@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 export const revalidate = 0
+export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+
+function jsonNoCache(body: any, init?: any) {
+  const res = NextResponse.json(body, init)
+  res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0')
+  res.headers.set('Pragma', 'no-cache')
+  res.headers.set('Expires', '0')
+  res.headers.set('CDN-Cache-Control', 'no-store')
+  res.headers.set('Vercel-CDN-Cache-Control', 'no-store')
+  return res
+}
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -203,7 +215,7 @@ export async function GET(req: NextRequest) {
       const s: any = stockRes.data?.[0] || {}
       const f: any = fundRes.data?.[0] || {}
       const p: any = priceRes.data?.[0] || {}
-      if (!s.ticker) return NextResponse.json({ stocks: [] })
+      if (!s.ticker) return jsonNoCache({ stocks: [] })
       const mapped = mapStock(s, f)
       if (p.adj_close != null) {
         mapped.price = p.adj_close
@@ -236,7 +248,7 @@ export async function GET(req: NextRequest) {
         if (m6m != null) mapped.mom6m = m6m
         if (m12m != null) mapped.mom12m = m12m
       }
-      return NextResponse.json({ stocks: [mapped], source: 'supabase' })
+      return jsonNoCache({ stocks: [mapped], source: 'supabase' })
     }
 
     if (search) {
@@ -246,7 +258,7 @@ export async function GET(req: NextRequest) {
         .or(`ticker.ilike.%${search}%,company.ilike.%${search}%`)
         .limit(limit > 0 ? limit : 20)
       const stocksData = data || []
-      if (!stocksData.length) return NextResponse.json({ stocks: [] })
+      if (!stocksData.length) return jsonNoCache({ stocks: [] })
       const tickers = stocksData.map((s: any) => s.ticker)
       const { data: fundData } = await supabase
         .from('fundamentals')
@@ -255,7 +267,7 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
       const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
-      return NextResponse.json({ stocks, source: 'supabase' })
+      return jsonNoCache({ stocks, source: 'supabase' })
     }
 
     const isUSOnly = exList.length === 1 && exList[0] === 'US'
@@ -284,10 +296,10 @@ export async function GET(req: NextRequest) {
       // "North America"/"Asia Pacific" combinati (gonfiati).
       stocks = applyUniverseFilter(fundData, stocksData)
     }
-    return NextResponse.json({ stocks, source: 'supabase' })
+    return jsonNoCache({ stocks, source: 'supabase' })
 
   } catch (e) {
-    return NextResponse.json({ error: 'Database error' }, { status: 500 })
+    return jsonNoCache({ error: 'Database error' }, { status: 500 })
   }
 }
 
