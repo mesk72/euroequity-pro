@@ -1,0 +1,6 @@
+Universo: 3000
+  ERRORE lettura freschi offset=0: HTTP 500
+Gia' freschi al 10 luglio: 0
+Da recuperare: 3000
+
+FINALE: ok=0 fail=3000 su 3000 recuperati
