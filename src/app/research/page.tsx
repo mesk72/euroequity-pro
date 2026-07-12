@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'European Equity Research | ForwardAlpha',
-  description: 'Institutional-grade quantitative equity research on European stocks.',
+  title: 'Global Equity Research | ForwardAlpha',
+  description: 'Institutional-grade quantitative equity research on 8,500+ stocks across North America, Europe, and Asia-Pacific.',
 }
 
 const MONTHS = [
@@ -99,7 +99,7 @@ export default function ResearchHubPage() {
             Research Hub
           </h1>
           <p style={{ color: '#94a3b8', fontSize: 14 }}>
-            Institutional-grade quantitative equity research on European stocks.
+            Institutional-grade quantitative equity research on 8,500+ stocks across North America, Europe, and Asia-Pacific.
           </p>
         </div>
 
@@ -166,9 +166,9 @@ export default function ResearchHubPage() {
         ))}
 
         <div style={{ background: '#0f1923', border: '1px solid #f9731633', borderRadius: 8, padding: '24px', textAlign: 'center', marginTop: 32 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Access the Full European Universe</div>
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Access the Full Global Universe</div>
           <p style={{ fontSize: 13, color: '#cbd5e1', marginBottom: 16 }}>
-            Screen 3,600+ European equities by Value Score, Growth Score, PE, momentum and more.
+            Screen 8,500+ equities across North America, Europe, and Asia-Pacific by Value Score, Growth Score, PE, momentum and more.
           </p>
           <Link href="/" style={{ display: 'inline-block', background: '#f97316', color: '#000', padding: '12px 28px', borderRadius: 6, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
             Open ForwardAlpha Screener →
