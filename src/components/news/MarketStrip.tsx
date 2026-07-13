@@ -23,6 +23,8 @@ const ASIA = [
   { name: 'Nikkei 225', url: 'https://finance.yahoo.com/quote/%5EN225/' },
   { name: 'Hang Seng',  url: 'https://finance.yahoo.com/quote/%5EHSI/'  },
   { name: 'ASX 200',    url: 'https://finance.yahoo.com/quote/%5EAXJO/' },
+  { name: 'KOSPI',      url: 'https://finance.yahoo.com/quote/%5EKS11/' },
+  { name: 'STI',        url: 'https://finance.yahoo.com/quote/%5ESTI/'  },
 ]
 
 function IndexBar({ label, indices }: { label: string; indices: { name: string; url: string }[] }) {
