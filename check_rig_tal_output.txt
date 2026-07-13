@@ -1,0 +1,11 @@
+
+=== RIG nel file TIKR (tutte le righe) ===
+  RIG | Transocean Ltd. | NYSE | USA | MktCap=$5,604.53MM | P/B=0.68x
+
+=== TAL nel file TIKR (tutte le righe) ===
+  TAL | TAL Education Group | NYSE | USA | MktCap=$5,529.87MM | P/B=1.46x
+  TAL | PetroTal Corp. | TSX | CAN | MktCap=$298.28MM | P/B=0.56x
+
+RIG.US nel database: [{'ticker': 'RIG', 'mkt_cap': 5604.53, 'pb': 0.68}]
+
+TAL.US nel database: [{'ticker': 'TAL', 'mkt_cap': 298.28, 'pb': 0.56}]
