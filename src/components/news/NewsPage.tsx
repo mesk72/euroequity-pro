@@ -39,6 +39,8 @@ const INDEX_LIST = [
   { name: 'Nikkei 225',    symbol: '^nkx'  },
   { name: 'Hang Seng',     symbol: '^hsi'  },
   { name: 'ASX 200',       symbol: '^axjo' },
+  { name: 'KOSPI',         symbol: '^kospi'},
+  { name: 'STI',           symbol: '^sti'  },
   { name: 'Gold',          symbol: 'gc.f'  },
   { name: 'Oil WTI',       symbol: 'cl.f'  },
   { name: 'EUR/USD',       symbol: 'eurusd'},
