@@ -1,0 +1,5 @@
+SIMO XETRA stocks: []
+SIMO XETRA fundamentals: []
+
+CMCX LSE stocks: [{'ticker': 'CMCX', 'exchange': 'LSE', 'company': 'CMC Markets Plc'}]
+CMCX LSE fundamentals: [{'ticker': 'CMCX', 'pe_trailing': 25.61, 'mom1w': 0.0731, 'mom1m': 0.6462}]
