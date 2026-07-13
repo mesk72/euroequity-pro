@@ -66,7 +66,14 @@ for i, ticker in enumerate(all_tickers):
         prev_date_sorted = sorted(prices_by_date.keys(), reverse=True)
         prev_price = prices_by_date[prev_date_sorted[1]] if len(prev_date_sorted) > 1 else None
 
-        p1w = nearest_price(prices_by_date, latest_dt - timedelta(days=7), 4)
+        def trading_day_price(prices_by_date, n):
+            # n=5 -> prezzo di 5 giorni di CONTRATTAZIONE fa (convenzione
+            # Yahoo), non "n giorni di calendario piu' vicino"
+            sorted_dates = sorted(prices_by_date.keys(), reverse=True)
+            if len(sorted_dates) <= n: return None
+            return prices_by_date[sorted_dates[n]]
+
+        p1w = trading_day_price(prices_by_date, 5)
         p1m = nearest_price(prices_by_date, latest_dt - timedelta(days=30), 6)
         p6m = nearest_price(prices_by_date, latest_dt - timedelta(days=182), 12)
         p12m = nearest_price(prices_by_date, latest_dt - timedelta(days=365), 15)
