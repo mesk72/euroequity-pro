@@ -143,15 +143,18 @@ try:
     for row in reader:
         ticker = row["Ticker"].strip()
         if not ticker: continue
-        # Determina exchange dalla colonna Exchange/Market del CSV
-        exch_raw = (row.get("Exchange","") or row.get("Market","") or "").strip().upper()
-        # Mappa borse TIKR → ForwardAlpha
-        if exch_raw in ("TSX","TSXV","TO","TSE"):
+        # Determina exchange dalla colonna corretta del CSV TIKR:
+        # "Primary Exchange" (non "Exchange"/"Market", che non esistono nel
+        # file — questo causava che TUTTO, incluso il Canada, finisse
+        # etichettato "US" di default, sovrascrivendo silenziosamente i
+        # dati dei titoli USA che condividono lo stesso simbolo ticker
+        # con un titolo canadese (es. HLF: Herbalife USA vs High Liner
+        # Foods Canada — 61 collisioni trovate).
+        exch_raw = (row.get("Primary Exchange","") or "").strip().upper()
+        country  = (row.get("Country","") or "").strip().upper()
+        if country == "CAN" or exch_raw in ("TSX","TSXV","CNSX","TO","TSE"):
             exchange = "TSX"
-        elif exch_raw in ("NYSE","NASDAQ","AMEX","OTC","PINK","NYSEARCA","BATS",""):
-            exchange = "US"
         else:
-            # Fallback: Canada ha suffisso .TO o ticker con pattern canadese
             exchange = "US"
         tikr_rows.append({
             "ticker": ticker, "exchange": exchange,
@@ -213,7 +216,7 @@ for r in tikr_rows:
 ok = 0
 for i in range(0, len(fund_updates), 100):
     try:
-        r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=fund_updates[i:i+100], timeout=30)
+        r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=fund_updates[i:i+100], timeout=30)
         if r.status_code in (200, 201, 204): ok += len(fund_updates[i:i+100])
     except Exception as e:
         print(f" WARN salvataggio fondamentali batch {i}: {e}")
