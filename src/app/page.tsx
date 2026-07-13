@@ -2368,11 +2368,6 @@ function AppContent() {
   }
 
   const accordionMenus = [
-    { id: 'dashboard', label: '📊 Dashboard', items: [
-      { id: 'northamerica' as Page, label: '🌎 North America' },
-      { id: 'dashboard' as Page, label: '🌍 Europe' },
-      { id: 'apdashboard' as Page, label: '🌏 Asia Pacific' },
-    ]},
     { id: 'bestideas', label: '⭐ Best Ideas', items: [
       { id: 'bestideas_us' as Page, label: '🌎 North America' },
       { id: 'bestideas' as Page, label: '🌍 Europe' },
@@ -2662,7 +2657,13 @@ function AppContent() {
               </div>
             </div>
           )}
-          {page === 'dashboard' && <Dashboard onSectorClick={goSector} onSelectStock={setDetailStock} onGoScreener={goScreenerEpsMom} />}
+          {page === 'dashboard' && (
+            <div style={{ padding: '48px 24px', textAlign: 'center', maxWidth: 480, margin: '0 auto' }}>
+              <div style={{ fontSize: 40, marginBottom: 16 }}>🛠️</div>
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Dashboard temporarily unavailable</div>
+              <p style={{ color: 'var(--text3)', fontSize: 14 }}>We're upgrading our data pipeline. This section will be back online shortly. In the meantime, the Screener and Research sections remain fully available.</p>
+            </div>
+          )}
           {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'GR' || page === 'CPSE' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'bestvalue'  && (user
             ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
@@ -2688,10 +2689,22 @@ function AppContent() {
             ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
-          {page === 'northamerica' && <DashboardUS onSectorClick={(s) => { setScrSectorUS(s); navigateTo('northamerica') }} onSelectStock={setDetailStock} />}
+          {page === 'northamerica' && (
+            <div style={{ padding: '48px 24px', textAlign: 'center', maxWidth: 480, margin: '0 auto' }}>
+              <div style={{ fontSize: 40, marginBottom: 16 }}>🛠️</div>
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Dashboard temporarily unavailable</div>
+              <p style={{ color: 'var(--text3)', fontSize: 14 }}>We're upgrading our data pipeline. This section will be back online shortly. In the meantime, the Screener and Research sections remain fully available.</p>
+            </div>
+          )}
           {page === 'globalscreen' && <Screener key="globalscreen" initExchange="US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={1000} />}
           {page === 'nascreen' && <Screener key={`nascreen-${scrSectorUS}`} initExchange="US,TSX" initSector={scrSectorUS} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={500} />}
-          {page === 'apdashboard' && <DashboardAP onSectorClick={(s) => { navigateTo('asiapacific') }} onSelectStock={setDetailStock} />}
+          {page === 'apdashboard' && (
+            <div style={{ padding: '48px 24px', textAlign: 'center', maxWidth: 480, margin: '0 auto' }}>
+              <div style={{ fontSize: 40, marginBottom: 16 }}>🛠️</div>
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Dashboard temporarily unavailable</div>
+              <p style={{ color: 'var(--text3)', fontSize: 14 }}>We're upgrading our data pipeline. This section will be back online shortly. In the meantime, the Screener and Research sections remain fully available.</p>
+            </div>
+          )}
           {page === 'asiapacific' && <Screener key={`asiapacific-${scrSectorAP}`} initExchange="TSE,SEHK,ASX,KRX,SGX" initSector={scrSectorAP} initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={350} />}
           {page === 'TSE' && <Screener key="TSE" initExchange="TSE" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={300} />}
           {page === 'SEHK' && <Screener key="SEHK" initExchange="SEHK" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={250} />}
