@@ -2328,3 +2328,56 @@ Andrea ha budget quasi zero per infrastruttura dati commerciale (vedi sezione pr
 
 ### Nota per la prossima sessione
 Andrea ha chiesto una stima dei ricavi potenziali se accettato nel programma Alpha Stream di QuantConnect — risposta rimandata perché richiede prima di verificare i dettagli esatti del programma (percentuali, soglie), e comunque nessuna stima è responsabile prima di avere un backtest reale con numeri concreti.
+
+---
+
+## Correzioni metodologiche sul cap settoriale (13 luglio, notte — CORREZIONI di Andrea al metodo proposto inizialmente)
+
+### Il metodo CORRETTO (non quello proposto inizialmente da Claude, corretto da Andrea)
+
+**Il cap è relativo al peso Russell 3000, non un tetto fisso uguale per tutti i settori.**
+Formula: `tetto_settore = peso_Russell_3000_del_settore + 20 punti percentuali` (overweight massimo consentito, valore illustrativo 20pp, da confermare).
+Esempio concreto: Financials nel Russell 3000 pesa 12,55% → tetto per Financials nel portafoglio = 32,55%, NON un generico 20% uguale per tutti i settori.
+
+**Non si tagliano titoli dal settore sopra soglia — si comprime il peso individuale.**
+Tutti i titoli che qualificano (es. tutti i 239 Financials con Best Score≥80) restano in portafoglio. Il peso del settore nel suo insieme viene limitato al tetto, quindi il peso PER SINGOLO TITOLO in quel settore si riduce proporzionalmente (es. 32,55% / 239 titoli = 0,1362% a testa, invece dello 0,193% "naturale" equal-weight).
+
+**La ridistribuzione del peso "liberato" è PROPORZIONALE al peso naturale degli altri settori, non equamente distribuita.**
+Il peso in eccesso tolto al settore sopra soglia si redistribuisce tra gli altri settori già qualificanti in proporzione al loro peso naturale originale (equal-weight) — non diviso in parti uguali tra tutti i settori rimanenti.
+
+**Il processo è ITERATIVO, non un solo calcolo.**
+Dopo aver fissato un settore al suo tetto e ridistribuito il resto, bisogna ricontrollare se qualche altro settore (che prima era sotto il proprio tetto) ora lo supera a causa della ridistribuzione — se sì, si fissa anche quello al suo tetto e si ripete il processo, finché nessun settore sfora più. Codice Python funzionante già scritto e testato stanotte (verificato: nel caso concreto Best Ideas 519 titoli, serve un solo giro — solo Financials sfora, tutti gli altri restano sotto il proprio tetto anche dopo la ridistribuzione).
+
+**Proprietà emergente interessante, verificata col calcolo reale**: dopo la ridistribuzione proporzionale, tutti i settori NON capped finiscono con lo stesso identico peso per singolo titolo tra loro (nel caso testato: 0,2409% ciascuno) — conseguenza matematica della scalatura uniforme che preserva le proporzioni relative tra settori.
+
+### Decisione presa: il cap si applica SOLO a Best Ideas, non a Value e Growth
+
+**Motivazione condivisa**: Value e Growth sono strategie fattoriali pure — la concentrazione settoriale (es. Value fortemente sovrappesato Financials, Growth verso Tech/Industrials) non è un difetto da correggere, è l'essenza stessa del fattore, coerente con come si comportano gli indici Value/Growth istituzionali reali (MSCI Value, Russell 1000 Growth ecc., che non impongono neutralità settoriale). Best Ideas invece si presenta con una promessa implicita di diversificazione ("le migliori opportunità sul mercato"), non di scommessa concentrata su un fattore — lì la disciplina del cap ha senso.
+
+### Dati sui pesi settoriali reali già calcolati (13 luglio, dal database ForwardAlpha, universo US 3.000 titoli)
+
+**Best Ideas (Best Score≥80): 519 titoli**
+Financials 46,05%, Energy 13,49%, Industrials 11,18%, Materials 7,32%, Consumer Discretionary 5,20%, Information Technology 4,43%, Healthcare 4,24%, Communication Services 3,85%, Consumer Staples 1,54%, Utilities 1,35%, Real Estate 1,35%.
+
+**Value (Value≥80 e Growth≥30): 391 titoli**
+Financials 59,59%, Energy 9,72%, Consumer Discretionary 8,70%, Industrials 6,65%, Materials 5,37%, Communication Services 2,30%, Utilities 2,05%, Information Technology 1,79%, Consumer Staples 1,53%, Healthcare 1,28%, Real Estate 1,02%.
+
+**Growth (Growth≥80): 529 titoli**
+Information Technology 24,76%, Industrials 19,28%, Healthcare 15,50%, Financials 14,74%, Energy 9,26%, Materials 6,05%, Consumer Discretionary 4,16%, Communication Services 2,27%, Consumer Staples 2,08%, Real Estate 1,70%, Utilities 0,19%.
+
+**Russell 3000 (IWV) al 10 luglio 2026, fornito da Andrea**:
+Information Technology 34,63%, Financials 12,55%, Industrials 10,02%, Health Care 9,60%, Communication 9,48%, Consumer Discretionary 9,39%, Consumer Staples 4,34%, Energy 3,24%, Real Estate 2,23%, Utilities 2,17%, Materials 2,14%, Cash/Derivatives 0,19%.
+
+### Bug noto, segnalato da Andrea, NON corretto su richiesta esplicita (rimandato)
+
+**"Best Ideas North America" mostra solo titoli USA, non include il Canada** — probabile stessa causa della disattenzione già corretta altrove stanotte (`apiExchange('US')` invece di `'US,TSX'`), ma in un punto del codice diverso (pagina Best Ideas specifica, non ancora localizzato/corretto). Da sistemare in una sessione futura.
+
+### Dati tecnici su QuantConnect utili per il prossimo passo
+
+**Dataset "US ETF Constituents"**: traccia titoli e pesi per 2.650 ETF USA, storico da giugno 2009 (giornaliero dal 2015). IWV (Russell 3000 ETF) molto probabilmente incluso. **Non è una tabella di pesi settoriali già pronta** — serve costruire una funzione che: prende i costituenti IWV a una data storica, li incrocia con il settore di ciascun titolo (anche questo disponibile storicamente nel dataset fondamentali USA di QuantConnect), somma per ottenere il peso settoriale Russell a quella data. Da scrivere come primo pezzo di codice quando si riprende, prima della logica di selezione vera e propria.
+
+**Programma Alpha Streams di QuantConnect** (per monetizzazione futura, se il backtest funziona bene): QuantConnect trattiene il 30% dei canoni di licenza, il quant riceve il 70%. I fondi pagano abbonamenti mensili che possono variare da ~100$ a ~30.000$/mese secondo la qualità/unicità della strategia — nessuna cifra garantita, dipende da criteri di accettazione severi (Probabilistic Sharpe Ratio, turnover minimo, bassa correlazione con fattori già ampiamente disponibili). Nota onesta condivisa con Andrea: le tre strategie (Value/Growth/Best Ideas classiche) sono fattori ben noti — il vero elemento distintivo da enfatizzare sarà la qualità del modello di ranking specifico di ForwardAlpha, non la categoria di fattore in sé.
+
+### Stato di avanzamento — nessun backtest ancora eseguito
+
+Tutta la sessione di stanotte ha riguardato SOLO la progettazione della metodologia (soglie, ribilanciamento, cap settoriale, fonte dati). **Nessun codice QuantConnect è stato ancora scritto, nessun backtest lanciato.** Prossima sessione (tra ~10 giorni): scrivere la funzione di pesi settoriali storici Russell, poi la Universe Selection con le tre soglie, poi la logica di cap iterativo (solo su Best Ideas), poi lanciare il primo backtest vero con conteggio del churn mensile incluso fin dall'inizio.
