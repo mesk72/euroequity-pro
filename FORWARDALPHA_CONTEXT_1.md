@@ -2207,3 +2207,93 @@ Il calcolo usava "31 giorni indietro" invece di "30", causando un errore misurab
 - Nel frattempo: gestione parallela del progetto tra Claude e Gemini per un mese, "chi fa meglio vince" — Andrea userà Gemini per il grosso del lavoro, interpellerà Claude solo se Gemini si blocca.
 - Richiesto un backup del repo (tag/branch Git che congela lo stato attuale) prima dell'inizio della transizione — non ancora creato, Andrea ha detto di aspettare.
 - Pomeriggio 12 luglio: nuovo tentativo di recupero titoli USA, condizionato allo sblocco di Leeway.
+
+---
+
+## Aggiornamento sessione notte 12-13 luglio 2026 (dopo il salvataggio precedente)
+
+### BUG GRAVI TROVATI E RISOLTI
+
+**Il vero motivo del bug momentum ×100 su tutti gli screener — risolto dopo ore di piste sbagliate.**
+Sintomo: momentum mostrato moltiplicato per 100 (8% diventava 800%) su schermate e mercati diversi, in modo incoerente. Piste sbagliate seguite ed escluse: cache browser (esclusa con test rigorosi in incognito e desktop pulito), componente `StockDetailPage.tsx` duplicato (trovato ma verificato essere codice morto, mai renderizzato), formule di formattazione diverse tra file (verificate tutte coerenti).
+**Causa reale**: in `route.ts`, nel percorso a singolo titolo, un blocco di codice residuo (probabilmente da un tentativo precedente mai ripulito) ricalcolava mom1w/1m/6m/12m dal vivo dalla cronologia prezzi, **già moltiplicato per 100**, sovrascrivendo silenziosamente il valore corretto (decimale) appena letto da `fundamentals`. Trovato leggendo la risposta JSON grezza dell'API fornita dall'utente. **Rimosso il blocco duplicato.**
+
+**Bug della finestra "1 mese" — 31 giorni invece di 30, verificato con fonte esterna.**
+Calcolo sbagliato di un giorno nella finestra "un mese fa" causava errori misurabili (per NVDA: 1,33% calcolato vs 5,26% reale, verificato contro Investing.com). Corretto in tutti gli script (`daily_us.py`, `daily_eu.py`, `daily_apac.py`, script standalone) da 31 a 30 giorni.
+
+**Bug del "1 settimana" — cambiata la convenzione su richiesta esplicita dell'utente.**
+Formula precedente: "giorno più vicino a 7 giorni di calendario fa" — divergeva da Yahoo Finance quando cadevano festività di mercato specifiche di un solo paese (verificato con NVDA, coincidenza dovuta a festività USA, vs SIM0 in Germania senza festività quella settimana, dove il metodo divergeva). **Cambiata la convenzione globalmente a "5 giorni di CONTRATTAZIONE effettivi indietro"** (convenzione standard Yahoo), applicata a tutti gli script permanenti (`daily_us.py`, `daily_eu.py`, `daily_apac.py`, sia percorso primario sia di retry) e ai 4 script standalone (US/EU/APAC/TSX). Rilanciato il calcolo completo su tutto il mondo.
+
+**Bug della market cap "di arrivo" invece che "di partenza" nelle mappe di calore — segnalato dall'utente, verificato e corretto.**
+Pesare il rendimento per la market cap ATTUALE crea un bias circolare: i titoli che sono saliti di più pesano di più proprio perché sono saliti (es. Kioxia +2911% pesava enormemente di più oggi che un anno fa). **Corretto pesando per la market cap di PARTENZA stimata** (`cap_oggi / (1+rendimento)`), sia nel componente `SectorHeatmap.tsx` condiviso sia nelle 3 tabelle "Sector Aggregates" (EU/US/APAC) in `page.tsx`.
+**Bug secondario scoperto nello stesso fix**: con rendimenti vicini a -100% (es. Takara Bio -99,9%, dato probabilmente corrotto) la formula di cap di partenza esplodeva verso l'infinito, distorcendo l'intera media di settore (Healthcare APAC mostrava -45,6% invece del +19,86% corretto). **Aggiunto un limite di sicurezza**: rapporto cap_partenza/cap_attuale limitato a [0.1x, 10x].
+
+**North America non includeva il Canada — bug trovato dall'utente, root cause diffusa.**
+Sia `SectorScreenUS` sia `DashboardUS` caricavano solo `apiExchange('US')`, escludendo completamente i ~400 titoli TSX. Corretto a `'US,TSX'` in entrambi — effetto a cascata su mappa di calore, tabella settori, top 500 per market cap, gainers/losers.
+**Conseguenza scoperta**: una volta incluso, il Canada mostrava variazioni giornaliere assurde (-28% Financials, -84% Materials) perché **TSX non era mai stato incluso in NESSUNO dei ricalcoli di stanotte** (momentum e punteggi erano ancora con la vecchia formula rotta). Creati `compute_momentum_tsx.py` e `recompute_scores_tsx.py`, eseguiti con successo (400/400 entrambi).
+
+**Best Score (combined_rank) calcolato nel modo sbagliato per EU/APAC/TSX — errore di metodologia, corretto dopo verifica del codice originale.**
+Scoperto (grazie a domanda diretta dell'utente) che `daily_us.py` calcola il Best Score sull'universo REGIONALE combinato (US+TSX insieme), non per singola borsa — mentre Value Score e Growth Score restano su base paese. Gli script scritti stanotte per EU/APAC/TSX calcolavano invece combined_rank per singola borsa, sbagliato. **Corretto con `fix_combined_rank_eu.py`** (tutta l'EU insieme), **`fix_combined_rank_na.py`** (US+TSX ricombinati), **`fix_combined_rank_ap.py`** (tutti e 5 i mercati APAC insieme, corretto dopo un primo tentativo errato a 3 soli mercati su indicazione esplicita dell'utente).
+
+**Mappa di calore, "1 Day" moltiplicato in modo incoerente.**
+Un'eccezione hardcoded (`multiplier = field === 'change1d' ? 1 : 100`) risaliva a quando `change1d` aveva una scala diversa da mom1w/mom6m/mom12m, non più valida dopo l'uniformazione di stanotte. Corretta in `SectorHeatmap.tsx`.
+
+**TIKR: collisione ticker USA/Canada — bug grave, root cause trovata nello script settimanale stesso.**
+Utente ha segnalato HLF (Herbalife USA vs High Liner Foods Canada) con dati scambiati. Trovate **61 collisioni totali** nel file `tikr_na_latest.csv` (inclusi AT&T, Wells Fargo, Welltower, Boston Scientific, Colgate-Palmolive, Equifax, CF Industries, Public Storage). **Causa radice**: `weekly_us.py` leggeva colonne inesistenti (`"Exchange"`/`"Market"` invece della vera colonna `"Primary Exchange"`), causando che OGNI riga (USA e Canada) finisse etichettata "US" per default — la scrittura successiva (senza `on_conflict`) faceva vincere l'ultima riga letta, a volte giusta a volte sbagliata. **Corretto**: nome colonna giusto, controllo incrociato su `Country`, aggiunto `on_conflict` mancante. Rilanciato `weekly_us.py` corretto — verificato stabile su un secondo run (HLF e TAL restano corretti).
+
+**Click sui settori North America portava alla dashboard invece che allo screener filtrato.**
+`onSectorClick` di `SectorScreenUS` puntava a `'northamerica'` (pagina Dashboard, non filtrata) mentre EU/APAC puntavano correttamente a pagine Screener. Creata/corretta destinazione `'usscreen'` con `initExchange='US,TSX'` (includendo il fix Canada), corretto il gestore click.
+
+**66 titoli con settore "numerico" (71-77) invece di un nome leggibile.**
+Causavano riquadri anomali nelle mappe di calore di tutti i continenti. Identificati come sottocodici GICS per REIT mai tradotti (SOCIMI spagnoli, REIT americani/coreani/di Singapore — tutti confermati dal nome azienda). Riclassificati tutti a "Real Estate".
+
+### PROCESSO — un errore di metodo da ricordare
+
+**Due volte stanotte un fix già fatto è andato perso** (il lucchetto login sui settori, poi la correzione `clr`→`clrS` per Asia Pacific) perché una modifica successiva è stata fatta su una copia locale scaricata PRIMA che il fix precedente fosse pushato, e il push successivo ha sovrascritto tutto. **Lezione operativa**: prima di ogni modifica a `page.tsx` (file toccato decine di volte in una notte), scaricare sempre una copia fresca da GitHub, mai riusare una copia locale precedente nella stessa sessione se sono passati altri push nel frattempo.
+
+### NUOVE FUNZIONALITÀ AGGIUNTE
+
+- **Screener Globale** ("🌐 Global"): Top 1.000 titoli per market cap su tutti e 3 i continenti insieme, posizionato prima di North America sia nelle schede in alto sia nella barra laterale.
+- **Riga TOTAL** in fondo alle tabelle "Sector Aggregates" per tutti e 3 i continenti: totale titoli, market cap, medie ponderate (1D/EPS/Rev/Mom12M con la stessa correzione market-cap-di-partenza, Value/Growth/Best con cap attuale).
+- **Ricerca globale** (qualsiasi titolo, qualsiasi mercato) aggiunta in cima allo Screener, identica a quella già presente nelle tre dashboard.
+- **Lucchetto login** aggiunto alle tre pagine Sector Heatmap dedicate (EU/US/APAC) — stesso schema `LoginGate` già usato per Best Value/Growth/Ideas. Le mappe di calore embedded nelle dashboard principali restano visibili a tutti (non richiesto dall'utente di proteggere anche quelle).
+- **Multi-wallet in "My Screen"**: riscritto `WatchlistButton.tsx` da toggle singolo a menu a checkbox — un titolo può stare in più wallet contemporaneamente, rimuoverlo da uno non tocca gli altri.
+- **Ordinamento in "My Screen"**: aggiunto per Settore/MktCap/1D/1W/1M/6M/12M/Value/Growth/Best — intestazioni cliccabili su desktop, menu a tendina su mobile.
+- **Fix pulsante indietro "My Screen"**: il wallet attivo ora persiste in sessionStorage, tornare da una pagina titolo non riporta più sempre al Wallet 1.
+- **KOSPI e Singapore STI** aggiunti alla pagina News (sia pulsanti "ASIA PAC" con link Yahoo, sia striscia prezzi live).
+
+### CORREZIONI DI CONTENUTO/SEO
+
+- **0E2B (LSE)** escluso dall'universo — è un fondo (Multi Units Luxembourg - Amundi), non un'azione.
+- **Pagina Research**: aggiornata da "European"/"3.600+ titoli" (residuo di quando il prodotto si chiamava EuroEquity Pro) a globale — poi corretto ulteriormente da "8.500+" a **"8.000+"** (numero reale più vicino ai conti effettivi: ~3.000 US + ~400 CA + ~2.137 EU + ~2.350 APAC ≈ 7.900). Stessa correzione 8.500→8.000 applicata anche in About e pagina principale.
+- **`noindex` automatico** aggiunto per titoli esclusi dall'universo (es. S.S. Lazio, market cap troppo bassa) — evita che Google proponga pagine con dati incompleti come risultati di ricerca prominenti.
+
+### DASHBOARD DISATTIVATE SU RICHIESTA ESPLICITA
+
+Le tre dashboard principali (Nord America, Europa, Asia Pacific) mostrano temporaneamente un avviso "temporarily unavailable" invece dei widget (mappa di calore, indici, gainers/losers) — motivo: indici mancanti, dati non allineati alla stessa data tra loro. **Codice originale non cancellato**, solo sostituito nella visualizzazione; rimosso il gruppo "Dashboard" dal menu laterale. Screener, Ricerca e My Screen restano pienamente attivi.
+
+### DECISIONI DI BUSINESS/LEGALI PRESE STANOTTE
+
+**Situazione economica**: Andrea guadagna ~1.000€/mese, spese fisse ~1.000€/mese (affitto+cibo), sta consumando patrimonio personale. Budget massimo disponibile ora: **~100€/mese totali** (Twelvedata + Claude + Supabase).
+
+**Preventivo Financial Modeling Prep ricevuto e RIFIUTATO**: $4.500/anno primo anno (sconto iniziale non permanente), €375/mese — troppo caro per il budget. Email di cancellazione inviata ad Alex Toti (FMP), cortese, motivo: budget.
+
+**Strategia dati decisa**:
+1. **Backtest per pitch a CIO/partner (eToro, Interactive Brokers)**: dati acquistati da **NASDAQ** — unica fonte pulita per questo scopo specifico, dato che verrà mostrata a terzi con finalità di business development.
+2. **Sito pubblico**: resta pubblico **solo fino al 16 luglio** (scadenza naturale della licenza commerciale Leeway per i prezzi). Dopo quella data, passaggio a **versione realmente privata** (login obbligatorio ovunque, non solo sulle funzioni premium) — non solo de-indicizzazione Google (insufficiente: un sito raggiungibile via URL diretto resta "pubblico" ai fini delle licenze dati, anche se Google non lo mostra più).
+3. **Dopo il 16 luglio**: uso personale di Yahoo Finance + TIKR per un sito privato di gestione portafoglio/investimenti — rischio pratico basso ma non "pulito" legalmente se lo scopo finale include mostrare risultati a CIO/eToro/IB (differenza chiarita: "non vendo il sito" non è l'argomento che protegge, il punto è "pubblico vs privato").
+4. **Demo dal vivo a CIO remoti** (Milano/Londra/New York/Zurigo): mai dare login diretto — condivisione schermo controllata da Andrea, idealmente su uno **snapshot statico preparato la mattina stessa e poi scollegato dalle API** (suggerito da Gemini, validato). File Excel/PDF con dati grezzi da NON mandare se contengono dati Yahoo/TIKR — solo output del modello (punteggi) o dati NASDAQ puliti.
+5. **Twelvedata**: trial 12 giorni parte **14 luglio**. Budget target 100-150€/mese, valutazione realistica più vicina a 250-400€/mese salvo piano custom. Andrea userà ~800 chiamate/giorno disponibili dal suo abbonamento "Health Data" personale già attivo per testare 2 titoli USA + 2 EU (~324 crediti su 800 disponibili) prima di consumare il trial vero e proprio.
+6. **GCC (Golfo)**: scoperto un file TIKR con 500 titoli aggiuntivi (Arabia Saudita 214, Emirati 113, Kuwait 84, Qatar 42, Oman 34, Bahrain 13). Copertura Yahoo Finance verificata parzialmente: Arabia Saudita (Tadawul) confermata coperta con storico completo (Saudi Aramco testato), Emirati (ADX) incerta (First Abu Dhabi Bank non risultava su Yahoo Finance diretto nella ricerca, solo su Bloomberg/TradingView/Investing.com) — **non verificato per Kuwait, Qatar, Oman, Bahrain**.
+
+**Infrastruttura**:
+- **Vercel**: confermato passaggio al piano gratuito, scadenza abbonamento attuale al **13 luglio** (non 1 agosto, corretto dall'utente). Rischio basso se il sito diventa privato come da piano.
+- **Supabase**: **NON si scende al piano gratuito** — verificato che `prices_eod` ha **6.176.308 righe**, stima 490-620MB solo per quella tabella, probabilmente già oltre il limite di 500MB del piano free. Risparmio di 25€/mese non vale il rischio di bloccare l'intera pipeline dati.
+
+**Gemini AI**: Andrea ha deciso di affiancare Gemini per un mese di prova parallela (memoria di contesto molto più ampia, 2M token, potenzialmente utile per bug complessi come quello di stanotte). Claude resta disponibile su richiesta se Gemini si blocca. Discussione onesta sui limiti di Claude fatta esplicitamente: nessuna memoria persistente tra sessioni (ricostruita ogni volta), nessuna visibilità diretta sul sito live, propri script diagnostici con bug propri (causa di più errori stanotte). Abbonamento Claude riattivato da Andrea per il mese prossimo.
+
+### PROMEMORIA TECNICI PER LA PROSSIMA SESSIONE
+
+- Copertura reale prezzi (US/EU/APAC/Canada) non riverificata dopo tutti i fix di stanotte — Leeway era bloccato ("limite di 0 richieste al giorno") per la maggior parte della sessione, quota da verificare.
+- Indice mancante su `prices_eod(exchange, date)` — causa nota di timeout su query aggregate, mai creato.
+- Se si riprende a lavorare sul sito pubblico prima del 16 luglio: verificare che i fix di stanotte (specialmente Best Score regionale e momentum 1w) siano rimasti stabili nel tempo, non sovrascritti da un run notturno con codice vecchio in qualche script non ancora aggiornato.
