@@ -4,8 +4,8 @@
   XETRA FINALE: ok=210 fail=1
 === PA: 217 titoli ===
   PA FINALE: ok=216 fail=1
-=== LSE: 424 titoli ===
-  LSE FINALE: ok=424 fail=0
+=== LSE: 423 titoli ===
+  LSE FINALE: ok=423 fail=0
 === SWX: 161 titoli ===
   SWX FINALE: ok=161 fail=0
 === OM: 206 titoli ===
@@ -31,4 +31,4 @@
 === LS: 35 titoli ===
   LS FINALE: ok=35 fail=0
 
-TOTALE EU: ok=2135 fail=2
+TOTALE EU: ok=2134 fail=2
