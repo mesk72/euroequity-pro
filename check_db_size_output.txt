@@ -1,0 +1,4 @@
+prices_eod: ? righe
+fundamentals: 12190 righe
+stocks: 10215 righe
+watchlist: 92 righe
