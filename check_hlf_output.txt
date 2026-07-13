@@ -1,0 +1,1 @@
+HLF fundamentals: [{'ticker': 'HLF', 'mkt_cap': 295.35, 'pb': 0.72, 'pe_trailing': 10.78, 'pe_forward': 8.22}]
