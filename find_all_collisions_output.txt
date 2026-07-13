@@ -1,0 +1,186 @@
+Ticker totali nel file: 3939
+Ticker duplicati (US+Canada stesso simbolo): 61
+
+ABX:
+  NYSE | USA | Abacus Global Management, Inc. | MktCap=$1,131.88MM
+  TSX | CAN | Barrick Mining Corporation | MktCap=$61,776.48MM
+ACM:
+  NYSE | USA | AECOM | MktCap=$8,693.29MM
+  CNSX | CAN | Allied Critical Metals Inc. | MktCap=$299.63MM
+ACT:
+  NasdaqGS | USA | Enact Holdings, Inc. | MktCap=$6,351.83MM
+  TSX | CAN | Aduro Clean Technologies Inc. | MktCap=$543.65MM
+AI:
+  NYSE | USA | C3.ai, Inc. | MktCap=$1,388.16MM
+  TSX | CAN | Atrium Mortgage Investment Corporation | MktCap=$409.02MM
+AII:
+  NYSE | USA | American Integrity Insurance Group, Inc. | MktCap=$375.16MM
+  TSX | CAN | Almonty Industries Inc. | MktCap=$4,374.28MM
+ARE:
+  NYSE | USA | Alexandria Real Estate Equities, Inc. | MktCap=$8,610.66MM
+  TSX | CAN | Aecon Group Inc. | MktCap=$2,403.81MM
+ARX:
+  NYSE | USA | Accelerant Holdings | MktCap=$2,939.17MM
+  TSX | CAN | ARC Resources Ltd. | MktCap=$12,431.63MM
+BLX:
+  NYSE | USA | Bladex Inc. | MktCap=$2,122.49MM
+  TSX | CAN | Boralex Inc. | MktCap=$2,678.75MM
+BSX:
+  NYSE | USA | Boston Scientific Corporation | MktCap=$67,331.89MM
+  TSX | CAN | Belo Sun Mining Corp | MktCap=$395.39MM
+BYD:
+  NYSE | USA | Boyd Gaming Corporation | MktCap=$6,590.85MM
+  TSX | CAN | Boyd Group Services Inc. | MktCap=$2,720.65MM
+BZ:
+  NasdaqGS | USA | Kanzhun Limited | MktCap=$6,274.15MM
+  TSXV | CAN | Benz Mining Corp. | MktCap=$559.84MM
+CCO:
+  NYSE | USA | Clear Channel Outdoor Holdings, Inc. | MktCap=$1,226.65MM
+  TSX | CAN | Cameco Corporation | MktCap=$41,251.81MM
+CF:
+  NYSE | USA | CF Industries Holdings, Inc. | MktCap=$17,658.15MM
+  TSX | CAN | Canaccord Genuity Group Inc. | MktCap=$1,034.07MM
+CG:
+  NasdaqGS | USA | The Carlyle Group Inc. | MktCap=$15,842.47MM
+  TSX | CAN | Centerra Gold Inc. | MktCap=$3,215.47MM
+CINF:
+  NasdaqGS | USA | Cincinnati Financial Corporation | MktCap=$29,245.08MM
+  TSX | CAN | CI Global Infrastructure Private Pool | MktCap=$327.94MM
+CL:
+  NYSE | USA | Colgate-Palmolive Company | MktCap=$76,041.99MM
+  CNSX | CAN | Cresco Labs Inc. | MktCap=$286.64MM
+CNR:
+  NYSE | USA | Core Natural Resources, Inc. | MktCap=$3,990.27MM
+  TSX | CAN | Canadian National Railway Company | MktCap=$74,634.67MM
+EFR:
+  NYSE | USA | Eaton Vance Senior Floating-Rate Trust | MktCap=$312.66MM
+  TSX | CAN | Energy Fuels Inc. | MktCap=$3,218.86MM
+EFX:
+  NYSE | USA | Equifax Inc. | MktCap=$20,787.66MM
+  TSX | CAN | Enerflex Ltd. | MktCap=$2,817.53MM
+ELF:
+  NYSE | USA | e.l.f. Beauty, Inc. | MktCap=$4,478.25MM
+  TSX | CAN | E-L Financial Corporation Limited | MktCap=$4,128.78MM
+ENS:
+  NYSE | USA | EnerSys | MktCap=$7,144.67MM
+  TSX | CAN | E Split Corp. | MktCap=$298.05MM
+ESI:
+  NYSE | USA | Element Solutions Inc | MktCap=$9,395.93MM
+  TSX | CAN | Ensign Energy Services Inc. | MktCap=$420.97MM
+ET:
+  NYSE | USA | Energy Transfer LP | MktCap=$68,169.37MM
+  TSX | CAN | Evertz Technologies Limited | MktCap=$948.46MM
+EXE:
+  NasdaqGS | USA | Expand Energy Corporation | MktCap=$21,425.34MM
+  TSX | CAN | Extendicare Inc. | MktCap=$2,471.93MM
+H:
+  NYSE | USA | Hyatt Hotels Corporation | MktCap=$18,188.43MM
+  TSX | CAN | Hydro One Limited | MktCap=$24,683.72MM
+HG:
+  NYSE | USA | Hamilton Insurance Group, Ltd. | MktCap=$3,373.31MM
+  CNSX | CAN | HydroGraph Clean Power Inc. | MktCap=$1,174.41MM
+HLF:
+  NYSE | USA | Herbalife Ltd. | MktCap=$1,362.22MM
+  TSX | CAN | High Liner Foods Incorporated | MktCap=$295.35MM
+IAU:
+  ARCA | USA | iShares Gold Trust | MktCap=$61,195.80MM
+  TSX | CAN | i-80 Gold Corp. | MktCap=$1,220.83MM
+KEY:
+  NYSE | USA | KeyCorp | MktCap=$25,224.85MM
+  TSX | CAN | Keyera Corp. | MktCap=$11,859.22MM
+L:
+  NYSE | USA | Loews Corporation | MktCap=$24,064.67MM
+  TSX | CAN | Loblaw Companies Limited | MktCap=$51,521.34MM
+LB:
+  NYSE | USA | LandBridge Company LLC | MktCap=$2,155.87MM
+  TSX | CAN | Laurentian Bank of Canada | MktCap=$1,269.34MM
+LGN:
+  NasdaqGS | USA | Legence Corp. | MktCap=$5,411.42MM
+  TSXV | CAN | Logan Energy Corp. | MktCap=$445.85MM
+LUNR:
+  NasdaqGM | USA | Intuitive Machines, Inc. | MktCap=$2,864.07MM
+  TSX | CAN | LunR Royalties Corp. | MktCap=$1,595.34MM
+MFI:
+  NasdaqCM | USA | mF International Limited | MktCap=$451.59MM
+  TSX | CAN | Maple Leaf Foods Inc. | MktCap=$2,692.96MM
+MG:
+  NYSE | USA | Mistras Group, Inc. | MktCap=$529.11MM
+  TSX | CAN | Magna International Inc. | MktCap=$17,530.70MM
+NEO:
+  NasdaqCM | USA | NeoGenomics, Inc. | MktCap=$1,888.07MM
+  TSX | CAN | Neo Performance Materials Inc. | MktCap=$1,147.76MM
+NFG:
+  NYSE | USA | National Fuel Gas Company | MktCap=$7,606.63MM
+  TSXV | CAN | New Found Gold Corp. | MktCap=$584.53MM
+PBH:
+  NYSE | USA | Prestige Consumer Healthcare Inc. | MktCap=$2,388.50MM
+  TSX | CAN | Premium Brands Holdings Corporation | MktCap=$3,141.18MM
+PCOR:
+  NYSE | USA | Procore Technologies, Inc. | MktCap=$6,747.81MM
+  TSX | CAN | PIMCO Managed Core Bond Pool | MktCap=$294.60MM
+PD:
+  NYSE | USA | PagerDuty, Inc. | MktCap=$792.82MM
+  TSX | CAN | Precision Drilling Corporation | MktCap=$1,015.48MM
+PPL:
+  NYSE | USA | PPL Corporation | MktCap=$27,378.03MM
+  TSX | CAN | Pembina Pipeline Corporation | MktCap=$27,758.79MM
+PSA:
+  NYSE | USA | Public Storage | MktCap=$57,711.28MM
+  TSX | CAN | Purpose Fund Corp. - Purpose High Interest Savings Fund | MktCap=$2,182.18MM
+QTWO:
+  NYSE | USA | Q2 Holdings, Inc. | MktCap=$3,377.29MM
+  TSXV | CAN | Q2 Metals Corp. | MktCap=$456.50MM
+REAL:
+  NasdaqGS | USA | The RealReal, Inc. | MktCap=$1,316.93MM
+  TSX | CAN | Real Matters Inc. | MktCap=$267.47MM
+REG:
+  NasdaqGS | USA | Regency Centers Corporation | MktCap=$14,742.77MM
+  TSXV | CAN | Regulus Resources Inc. | MktCap=$361.78MM
+RSI:
+  NYSE | USA | Rush Street Interactive, Inc. | MktCap=$3,363.71MM
+  TSX | CAN | Rogers Sugar Inc. | MktCap=$624.48MM
+SBC:
+  NasdaqGM | USA | SBC Medical Group Holdings Incorporated | MktCap=$304.43MM
+  TSX | CAN | Brompton Split Banc Corp. | MktCap=$364.13MM
+SES:
+  NYSE | USA | SES AI Corporation | MktCap=$298.53MM
+  TSX | CAN | SECURE Waste Infrastructure Corp. | MktCap=$3,748.25MM
+SIG:
+  NYSE | USA | Signet Jewelers Limited | MktCap=$3,282.46MM
+  TSXV | CAN | Sitka Gold Corp. | MktCap=$310.20MM
+SLG:
+  NYSE | USA | SL Green Realty Corp. | MktCap=$3,575.43MM
+  TSXV | CAN | San Lorenzo Gold Corp. | MktCap=$322.02MM
+SLS:
+  NasdaqCM | USA | SELLAS Life Sciences Group, Inc. | MktCap=$2,654.54MM
+  TSX | CAN | Solaris Resources Inc. | MktCap=$1,338.12MM
+SPB:
+  NYSE | USA | Spectrum Brands Holdings, Inc. | MktCap=$1,917.14MM
+  TSX | CAN | Superior Plus Corp. | MktCap=$1,173.15MM
+T:
+  NYSE | USA | AT&T Inc. | MktCap=$146,540.47MM
+  TSX | CAN | TELUS Corporation | MktCap=$16,402.07MM
+TAL:
+  NYSE | USA | TAL Education Group | MktCap=$5,529.87MM
+  TSX | CAN | PetroTal Corp. | MktCap=$298.28MM
+TKO:
+  NYSE | USA | TKO Group Holdings, Inc. | MktCap=$14,312.64MM
+  TSX | CAN | Trekor Metals Limited | MktCap=$2,389.15MM
+TOI:
+  NasdaqCM | USA | The Oncology Institute, Inc. | MktCap=$579.90MM
+  TSXV | CAN | Topicus.com Inc. | MktCap=$5,416.76MM
+TXG:
+  NasdaqGS | USA | 10x Genomics, Inc. | MktCap=$4,802.75MM
+  TSX | CAN | Torex Gold Resources Inc. | MktCap=$3,710.44MM
+VHI:
+  NYSE | USA | Valhi, Inc. | MktCap=$376.42MM
+  TSX | CAN | Vitalhub Corp. | MktCap=$327.15MM
+WELL:
+  NYSE | USA | Welltower Inc. | MktCap=$167,718.21MM
+  TSX | CAN | WELL Health Technologies Corp. | MktCap=$766.60MM
+WFC:
+  NYSE | USA | Wells Fargo & Company | MktCap=$266,787.32MM
+  TSX | CAN | Wall Financial Corporation | MktCap=$450.51MM
+WGO:
+  NYSE | USA | Winnebago Industries, Inc. | MktCap=$872.94MM
+  TSXV | CAN | White Gold Corp. | MktCap=$263.80MM
