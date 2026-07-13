@@ -2297,3 +2297,34 @@ Le tre dashboard principali (Nord America, Europa, Asia Pacific) mostrano tempor
 - Copertura reale prezzi (US/EU/APAC/Canada) non riverificata dopo tutti i fix di stanotte — Leeway era bloccato ("limite di 0 richieste al giorno") per la maggior parte della sessione, quota da verificare.
 - Indice mancante su `prices_eod(exchange, date)` — causa nota di timeout su query aggregate, mai creato.
 - Se si riprende a lavorare sul sito pubblico prima del 16 luglio: verificare che i fix di stanotte (specialmente Best Score regionale e momentum 1w) siano rimasti stabili nel tempo, non sovrascritti da un run notturno con codice vecchio in qualche script non ancora aggiornato.
+
+---
+
+## Discussione parallela: monetizzazione tramite piattaforme di quant trading crowdsourced (13 luglio, notte, ripresa prevista tra ~10 giorni)
+
+### Contesto
+Andrea ha budget quasi zero per infrastruttura dati commerciale (vedi sezione precedente). Alternativa esplorata: piattaforme che offrono dati istituzionali gratuiti in cambio di mostrare/licenziare la strategia, invece di comprare dati a pagamento.
+
+### Piattaforme confrontate
+- **QuantConnect** — scelta primaria. Dati fondamentali USA gratuiti (Morningstar, ~8.100 titoli, PE/PB/ratios aggiornati, point-in-time corretto, include titoli delistati quindi niente survivorship bias). Piano gratuito senza scadenza, backtest illimitati, nessuna carta di credito richiesta. Il trading live costa (~60-120$/mese secondo le fonti), ma per validare le strategie non serve arrivare lì. **Limite importante**: dati fondamentali gratuiti sono SOLO USA, non globali — Europa/APAC richiederebbero dataset aggiuntivi a pagamento. Hanno un programma "Alpha Stream" dove le strategie migliori vengono selezionate e licenziate dalla piattaforma con revenue share per l'autore — dettagli esatti (percentuale, soglie di accettazione, capitale tipico allocato) non ancora verificati in profondità.
+- **Quantiacs** — seconda scelta. Se supera i loro stress test, allocano fino a 1 milione di dollari sulla strategia, autore mantiene il 100% della proprietà del codice, riceve il 10% dei profitti generati, zero rischio di perdite a carico dell'autore. Da verificare se hanno dati fondamentali altrettanto profondi di QuantConnect (sembrano più orientati a prezzi/tecnico).
+- **Darwinex** — scartata per ora: richiede di far girare la strategia su un conto di trading reale con capitale esposto prima di attrarre capitale terzo, non compatibile con la situazione economica attuale di Andrea.
+- **Numerai** — scartata: crowdsourcing di segnali su dati spesso astratti/criptati, logica diversa da un modello di valutazione fondamentale come quello di ForwardAlpha.
+
+### Le tre strategie definite da testare
+1. **Best Ideas**: tutti i titoli con Best Score (combined_rank) ≥ 80
+2. **Value**: tutti i titoli con Value Score ≥ 80 E Growth Score ≥ 30
+3. **Growth**: tutti i titoli con Growth Score ≥ 80
+
+### Metodologia di ribilanciamento concordata (stile JP Morgan, confermata da Andrea)
+- **Ricalcolo dei punteggi: giornaliero** (il modello deve sempre usare l'informazione più fresca disponibile il giorno del trade)
+- **Ribilanciamento/trade: mensile** (primo giorno di contrattazione del mese — confronta chi soddisfa ancora la soglia, chi esce, chi entra; i titoli che restano sopra soglia non vengono ritoccati tra un ribilanciamento e l'altro, per non far mangiare i costi di transazione dalla rotazione continua)
+- **Attenzione al look-ahead bias**: usare solo dati fondamentali realmente pubblici alla data del ribilanciamento, non rettifiche successive — QuantConnect lo garantisce di base per il dataset USA ("solo le cifre originariamente riportate")
+- **Suggerimento di Gemini, condiviso**: monitorare il "churn" (quanti titoli entrano/escono ad ogni ribilanciamento) fin dal primo backtest, integrato nel codice stesso (non aggiunto dopo). Se il churn è molto alto (es. 200 titoli su 519 ogni mese), considerare un "filtro di inerzia/banding" — entra sopra 80, esce solo sotto 70 — tecnica standard nel factor investing per ridurre rumore/costi di transazione inutili.
+- **Nessun dato di churn disponibile ancora**: il database ForwardAlpha tiene solo il punteggio ATTUALE di ogni titolo, non uno storico mese per mese — serve il backtest vero per saperlo, non calcolabile a posteriori sui dati esistenti.
+
+### Stato di avanzamento
+**Nessun backtest ancora eseguito.** Solo definita la struttura/metodologia. Andrea userà il tempo prima della ripresa (10 giorni) per concentrarsi sul trial Twelvedata (priorità più urgente, finestra di tempo fissa). Quando si riprende: scrivere il codice Python per QuantConnect (Universe Selection sulle tre soglie), includendo il conteggio del churn come metrica di output fin dal primo test.
+
+### Nota per la prossima sessione
+Andrea ha chiesto una stima dei ricavi potenziali se accettato nel programma Alpha Stream di QuantConnect — risposta rimandata perché richiede prima di verificare i dettagli esatti del programma (percentuali, soglie), e comunque nessuna stima è responsabile prima di avere un backtest reale con numeri concreti.
