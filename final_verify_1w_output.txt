@@ -1,0 +1,2 @@
+NVDA.US: mom1w=0.0828 -> 8.28%
+SIM0.XETRA: mom1w=0.0084 -> 0.84%
