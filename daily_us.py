@@ -342,9 +342,20 @@ for stock in all_stocks:
             return round(last_px / closest['close'] - 1, 6)
         return None
 
+    def mom1w_trading():
+        # 1w = esattamente 5 giorni di CONTRATTAZIONE fa (come Yahoo Finance
+        # "5G"), non "7 giorni di calendario piu' vicino" — le due
+        # convenzioni divergono quando cadono festivita' di mercato che
+        # spostano il conteggio in modo diverso da paese a paese.
+        if len(data) < 6: return None
+        base = data[5]['close']
+        if base and base != 0:
+            return round(last_px / base - 1, 6)
+        return None
+
     mom_updates.append({
         "ticker": ticker, "exchange": exchange,
-        "mom1w": mom_cal(7), "mom1m": mom_cal(30),
+        "mom1w": mom1w_trading(), "mom1m": mom_cal(30),
         "mom6m": mom_cal(182), "mom12m": mom_cal(365),
         "change1d": chg1d, "price": last_px,
     })
@@ -388,10 +399,17 @@ if split_suspects:
                         return round(last_px2 / closest["adj_close"] - 1, 6)
                     return None
 
+                def mom1w_trading2():
+                    if len(new_sorted) < 6: return None
+                    base = new_sorted[5]["adj_close"]
+                    if base and base != 0:
+                        return round(last_px2 / base - 1, 6)
+                    return None
+
                 key = (ticker, exchange)
                 if key in mom_by_key:
                     mom_by_key[key].update({
-                        "mom1w": mom_cal2(7), "mom1m": mom_cal2(30),
+                        "mom1w": mom1w_trading2(), "mom1m": mom_cal2(30),
                         "mom6m": mom_cal2(182), "mom12m": mom_cal2(365),
                         "change1d": new_chg1d, "price": last_px2,
                     })
