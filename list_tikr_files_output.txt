@@ -1,0 +1,7 @@
+STATUS: 200
+  fiscal_year_end.csv - 241796 bytes - 2026-07-10T06:33:59.942Z
+  fiscal_year_global.csv - 418865 bytes - 2026-06-15T08:39:25.565Z
+  tikr_apac_latest.csv - 688744 bytes - 2026-07-01T13:34:43.074Z
+  tikr_eu_latest.csv - 607870 bytes - 2026-07-04T16:10:14.995Z
+  tikr_gcc_latest.csv - 85908 bytes - 2026-07-09T10:36:25.690Z
+  tikr_na_latest.csv - 763616 bytes - 2026-07-08T16:05:47.869Z
