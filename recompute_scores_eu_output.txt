@@ -4,8 +4,8 @@ XETRA: universo 211, fundamentals filtrati 211
   XETRA: scritti ok=211 fail=0
 PA: universo 217, fundamentals filtrati 217
   PA: scritti ok=217 fail=0
-LSE: universo 424, fundamentals filtrati 424
-  LSE: scritti ok=424 fail=0
+LSE: universo 423, fundamentals filtrati 423
+  LSE: scritti ok=423 fail=0
 SWX: universo 161, fundamentals filtrati 161
   SWX: scritti ok=161 fail=0
 OM: universo 206, fundamentals filtrati 206
@@ -31,4 +31,4 @@ IR: universo 15, fundamentals filtrati 15
 LS: universo 35, fundamentals filtrati 35
   LS: scritti ok=35 fail=0
 
-TOTALE EU: ok=2137 fail=0
+TOTALE EU: ok=2136 fail=0
