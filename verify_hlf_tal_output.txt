@@ -1,0 +1,2 @@
+HLF.US ora: [{'ticker': 'HLF', 'mkt_cap': 1362.22, 'pb': -3.08, 'pe_trailing': 5.77, 'pe_forward': 4.74}]
+TAL.US ora: [{'ticker': 'TAL', 'mkt_cap': 5529.87, 'pb': 1.46, 'pe_trailing': 10.88, 'pe_forward': 11.56}]
