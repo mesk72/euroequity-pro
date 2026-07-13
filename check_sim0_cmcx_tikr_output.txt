@@ -1,0 +1,6 @@
+SIM0 nel database (stocks): [{'ticker': 'SIM0', 'exchange': 'XETRA', 'company': 'SIMONA Aktiengesellschaft'}]
+SIM0 nel database (fundamentals): [{'ticker': 'SIM0', 'exchange': 'XETRA', 'mom1w': 0.0084, 'mom1m': 0.1036, 'pe_trailing': 18.24}]
+
+=== Righe TIKR EU per SIM0 e CMCX ===
+  CMCX | CMC Markets Plc | LSE | GBR | MktCap=$2,513.63MM | P/E LTM=25.61x
+  SIM0 | SIMONA Aktiengesellschaft | DB | DEU | MktCap=$408.33MM | P/E LTM=18.24x
