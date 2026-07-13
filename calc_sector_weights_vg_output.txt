@@ -1,0 +1,26 @@
+
+=== VALUE (Value>=80 e Growth>=30): 391 titoli ===
+  Financials: 233 titoli = 59.59%
+  Energy: 38 titoli = 9.72%
+  Consumer Discretionary: 34 titoli = 8.70%
+  Industrials: 26 titoli = 6.65%
+  Materials: 21 titoli = 5.37%
+  Communication Services: 9 titoli = 2.30%
+  Utilities: 8 titoli = 2.05%
+  Information Technology: 7 titoli = 1.79%
+  Consumer Staples: 6 titoli = 1.53%
+  Healthcare: 5 titoli = 1.28%
+  Real Estate: 4 titoli = 1.02%
+
+=== GROWTH (Growth>=80): 529 titoli ===
+  Information Technology: 131 titoli = 24.76%
+  Industrials: 102 titoli = 19.28%
+  Healthcare: 82 titoli = 15.50%
+  Financials: 78 titoli = 14.74%
+  Energy: 49 titoli = 9.26%
+  Materials: 32 titoli = 6.05%
+  Consumer Discretionary: 22 titoli = 4.16%
+  Communication Services: 12 titoli = 2.27%
+  Consumer Staples: 11 titoli = 2.08%
+  Real Estate: 9 titoli = 1.70%
+  Utilities: 1 titoli = 0.19%
