@@ -1,0 +1,3 @@
+Ticker che iniziano con SIMO (qualsiasi borsa): [{'ticker': 'SIMO', 'exchange': 'US', 'company': 'Silicon Motion Technology Corporation'}]
+
+Aziende con 'Silicon Motion' nel nome: [{'ticker': 'SIMO', 'exchange': 'US', 'company': 'Silicon Motion Technology Corporation'}]
