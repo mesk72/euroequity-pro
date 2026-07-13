@@ -4,7 +4,7 @@ export default function AboutPage() {
       title: 'Our Philosophy',
       content: `ForwardAlpha applies a quantitative methodology used by institutional portfolio managers to analyse global equities.
 
-We cover approximately 8,500 stocks across three continents: roughly 2,100 stocks across 16 European exchanges, approximately 3,400 stocks in North America (US and Canada), and approximately 2,350 stocks across Asia Pacific (Japan, Hong Kong, Australia, Korea and Singapore).
+We cover approximately 8,000 stocks across three continents: roughly 2,100 stocks across 16 European exchanges, approximately 3,400 stocks in North America (US and Canada), and approximately 2,350 stocks across Asia Pacific (Japan, Hong Kong, Australia, Korea and Singapore).
 
 We combine two of the most proven investment philosophies — Value Investing and Growth Investing — into a single, transparent quantitative framework. Our goal is to give independent investors access to the same analytical rigor used by institutional portfolio managers.`,
     },
