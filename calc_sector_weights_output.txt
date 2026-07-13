@@ -1,0 +1,15 @@
+Universo US: 3000 titoli
+Titoli con Best Score >= 80 (in universo): 519
+
+Ripartizione settoriale (equal-weight, 519 titoli):
+  Financials: 239 titoli = 46.05%
+  Energy: 70 titoli = 13.49%
+  Industrials: 58 titoli = 11.18%
+  Materials: 38 titoli = 7.32%
+  Consumer Discretionary: 27 titoli = 5.20%
+  Information Technology: 23 titoli = 4.43%
+  Healthcare: 22 titoli = 4.24%
+  Communication Services: 20 titoli = 3.85%
+  Consumer Staples: 8 titoli = 1.54%
+  Utilities: 7 titoli = 1.35%
+  Real Estate: 7 titoli = 1.35%
