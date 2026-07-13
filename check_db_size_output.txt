@@ -1,4 +1,2 @@
-prices_eod: ? righe
-fundamentals: 12190 righe
-stocks: 10215 righe
-watchlist: 92 righe
+STATUS: 206
+Content-Range: 0-999/6176308
