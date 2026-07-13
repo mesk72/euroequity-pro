@@ -2559,7 +2559,7 @@ function AppContent() {
                   <span style={{ color: 'var(--orange)' }}>ranked across three continents.</span>
                 </h1>
                 <p style={{ fontSize: 15, color: 'var(--text3)', maxWidth: 540, margin: '0 auto 30px', lineHeight: 1.6 }}>
-                  ForwardAlpha percentile-ranks approximately 8,500 stocks across North America, Europe
+                  ForwardAlpha percentile-ranks approximately 8,000 stocks across North America, Europe
                   and Asia Pacific on valuation and growth — the same methodology used by institutional
                   portfolio managers, rebuilt as a transparent, always-on screener.
                 </p>
@@ -2643,7 +2643,7 @@ function AppContent() {
                     📰 News — last 24 hours only
                   </div>
                   <div style={{ fontSize: 12.5, color: 'var(--text3)', lineHeight: 1.55, maxWidth: 520 }}>
-                    Scan run on demand — all ~8,500 stocks across North America,
+                    Scan run on demand — all ~8,000 stocks across North America,
                     Europe and Asia Pacific, not just the largest names — and keep only what was
                     published in the last 24 hours. No stale headlines, no gaps in coverage.
                   </div>
