@@ -1,0 +1,22 @@
+Righe totali nel file GCC: 500
+Colonne: ['Ticker', 'Company Name', 'Primary Exchange', 'Country', 'Sector', 'Last Price', 'Last Mkt Cap', 'LTM P/E LTM', 'LTM P/BVPS LTM', 'EPS Normalized (FY 2025)', 'Mean EPS Normalized (FY 2026)', 'Mean EPS Normalized (FY 2027)', 'Mean EPS Normalized (FY 2028)', 'EPS (GAAP) (FY 2025)', 'Mean EPS (GAAP) (FY 2026)', 'Mean EPS (GAAP) (FY 2027)', 'Mean EPS (GAAP) (FY 2028)', 'Rev (FY 2025)', 'Mean Rev (FY 2026)', 'Mean Rev (FY 2027)', 'Mean Rev (FY 2028)', 'Mean EPS Normalized (FY 2030)', 'Mean EPS (GAAP) (FY 2029)', 'Mean EPS (GAAP) (FY 2030)', 'Mean Fwd P/E NTM', 'ECS Total Shares Outstanding on Filing Date LTM']
+
+Prime 15 righe (ticker, borsa, paese, nome):
+  2222 | SASE | SAU | Saudi Arabian Oil Company
+  IHC | ADX | ARE | International Holding Company PJSC
+  1120 | SASE | SAU | Al Rajhi Banking and Investment Corporation
+  TAQA | ADX | ARE | Abu Dhabi National Energy Company PJSC
+  ADNOCGAS | ADX | ARE | ADNOC Gas PLC
+  1180 | SASE | SAU | The Saudi National Bank
+  1211 | SASE | SAU | Saudi Arabian Mining Company (Maaden)
+  7010 | SASE | SAU | Saudi Telecom Company
+  FAB | ADX | ARE | First Abu Dhabi Bank P.J.S.C.
+  EMIRATESNBD | DFM | ARE | Emirates NBD Bank PJSC
+  KFH | KWSE | KWT | Kuwait Finance House K.S.C.P.
+  EAND | ADX | ARE | Emirates Telecommunications Group Company PJSC
+  QNBK | DSM | QAT | Qatar National Bank (Q.P.S.C.)
+  2010 | SASE | SAU | Saudi Basic Industries Corporation
+  2082 | SASE | SAU | ACWA Power Company
+
+Distribuzione paesi: {'SAU': 214, 'ARE': 113, 'KWT': 84, 'QAT': 42, 'OMN': 34, 'BHR': 13}
+Distribuzione borse: {'SASE': 214, 'ADX': 72, 'DFM': 40, 'KWSE': 84, 'DSM': 42, 'MSM': 34, 'BAX': 13, 'DIFX': 1}
