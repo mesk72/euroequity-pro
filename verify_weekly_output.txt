@@ -1,0 +1,2 @@
+HLF.US: [{'ticker': 'HLF', 'mkt_cap': 295.35, 'pb': 0.72, 'value_score': 98, 'growth_score': 32, 'combined_rank': 78}]
+TAL.US: [{'ticker': 'TAL', 'mkt_cap': 298.28, 'pb': 0.56, 'value_score': 99, 'growth_score': 65, 'combined_rank': 95}]
