@@ -1,0 +1,7 @@
+Universo Norvegia (OB): 100 titoli
+Titoli con PE NTM positivo valido: 95
+
+Un PE NTM di 15.0 sarebbe piu' basso di 60/95 titoli
+Rank percentile stimato: 63
+
+Distribuzione: min=3.94, mediana=12.39, max=58.83
