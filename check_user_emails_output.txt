@@ -1,2 +1,37 @@
-STATUS: 200
-{"id":"fee79b7f-1481-4936-b381-4c28cf832414","aud":"authenticated","role":"authenticated","email":"andreameschini19@gmail.com","email_confirmed_at":"2026-05-17T22:37:37.527204Z","phone":"","confirmation_sent_at":"2026-05-17T22:36:51.073056Z","confirmed_at":"2026-05-17T22:37:37.527204Z","recovery_sent_at":"2026-06-28T04:01:03.408719Z","last_sign_in_at":"2026-07-13T22:51:35.682291Z","app_metadata":{"provider":"email","providers":["email"]},"user_metadata":{"email":"andreameschini19@gmail.com","email_verified":true,"phone_verified":false,"sub":"fee79b7f-1481-4936-b381-4c28cf832414"},"identities":[{"identity_id":"f02f62da-3ff7-4f7e-bef6-a15422cf24f2","id":"fee79b7f-1481-4936-b381-4c28cf832414","user_id":"fee79b7f-1481-4936-b381-4c28cf832414","identity_data":{"email":"andreameschini19@gmail.com","email_verified":true,"phone_verified":false,"sub":"fee79b7f-1481-4936-b381-4c28cf832414"},"provider":"email","last_sign_in_at":"2026-05-17T22:36:51.055569Z","created_at":"2026-05-17T22:36:51.056213Z","updated_at":"2026-05-17T22:36:51.056213Z","email":"andreameschini19@gmail.com"}],"created_at":"2026-05-17T22:36:51.001091Z","updated_at":"2026-07-13T22:51:35.760281Z","is_anonymous":false}
+Utenti totali trovati: 5
+
+ID: fee79b7f-1481-4936-b381-4c28cf832414
+  Email: andreameschini19@gmail.com
+  Nome: (nessuno)
+  Paese: (nessuno)
+  Creato: 2026-05-17T22:36:51.001091Z
+  Ultimo accesso: 2026-07-13T22:51:35.682291Z
+
+ID: c8e832d6-955c-492a-bdf8-d1b6bdcb3cb0
+  Email: langskltdlondon@gmail.com
+  Nome: Matthew Windsor
+  Paese: Italy
+  Creato: 2026-05-28T17:04:30.610476Z
+  Ultimo accesso: None
+
+ID: 44ffd22c-db71-4106-8de5-5a1d08d1bafd
+  Email: moritzalexanderschaefer@gmail.com
+  Nome: Moritz Schäfer
+  Paese: Germany
+  Creato: 2026-06-04T21:47:17.972584Z
+  Ultimo accesso: None
+
+ID: 66aa3270-d165-431d-a9e0-5689446c4deb
+  Email: ilovenokialumia635@gmail.com
+  Nome: Angelo
+  Paese: Italy
+  Creato: 2026-06-17T17:48:54.853582Z
+  Ultimo accesso: 2026-06-17T17:49:23.606769Z
+
+ID: ff6b05e4-cf75-4c39-bfa8-04ffd19c233e
+  Email: hawkeyeboy05@icloud.com
+  Nome: Keith Fisher
+  Paese: United States
+  Creato: 2026-06-29T01:25:17.765214Z
+  Ultimo accesso: 2026-06-29T01:26:00.687468Z
+
