@@ -1,8 +1,6 @@
-Titoli con val_sums valido: 96
-
-Somma rank PRIMA (LTM=69+NTM=58+PB=98=225): value_score ricalcolato = 86
-  (tu avevi detto 85 — confronto per verificare coerenza)
-
-Somma rank DOPO (LTM=48+NTM=63+PB=98=209): value_score = 76
-
-Impatto: -10 punti
+Titoli nel gruppo Norvegia: 100
+val_sums costruiti: 96
+min=12, max=273, media=144.6
+Sum=204 -> value_score=74
+Sum=209 -> value_score=76
+Sum=225 -> value_score=86
