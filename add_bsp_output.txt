@@ -1,0 +1,3 @@
+BSP gia' presente? []
+Insert stocks: 201 
+Insert fundamentals (placeholder mkt_cap/price): 200 
