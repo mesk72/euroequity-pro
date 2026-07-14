@@ -1,0 +1,6 @@
+Righe totali in watchlist: 92
+
+Utenti distinti con almeno una riga: 3
+  user_id=fee79b7f-1481-4936-b381-4c28cf832414: 81 righe totali (tutti i wallet)
+  user_id=ff6b05e4-cf75-4c39-bfa8-04ffd19c233e: 10 righe totali (tutti i wallet)
+  user_id=66aa3270-d165-431d-a9e0-5689446c4deb: 1 righe totali (tutti i wallet)
