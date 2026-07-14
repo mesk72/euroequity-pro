@@ -1,0 +1,17 @@
+US: 853 titoli senza yahoo_ticker
+TSX: 35 titoli senza yahoo_ticker
+XETRA: 18 titoli senza yahoo_ticker
+PA: 9 titoli senza yahoo_ticker
+LSE: 13 titoli senza yahoo_ticker
+SWX: 13 titoli senza yahoo_ticker
+OM: 3 titoli senza yahoo_ticker
+MC: 12 titoli senza yahoo_ticker
+HE: 2 titoli senza yahoo_ticker
+CPSE: 38 titoli senza yahoo_ticker
+GR: 100 titoli senza yahoo_ticker
+TSE: 33 titoli senza yahoo_ticker
+SEHK: 9 titoli senza yahoo_ticker
+ASX: 29 titoli senza yahoo_ticker
+KRX: 44 titoli senza yahoo_ticker
+
+TOTALE mancanti: 1211
