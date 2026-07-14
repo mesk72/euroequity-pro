@@ -2381,3 +2381,36 @@ Information Technology 34,63%, Financials 12,55%, Industrials 10,02%, Health Car
 ### Stato di avanzamento — nessun backtest ancora eseguito
 
 Tutta la sessione di stanotte ha riguardato SOLO la progettazione della metodologia (soglie, ribilanciamento, cap settoriale, fonte dati). **Nessun codice QuantConnect è stato ancora scritto, nessun backtest lanciato.** Prossima sessione (tra ~10 giorni): scrivere la funzione di pesi settoriali storici Russell, poi la Universe Selection con le tre soglie, poi la logica di cap iterativo (solo su Best Ideas), poi lanciare il primo backtest vero con conteggio del churn mensile incluso fin dall'inizio.
+
+---
+
+## Aggiornamento trial Twelvedata (13-14 luglio, notte) — da riprendere tra ~15 giorni
+
+### Problema tecnico trovato: entrambe le chiavi fornite sono su piano "Basic"
+
+Testate 2 chiavi API (account personale "Health Data" con 800 crediti/giorno, e una presunta chiave trial) su NVDA/JPM/ASML/BNP contro `/statistics`, `/earnings`, `/earnings_estimate`, `/eps_trend`, `/revenue_estimate`, `/growth_estimates` — **tutte le chiamate hanno restituito HTTP 403** ("richiede piano Grow/Pro/Ultra/Enterprise"). Screenshot del pannello Twelvedata confermano: l'account è su **piano "Basic"** (800 crediti/giorno, 8/minuto) — nessuno degli endpoint fondamentali/stime è incluso a questo livello. La seconda chiave data da Andrea non era quindi il vero trial "alto livello" descritto da Yury nelle sue risposte tecniche, o il trial non era ancora stato attivato correttamente dal loro lato.
+
+**Email inviata a Yury** chiedendo conferma se la chiave trial è attiva e su quale piano è effettivamente provisionata — risposta non ancora ricevuta al momento del salvataggio.
+
+### Endpoint Twelvedata confermati utili (da documentazione, non ancora testati con successo per limiti di piano)
+- `/earnings_estimate` — EPS consensus per current_quarter/next_quarter/current_year(FY1)/next_year(FY2), con avg/low/high e numero analisti (richiede piano Ultra+)
+- `/eps_trend` — andamento storico stime EPS nel tempo (per confrontare stima oggi vs 30gg fa)
+- `/eps_revisions` — revisioni analisti EPS ultima settimana/mese
+- `/earnings?period=latest` — data ultima trimestrale pubblicata, pre/post market
+- `/statistics` — most_recent_quarter, fiscal_year_ends, forward_pe (richiede piano Pro+)
+- `/analyst_ratings/us_equities` — rating discreti per firma di analisi, **SOLO titoli USA**, non internazionale
+- Nessun endpoint `/revenue_estimate` dedicato trovato/confermato — da verificare con Yury se le stime ricavi sono incluse altrove (es. dentro earnings_estimate stesso)
+
+### Scoperta architetturale importante: Twelvedata NON ha uno screener/scanner
+A differenza di TIKR (che fornisce export gia' pronti per essere ordinati per market cap), **Twelvedata non permette di filtrare/ordinare per market cap via API** — il catalogo `/stocks` e' solo metadata statico (simbolo, nome, borsa, paese), senza market cap. Per costruire "i primi N per market cap" servirebbe chiamare `/statistics` per OGNI titolo del mercato, costo proibitivo (migliaia di chiamate a 50 crediti l'una solo per scoprire chi tenere). **Soluzione decisa**: continuare a usare TIKR per la fase di SELEZIONE dell'universo (chi entra/esce per market cap), usare Twelvedata solo per scaricare dati sui ticker gia' selezionati.
+
+**Logica proposta per rilevare nuove IPO/quotazioni automaticamente**: il catalogo `/stocks` si aggiorna quotidianamente ed e' probabilmente incluso anche nei piani base (costo basso). Script settimanale: scarica il catalogo completo, confronta con i ticker gia' presenti nel database, i nuovi simboli trovati sono candidati IPO da valutare — solo per QUESTI pochi nuovi si spende credito su `/statistics` per verificare se superano la soglia di market cap del mercato. Non ancora implementato, da costruire quando il trial sara' sbloccato.
+
+### Bending Spoons (BSP) aggiunta al database
+Nuova IPO Nasdaq, 1 luglio 2026, azienda italiana (Milano) — ticker **BSP**, settore Information Technology, market cap post-debutto ~25,7 miliardi $ (prezzo IPO $29, chiusura primo giorno $40,50, +40%). Aggiunta a `stocks` e `fundamentals` con dati placeholder (mkt_cap/price), in attesa che il prossimo giro daily/weekly la aggiorni con dati completi da TIKR/Leeway o Twelvedata.
+
+### Nota strategica importante sulla negoziazione del prezzo Twelvedata — NON massimizzare l'uso durante il trial
+
+Andrea aveva chiesto di "massimizzare tutti i parametri monitorati da Twelvedata per ottenere il prezzo migliore" — **consigliato esplicitamente il contrario**. Yury ha scritto che dopo la settimana di trial "rivedono l'utilizzo e tornano con un piano" — questo significa che il prezzo proposto sara' tarato sul volume OSSERVATO durante il trial, non su un generico "piu' usi meglio e'". Massimizzare l'uso durante il trial rischia di segnalare un bisogno piu' grande di quello reale, portando a un preventivo piu' caro, non piu' conveniente.
+
+**Approccio raccomandato invece**: usare il trial solo per verificare qualita'/copertura dati (pochi titoli rappresentativi per mercato, non volume massimo), poi quando si negozia il prezzo finale essere ESPLICITI sul bisogno reale gia' calcolato (~926 crediti/minuto per i fondamentali notturni, cadenza 3 notti/settimana fondamentali + 6 giorni/settimana prezzi) e sul budget disponibile (100-150€/mese) — la chiarezza diretta nella negoziazione e' piu' efficace del volume di utilizzo per ottenere un piano su misura/economico.
