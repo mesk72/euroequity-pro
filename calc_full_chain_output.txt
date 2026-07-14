@@ -1,0 +1,12 @@
+Nuovo EPS growth: -2.88%
+Nuovo mom6_adj: 1.2493  |  Nuovo mom12_adj: 0.7575
+
+rank_eps_gr: 26 (prima: 85)
+rank_rev_gr: 65 (prima: 77, ridotto -15% come richiesto)
+rank_mom6_adj: 100 (prima: 99)
+rank_mom12_adj: 89 (prima: 93)
+
+NUOVO VALUE SCORE (Norvegia): 56 (prima: 85)
+NUOVO GROWTH SCORE (Norvegia): 83 (prima: 95)
+
+NUOVO BEST SCORE (EU intera): 85 (prima: 99)
