@@ -4,16 +4,13 @@ SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
 def pct_rank(arr, val):
-    if val is None or not arr: return None
     below = sum(1 for x in arr if x < val)
     return round(below / len(arr) * 100)
-
 def ey(pe):
-    if pe is None or pe == 0 or abs(pe) > 200: return None
+    if pe is None or pe==0 or abs(pe)>200: return None
     return 1/pe
-
-def book_yield(pb):
-    if pb is None or pb == 0: return None
+def by(pb):
+    if pb is None or pb==0: return None
     return 1/pb
 
 universe = set()
@@ -35,33 +32,27 @@ while True:
     batch = r.json()
     if not isinstance(batch,list) or not batch: break
     for d in batch:
-        if d["ticker"] in universe:
-            group.append(d)
+        if d["ticker"] in universe: group.append(d)
     offset += 1000
     if len(batch) < 1000: break
 
-ey_trail_g = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
-ey_fwd_g   = [ey(d["pe_forward"])  for d in group if ey(d["pe_forward"])  is not None]
-by_g       = [book_yield(d["pb"])  for d in group if book_yield(d["pb"])  is not None]
+print(f"Titoli nel gruppo Norvegia: {len(group)}")
+
+ey_l = [ey(d["pe_trailing"]) for d in group if ey(d["pe_trailing"]) is not None]
+ey_f = [ey(d["pe_forward"]) for d in group if ey(d["pe_forward"]) is not None]
+b_g  = [by(d["pb"]) for d in group if by(d["pb"]) is not None]
 
 val_sums = []
 for d in group:
-    ey_t = ey(d["pe_trailing"]); r_eyt = pct_rank(ey_trail_g, ey_t) if ey_t is not None else None
-    ey_f = ey(d["pe_forward"]);  r_eyf = pct_rank(ey_fwd_g,   ey_f) if ey_f is not None else None
-    by_v = book_yield(d["pb"]);  r_pb  = pct_rank(by_g,       by_v) if by_v is not None else None
-    inputs = [x for x in [r_eyt, r_eyf, r_pb] if x is not None]
+    rl = pct_rank(ey_l, ey(d["pe_trailing"])) if ey(d["pe_trailing"]) is not None else None
+    rf = pct_rank(ey_f, ey(d["pe_forward"])) if ey(d["pe_forward"]) is not None else None
+    rb = pct_rank(b_g, by(d["pb"])) if by(d["pb"]) is not None else None
+    inputs = [x for x in [rl,rf,rb] if x is not None]
     if len(inputs) >= 2:
         val_sums.append(sum(inputs))
 
-print(f"Titoli con val_sums valido: {len(val_sums)}")
+print(f"val_sums costruiti: {len(val_sums)}")
+print(f"min={min(val_sums)}, max={max(val_sums)}, media={sum(val_sums)/len(val_sums):.1f}")
 
-old_sum = 69 + 58 + 98
-new_sum = 48 + 63 + 98  # PB rank invariato a 98, come da tua domanda
-
-old_value_score = pct_rank(val_sums, old_sum)
-new_value_score = pct_rank(val_sums, new_sum)
-
-print(f"\nSomma rank PRIMA (LTM=69+NTM=58+PB=98={old_sum}): value_score ricalcolato = {old_value_score}")
-print(f"  (tu avevi detto 85 — confronto per verificare coerenza)")
-print(f"\nSomma rank DOPO (LTM=48+NTM=63+PB=98={new_sum}): value_score = {new_value_score}")
-print(f"\nImpatto: {new_value_score - old_value_score:+d} punti")
+for test_sum in [204, 209, 225]:
+    print(f"Sum={test_sum} -> value_score={pct_rank(val_sums, test_sum)}")
