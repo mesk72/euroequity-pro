@@ -1,0 +1,21 @@
+Top 20 per market cap (grezzo dal database):
+  NVDA (NVIDIA Corporation): 4,769,748.03
+  AAPL (Apple Inc.): 4,562,774.01
+  GOOGL (Alphabet Inc.): 4,460,079.02
+  MSFT (Microsoft Corporation): 2,888,472.55
+  AMZN (Amazon.com, Inc.): 2,646,033.78
+  SPCX (Space Exploration Technologies Corp): 1,969,145.78
+  AVGO (Broadcom Inc.): 1,764,015.59
+  META (Meta Platforms, Inc.): 1,562,602.62
+  TSLA (Tesla, Inc.): 1,513,181.15
+  LLY (Eli Lilly and Company): 1,101,800.01
+  BRK.A (Berkshire Hathaway Inc.): 1,087,054.51
+  MU (Micron Technology, Inc.): 1,059,799.95
+  JPM (JPMorgan Chase & Co.): 908,943.86
+  WMT (Walmart Inc.): 887,644.15
+  AMD (Advanced Micro Devices, Inc.): 841,569.30
+  V (Visa Inc.): 663,510.53
+  JNJ (Johnson & Johnson): 643,304.66
+  XOM (Exxon Mobil Corporation): 587,227.91
+  INTC (Intel Corporation): 554,820.14
+  MA (Mastercard Incorporated): 469,730.85
