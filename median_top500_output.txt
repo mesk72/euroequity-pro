@@ -1,4 +1,4 @@
 Titoli totali con mkt_cap: 3001
-Top 500 - max: 4769748.03B, min: 20055.21B
-Mediana top 500: 51458.55B
-Media top 500: 146667.42B
+Top 500 - max: $4,769.7B, min: $20.1B
+Mediana top 500: $51.46B
+Media top 500: $146.67B
