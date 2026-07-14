@@ -1,0 +1,17 @@
+US: 853/853 yahoo_ticker aggiornati
+TSX: 35/35 yahoo_ticker aggiornati
+XETRA: 18/18 yahoo_ticker aggiornati
+PA: 9/9 yahoo_ticker aggiornati
+LSE: 13/13 yahoo_ticker aggiornati
+SWX: 13/13 yahoo_ticker aggiornati
+OM: 3/3 yahoo_ticker aggiornati
+MC: 12/12 yahoo_ticker aggiornati
+HE: 2/2 yahoo_ticker aggiornati
+CPSE: 38/38 yahoo_ticker aggiornati
+GR: 100/100 yahoo_ticker aggiornati
+TSE: 33/33 yahoo_ticker aggiornati
+SEHK: 9/9 yahoo_ticker aggiornati
+ASX: 29/29 yahoo_ticker aggiornati
+KRX: 44/44 yahoo_ticker aggiornati
+
+TOTALE aggiornati: 1211
