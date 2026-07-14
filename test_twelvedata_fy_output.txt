@@ -1,0 +1,208 @@
+
+======================================================================
+TICKER: NVDA
+======================================================================
+
+--- /earnings (period=latest) — LAST REPORTING DATE ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings is available exclusively with grow or pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /statistics — most_recent_quarter, fiscal_year_ends ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/statistics is available exclusively with pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /earnings_estimate — EPS FY1/FY2 ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /eps_trend — storico EPS, verifica se distingue normalized/GAAP ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/eps_trend is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /revenue_estimate (tentativo, nome endpoint da verificare) ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/revenue_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /growth_estimates ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/growth_estimates is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+======================================================================
+TICKER: JPM
+======================================================================
+
+--- /earnings (period=latest) — LAST REPORTING DATE ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings is available exclusively with grow or pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /statistics — most_recent_quarter, fiscal_year_ends ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/statistics is available exclusively with pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /earnings_estimate — EPS FY1/FY2 ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /eps_trend — storico EPS, verifica se distingue normalized/GAAP ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/eps_trend is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /revenue_estimate (tentativo, nome endpoint da verificare) ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/revenue_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /growth_estimates ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/growth_estimates is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+======================================================================
+TICKER: ASML
+======================================================================
+
+--- /earnings (period=latest) — LAST REPORTING DATE ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings is available exclusively with grow or pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /statistics — most_recent_quarter, fiscal_year_ends ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/statistics is available exclusively with pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /earnings_estimate — EPS FY1/FY2 ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /eps_trend — storico EPS, verifica se distingue normalized/GAAP ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/eps_trend is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /revenue_estimate (tentativo, nome endpoint da verificare) ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/revenue_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /growth_estimates ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/growth_estimates is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+======================================================================
+TICKER: BNP
+======================================================================
+
+--- /earnings (period=latest) — LAST REPORTING DATE ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings is available exclusively with grow or pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /statistics — most_recent_quarter, fiscal_year_ends ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/statistics is available exclusively with pro or ultra or venture or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /earnings_estimate — EPS FY1/FY2 ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/earnings_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /eps_trend — storico EPS, verifica se distingue normalized/GAAP ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/eps_trend is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /revenue_estimate (tentativo, nome endpoint da verificare) ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/revenue_estimate is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
+
+--- /growth_estimates ---
+HTTP 403
+{
+  "code": 403,
+  "message": "/growth_estimates is available exclusively with ultra or enterprise plans. Consider upgrading your API Key now at https://twelvedata.com/pricing",
+  "status": "error"
+}
