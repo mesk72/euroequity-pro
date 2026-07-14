@@ -1,0 +1,6 @@
+Nuovo prezzo stimato: 35.18 (da 42.9)
+Nuovo PE LTM stimato: 13.28 (da 10.53)
+Nuovo PE NTM stimato: 13.52 (da 11.21)
+
+Nuovo rank_pe_ltm: 57 (prima: 69)
+Nuovo rank_pe_ntm: 50 (prima: 58)
