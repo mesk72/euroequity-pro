@@ -1,0 +1,54 @@
+Titoli in Wallet 1: 46
+
+Titoli con mkt_cap disponibile: 46
+
+Media: $252.19B
+Mediana: $8.70B
+
+Dettaglio (ordinato per market cap):
+  NVDA.US: $4,769.75B
+  GOOGL.US: $4,460.08B
+  LLY.US: $1,101.80B
+  C.US: $240.09B
+  VZ.US: $177.84B
+  UBSG.SWX: $155.75B
+  UCG.MIL: $140.45B
+  ADBE.US: $88.06B
+  ADBE.US: $88.06B
+  DAL.US: $57.91B
+  BPE.MIL: $33.24B
+  EQT.US: $32.37B
+  EIX.US: $29.14B
+  WTW.US: $27.76B
+  NESTE.HE: $24.82B
+  IPN.PA: $16.03B
+  JAZZ.US: $15.56B
+  TIGO.US: $15.54B
+  EXEL.US: $14.35B
+  9502.TSE: $14.20B
+  ARW.US: $9.91B
+  AMG.US: $9.50B
+  NDA.XETRA: $9.01B
+  BIRK.US: $8.38B
+  HQY.US: $8.11B
+  5101.TSE: $7.02B
+  AVT.US: $6.68B
+  M.US: $6.08B
+  CVSA.US: $4.61B
+  CMBT.BR: $4.39B
+  PLMR.US: $3.85B
+  UNFI.US: $2.86B
+  ANDE.US: $2.29B
+  MD.US: $2.15B
+  AUPH.US: $2.09B
+  ECPG.US: $1.93B
+  DBG.PA: $1.80B
+  HOFI.OM: $1.62B
+  GROW.LSE: $1.25B
+  MRN.PA: $1.17B
+  AEP.LSE: $0.79B
+  GNFT.PA: $0.74B
+  FFARM.AS: $0.64B
+  DR0.XETRA: $0.44B
+  NSKOG.OB: $0.37B
+  KENDR.AS: $0.36B
