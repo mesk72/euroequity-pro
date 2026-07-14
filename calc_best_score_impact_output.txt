@@ -1,0 +1,4 @@
+Titoli EU con value+growth score: 1644
+
+Value=76 + Growth=80 = 156
+Best Score risultante: 93
