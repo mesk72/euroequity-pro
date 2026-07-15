@@ -1,0 +1,2 @@
+Titoli nel top 1500 per market cap: 1500
+Con Value>=80 E Growth>=30: 161
