@@ -28,9 +28,9 @@ Inspired by the principles of Benjamin Graham and Warren Buffett, value investin
 
 Our Value Score combines three rank components, each calculated relative to all stocks listed on the same exchange:
 
-• PE LTM Rank — ranks stocks by trailing earnings yield (1/PE). A high rank means the stock earns more relative to its price than its peers. Negative earnings are excluded.
-• PE NTM Rank — ranks stocks by forward earnings yield based on next-twelve-month consensus estimates. Forward-looking and more predictive than trailing earnings.
-• PB Rank — ranks stocks by Price/Book ratio. Lower P/B means more assets per dollar of market value. Negative book value stocks receive rank 0.
+• PE LTM Rank — ranks stocks by PE LTM. 
+• PE NTM Rank — ranks stocks by PE NTM.
+• PB Rank — ranks stocks by Price/Book ratio. 
 
 Each component is ranked from 1 to 100 within the stock's country. The three ranks are averaged and re-ranked to produce the final Value Score.
 
@@ -42,10 +42,10 @@ A Value Score of 80 means the stock is cheaper than 80% of its peers on our comb
 
 Our Growth Score combines four rank components, each calculated relative to all stocks listed on the same exchange:
 
-• EPS Growth Rank — ranks stocks by expected earnings per share growth over the next 12 months.
-• Revenue Growth Rank — ranks stocks by top-line growth momentum using a time-weighted blend of fiscal year estimates.
-• Price Momentum 6M — 6-month price return, adjusted for overbought.
-• Price Momentum 12M — 12-month price return, adjusted for overbought.
+• EPS Growth Rank — ranks stocks by expected earnings per share growth over the next future.
+• Revenue Growth Rank — ranks stocks by top-line growth momentum looking forward.
+• Price Momentum 6M — 6-month price return, adjusted.
+• Price Momentum 12M — 12-month price return, adjusted.
 
 The four components are averaged and re-ranked to produce the final Growth Score.
 
@@ -73,7 +73,7 @@ It is a way to read what growth the market is currently pricing in — not a pri
       title: 'How to Use ForwardAlpha',
       content: `Key parameters to focus on:
 
-• Best Score ≥ 80 — the top 20% of equities combining Value and Growth. Our primary Best Ideas filter.
+• Best Score ≥ 80 — the top 20% of equities combining Value and Growth. Agood idea when combined with Value Score and/or Growth Score.
 • Value Score — use to identify attractively valued stocks within a sector or country.
 • Growth Score — use to identify companies with strong earnings, revenue and price momentum.
 • Momentum 1W, 1M, 6M, 12M — short, medium and long-term price performance indicators, calculated on calendar days.
