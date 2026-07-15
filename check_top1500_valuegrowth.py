@@ -34,11 +34,13 @@ top1500 = all_data[:1500]
 
 qualifying = [d for d in top1500
               if d.get("value_score") is not None and d.get("growth_score") is not None
-              and d["value_score"] >= 80 and d["growth_score"] >= 30]
+              and d["value_score"] >= 80 and d["growth_score"] >= 80]
 
 total = len(qualifying)
-print(f"Totale titoli qualificanti: {total}")
-sector_counts = Counter(universe[d["ticker"]] for d in qualifying)
-for sector, count in sector_counts.most_common():
-    pct = 100 * count / total
-    print(f"  {sector}: {count} titoli = {pct:.2f}%")
+print(f"Titoli con Value>=80 E Growth>=80 (nei top 1500 per market cap): {total}")
+
+if total > 0:
+    sector_counts = Counter(universe[d["ticker"]] for d in qualifying)
+    for sector, count in sector_counts.most_common():
+        pct = 100 * count / total
+        print(f"  {sector}: {count} titoli = {pct:.2f}%")
