@@ -1,7 +1,7 @@
 ======================================================================
-HEALTH CHECK — 2026-07-15 10:50 UTC
+HEALTH CHECK — 2026-07-15 18:23 UTC
 ======================================================================
-US       count= 3001/3000   campione_fresco=11/20  eta_max_campione=8gg  [PROBLEMA]
+US       count= 3001/3000   campione_fresco=14/20  eta_max_campione=8gg  [PROBLEMA]
 TSX      count=  400/400    campione_fresco=13/20  eta_max_campione=5gg  [PROBLEMA]
 LSE      count=  423/-      campione_fresco=18/20  eta_max_campione=12gg  [OK]
 XETRA    count=  211/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
@@ -26,7 +26,7 @@ KRX      count=  400/400    campione_fresco=0/20  eta_max_campione=7gg  [PROBLEM
 SGX      count=  100/100    campione_fresco=0/20  eta_max_campione=8gg  [PROBLEMA]
 ----------------------------------------------------------------------
 STATO GENERALE: PROBLEMA (8 mercati)
-  - US: count=3001/3000 fresh=11/20 eta_max=8gg
+  - US: count=3001/3000 fresh=14/20 eta_max=8gg
   - TSX: count=400/400 fresh=13/20 eta_max=5gg
   - GR: count=100/100 fresh=17/20 eta_max=8gg
   - TSE: count=1000/1000 fresh=0/20 eta_max=5gg
