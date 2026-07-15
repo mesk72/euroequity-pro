@@ -1,16 +1,18 @@
 import os, requests
+from collections import Counter
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-universe = set()
+universe = {}
 offset = 0
 while True:
     r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
-        params={"select":"ticker","exchange":"eq.US","in_universe":"eq.true","limit":"1000","offset":str(offset)})
+        params={"select":"ticker,sector","exchange":"eq.US","in_universe":"eq.true","limit":"1000","offset":str(offset)})
     batch = r.json()
     if not isinstance(batch,list) or not batch: break
-    universe.update(s["ticker"] for s in batch)
+    for s in batch:
+        universe[s["ticker"]] = s.get("sector") or "Other"
     offset += 1000
     if len(batch) < 1000: break
 
@@ -29,9 +31,14 @@ while True:
 
 all_data.sort(key=lambda x: -x["mkt_cap"])
 top1500 = all_data[:1500]
-print(f"Titoli nel top 1500 per market cap: {len(top1500)}")
 
-count = sum(1 for d in top1500
-            if d.get("value_score") is not None and d.get("growth_score") is not None
-            and d["value_score"] >= 80 and d["growth_score"] >= 30)
-print(f"Con Value>=80 E Growth>=30: {count}")
+qualifying = [d for d in top1500
+              if d.get("value_score") is not None and d.get("growth_score") is not None
+              and d["value_score"] >= 80 and d["growth_score"] >= 30]
+
+total = len(qualifying)
+print(f"Totale titoli qualificanti: {total}")
+sector_counts = Counter(universe[d["ticker"]] for d in qualifying)
+for sector, count in sector_counts.most_common():
+    pct = 100 * count / total
+    print(f"  {sector}: {count} titoli = {pct:.2f}%")
