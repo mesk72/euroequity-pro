@@ -1,2 +1,7 @@
-Universo US: 3001 titoli
-Titoli con Value>=80 E Growth>=80: 86
+Totale titoli: 86
+  Financials: 46 titoli = 53.49%
+  Energy: 22 titoli = 25.58%
+  Materials: 7 titoli = 8.14%
+  Industrials: 5 titoli = 5.81%
+  Information Technology: 4 titoli = 4.65%
+  Consumer Staples: 2 titoli = 2.33%
