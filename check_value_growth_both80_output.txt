@@ -1,0 +1,2 @@
+Universo US: 3001 titoli
+Titoli con Value>=80 E Growth>=80: 86
