@@ -534,13 +534,16 @@ if unranked:
     rank_updates.extend(calc_ranks(unranked))
 
 ok = 0
-for upd in rank_updates:
-    body = {k: v for k, v in upd.items() if k not in ("ticker", "exchange")}
-    r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{upd['ticker']}", "exchange": f"eq.{upd['exchange']}"},
-        json=body)
-    if r.status_code in (200, 201, 204): ok += 1
+# FIX: batch POST + on_conflict invece di un PATCH separato per ogni
+# titolo (stesso bug strutturale gia' trovato e corretto in daily_us.py,
+# probabile causa primaria dei blocchi di ore osservati sui run reali).
+for i in range(0, len(rank_updates), 200):
+    chunk = rank_updates[i:i+200]
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+        headers=headers_up, json=chunk)
+    if r.status_code in (200, 201, 204):
+        ok += len(chunk)
+    time.sleep(0.2)
 print("  Rank EU: " + str(ok) + "/" + str(len(rank_updates)))
 
 # Combined rank EU
@@ -550,13 +553,14 @@ combined_updates = [{"ticker": d["ticker"], "exchange": d["exchange"],
                      "combined_rank": min(99, pct_rank(sum_arr, d["value_score"] + d["growth_score"]))}
                     for d in all_scores]
 ok = 0
-for upd in combined_updates:
-    _t = upd.pop("ticker"); _e = upd.pop("exchange")
-    r = requests.patch(SUPABASE_URL + "/rest/v1/fundamentals",
-        headers=headers_up,
-        params={"ticker": f"eq.{_t}", "exchange": f"eq.{_e}"},
-        json=upd)
-    if r.status_code in (200, 201, 204): ok += 1
+# FIX: stesso batch invece di PATCH per titolo
+for i in range(0, len(combined_updates), 200):
+    chunk = combined_updates[i:i+200]
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+        headers=headers_up, json=chunk)
+    if r.status_code in (200, 201, 204):
+        ok += len(chunk)
+    time.sleep(0.2)
 print("  Combined rank EU: " + str(ok) + "/" + str(len(combined_updates)))
 ok_rank = ok
 
