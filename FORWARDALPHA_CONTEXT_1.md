@@ -2414,3 +2414,95 @@ Nuova IPO Nasdaq, 1 luglio 2026, azienda italiana (Milano) — ticker **BSP**, s
 Andrea aveva chiesto di "massimizzare tutti i parametri monitorati da Twelvedata per ottenere il prezzo migliore" — **consigliato esplicitamente il contrario**. Yury ha scritto che dopo la settimana di trial "rivedono l'utilizzo e tornano con un piano" — questo significa che il prezzo proposto sara' tarato sul volume OSSERVATO durante il trial, non su un generico "piu' usi meglio e'". Massimizzare l'uso durante il trial rischia di segnalare un bisogno piu' grande di quello reale, portando a un preventivo piu' caro, non piu' conveniente.
 
 **Approccio raccomandato invece**: usare il trial solo per verificare qualita'/copertura dati (pochi titoli rappresentativi per mercato, non volume massimo), poi quando si negozia il prezzo finale essere ESPLICITI sul bisogno reale gia' calcolato (~926 crediti/minuto per i fondamentali notturni, cadenza 3 notti/settimana fondamentali + 6 giorni/settimana prezzi) e sul budget disponibile (100-150€/mese) — la chiarezza diretta nella negoziazione e' piu' efficace del volume di utilizzo per ottenere un piano su misura/economico.
+
+---
+
+## Sessione pomeriggio/sera 15 luglio 2026 — QuantConnect backtest completo, indagine Mia su dati forward, fix daily_eu.py
+
+### RISULTATO FINALE — Backtest "Best Ideas" (Best Score >=80/70, 1500 titoli, 2016-2025, 10 anni)
+
+**Return: +161%. Sharpe Ratio: 0,44. PSR finale: 2,4%.**
+
+Confrontato con benchmark reali sullo stesso periodo (2016-2025):
+- JPM US Value: +243%
+- Russell 1000 Value: +254%
+- JPM US Select Equity: +214%
+- S&P 500: +298%
+
+**Il modello Best Ideas perde su tutti i benchmark**, non solo il mercato generico. Causa identificata con alta confidenza: Growth Score è per 2/3 momentum (mom6_adj + mom12_adj) e solo 1/3 EPS growth — il momentum come fattore genera rendimenti "a scatti" (buona media, crash improvvisi), esattamente il pattern che spiega Sharpe basso nonostante buon rendimento assoluto.
+
+**Bug trovati e corretti durante il backtest (per la cronologia)**:
+1. `self.add_equity("SPY", ...)` mancante — causava warning "no existing symbol" e possibili ribilanciamenti saltati nei primi mesi
+2. Filtro `pe_ltm > 0 and pb > 0` errato — escludeva sistematicamente aziende con PE/PB negativi, contro la regola ForwardAlpha "PE/PB negativi sempre inclusi". Corretto a `abs(pe_ltm) > 200` come unico limite.
+3. Storico ridotto da 400 a 260 giorni (ottimizzazione velocità, sicura)
+4. `set_holdings` batchato con lista di `PortfolioTarget` invece di una chiamata per titolo (ottimizzazione velocità, sicura)
+5. **NON toccato**: `pct_rank` è O(n²) (segnalato dall'AI di QuantConnect, "Mia") — probabile vero collo di bottiglia di velocità, lasciato intatto per prudenza dato che tocca la formula già verificata. Andrebbe vettorizzato con numpy se si vuole testare su universo più grande (es. 3000 titoli, altrimenti richiederebbe 20+ ore, oltre il limite di 12h del piano gratuito).
+
+### RISULTATO IN CORSO — Strategia "Value" (Value>=80 growth>=30 entrata, Value>=75 growth>=30 permanenza)
+
+Nettamente migliore di Best Ideas in ogni checkpoint osservato:
+- 01/09/2017: +48%, PSR 65,5%
+- Fine 2017 (stimato): PSR salito a 72% (il massimo di tutta la sessione)
+- 01/03/2018: PSR sceso a 61%
+- 01/05/2018: +52%, PSR 49%
+- 01/11/2018: +46%, PSR crollato a 26% (coincide con ottobre 2018, verificato storicamente come uno dei mesi più volatili della decade — peggior mese S&P dal 2010, Nasdaq -10%+ in correzione)
+
+Costi di transazione proporzionalmente molto più bassi di Best Ideas (~0,88% del portafoglio vs ~2,5% di Best Ideas allo stesso periodo relativo).
+
+**Motivo strutturale del vantaggio, identificato con Andrea**: Value/Growth usa logica "E" rigida (entrambe le soglie separate devono essere superate), mentre Best Ideas usa logica "somma" (Value+Growth sommati, poi soglia sulla somma) — la somma permette compensazione nascosta tra le due dimensioni (es. momentum estremo che compensa Value debole), lasciando entrare profili più rischiosi. La logica "E" è strutturalmente più disciplinata.
+
+**Ancora in corso al momento del salvataggio** — non ancora arrivato al risultato finale sui 10 anni.
+
+### Pattern di concentrazione settoriale — confermato su 4 sottoinsiemi diversi del database reale ForwardAlpha
+
+Controllato oggi su dati REALI del database (non backtest), universo USA:
+- Best Ideas (Best>=80): Financials 46%, Energy 13,5%
+- Value∩Growth 80/80, tutto universo (86 titoli): Financials 53%, Energy 26%
+- Value>=80 Growth>=30, top 1500 (161 titoli): Financials 51,5%, Energy 14,9%
+- Value∩Growth 80/80, top 1500 (31 titoli): Energy 45%, Financials 26%
+- Value∩Growth 80/80, top 3000 (86 titoli, stesso di sopra): Financials 53%, Energy 26%
+
+**Pattern costante**: Financials+Energy+Materials ≈ 87% del totale, indipendentemente da quanto si restringe o allarga l'universo o le soglie. È una caratteristica strutturale del modello nel mercato attuale, non un artefatto di una singola combinazione di parametri. Rinforza l'importanza del cap settoriale (mai implementato) come prossimo intervento prioritario.
+
+### Indagine approfondita con "Mia" (AI QuantConnect) sui dati forward Morningstar — risultati definitivi
+
+**Confermato con verifica numerica su AAPL, XOM, MSFT (fiscal year end diversi: settembre, giugno, dicembre)**:
+
+1. **ForwardPERatio e FirstYearEstimatedEPSGrowth si aggiornano MENSILMENTE** (non giornalmente), fill-forward tra un aggiornamento e l'altro. Confermato dal glossario ufficiale Morningstar: "calculated monthly" usando il prezzo di fine mese.
+
+2. **Bug trovato nella formula EPS growth originale**: `eps_ntm_derived = price / fwd_pe` mescola il prezzo GIORNALIERO corrente con un fwd_pe calcolato sul prezzo di FINE MESE — introduce rumore di prezzo nel calcolo della crescita EPS. Verificato numericamente: effetto piccolo (~0,08% su AAPL) ma concettualmente sbagliato.
+
+3. **Campi diretti trovati**: `ValuationRatios.FirstYearEstimatedEPSGrowth` e `SecondYearEstimatedEPSGrowth` — veri tassi di crescita da consensus Zacks, non derivati dal prezzo. Formula: `(EPS stimato anno1 / EPS riportato LTM) - 1`.
+
+4. **PROBLEMA SERIO scoperto — due tipi distinti di "salto falso" nei campi FY1/FY2, NON vere revisioni analisti**:
+   - **Pre-roll**: Zacks fa scorrere FY2→FY1 circa 2 MESI PRIMA della vera chiusura dell'anno fiscale dell'azienda (non alla chiusura reale). Verificato su 3 titoli con fiscal year end diversi (AAPL settembre, XOM giugno, MSFT dicembre) — sempre ~2 mesi prima, con ratio old_FY2/new_FY1 ≈ 1.0 (conferma che è solo un cambio di etichetta, stesso valore sottostante).
+   - **Post-filing**: quando il 10-K viene effettivamente depositato (`EarningReports.FileDate.TwelveMonths` cambia), l'EPS_LTM si aggiorna con i dati reali e FY1 si ricalibra — un secondo tipo di salto, distinto dal pre-roll.
+   - Entrambi NON sono vere revisioni del consensus analisti, sono artefatti del sistema di etichettatura FY1/FY2 relativo invece che ancorato a un anno fiscale fisso.
+
+5. **Campi utili per costruire una soluzione robusta, tutti confermati esistenti con storico completo nel backtest**:
+   - `EarningReports.FileDate.TwelveMonths` — data reale di deposito del 10-K (non trimestrale)
+   - `EarningReports.PeriodEndingDate.TwelveMonths` — a quale anno fiscale specifico si riferisce l'ultimo 10-K depositato
+   - `EarningReports.NormalizedBasicEPS.TwelveMonths` — EPS normalizzato assoluto, ma solo FY0 (LTM riportato), non forward
+   - EPS_FY1/FY2 assoluti derivabili: `EPS_FY1 = NormalizedBasicEPS_LTM * (1 + FirstYearEstimatedEPSGrowth)`, verificato coerente con Price/ForwardPE su 4/5 titoli testati (JPM non coincide, probabile calcolo diverso per i finanziari — non approfondito)
+
+6. **Sui ricavi — nessuna soluzione trovata, gap resta aperto**: non esiste alcun campo con split FY1/FY2 per i ricavi stimati. Solo `ValuationRatios.EVToForwardRevenue` (singolo numero forward ambiguo, stessa vulnerabilità di riferimento fiscale del vecchio ForwardPERatio, verificato +5,66% su AAPL come esempio). Nessun modo trovato per applicare la soluzione "traccia per anno fiscale reale" ai ricavi, dato che manca lo split di base.
+
+### La soluzione raccomandata da Claude — DIVERSA da quella proposta da Mia, non ancora implementata
+
+**Mia ha proposto**: costruire un "detector" che riconosce entrambi i tipi di salto (pre-roll via calcolo dei 2 mesi prima del FiscalYearEnd, post-filing via cambio di FileDate) e sopprime la revisione in quei mesi specifici.
+
+**Claude ha raccomandato un approccio diverso e più robusto**: invece di rilevare e sopprimere ogni singolo tipo di discontinuità (fragile — se emergesse un terzo tipo di salto mai visto, il detector non lo riconoscerebbe), **tracciare le stime EPS per ANNO FISCALE REALE IDENTIFICATO** (usando `PeriodEndingDate` per sapere a quale anno specifico si riferisce ogni stima), non per posizione relativa (FY1/FY2). Confrontando sempre "la stima per l'esercizio che chiude a settembre 2026" nel tempo, invece di "quello che oggi si chiama FY1", il problema dell'etichetta che salta non può più corrompere il segnale — indipendentemente da quanti tipi di salto esistano o vengano scoperti in futuro. È lo stesso principio che Andrea aveva già intuito autonomamente durante la discussione su NSKOG (calendarizzare con `last_reporting_date` invece che con un buffer generico di giorni).
+
+**Costo**: implementazione leggermente più complessa (serve mantenere uno storico per anno fiscale specifico, non solo per posizione FY1/FY2), ma strutturalmente più affidabile nel tempo.
+
+**Non ancora implementata nel codice** — resta una decisione/lavoro per la prossima sessione con energie fresche, non da affrontare a fine di una sessione lunghissima.
+
+### FIX APPLICATO STASERA — daily_eu.py aveva lo stesso bug strutturale di daily_us.py, mai notato prima
+
+Su richiesta esplicita di Andrea di controllare il contesto prima di agire (per non ripetere errori), trovato che **`daily_eu.py` aveva lo stesso identico bug strutturale già risolto in `daily_us.py`** in sessioni precedenti ma mai applicato qui: le sezioni `rank_updates` e `combined_updates` scrivevano con un **PATCH separato per ogni singolo titolo** invece che in batch — probabile causa (non ancora confermata con certezza) di rallentamenti sui run EU. **Corretto**: sostituito con batch POST + `on_conflict=ticker,exchange` da 200 elementi, stesso schema già usato altrove nello stesso file. Compilato e pushato con successo.
+
+**daily_us.py lanciato per verificare (finalmente) la distribuzione HTTP reale** (`STATUS_COUNTS`) su un run completo — mai ottenuta con successo nelle sessioni precedenti per limiti nel leggere i log grezzi di GitHub Actions in diretta (confermato: l'host di Azure Blob Storage dove risiedono i log in streaming non è nella lista dei domini di rete consentiti a Claude — limite tecnico, non aggirabile). Il run era ancora in corso al momento del salvataggio, esito non ancora noto.
+
+### Nota di processo per la prossima sessione — timing autonomo
+
+Andrea ha chiesto di lanciare uno script "dopo due ore" — chiarito esplicitamente che Claude non può attendere autonomamente in background tra un messaggio e l'altro; serve che l'utente scriva di nuovo per far scattare l'azione programmata. Va tenuto a mente per richieste simili in futuro.
