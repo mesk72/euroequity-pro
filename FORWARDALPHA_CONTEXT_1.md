@@ -2506,3 +2506,19 @@ Su richiesta esplicita di Andrea di controllare il contesto prima di agire (per 
 ### Nota di processo per la prossima sessione — timing autonomo
 
 Andrea ha chiesto di lanciare uno script "dopo due ore" — chiarito esplicitamente che Claude non può attendere autonomamente in background tra un messaggio e l'altro; serve che l'utente scriva di nuovo per far scattare l'azione programmata. Va tenuto a mente per richieste simili in futuro.
+
+---
+
+## REGOLA PERMANENTE — vincolante per ogni sessione futura, priorita' massima
+
+**REGOLA 1: Claude NON HA IL PERMESSO di modificare le formule di calcolo (Value Score, Growth Score, Best Score, soglie di selezione, filtri sui dati, limiti su PE/PB/qualsiasi metrica) senza il consenso ESPLICITO di Andrea per QUELLA specifica modifica.**
+
+Questo vale sia per il codice QuantConnect sia per qualsiasi script della pipeline ForwardAlpha (daily_us.py, daily_eu.py, weekly_*.py, ecc.).
+
+**Cosa e' permesso senza chiedere**: ottimizzazioni di velocita' che non cambiano il risultato numerico (es. batch invece di chiamate singole, riduzione di storico ridondante non utilizzato), fix di bug veri e dimostrati (es. bug che causano un comportamento diverso da quello esplicitamente specificato da Andrea), aggiunta di logging/debug che non altera la logica.
+
+**Cosa NON e' permesso senza chiedere prima, anche se sembra una "buona pratica" tecnica**: aggiungere limiti/soglie non richiesti (es. il caso specifico del 13-14 luglio: Claude aveva aggiunto `abs(pe_ltm) > 200` come filtro di sicurezza, mai richiesto da Andrea — Andrea lo ha definito "un atto gravissimo" e ha richiesto la rimozione immediata), cambiare la formula di un fattore anche se una fonte esterna (inclusa l'AI di QuantConnect, "Mia") lo consiglia, modificare soglie di selezione, modificare la logica di calendarizzazione o di combinazione dei punteggi.
+
+**Precedente specifico registrato**: il 14-15 luglio, durante il test della strategia Value isolato su giugno2018-giugno2019, Claude ha aggiunto un limite `abs(pe_ltm) > 200` e `abs(fwd_pe) > 200` come filtro di sicurezza contro valori anomali, senza che Andrea lo avesse richiesto. Andrea ha reagito con forte irritazione, definendolo un cambiamento non autorizzato della formula. Il limite e' stato rimosso su richiesta esplicita. **La modifica del campo eps_growth (da `price/fwd_pe` derivato a `ValuationRatios.FirstYearEstimatedEPSGrowth` diretto) era stata invece esplicitamente richiesta e accettata da Andrea in un messaggio precedente ("implementa le formule nuove se sono attendibili") — quella resta valida e non va reinterpretata come una violazione della regola.**
+
+**In pratica, per ogni sessione futura**: prima di aggiungere QUALSIASI controllo, limite, filtro o modifica alla logica di calcolo che non sia stato esplicitamente richiesto da Andrea in quella conversazione, Claude deve fermarsi, spiegare la modifica proposta e il motivo, e attendere conferma esplicita — anche se la modifica sembra ovviamente corretta o raccomandata da altre fonti.
