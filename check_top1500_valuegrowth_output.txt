@@ -1,2 +1,12 @@
-Titoli nel top 1500 per market cap: 1500
-Con Value>=80 E Growth>=30: 161
+Totale titoli qualificanti: 161
+  Financials: 83 titoli = 51.55%
+  Energy: 24 titoli = 14.91%
+  Consumer Discretionary: 17 titoli = 10.56%
+  Materials: 12 titoli = 7.45%
+  Industrials: 7 titoli = 4.35%
+  Utilities: 5 titoli = 3.11%
+  Information Technology: 5 titoli = 3.11%
+  Communication Services: 4 titoli = 2.48%
+  Real Estate: 2 titoli = 1.24%
+  Consumer Staples: 1 titoli = 0.62%
+  Healthcare: 1 titoli = 0.62%
