@@ -19,13 +19,13 @@ FORWARDALPHA DAILY EU LOAD — 2026-07-15
   6 ancora falliti — pausa 30s prima del prossimo giro...
   --- Giro 6/6: 6 titoli da scaricare ---
   FALLITI DEFINITIVI dopo 6 giri (6) — diagnosi automatica:
-    EISP.OB (Eiendomsspar AS): Leeway si ferma al 2026-06-17 — gap dati sul fornitore, non recuperabile da noi
     NYILOKLA.CPSE (Nykredit Invest Lange Obligationer): Leeway si ferma al 2026-07-10 — gap dati sul fornitore, non recuperabile da noi
+    SOHO.LSE (Social Housing REIT plc): Leeway si ferma al 2026-07-10 — gap dati sul fornitore, non recuperabile da noi
+    EISP.OB (Eiendomsspar AS): Leeway si ferma al 2026-06-17 — gap dati sul fornitore, non recuperabile da noi
     ECT.AS (Eurocastle Investment Limited): Leeway si ferma al 2026-06-18 — gap dati sul fornitore, non recuperabile da noi
     COFB.BR (Cofinimmo SA): Leeway si ferma al 2026-06-30 — gap dati sul fornitore, non recuperabile da noi
     PRIMOF.CPSE (Prime Office A/S): Leeway si ferma al 2026-07-10 — gap dati sul fornitore, non recuperabile da noi
-    SOHO.LSE (Social Housing REIT plc): Leeway si ferma al 2026-07-10 — gap dati sul fornitore, non recuperabile da noi
-  Distribuzione codici HTTP/errori su tutte le chiamate: {200: 2169, 429: 1, 404: 18}
+  Distribuzione codici HTTP/errori su tutte le chiamate: {200: 2169, 404: 18, 'EXCEPTION:ConnectTimeout': 4, 'EXCEPTION:ReadTimeout': 1}
   Prezzi Leeway: ok=2130 fail=6
 
 [3/5] Lettura prezzi da prices_eod...
@@ -61,8 +61,8 @@ FORWARDALPHA DAILY EU LOAD — 2026-07-15
   Aggiornamento indici EU...
   ERR DAX: HTTP 400
   CAC 40: 1.79 (0.0%)
-  AEX: 9.08 (0.0%)
-  IBEX 35: 33.85 (-1.6%)
+  AEX: 11.91 (1.02%)
+  IBEX 35: 34.63 (2.3%)
   BEL 20: 0.07 (-1.21%)
   ERR SMI: HTTP 400
   OMX Stockholm: 471.95 (-0.26%)
@@ -77,7 +77,7 @@ FORWARDALPHA DAILY EU LOAD — 2026-07-15
   FTSE MIB (proxy ETF): 22127.5 (-1.5%)
   Indici EU: 8/16
 
-Log: leeway=2130 fail=6 momentum=2136 rank=1590 durata=3978s
+Log: leeway=2130 fail=6 momentum=2136 rank=1590 durata=3621s
 
 ============================================================
 DAILY EU LOAD COMPLETATO
