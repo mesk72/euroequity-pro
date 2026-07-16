@@ -1,0 +1,332 @@
+
+=== ASML / statistics  ===
+{
+ "meta": {
+  "symbol": "ASML",
+  "name": "ASML Holding N.V. New York Registry Shares",
+  "currency": "USD",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "exchange_timezone": "America/New_York"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 699637132452,
+   "enterprise_value": 43456941604061,
+   "trailing_pe": 61.576324,
+   "forward_pe": 36.180744,
+   "peg_ratio": 36.180744,
+   "price_to_sales_ttm": 20.765244,
+   "price_to_book_mrq": 1634.0942,
+   "enterprise_to_revenue": 1128.219,
+   "enterprise_to_ebitda": 2992.094
+  },
+  "financials": {
+   "fiscal_year_ends": "2025-12-31",
+   "most_recent_quarter": "2026-06-30",
+   "gross_margin": 0.5399024285637699,
+   "profit_margin": 0.29713,
+   "operating_margin": 0.36020002,
+   "return_on_assets_ttm": 0.15664,
+   "return_on_equity_ttm": 0.52236,
+   "income_statement": {
+    "revenue_ttm": 38518169262,
+    "revenue_per_share_ttm": 1.568016,
+    "quarterly_revenue_growth": 0.132,
+    "gross_profit_ttm": 20261630843,
+    "ebitda": 13043200000,
+    "net_income_to_common_ttm": 11444889924,
+    "diluted_eps_ttm": 29.48,
+    "quarterly_earnings_growth_yoy": 0.171
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 9575953722,
+    "total_cash_per_share_mrq": 0.391,
+    "total_debt_mrq": 3093096031,
+    "total_debt_to_equity_mrq": 12.989,
+    "current_ratio_mrq": 1.36,
+    "book_value_per_share_mrq": 1.1108723
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 12039821466,
+    "levered_free_cash_flow_ttm": 9423876561
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 385417665,
+   "float_shares": 21403831333,
+   "avg_10_volume": 2138504,
+   "avg_90_volume": 2253228,
+   "shares_short": 1132572,
+   "short_ratio": 0.5,
+   "short_percent_of_shares_outstanding": 0.0029,
+   "percent_held_by_insiders": 
+
+=== ASML / earnings  ===
+{
+ "meta": {
+  "symbol": "ASML",
+  "name": "ASML Holding N.V. New York Registry Shares",
+  "currency": "USD",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "exchange_timezone": "America/New_York"
+ },
+ "earnings": [
+  {
+   "date": "2026-07-14",
+   "time": "",
+   "eps_estimate": 6.9,
+   "eps_actual": 7.58,
+   "difference": 0.68,
+   "surprise_prc": 9.86
+  },
+  {
+   "date": "2026-05-19",
+   "time": "",
+   "eps_estimate": 0.24,
+   "eps_actual": 0.34,
+   "difference": 0.1,
+   "surprise_prc": 41.67
+  },
+  {
+   "date": "2026-05-07",
+   "time": "",
+   "eps_estimate": 1.11,
+   "eps_actual": 1.22,
+   "difference": 0.11,
+   "surprise_prc": 9.91
+  },
+  {
+   "date": "2026-04-15",
+   "time": "",
+   "eps_estimate": 6.62,
+   "eps_actual": 7.15,
+   "difference": 0.53,
+   "surprise_prc": 8.01
+  },
+  {
+   "date": "2026-01-28",
+   "time": "",
+   "eps_estimate": 7.55,
+   "eps_actual": 7.34,
+   "difference": -0.21,
+   "surprise_prc": -2.78
+  }
+ ],
+ "status": "ok"
+}
+
+=== TM / statistics  ===
+{
+ "meta": {
+  "symbol": "TM",
+  "name": "Toyota Motor Corporation",
+  "currency": "USD",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "exchange_timezone": "America/New_York"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 209503122157,
+   "enterprise_value": 214886037927,
+   "trailing_pe": 9.580592,
+   "forward_pe": 11.074144,
+   "peg_ratio": 11.074144,
+   "price_to_sales_ttm": 0.00408274,
+   "price_to_book_mrq": 14.783569,
+   "enterprise_to_revenue": 0.686,
+   "enterprise_to_ebitda": 6.199
+  },
+  "financials": {
+   "fiscal_year_ends": "2026-03-31",
+   "most_recent_quarter": "2026-03-31",
+   "gross_margin": 0.15143537762355835,
+   "profit_margin": 0.07592,
+   "operating_margin": 0.04566,
+   "return_on_assets_ttm": 0.02368,
+   "return_on_equity_ttm": 0.10233,
+   "income_statement": {
+    "revenue_ttm": 313025188900,
+    "revenue_per_share_ttm": 2430.5557,
+    "quarterly_revenue_growth": 0.019,
+    "gross_profit_ttm": 52306240279,
+    "ebitda": 7078943000000,
+    "net_income_to_common_ttm": 23765468570,
+    "diluted_eps_ttm": 18.24,
+    "quarterly_earnings_growth_yoy": 0.229
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 85644561463,
+    "total_cash_per_share_mrq": 665.001,
+    "total_debt_mrq": 271223795029,
+    "total_debt_to_equity_mrq": 107.061,
+    "current_ratio_mrq": 1.274,
+    "book_value_per_share_mrq": 11.820556
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 33800205075,
+    "levered_free_cash_flow_ttm": -7440947308
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 13033384474,
+   "float_shares": 19231227993,
+   "avg_10_volume": 459342,
+   "avg_90_volume": 560951,
+   "shares_short": 1030022,
+   "short_ratio": 1.69,
+   "short_percent_of_shares_outstanding": 0.00090000004,
+   "percent_held_by_insiders": 0,
+   "perce
+
+=== 7203 / statistics  ===
+{
+ "meta": {
+  "symbol": "7203",
+  "name": "Toyota Motor Corporation",
+  "currency": "JPY",
+  "exchange": "JPX",
+  "mic_code": "XJPX",
+  "exchange_timezone": "Asia/Tokyo"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 40835326178101,
+   "enterprise_value": 68151932878848,
+   "trailing_pe": 9.7388735,
+   "forward_pe": 8.868978,
+   "peg_ratio": 8.868978,
+   "price_to_sales_ttm": 0.67181224,
+   "price_to_book_mrq": 0.93884194,
+   "enterprise_to_revenue": 1.345,
+   "enterprise_to_ebitda": 12.142
+  },
+  "financials": {
+   "fiscal_year_ends": "2026-03-31",
+   "most_recent_quarter": "2026-03-31",
+   "gross_margin": 0.15143537762355835,
+   "profit_margin": 0.07592,
+   "operating_margin": 0.04566,
+   "return_on_assets_ttm": 0.02368,
+   "return_on_equity_ttm": 0.10233,
+   "income_statement": {
+    "revenue_ttm": 50684951003136,
+    "revenue_per_share_ttm": 3888.889,
+    "quarterly_revenue_growth": 0.019,
+    "gross_profit_ttm": 8469411790848,
+    "ebitda": 7078943000000,
+    "net_income_to_common_ttm": 3848098021376,
+    "diluted_eps_ttm": 295.26,
+    "quarterly_earnings_growth_yoy": 0.229
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 13867543429120,
+    "total_cash_per_share_mrq": 1064.002,
+    "total_debt_mrq": 43916481003520,
+    "total_debt_to_equity_mrq": 107.061,
+    "current_ratio_mrq": 1.274,
+    "book_value_per_share_mrq": 3062.816
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 5472919748608,
+    "levered_free_cash_flow_ttm": -1204836106240
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 13033384474,
+   "float_shares": 12019517496,
+   "avg_10_volume": 25056480,
+   "avg_90_volume": 25648120,
+   "shares_short": null,
+   "short_ratio": null,
+   "short_percent_of_shares_outstanding": null,
+   "percent_held_by_insiders": 0.09
+
+=== ORCL / earnings {'outputsize': '1', 'symbol': 'ORCL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} ===
+{
+ "meta": {
+  "symbol": "ORCL",
+  "name": "Oracle Corporation",
+  "currency": "USD",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "exchange_timezone": "America/New_York"
+ },
+ "earnings": [
+  {
+   "date": "2026-06-10",
+   "time": "",
+   "eps_estimate": 1.96,
+   "eps_actual": 2.11,
+   "difference": 0.15,
+   "surprise_prc": 7.65
+  }
+ ],
+ "status": "ok"
+}
+
+=== CASY / statistics  ===
+{
+ "meta": {
+  "symbol": "CASY",
+  "name": "Casey's General Stores Inc.",
+  "currency": "USD",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "exchange_timezone": "America/New_York"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 29918102549,
+   "enterprise_value": 34173005824,
+   "trailing_pe": 44.76357,
+   "forward_pe": 36.44368,
+   "peg_ratio": 0.6778483457142854,
+   "price_to_sales_ttm": 1.8072901,
+   "price_to_book_mrq": 8.009619,
+   "enterprise_to_revenue": 1.946,
+   "enterprise_to_ebitda": 22.882
+  },
+  "financials": {
+   "fiscal_year_ends": "2026-04-30",
+   "most_recent_quarter": "2026-04-30",
+   "gross_margin": 0.2363099791131636,
+   "profit_margin": 0.04068,
+   "operating_margin": 0.05351,
+   "return_on_assets_ttm": 0.076079994,
+   "return_on_equity_ttm": 0.19153,
+   "income_statement": {
+    "revenue_ttm": 17561100288,
+    "revenue_per_share_ttm": 473.788,
+    "quarterly_revenue_growth": 0.145,
+    "gross_profit_ttm": 4321040896,
+    "ebitda": 1483615000,
+    "net_income_to_common_ttm": 714448000,
+    "diluted_eps_ttm": 19.16,
+    "quarterly_earnings_growth_yoy": 0.655
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 522991008,
+    "total_cash_per_share_mrq": 14.133,
+    "total_debt_mrq": 2905074944,
+    "total_debt_to_equity_mrq": 73.514,
+    "current_ratio_mrq": 1.01,
+    "book_value_per_share_mrq": 107.08
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 1377539968,
+    "levered_free_cash_flow_ttm": 550939648
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 36904285,
+   "float_shares": 36746620,
+   "avg_10_volume": 467459,
+   "avg_90_volume": 629273,
+   "shares_short": 1419246,
+   "short_ratio": 2.01,
+   "short_percent_of_shares_outstanding": 0.043,
+   "percent_held_by_insiders": 0.0056,
+   "percent_held_by_insti
