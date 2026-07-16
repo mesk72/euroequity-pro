@@ -1,0 +1,20 @@
+
+=== symbol_search: Vodafone ===
+  symbol=VOD exchange=LSE mic=XLON currency=GBp country=United Kingdom
+  symbol=VODI exchange=XETR mic=XETR currency=EUR country=Germany
+  symbol=VODI exchange=FSX mic=XFRA currency=EUR country=Germany
+  symbol=VODI exchange=XSTU mic=XSTU currency=EUR country=Germany
+  symbol=VODPF exchange=OTC mic=PINX currency=USD country=United States
+  symbol=VOD1N exchange=BMV mic=XMEX currency=MXN country=Mexico
+  symbol=VODI exchange=XHAN mic=XHAN currency=EUR country=Germany
+  symbol=VODI exchange=XDUS mic=XDUS currency=EUR country=Germany
+
+=== symbol_search: Unicredit ===
+  symbol=0P00016Q7D exchange=FSX mic=XFRA currency=EUR country=Germany
+  symbol=UCG exchange=MTA mic=XMIL currency=EUR country=Italy
+  symbol=0RLS exchange=LSE mic=XLON currency=EUR country=United Kingdom
+  symbol=CRIN exchange=XETR mic=XETR currency=EUR country=Germany
+  symbol=UNCFF exchange=OTC mic=PINX currency=USD country=United States
+  symbol=F84204 exchange=MTA mic=XMIL currency=EUR country=Italy
+  symbol=UCG exchange=VSE mic=XWBO currency=EUR country=Austria
+  symbol=CRIN exchange=XSTU mic=XSTU currency=EUR country=Germany
