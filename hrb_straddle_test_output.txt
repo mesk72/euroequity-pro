@@ -1,0 +1,124 @@
+fiscal_year_ends: 2025-06-30
+
+=== earnings_estimate annual ===
+{
+ "meta": {
+  "symbol": "HRB",
+  "name": "H&R Block Inc.",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "type": "Common Stock"
+ },
+ "earnings_estimate": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "number_of_analysts": 1,
+   "avg_estimate": -1.41,
+   "low_estimate": -1.41,
+   "high_estimate": -1.41,
+   "year_ago_eps": -1.2
+  },
+  {
+   "date": "2027-06-30",
+   "period": "next_year",
+   "number_of_analysts": 4,
+   "avg_estimate": 5.8225,
+   "low_estimate": 5.47,
+   "high_estimate": 6.43,
+   "year_ago_eps": 5.16
+  }
+ ],
+ "status": "ok"
+}
+
+=== eps_trend annual ===
+{
+ "meta": {
+  "symbol": "HRB",
+  "name": "H&R Block Inc.",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "type": "Common Stock"
+ },
+ "eps_trend": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "current_estimate": -1.41,
+   "7_days_ago": -1.36,
+   "30_days_ago": -1.36,
+   "60_days_ago": -1.36,
+   "90_days_ago": -1.28
+  },
+  {
+   "date": "2027-06-30",
+   "period": "next_year",
+   "current_estimate": 5.8225,
+   "7_days_ago": 5.8225,
+   "30_days_ago": 5.8225,
+   "60_days_ago": 5.5775,
+   "90_days_ago": 5.5775
+  }
+ ],
+ "status": "ok"
+}
+
+=== earnings (storico reale) ===
+{
+ "meta": {
+  "symbol": "HRB",
+  "name": "H&R Block Inc.",
+  "currency": "USD",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "exchange_timezone": "America/New_York"
+ },
+ "earnings": [
+  {
+   "date": "2026-05-20",
+   "time": "",
+   "eps_estimate": 2.91,
+   "eps_actual": 3.09,
+   "difference": 0.18,
+   "surprise_prc": 6.19
+  },
+  {
+   "date": "2026-05-06",
+   "time": "",
+   "eps_estimate": 5.77,
+   "eps_actual": 6.02,
+   "difference": 0.25,
+   "surprise_prc": 4.33
+  },
+  {
+   "date": "2026-03-27",
+   "time": "",
+   "eps_estimate": -3.78,
+   "eps_actual": -0.97,
+   "difference": 2.81,
+   "surprise_prc": -74.34
+  },
+  {
+   "date": "2026-02-03",
+   "time": "",
+   "eps_estimate": -1.89,
+   "eps_actual": -1.84,
+   "difference": 0.05,
+   "surprise_prc": -2.65
+  },
+  {
+   "date": "2025-11-06",
+   "time": "",
+   "eps_estimate": -1.35,
+   "eps_actual": -1.2,
+   "difference": 0.15,
+   "surprise_prc": -11.11
+  }
+ ],
+ "status": "ok"
+}
