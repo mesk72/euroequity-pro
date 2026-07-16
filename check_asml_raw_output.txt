@@ -1,0 +1,13 @@
+ASML fundamentals: [{'ticker': 'ASML', 'exchange': 'AS', 'updated_at': '2026-06-03T04:52:46.62441+00:00', 'mkt_cap': 719344.15, 'pe_trailing': 62.78, 'pe_forward': 47.28, 'pb': 30.24, 'ev_ebitda': 42.56, 'roe': 52.59, 'roa': None, 'roic': None, 'gross_margin': None, 'net_margin': None, 'eps_growth': 0.2827, 'rev_growth': 0.187, 'div_yield': 0.53, 'div_payout': 25.67, 'beta': None, 'eps_current': None, 'eps_next': None, 'eps_30d_ago': None, 'value_score': 11, 'growth_score': 97, 'fiscal_month': 12, 'last_report_date': None, 'eps_ntm': 39.4775, 'eps_ltm': 29.7776, 'rev_ntm': 47999.25, 'rev_ltm': 40687.13, 'eps_mom_30d': None, 'rev_mom_30d': None, 'mom1w': 0.0305, 'mom1m': -0.0409, 'mom6m': 0.416, 'mom12m': 1.2817, 'eps_fy0': 29.52, 'eps_fy1': 36.32, 'eps_fy2': 49.28, 'rev_fy0': 39024.37, 'rev_fy1': 45244.86, 'rev_fy2': 54854.05, 'last_report': '2026-07-15', 'mrq': '2026-03-29', 'eps_ttm': None, 'div_yield_ttm': None, 'value_score_prev': None, 'growth_score_prev': None, 'rank_pe_ltm': 42, 'rank_pe_ntm': 15, 'rank_pb': 5, 'rank_eps_gr': 78, 'rank_rev_gr': 87, 'change1d': 0.9735, 'combined_rank': 59, 'price': 1555.8, 'rank_mom6_adj': 93, 'rank_mom12_adj': 99, 'eps_cagr_3y': None, 'implied_growth': None, 'ke': None, 'beta_local': None, 'rf_rate': None, 'eps_fy3': 60.46, 'eps_fy4': 70.08, 'eps_fy5': 76.94, 'eps_fwd24': None, 'eps_fwd36': None, 'eps_growth_12_24m': None, 'eps_growth_24_36m': None, 'eps_cagr_2y': None, 'implied_growth_10y': None, 'eps_ntm_dcf': None}]
+
+ASML ultimi 10 prezzi grezzi:
+  {'date': '2026-07-14', 'adj_close': 1555.8}
+  {'date': '2026-07-13', 'adj_close': 1540.8}
+  {'date': '2026-07-10', 'adj_close': 1569.0}
+  {'date': '2026-07-09', 'adj_close': 1602.8}
+  {'date': '2026-07-08', 'adj_close': 1529.0}
+  {'date': '2026-07-07', 'adj_close': 1509.8}
+  {'date': '2026-07-03', 'adj_close': 1634.4}
+  {'date': '2026-07-02', 'adj_close': 1577.8}
+  {'date': '2026-07-01', 'adj_close': 1641.6}
+  {'date': '2026-06-30', 'adj_close': 1721.4}
