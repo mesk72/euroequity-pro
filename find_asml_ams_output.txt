@@ -1,70 +1,96 @@
+Status: 200
+Currency: EUR | Exchange: Euronext
+EPS TTM: 25.89
+Revenue TTM: 33692700672
+BVPS: 54.046
+Fiscal year end: 2025-12-31
+{"meta": {"symbol": "ASML", "name": "ASML Holding N.V.", "currency": "EUR", "exchange": "Euronext", "mic_code": "XAMS", "exchange_timezone": "Europe/Amsterdam"}, "statistics": {"valuations_metrics": {"market_capitalization": 597166137859, "enterprise_value": 588153618432, "trailing_pe": 60.092705, "forward_pe": 35.339214, "peg_ratio": 3.135271565217392, "price_to_sales_ttm": 17.797113, "price_to_book_mrq": 28.786589, "enterprise_to_revenue": 17.456, "enterprise_to_ebitda": 46.295}, "financials": {"fiscal_year_ends": "2025-12-31", "most_recent_quarter": "2026-03-31", "gross_margin": 0.5298338067047645, "profit_margin": 0.29713, "operating_margin": 0.36020002, "return_on_assets_ttm": 0.15664, "return_on_equity_ttm": 0.52236, "income_statement": {"revenue_ttm": 33692700672, "revenue_per_share
 
-=== ASML:XAMS (status 404) ===
-{"code": 404, "message": "**symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data", "status": "error"}
-
-=== ASML.AS (status 404) ===
-{"code": 404, "message": "**symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data", "status": "error"}
-
-=== ASML:AMS (status 404) ===
-{"code": 404, "message": "**symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data", "status": "error"}
-
-=== symbol_search ASML ===
+=== earnings_estimate ===
 {
- "data": [
+ "meta": {
+  "symbol": "ASML",
+  "name": "ASML Holding N.V.",
+  "currency": "EUR",
+  "exchange_timezone": "Europe/Amsterdam",
+  "exchange": "Euronext",
+  "mic_code": "XAMS",
+  "type": "Common Stock"
+ },
+ "earnings_estimate": [
   {
-   "symbol": "ASML",
-   "instrument_name": "ASML Holding N.V. New York Registry Shares",
-   "exchange": "NASDAQ",
-   "mic_code": "XNGS",
-   "exchange_timezone": "America/New_York",
-   "instrument_type": "Depositary Receipt",
-   "country": "United States",
-   "currency": "USD"
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "number_of_analysts": 15,
+   "avg_estimate": 8.5217,
+   "low_estimate": 7.36,
+   "high_estimate": 10.18,
+   "year_ago_eps": 5.49
   },
   {
-   "symbol": "ASML",
-   "instrument_name": "ASML Holding N.V.",
-   "exchange": "Euronext",
-   "mic_code": "XAMS",
-   "exchange_timezone": "Europe/Amsterdam",
-   "instrument_type": "Common Stock",
-   "country": "Netherlands",
-   "currency": "EUR"
+   "date": "2026-12-31",
+   "period": "current_year",
+   "number_of_analysts": 36,
+   "avg_estimate": 32.0601,
+   "low_estimate": 29.1,
+   "high_estimate": 35.68,
+   "year_ago_eps": 24.71
   },
   {
-   "symbol": "ASML",
-   "instrument_name": "ASML Holding N.V.",
-   "exchange": "BCBA",
-   "mic_code": "XBUE",
-   "exchange_timezone": "America/Argentina/Buenos_Aires",
-   "instrument_type": "Depositary Receipt",
-   "country": "Argentina",
-   "currency": "ARS"
+   "date": "2027-12-31",
+   "period": "next_year",
+   "number_of_analysts": 35,
+   "avg_estimate": 44.02475,
+   "low_estimate": 35.231,
+   "high_estimate": 54.37,
+   "year_ago_eps": 32.0601
+  }
+ ],
+ "status": "ok"
+}
+
+=== revenue_estimate ===
+{
+ "meta": {
+  "symbol": "ASML",
+  "name": "ASML Holding N.V.",
+  "currency": "EUR",
+  "exchange_timezone": "Europe/Amsterdam",
+  "exchange": "Euronext",
+  "mic_code": "XAMS",
+  "type": "Common Stock"
+ },
+ "revenue_estimate": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "number_of_analysts": 18,
+   "avg_estimate": 10369742340,
+   "low_estimate": 9575000000,
+   "high_estimate": 11734000000,
+   "year_ago_sales": 7516000000,
+   "sales_growth": 0.38
   },
   {
-   "symbol": "ASML",
-   "instrument_name": "ASML Holding N.V. Depositary Receipt",
-   "exchange": "TSX",
-   "mic_code": "XTSE",
-   "exchange_timezone": "America/Toronto",
-   "instrument_type": "Depositary Receipt",
-   "country": "Canada",
-   "currency": "CAD"
+   "date": "2026-12-31",
+   "period": "current_year",
+   "number_of_analysts": 38,
+   "avg_estimate": 39512797570,
+   "low_estimate": 37047000000,
+   "high_estimate": 42200000000,
+   "year_ago_sales": 32667300000,
+   "sales_growth": 0.21
   },
   {
-   "symbol": "ASML",
-   "instrument_name": "ASML Holding N.V.",
-   "exchange": "VSE",
-   "mic_code": "XWBO",
-   "exchange_timezone": "Europe/Vienna",
-   "instrument_type": "Common Stock",
-   "country": "Austria",
-   "currency": "EUR"
-  },
-  {
-   "symbol": "ASML",
-   "instrument_name": "ASML Holding N.V.",
-   "exchange": "NEO",
-   "mic_code": "NEOE",
-   "exchange_timezone": "America/Toronto",
-   "instr
+   "date": "2027-12-31",
+   "period": "next_year",
+   "number_of_analysts": 38,
+   "avg_estimate": 49624000920,
+   "low_estimate": 43586400000,
+   "high_estimate": 55690454570,
+   "year_ago_sales": 39512797570,
+   "sales_growth": 0.26
+  }
+ ],
+ "status": "ok"
+}
