@@ -1,0 +1,70 @@
+
+=== ASML:XAMS (status 404) ===
+{"code": 404, "message": "**symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data", "status": "error"}
+
+=== ASML.AS (status 404) ===
+{"code": 404, "message": "**symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data", "status": "error"}
+
+=== ASML:AMS (status 404) ===
+{"code": 404, "message": "**symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data", "status": "error"}
+
+=== symbol_search ASML ===
+{
+ "data": [
+  {
+   "symbol": "ASML",
+   "instrument_name": "ASML Holding N.V. New York Registry Shares",
+   "exchange": "NASDAQ",
+   "mic_code": "XNGS",
+   "exchange_timezone": "America/New_York",
+   "instrument_type": "Depositary Receipt",
+   "country": "United States",
+   "currency": "USD"
+  },
+  {
+   "symbol": "ASML",
+   "instrument_name": "ASML Holding N.V.",
+   "exchange": "Euronext",
+   "mic_code": "XAMS",
+   "exchange_timezone": "Europe/Amsterdam",
+   "instrument_type": "Common Stock",
+   "country": "Netherlands",
+   "currency": "EUR"
+  },
+  {
+   "symbol": "ASML",
+   "instrument_name": "ASML Holding N.V.",
+   "exchange": "BCBA",
+   "mic_code": "XBUE",
+   "exchange_timezone": "America/Argentina/Buenos_Aires",
+   "instrument_type": "Depositary Receipt",
+   "country": "Argentina",
+   "currency": "ARS"
+  },
+  {
+   "symbol": "ASML",
+   "instrument_name": "ASML Holding N.V. Depositary Receipt",
+   "exchange": "TSX",
+   "mic_code": "XTSE",
+   "exchange_timezone": "America/Toronto",
+   "instrument_type": "Depositary Receipt",
+   "country": "Canada",
+   "currency": "CAD"
+  },
+  {
+   "symbol": "ASML",
+   "instrument_name": "ASML Holding N.V.",
+   "exchange": "VSE",
+   "mic_code": "XWBO",
+   "exchange_timezone": "Europe/Vienna",
+   "instrument_type": "Common Stock",
+   "country": "Austria",
+   "currency": "EUR"
+  },
+  {
+   "symbol": "ASML",
+   "instrument_name": "ASML Holding N.V.",
+   "exchange": "NEO",
+   "mic_code": "NEOE",
+   "exchange_timezone": "America/Toronto",
+   "instr
