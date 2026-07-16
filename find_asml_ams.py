@@ -1,18 +1,20 @@
 import os, requests, json
 API_KEY = os.environ.get("TWELVEDATA_API_KEY", "")
 
-# Prova varie sintassi per ASML su Amsterdam
-for sym in ["ASML:XAMS", "ASML.AS", "ASML:AMS"]:
-    r = requests.get("https://api.twelvedata.com/statistics", params={"symbol":sym,"apikey":API_KEY})
-    d = r.json()
-    print(f"\n=== {sym} (status {r.status_code}) ===")
-    if "meta" in d:
-        print("Currency:", d["meta"].get("currency"), "| Exchange:", d["meta"].get("exchange"))
-        print("EPS TTM:", d.get("statistics",{}).get("financials",{}).get("income_statement",{}).get("diluted_eps_ttm"))
-    else:
-        print(json.dumps(d)[:300])
+r = requests.get("https://api.twelvedata.com/statistics", params={"symbol":"ASML","mic_code":"XAMS","apikey":API_KEY})
+d = r.json()
+print("Status:", r.status_code)
+if "meta" in d:
+    print("Currency:", d["meta"].get("currency"), "| Exchange:", d["meta"].get("exchange"))
+    fin = d.get("statistics",{}).get("financials",{})
+    print("EPS TTM:", fin.get("income_statement",{}).get("diluted_eps_ttm"))
+    print("Revenue TTM:", fin.get("income_statement",{}).get("revenue_ttm"))
+    print("BVPS:", fin.get("balance_sheet",{}).get("book_value_per_share_mrq"))
+    print("Fiscal year end:", fin.get("fiscal_year_ends"))
+print(json.dumps(d)[:800])
 
-# Symbol search per trovare la sintassi esatta
-r2 = requests.get("https://api.twelvedata.com/symbol_search", params={"symbol":"ASML","apikey":API_KEY})
-print("\n=== symbol_search ASML ===")
-print(json.dumps(r2.json(), indent=1)[:1500])
+# earnings_estimate e revenue_estimate stesso simbolo/mic
+for ep in ["earnings_estimate","revenue_estimate"]:
+    r2 = requests.get(f"https://api.twelvedata.com/{ep}", params={"symbol":"ASML","mic_code":"XAMS","period":"annual","apikey":API_KEY})
+    print(f"\n=== {ep} ===")
+    print(json.dumps(r2.json(), indent=1)[:1200])
