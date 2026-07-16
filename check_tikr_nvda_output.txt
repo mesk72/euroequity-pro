@@ -1,5 +1,27 @@
-Bucket disponibili: 200 [{"id":"tikr-uploads","name":"tikr-uploads","owner":"","public":false,"type":"STANDARD","file_size_limit":null,"allowed_mime_types":null,"created_at":"2026-06-15T08:08:12.184Z","updated_at":"2026-06-15T08:08:12.184Z"}]
-
-Tentativo bucket 'tikr-uploads': status 200
-TROVATO! Primi 500 caratteri:
-Ticker,Company Name,Primary Exchange,Country,Sector,Last Price,Last Mkt Cap,LTM P/E LTM,LTM P/BVPS LTM,EPS Normalized (FY 2025),Mean EPS Normalized (FY 2026),Mean EPS Normalized (FY 2027),Mean EPS Normalized (FY 2028),EPS (GAAP) (FY 2025),Mean EPS (GAAP) (FY 2026),Mean EPS (GAAP) (FY 2027),Mean EPS (GAAP) (FY 2028),Rev (FY 2025),Mean Rev (FY 2026),Mean Rev (FY 2027),Mean Rev (FY 2028),Mean EPS Normalized (FY 2030),Mean EPS (GAAP) (FY 2029),Mean EPS (GAAP) (FY 2030),Mean Fwd P/E NTM,ECS Total Sha
+Riga NVDA completa:
+  Ticker: NVDA
+  Company Name: NVIDIA Corporation
+  Primary Exchange: NasdaqGS
+  Country: USA
+  Sector: Information Technology
+  Last Price: 196.93
+  Last Mkt Cap: $4,769,748.03MM
+  LTM P/E LTM: 30.16x
+  LTM P/BVPS LTM: 24.40x
+  EPS Normalized (FY 2025): 2.99
+  Mean EPS Normalized (FY 2026): 4.70
+  Mean EPS Normalized (FY 2027): 8.97
+  Mean EPS Normalized (FY 2028): 12.76
+  EPS (GAAP) (FY 2025): 2.94
+  Mean EPS (GAAP) (FY 2026): 4.60
+  Mean EPS (GAAP) (FY 2027): 9.42
+  Mean EPS (GAAP) (FY 2028): 12.98
+  Rev (FY 2025): $130,497.00MM
+  Mean Rev (FY 2026): $213,999.22MM
+  Mean Rev (FY 2027): $392,638.71MM
+  Mean Rev (FY 2028): $554,435.31MM
+  Mean EPS Normalized (FY 2030): 17.50
+  Mean EPS (GAAP) (FY 2029): 15.74
+  Mean EPS (GAAP) (FY 2030): 19.13
+  Mean Fwd P/E NTM: 19.82x
+  ECS Total Shares Outstanding on Filing Date LTM: 24,200.00
