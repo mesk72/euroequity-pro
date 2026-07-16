@@ -1,0 +1,51 @@
+Status: 200
+{
+ "meta": {
+  "symbol": "NVDA",
+  "name": "NVIDIA Corporation",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "type": "Common Stock"
+ },
+ "eps_trend": [
+  {
+   "date": "2026-07-31",
+   "period": "current_quarter",
+   "current_estimate": 2.09366,
+   "7_days_ago": 2.07925,
+   "30_days_ago": 2.07925,
+   "60_days_ago": 1.96129,
+   "90_days_ago": 1.94641
+  },
+  {
+   "date": "2026-10-31",
+   "period": "next_quarter",
+   "current_estimate": 2.34689,
+   "7_days_ago": 2.3463,
+   "30_days_ago": 2.3463,
+   "60_days_ago": 2.19094,
+   "90_days_ago": 2.17246
+  },
+  {
+   "date": "2027-01-31",
+   "period": "current_year",
+   "current_estimate": 8.98214,
+   "7_days_ago": 8.97274,
+   "30_days_ago": 8.96014,
+   "60_days_ago": 8.38125,
+   "90_days_ago": 8.32094
+  },
+  {
+   "date": "2028-01-31",
+   "period": "next_year",
+   "current_estimate": 12.80493,
+   "7_days_ago": 12.76443,
+   "30_days_ago": 12.72715,
+   "60_days_ago": 11.42982,
+   "90_days_ago": 11.20005
+  }
+ ],
+ "status": "ok"
+}
