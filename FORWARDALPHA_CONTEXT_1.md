@@ -2528,3 +2528,57 @@ Questo vale sia per il codice QuantConnect sia per qualsiasi script della pipeli
 ## REGOLA PERMANENTE — EPS growth, denominatore sempre in ABS()
 
 **`eps_growth = EPS_NTM / abs(EPS_LTM) - 1`** — il valore assoluto va SEMPRE applicato al denominatore (EPS_LTM), mai al numeratore. Vale per ogni piattaforma (QuantConnect, Portfolio123, Twelvedata, script propri) e ogni volta che si costruisce questa formula da capo. Andrea l'ha dovuto ripetere più volte nella sessione del 15-16 luglio 2026 — motivo: senza abs(), un EPS_LTM negativo capovolge il segno della crescita in modo scorretto (un'azienda che passa da perdita a utile mostrerebbe una crescita negativa invece che positiva). Stessa logica si applica a revenue_growth se il fatturato LTM potesse mai essere negativo (raro ma non impossibile in casi contabili estremi) — usare abs() anche lì per coerenza.
+
+---
+
+## REGOLA PERMANENTE — MAI usare TTM (rolling) come EPS/Revenue LTM
+
+**EPS_LTM e Revenue_LTM devono SEMPRE usare l'anno fiscale FISSO e chiuso (FY0)**, mai un valore "Trailing Twelve Months" rolling che si aggiorna ogni trimestre. Su Twelvedata: usare `year_ago_eps`/`year_ago_sales` dal campo `current_year` di `/earnings_estimate` e `/revenue_estimate` (con `period=annual`), MAI `diluted_eps_ttm`/`revenue_ttm` da `/statistics`. Motivo: TTM mescola concettualmente con la calendarizzazione (che già gestisce lo scorrimento tra FY0/FY1), creando un doppio meccanismo di rolling sovrapposto e concettualmente confuso. Andrea l'ha ripetuto piu' volte nella sessione del 16 luglio 2026 — la formula corretta usa sempre anni fiscali fissi (FY0/FY1/FY2), il "rolling" avviene SOLO tramite i pesi w_curr/w_next della calendarizzazione, non tramite il dato sottostante.
+
+## Schema tabella Supabase per dati Twelvedata (proposta)
+
+```sql
+CREATE TABLE fundamentals_twelvedata_v2 (
+    ticker text NOT NULL,
+    exchange text NOT NULL,
+    mic_code text,
+    currency text,
+    price numeric,
+    fiscal_year_end date,
+    last_reporting_date date,
+    eps_fy0 numeric,
+    eps_fy1 numeric,
+    eps_fy2 numeric,
+    eps_fy1_30d_ago numeric,
+    eps_fy2_30d_ago numeric,
+    revenue_fy0 numeric,
+    revenue_fy1 numeric,
+    revenue_fy2 numeric,
+    pb numeric,
+    analysts_fy1 integer,
+    analysts_fy2 integer,
+    updated_at timestamptz DEFAULT now(),
+    PRIMARY KEY (ticker, exchange)
+);
+```
+
+## Twelvedata: chiave API ora su piano ENTERPRISE (16 luglio 2026)
+
+Confermato con test diretto (`/api_usage`): `plan_category: enterprise`, `plan_limit: 100000` crediti/giorno. La stessa chiave (e8ee8c5225bf46feb5873bce01d03e5f) che il 13-14 luglio era su piano Basic (403 su tutto) e' stata aggiornata da Yury dopo il colloquio del 14 luglio. Tutti gli endpoint fondamentali/stime ora rispondono HTTP 200 con dati reali e ricchi.
+
+### Endpoint verificati e utili
+- `/earnings` — storico trimestrali reali con date, eps_actual, eps_estimate (usare per identificare last_reporting_date incrociando con fiscal_year_ends)
+- `/earnings_estimate?period=annual` — restituisce 4 righe: current_quarter, next_quarter, current_year (FY1), next_year (FY2), ognuna con una DATA FISSA di scadenza allegata (niente ambiguita' di roll come su QuantConnect/Portfolio123). Il campo `year_ago_eps` della riga "current_year" e' l'EPS FY0 REALE.
+- `/revenue_estimate?period=annual` — stessa struttura per i ricavi, incluso `year_ago_sales` per Revenue FY0
+- `/eps_trend?period=annual` — stime a 7/30/60/90 giorni fa, sia per FY1 che FY2 — usare per costruire EPS NTM momentum a 30gg
+- `/statistics` — PB (`price_to_book_mrq`), `fiscal_year_ends`, altri ratio. NON usare `diluted_eps_ttm`/`revenue_ttm` per LTM (vedi regola sopra)
+- `/time_series?adjust=all` — prezzi aggiustati per split/dividendi, dati aggiornati fino a oggi
+
+### Scoperta importante — titoli europei/asiatici richiedono `mic_code` esplicito
+Il ticker da solo (es. "ASML", "TM" per Toyota) restituisce di default l'ADR quotato in USD su borsa USA, NON il titolo locale nella valuta originale. Serve sempre passare `mic_code` esplicito (es. `mic_code=XAMS` per Amsterdam, confermato dare EPS/Revenue in EUR; il ticker giapponese diretto e' "7203" su mic_code borsa Tokyo, in JPY) — verificare sempre con `/symbol_search` prima di assumere quale mic_code sia corretto per ogni titolo.
+
+### Verificato — nessun "pre-roll anomalo" come su QuantConnect/Portfolio123
+Testato su NVDA (FY end 25 gen) e ORCL (FY end 31 mag, chiusa solo 46 giorni prima del test): le etichette current_year/next_year si aggiornano SUBITO DOPO la vera chiusura fiscale, non prima come il bug Zacks/Morningstar scoperto su QuantConnect. Nessuna discontinuita' falsa osservata finora.
+
+### Domanda aperta, non ancora testata
+Comportamento dell'etichetta "current_year" nella finestra tra chiusura FY e pubblicazione REALE dei risultati (es. NVDA chiude FY 25/01 ma riporta ~25/02, un mese di ritardo) — ORCL aveva solo 10 giorni di ritardo (31/05->10/06), non testa questo scenario a pieno. Serve un titolo con FY chiusa 4-5 settimane fa per verificare.
