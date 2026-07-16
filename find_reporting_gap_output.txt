@@ -1,0 +1,7 @@
+NKE: fiscal_year_ends = 2026-05-31
+FDX: fiscal_year_ends = 2026-05-31
+GIS: fiscal_year_ends = 2026-05-31
+MKC: fiscal_year_ends = 2025-11-30
+WBA: fiscal_year_ends = None
+CAG: fiscal_year_ends = 2025-05-25
+STZ: fiscal_year_ends = 2026-02-28
