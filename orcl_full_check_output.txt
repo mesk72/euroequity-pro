@@ -1,0 +1,302 @@
+
+=== earnings  ===
+{
+ "meta": {
+  "symbol": "ORCL",
+  "name": "Oracle Corporation",
+  "currency": "USD",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "exchange_timezone": "America/New_York"
+ },
+ "earnings": [
+  {
+   "date": "2026-06-10",
+   "time": "",
+   "eps_estimate": 1.96,
+   "eps_actual": 2.11,
+   "difference": 0.15,
+   "surprise_prc": 7.65
+  },
+  {
+   "date": "2026-05-29",
+   "time": "",
+   "eps_estimate": 0.74,
+   "eps_actual": 0.92,
+   "difference": 0.18,
+   "surprise_prc": 24.32
+  },
+  {
+   "date": "2026-03-10",
+   "time": "",
+   "eps_estimate": 1.69,
+   "eps_actual": 1.79,
+   "difference": 0.1,
+   "surprise_prc": 5.92
+  },
+  {
+   "date": "2025-12-10",
+   "time": "",
+   "eps_estimate": 1.64,
+   "eps_actual": 2.26,
+   "difference": 0.62,
+   "surprise_prc": 37.8
+  }
+ ],
+ "status": "ok"
+}
+
+=== earnings_estimate {'period': 'annual', 'symbol': 'ORCL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} ===
+{
+ "meta": {
+  "symbol": "ORCL",
+  "name": "Oracle Corporation",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "type": "Common Stock"
+ },
+ "earnings_estimate": [
+  {
+   "date": "2026-08-31",
+   "period": "current_quarter",
+   "number_of_analysts": 33,
+   "avg_estimate": 1.73873,
+   "low_estimate": 1.64,
+   "high_estimate": 1.8,
+   "year_ago_eps": 1.47
+  },
+  {
+   "date": "2026-11-30",
+   "period": "next_quarter",
+   "number_of_analysts": 32,
+   "avg_estimate": 1.88617,
+   "low_estimate": 1.77,
+   "high_estimate": 2.02,
+   "year_ago_eps": 2.26
+  },
+  {
+   "date": "2027-05-31",
+   "period": "current_year",
+   "number_of_analysts": 42,
+   "avg_estimate": 8.04521,
+   "low_estimate": 7.72,
+   "high_estimate": 8.57,
+   "year_ago_eps": 7.63
+  },
+  {
+   "date": "2028-05-31",
+   "period": "next_year",
+   "number_of_analysts": 40,
+   "avg_estimate": 10.9216,
+   "low_estimate": 8.28,
+   "high_estimate": 13.51,
+   "year_ago_eps": 8.04521
+  }
+ ],
+ "status": "ok"
+}
+
+=== revenue_estimate {'period': 'annual', 'symbol': 'ORCL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} ===
+{
+ "meta": {
+  "symbol": "ORCL",
+  "name": "Oracle Corporation",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "type": "Common Stock"
+ },
+ "revenue_estimate": [
+  {
+   "date": "2026-08-31",
+   "period": "current_quarter",
+   "number_of_analysts": 32,
+   "avg_estimate": 19122456910,
+   "low_estimate": 18636500000,
+   "high_estimate": 19295700000,
+   "year_ago_sales": 14926000000,
+   "sales_growth": 0.28
+  },
+  {
+   "date": "2026-11-30",
+   "period": "next_quarter",
+   "number_of_analysts": 31,
+   "avg_estimate": 21146163020,
+   "low_estimate": 20585000000,
+   "high_estimate": 21637000000,
+   "year_ago_sales": 16058000000,
+   "sales_growth": 0.32
+  },
+  {
+   "date": "2027-05-31",
+   "period": "current_year",
+   "number_of_analysts": 41,
+   "avg_estimate": 89218422680,
+   "low_estimate": 80121000000,
+   "high_estimate": 90513000000,
+   "year_ago_sales": 67357000000,
+   "sales_growth": 0.32
+  },
+  {
+   "date": "2028-05-31",
+   "period": "next_year",
+   "number_of_analysts": 39,
+   "avg_estimate": 130188834760,
+   "low_estimate": 107657000000,
+   "high_estimate": 137033000000,
+   "year_ago_sales": 89218422680,
+   "sales_growth": 0.46
+  }
+ ],
+ "status": "ok"
+}
+
+=== eps_trend {'period': 'annual', 'symbol': 'ORCL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} ===
+{
+ "meta": {
+  "symbol": "ORCL",
+  "name": "Oracle Corporation",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "type": "Common Stock"
+ },
+ "eps_trend": [
+  {
+   "date": "2026-08-31",
+   "period": "current_quarter",
+   "current_estimate": 1.73873,
+   "7_days_ago": 1.73873,
+   "30_days_ago": 1.68517,
+   "60_days_ago": 1.6782,
+   "90_days_ago": 1.68073
+  },
+  {
+   "date": "2026-11-30",
+   "period": "next_quarter",
+   "current_estimate": 1.88617,
+   "7_days_ago": 1.88617,
+   "30_days_ago": 1.84516,
+   "60_days_ago": 1.82989,
+   "90_days_ago": 1.82655
+  },
+  {
+   "date": "2027-05-31",
+   "period": "current_year",
+   "current_estimate": 8.04521,
+   "7_days_ago": 8.04521,
+   "30_days_ago": 8.05266,
+   "60_days_ago": 8.02763,
+   "90_days_ago": 7.96331
+  },
+  {
+   "date": "2028-05-31",
+   "period": "next_year",
+   "current_estimate": 10.9216,
+   "7_days_ago": 10.9216,
+   "30_days_ago": 10.7212,
+   "60_days_ago": 10.71101,
+   "90_days_ago": 10.72784
+  }
+ ],
+ "status": "ok"
+}
+
+=== statistics  ===
+{
+ "meta": {
+  "symbol": "ORCL",
+  "name": "Oracle Corporation",
+  "currency": "USD",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "exchange_timezone": "America/New_York"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 381633631594,
+   "enterprise_value": 519937163264,
+   "trailing_pe": 22.18182,
+   "forward_pe": 11.840756,
+   "peg_ratio": 11.840756,
+   "price_to_sales_ttm": 5.530272,
+   "price_to_book_mrq": 9.917178,
+   "enterprise_to_revenue": 7.719,
+   "enterprise_to_ebitda": 17.05
+  },
+  "financials": {
+   "fiscal_year_ends": "2026-05-31",
+   "most_recent_quarter": "2026-05-31",
+   "gross_margin": 0.6522623019182652,
+   "profit_margin": 0.25368,
+   "operating_margin": 0.36202,
+   "return_on_assets_ttm": 0.06505,
+   "return_on_equity_ttm": 0.53376,
+   "income_statement": {
+    "revenue_ttm": 67356999680,
+    "revenue_per_share_ttm": 23.551,
+    "quarterly_revenue_growth": 0.206,
+    "gross_profit_ttm": 44336001024,
+    "ebitda": 32604000000,
+    "net_income_to_common_ttm": 16984000512,
+    "diluted_eps_ttm": 5.83,
+    "quarterly_earnings_growth_yoy": 0.256
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 31893999616,
+    "total_cash_per_share_mrq": 11.072,
+    "total_debt_mrq": 167431995392,
+    "total_debt_to_equity_mrq": 388.87,
+    "current_ratio_mrq": 1.115,
+    "book_value_per_share_mrq": 13.04
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 31977000960,
+    "levered_free_cash_flow_ttm": -24536750080
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 2880000000,
+   "float_shares": 1713361760,
+   "avg_10_volume": 36887007,
+   "avg_90_volume": 33011782,
+   "shares_short": 41966703,
+   "short_ratio": 1.34,
+   "short_percent_of_shares_outstanding": 0.024400001,
+   "percent_held_by_insiders": 0.40479,
+   "percent_held_by_institutions": 0.43897998
+  },
+  "stock_price_summary": {
+   "fifty_two_week_low": 125.94,
+   "fifty_two_week_high": 345.72,
+   "fifty_two_week_change": -95.943,
+   "beta": 1.712,
+   "day_50_ma": 182.42
+
+=== time_series {'interval': '1day', 'outputsize': '1', 'adjust': 'all', 'symbol': 'ORCL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} ===
+{
+ "meta": {
+  "symbol": "ORCL",
+  "interval": "1day",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NYSE",
+  "mic_code": "XNYS",
+  "type": "Common Stock"
+ },
+ "values": [
+  {
+   "datetime": "2026-07-16",
+   "open": "131.64",
+   "high": "131.64",
+   "low": "125.94",
+   "close": "126.98",
+   "volume": "2813456"
+  }
+ ],
+ "status": "ok"
+}
