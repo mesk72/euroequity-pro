@@ -1,2 +1,5 @@
-Status download: 400
-Contenuto errore: {"statusCode":"404","error":"Bucket not found","message":"Bucket not found"}
+Bucket disponibili: 200 [{"id":"tikr-uploads","name":"tikr-uploads","owner":"","public":false,"type":"STANDARD","file_size_limit":null,"allowed_mime_types":null,"created_at":"2026-06-15T08:08:12.184Z","updated_at":"2026-06-15T08:08:12.184Z"}]
+
+Tentativo bucket 'tikr-uploads': status 200
+TROVATO! Primi 500 caratteri:
+Ticker,Company Name,Primary Exchange,Country,Sector,Last Price,Last Mkt Cap,LTM P/E LTM,LTM P/BVPS LTM,EPS Normalized (FY 2025),Mean EPS Normalized (FY 2026),Mean EPS Normalized (FY 2027),Mean EPS Normalized (FY 2028),EPS (GAAP) (FY 2025),Mean EPS (GAAP) (FY 2026),Mean EPS (GAAP) (FY 2027),Mean EPS (GAAP) (FY 2028),Rev (FY 2025),Mean Rev (FY 2026),Mean Rev (FY 2027),Mean Rev (FY 2028),Mean EPS Normalized (FY 2030),Mean EPS (GAAP) (FY 2029),Mean EPS (GAAP) (FY 2030),Mean Fwd P/E NTM,ECS Total Sha
