@@ -331,7 +331,7 @@ for stock in all_stocks:
     if len(data) < 2: fail += 1; continue
     last_px   = data[0]['close']
     last_date = datetime.strptime(data[0]['date'], "%Y-%m-%d")
-    chg1d = round((data[0]['close'] / data[1]['close'] - 1) * 100, 4)
+    chg1d = round((data[0]['close'] / data[1]['close'] - 1), 6)
     if abs(chg1d) > SPLIT_THRESHOLD_PCT:
         split_suspects.append((ticker, exchange, chg1d))
 
@@ -390,7 +390,7 @@ if split_suspects:
             if len(new_sorted) >= 2:
                 last_px2   = new_sorted[0]["adj_close"]
                 last_date2 = datetime.strptime(new_sorted[0]["date"], "%Y-%m-%d")
-                new_chg1d  = round((new_sorted[0]["adj_close"] / new_sorted[1]["adj_close"] - 1) * 100, 4)
+                new_chg1d  = round((new_sorted[0]["adj_close"] / new_sorted[1]["adj_close"] - 1), 6)
 
                 def mom_cal2(days):
                     target  = last_date2 - timedelta(days=days)
