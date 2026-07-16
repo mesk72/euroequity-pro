@@ -1,0 +1,18 @@
+MIL: 112/112 corretti (su 249 totali controllati)
+XETRA: 177/177 corretti (su 359 totali controllati)
+PA: 228/228 corretti (su 514 totali controllati)
+LSE: 221/221 corretti (su 513 totali controllati)
+SWX: 80/80 corretti (su 202 totali controllati)
+OM: 294/294 corretti (su 516 totali controllati)
+AS: 43/43 corretti (su 107 totali controllati)
+MC: 49/49 corretti (su 165 totali controllati)
+BR: 33/33 corretti (su 113 totali controllati)
+HE: 85/85 corretti (su 155 totali controllati)
+CPSE: 45/45 corretti (su 138 totali controllati)
+OB: 103/103 corretti (su 203 totali controllati)
+GR: 59/59 corretti (su 102 totali controllati)
+VI: 27/27 corretti (su 72 totali controllati)
+IR: 6/6 corretti (su 16 totali controllati)
+LS: 11/11 corretti (su 41 totali controllati)
+
+TOTALE corretti: 1573
