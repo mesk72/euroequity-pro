@@ -2601,3 +2601,18 @@ Comportamento dell'etichetta "current_year" nella finestra tra chiusura FY e pub
 **Nota**: la regola `eps_growth = NTM/abs(LTM) - 1` (denominatore in valore assoluto) resta valida per l'input #1. Da verificare se lo stesso abs() debba applicarsi anche a Revenue growth (Andrea l'aveva menzionato come precauzione, non ancora confermato come necessario per i ricavi specificamente).
 
 **Non ancora implementata nel codice** — solo formula confermata a parole. Prossimo passo: test su Vodafone, UCG (Unicredit), MSFT con questa formula esatta, poi eventuale lancio su US+Canada se i risultati sono sensati.
+
+---
+
+## REGOLA PERMANENTE — EPS momentum 30gg: pesi di calendarizzazione FISSI (quelli di oggi), non ricalcolati a 30gg fa
+
+Per calcolare `EPS_NTM_momentum_30d`, i pesi w_curr/w_next usati per pesare FY1/FY2 vanno presi UNA SOLA VOLTA (quelli di OGGI) e applicati sia al valore NTM di oggi sia al valore NTM di 30 giorni fa. NON ricalcolare i pesi sulla data di 30 giorni fa — altrimenti si mescola l'effetto "vera revisione delle stime" con l'effetto meccanico "il peso tra FY1/FY2 e' cambiato solo perche' e' passato tempo", gonfiando artificialmente il numero.
+
+Formula corretta:
+```
+NTM_oggi = w_curr_OGGI * FY1_oggi + w_next_OGGI * FY2_oggi
+NTM_30gg_fa = w_curr_OGGI * FY1_30gg_fa + w_next_OGGI * FY2_30gg_fa   (STESSI pesi di oggi)
+momentum_30d = NTM_oggi / NTM_30gg_fa - 1
+```
+
+Verificato su ORCL (16 luglio 2026): FY27 quasi fermo (8,05266->8,04521), FY28 in rialzo (10,7212->10,9216, +1,87%) -> momentum finale calcolato correttamente = **+0,22%** (positivo, coerente con la direzione attesa). Un primo tentativo con pesi ricalcolati a 30gg fa aveva dato erroneamente un numero gonfiato (+2,90%, sbagliato per doppio conteggio), poi un secondo tentativo con errore aritmetico aveva dato -0,37% (segno sbagliato). La versione corretta e verificata e' +0,22%.
