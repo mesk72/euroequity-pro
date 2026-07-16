@@ -1,0 +1,19 @@
+=== Test 1: api_usage (verifica piano attuale) ===
+Status: 200
+{"timestamp":"2026-07-16 14:59:01","current_usage":1,"plan_limit":100000,"plan_category":"enterprise"}
+
+=== Test 2: statistics NVDA (endpoint fondamentali) ===
+Status: 200
+{"meta":{"symbol":"NVDA","name":"NVIDIA Corporation","currency":"USD","exchange":"NASDAQ","mic_code":"XNGS","exchange_timezone":"America/New_York"},"statistics":{"valuations_metrics":{"market_capitalization":5146962500000,"enterprise_value":5102142226432,"trailing_pe":32.44275,"forward_pe":16.595171,"peg_ratio":0.15325716257668712,"price_to_sales_ttm":20.304321,"price_to_book_mrq":26.332096,"enterprise_to_revenue":20.128,"enterprise_to_ebitda":30.826},"financials":{"fiscal_year_ends":"2026-01-25
+
+=== Test 3: earnings_estimate NVDA ===
+Status: 200
+{"meta":{"symbol":"NVDA","name":"NVIDIA Corporation","currency":"USD","exchange_timezone":"America/New_York","exchange":"NASDAQ","mic_code":"XNGS","type":"Common Stock"},"earnings_estimate":[{"date":"2026-07-31","period":"current_quarter","number_of_analysts":41,"avg_estimate":2.09366,"low_estimate":2.03128,"high_estimate":2.6,"year_ago_eps":1.05},{"date":"2026-10-31","period":"next_quarter","number_of_analysts":40,"avg_estimate":2.34689,"low_estimate":2.13,"high_estimate":2.63,"year_ago_eps":1.
+
+=== Test 4: eps_trend NVDA ===
+Status: 200
+{"meta":{"symbol":"NVDA","name":"NVIDIA Corporation","currency":"USD","exchange_timezone":"America/New_York","exchange":"NASDAQ","mic_code":"XNGS","type":"Common Stock"},"eps_trend":[{"date":"2026-07-31","period":"current_quarter","current_estimate":2.09366,"7_days_ago":2.07925,"30_days_ago":2.07925,"60_days_ago":1.96129,"90_days_ago":1.94641},{"date":"2026-10-31","period":"next_quarter","current_estimate":2.34689,"7_days_ago":2.3463,"30_days_ago":2.3463,"60_days_ago":2.19094,"90_days_ago":2.172
+
+=== Test 5: revenue_estimate NVDA ===
+Status: 200
+{"meta":{"symbol":"NVDA","name":"NVIDIA Corporation","currency":"USD","exchange_timezone":"America/New_York","exchange":"NASDAQ","mic_code":"XNGS","type":"Common Stock"},"revenue_estimate":[{"date":"2026-07-31","period":"current_quarter","number_of_analysts":41,"avg_estimate":91742027460,"low_estimate":90302000000,"high_estimate":96655000000,"year_ago_sales":46743000000,"sales_growth":0.96},{"date":"2026-10-31","period":"next_quarter","number_of_analysts":39,"avg_estimate":102896185810,"low_esti
