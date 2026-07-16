@@ -1,3 +1,2 @@
-C: [{'ticker': 'C', 'rank_pe_ntm': 72, 'pe_forward': 12.53}]
-JNJ: [{'ticker': 'JNJ', 'rank_pe_ntm': 44, 'pe_forward': 22.62}]
-MU: [{'ticker': 'MU', 'rank_pe_ntm': 95, 'pe_forward': 6.54}]
+NVDA: [{'ticker': 'NVDA', 'rank_mom6_adj': 45, 'rank_mom12_adj': 61, 'mom6m': 0.1426, 'mom12m': 0.2873, 'mom1w': 0.0828, 'mom1m': 0.0526}]
+JNJ: [{'ticker': 'JNJ', 'rank_mom6_adj': 68, 'rank_mom12_adj': 79, 'mom6m': 0.2828, 'mom12m': 0.7334, 'mom1w': 0.0742, 'mom1m': 0.1801}]
