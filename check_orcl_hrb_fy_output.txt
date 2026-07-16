@@ -1,2 +1,5 @@
-ORCL: fiscal_year_ends = 2026-05-31
-HRB: fiscal_year_ends = 2025-06-30
+DE: fiscal_year_ends = 2025-11-02
+CTAS: fiscal_year_ends = 2025-05-31
+FDS: fiscal_year_ends = 2025-08-31
+PAYX: fiscal_year_ends = 2019-08-31
+MU: fiscal_year_ends = 2025-08-28
