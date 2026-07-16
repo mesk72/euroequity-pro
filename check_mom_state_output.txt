@@ -1,0 +1,14 @@
+NVDA.US: [{'ticker': 'NVDA', 'mom1w': 0.0828, 'mom1m': 0.0526, 'mom6m': 0.1426, 'mom12m': 0.2873, 'change1d': 0.040339, 'price': 210.96, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
+AAPL.US: [{'ticker': 'AAPL', 'mom1w': 0.0217, 'mom1m': 0.0814, 'mom6m': 0.218, 'mom12m': 0.4904, 'change1d': -0.002846, 'price': 315.32, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
+
+NVDA ultimi 10 prezzi:
+  {'date': '2026-07-14', 'adj_close': 211.8}
+  {'date': '2026-07-13', 'adj_close': 203.53}
+  {'date': '2026-07-10', 'adj_close': 210.96}
+  {'date': '2026-07-09', 'adj_close': 202.78}
+  {'date': '2026-07-08', 'adj_close': 204.12}
+  {'date': '2026-07-07', 'adj_close': 196.93}
+  {'date': '2026-07-06', 'adj_close': 195.55}
+  {'date': '2026-07-02', 'adj_close': 194.83}
+  {'date': '2026-07-01', 'adj_close': 197.58}
+  {'date': '2026-06-30', 'adj_close': 200.09}
