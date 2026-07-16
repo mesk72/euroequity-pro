@@ -1,0 +1,18 @@
+MIL: 117/117 ricalcolati da prices_eod fresco
+XETRA: 211/211 ricalcolati da prices_eod fresco
+PA: 217/217 ricalcolati da prices_eod fresco
+LSE: 423/423 ricalcolati da prices_eod fresco
+SWX: 161/161 ricalcolati da prices_eod fresco
+OM: 206/206 ricalcolati da prices_eod fresco
+AS: 98/98 ricalcolati da prices_eod fresco
+MC: 100/100 ricalcolati da prices_eod fresco
+BR: 100/100 ricalcolati da prices_eod fresco
+HE: 100/100 ricalcolati da prices_eod fresco
+CPSE: 100/100 ricalcolati da prices_eod fresco
+OB: 100/100 ricalcolati da prices_eod fresco
+GR: 100/100 ricalcolati da prices_eod fresco
+VI: 53/53 ricalcolati da prices_eod fresco
+IR: 15/15 ricalcolati da prices_eod fresco
+LS: 35/35 ricalcolati da prices_eod fresco
+
+TOTALE ricalcolati: 2136 | saltati (storico insufficiente): 0
