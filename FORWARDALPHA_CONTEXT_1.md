@@ -2582,3 +2582,22 @@ Testato su NVDA (FY end 25 gen) e ORCL (FY end 31 mag, chiusa solo 46 giorni pri
 
 ### Domanda aperta, non ancora testata
 Comportamento dell'etichetta "current_year" nella finestra tra chiusura FY e pubblicazione REALE dei risultati (es. NVDA chiude FY 25/01 ma riporta ~25/02, un mese di ritardo) — ORCL aveva solo 10 giorni di ritardo (31/05->10/06), non testa questo scenario a pieno. Serve un titolo con FY chiusa 4-5 settimane fa per verificare.
+
+---
+
+## REGOLA PERMANENTE — Nuova formula Growth Score (5 input), confermata 16 luglio 2026
+
+**Correzione importante**: il quinto input NON è "price momentum 30gg" — è **EPS momentum 30gg** (revisione delle stime, non rendimento di prezzo). Andrea ha corretto esplicitamente un mio errore di lettura.
+
+**I 5 input, ognuno rankato singolarmente 1-100**:
+1. EPS growth (calendarizzato, NTM/LTM, FY0/FY1/FY2 fissi da year_ago_eps — mai TTM)
+2. Revenue growth (calendarizzato, stessa logica, 12 mesi forward — mai TTM)
+3. **EPS momentum 30gg** (= EPS_NTM_calendarizzato_oggi / EPS_NTM_calendarizzato_30gg_fa - 1, usando eps_trend con period=annual su Twelvedata per i valori storici a 30gg)
+4. Price momentum 6m aggiustato (mom6m - mom1w, invariato rispetto alla formula storica)
+5. Price momentum 12m aggiustato (mom12m - mom1m, invariato)
+
+**Formula finale**: somma dei 5 rank (1-100 ciascuno) → quella somma ri-rankata su base COUNTRY (non universo intero) da 1-100 = Growth Score finale.
+
+**Nota**: la regola `eps_growth = NTM/abs(LTM) - 1` (denominatore in valore assoluto) resta valida per l'input #1. Da verificare se lo stesso abs() debba applicarsi anche a Revenue growth (Andrea l'aveva menzionato come precauzione, non ancora confermato come necessario per i ricavi specificamente).
+
+**Non ancora implementata nel codice** — solo formula confermata a parole. Prossimo passo: test su Vodafone, UCG (Unicredit), MSFT con questa formula esatta, poi eventuale lancio su US+Canada se i risultati sono sensati.
