@@ -1,0 +1,730 @@
+
+=== VOD (XLON) / earnings  (status 200) ===
+{
+ "meta": {
+  "symbol": "VOD",
+  "name": "Vodafone Group Public Limited Company",
+  "currency": "GBp",
+  "exchange": "LSE",
+  "mic_code": "XLON",
+  "exchange_timezone": "Europe/London"
+ },
+ "earnings": [
+  {
+   "date": "2026-05-15",
+   "time": "",
+   "eps_estimate": -0.53,
+   "eps_actual": -0.61,
+   "difference": -0.08,
+   "surprise_prc": 15.09
+  },
+  {
+   "date": "2026-04-24",
+   "time": "",
+   "eps_estimate": 1.56,
+   "eps_actual": 1.59,
+   "difference": 0.03,
+   "surprise_prc": 1.92
+  },
+  {
+   "date": "2012-11-13",
+   "time": "",
+   "eps_estimate": 0.09,
+   "eps_actual": 0.1,
+   "difference": 0.01,
+   "surprise_prc": 11.11
+  },
+  {
+   "date": "2012-07-20",
+   "time": "",
+   "eps_estimate": 0.09,
+   "eps_actual": 0.09,
+   "difference": 0,
+   "surprise_prc": 0
+  }
+ ],
+ "status": "ok"
+}
+
+=== VOD (XLON) / earnings_estimate {'period': 'annual', 'symbol': 'VOD', 'mic_code': 'XLON', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "VOD",
+  "name": "Vodafone Group Public Limited Company",
+  "currency": "GBp",
+  "exchange_timezone": "Europe/London",
+  "exchange": "LSE",
+  "mic_code": "XLON",
+  "type": "Common Stock"
+ },
+ "earnings_estimate": [
+  {
+   "date": "2027-03-31",
+   "period": "current_year",
+   "number_of_analysts": 10,
+   "avg_estimate": 0.09928,
+   "low_estimate": 0.073,
+   "high_estimate": 0.16,
+   "year_ago_eps": null
+  },
+  {
+   "date": "2028-03-31",
+   "period": "next_year",
+   "number_of_analysts": 10,
+   "avg_estimate": 0.12411,
+   "low_estimate": 0.08742,
+   "high_estimate": 0.1845,
+   "year_ago_eps": 0.09928
+  }
+ ],
+ "status": "ok"
+}
+
+=== VOD (XLON) / revenue_estimate {'period': 'annual', 'symbol': 'VOD', 'mic_code': 'XLON', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "VOD",
+  "name": "Vodafone Group Public Limited Company",
+  "currency": "GBp",
+  "exchange_timezone": "Europe/London",
+  "exchange": "LSE",
+  "mic_code": "XLON",
+  "type": "Common Stock"
+ },
+ "revenue_estimate": [
+  {
+   "date": "2027-03-31",
+   "period": "current_year",
+   "number_of_analysts": 10,
+   "avg_estimate": 44471971200,
+   "low_estimate": 43400355100,
+   "high_estimate": 45907000000,
+   "year_ago_sales": null,
+   "sales_growth": null
+  },
+  {
+   "date": "2028-03-31",
+   "period": "next_year",
+   "number_of_analysts": 10,
+   "avg_estimate": 45932233310,
+   "low_estimate": 45117945290,
+   "high_estimate": 47075000000,
+   "year_ago_sales": 44471971200,
+   "sales_growth": 0.03
+  }
+ ],
+ "status": "ok"
+}
+
+=== VOD (XLON) / eps_trend {'period': 'annual', 'symbol': 'VOD', 'mic_code': 'XLON', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "VOD",
+  "name": "Vodafone Group Public Limited Company",
+  "currency": "GBp",
+  "exchange_timezone": "Europe/London",
+  "exchange": "LSE",
+  "mic_code": "XLON",
+  "type": "Common Stock"
+ },
+ "eps_trend": [
+  {
+   "date": "2027-03-31",
+   "period": "current_year",
+   "current_estimate": 0.09928,
+   "7_days_ago": 0.09898,
+   "30_days_ago": 0.10153,
+   "60_days_ago": 0.11139,
+   "90_days_ago": 0.10539
+  },
+  {
+   "date": "2028-03-31",
+   "period": "next_year",
+   "current_estimate": 0.12411,
+   "7_days_ago": 0.12401,
+   "30_days_ago": 0.12812,
+   "60_days_ago": 0.13024,
+   "90_days_ago": 0.129
+  }
+ ],
+ "status": "ok"
+}
+
+=== VOD (XLON) / statistics  (status 200) ===
+{
+ "meta": {
+  "symbol": "VOD",
+  "name": "Vodafone Group Public Limited Company",
+  "currency": "GBp",
+  "exchange": "LSE",
+  "mic_code": "XLON",
+  "exchange_timezone": "Europe/London"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 2676953376397,
+   "enterprise_value": 60240148896,
+   "trailing_pe": 11.102857,
+   "forward_pe": 11.041995,
+   "peg_ratio": null,
+   "price_to_sales_ttm": 0.6644589,
+   "price_to_book_mrq": 61.415493,
+   "enterprise_to_revenue": 1.744,
+   "enterprise_to_ebitda": 7.885
+  },
+  "financials": {
+   "fiscal_year_ends": "2026-03-31",
+   "most_recent_quarter": "2018-09-30",
+   "gross_margin": null,
+   "profit_margin": -0.00981,
+   "operating_margin": 0.07783,
+   "return_on_assets_ttm": 0.01523,
+   "return_on_equity_ttm": 0.0010899999,
+   "income_statement": {
+    "revenue_ttm": 34547625451,
+    "revenue_per_share_ttm": 1.684,
+    "quarterly_revenue_growth": null,
+    "gross_profit_ttm": 10872071776,
+    "ebitda": 16274000000,
+    "net_income_to_common_ttm": -246762650,
+    "diluted_eps_ttm": -0.01,
+    "quarterly_earnings_growth_yoy": null
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 12451694604,
+    "total_cash_per_share_mrq": 0.632,
+    "total_debt_mrq": 46490425674,
+    "total_debt_to_equity_mrq": 100.153,
+    "current_ratio_mrq": 1.137,
+    "book_value_per_share_mrq": 1.9009861
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 12202370623,
+    "levered_free_cash_flow_ttm": 4412163013
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 23087114293,
+   "float_shares": 18019492706,
+   "avg_10_volume": 75285826,
+   "avg_90_volume": 76675833,
+   "shares_short": null,
+   "short_ratio": null,
+   "short_percent_of_shares_outstanding": null,
+   "percent_held_by_insiders": 0.03302,
+   "percent_held_by_institutions": 0.60556
+  },
+  "stock_price_summary": {
+   "fifty_two_week_low": 80.68,
+   "fifty_two_week_high": 131.1,
+   "fifty_two_week_change": 29.462,
+   "beta": 0.317,
+   "day_50_ma": 109.6924,
+   "day_200_ma": 104.2718
+  },
+  "dividends_and_splits": {
+   "forward_annual_dividend_rate": 4.0284876,
+   "forward_annual_dividend_yield": 0.03472834137931034,
+   "trailing_annual_dividend_rate": 3.9654438,
+
+
+=== UCG (XMIL) / earnings  (status 200) ===
+{
+ "meta": {
+  "symbol": "UCG",
+  "name": "UniCredit S.p.A.",
+  "currency": "EUR",
+  "exchange": "MTA",
+  "mic_code": "XMIL",
+  "exchange_timezone": "Europe/Rome"
+ },
+ "earnings": [
+  {
+   "date": "2026-05-21",
+   "time": "",
+   "eps_estimate": 2.6,
+   "eps_actual": 3.64,
+   "difference": 1.04,
+   "surprise_prc": 40
+  },
+  {
+   "date": "2026-05-05",
+   "time": "",
+   "eps_estimate": 1.85,
+   "eps_actual": 2.09,
+   "difference": 0.24,
+   "surprise_prc": 12.97
+  },
+  {
+   "date": "2026-02-09",
+   "time": "",
+   "eps_estimate": 1.21,
+   "eps_actual": 1.09,
+   "difference": -0.12,
+   "surprise_prc": -9.92
+  },
+  {
+   "date": "2026-01-29",
+   "time": "",
+   "eps_estimate": 6.45,
+   "eps_actual": 6.57,
+   "difference": 0.12,
+   "surprise_prc": 1.86
+  },
+  {
+   "date": "2025-11-14",
+   "time": "",
+   "eps_estimate": -1.72,
+   "eps_actual": -2.28,
+   "difference": -0.56,
+   "surprise_prc": 32.56
+  }
+ ],
+ "status": "ok"
+}
+
+=== UCG (XMIL) / earnings_estimate {'period': 'annual', 'symbol': 'UCG', 'mic_code': 'XMIL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "UCG",
+  "name": "UniCredit S.p.A.",
+  "currency": "EUR",
+  "exchange_timezone": "Europe/Rome",
+  "exchange": "MTA",
+  "mic_code": "XMIL",
+  "type": "Common Stock"
+ },
+ "earnings_estimate": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "number_of_analysts": 3,
+   "avg_estimate": 1.85522,
+   "low_estimate": 1.84002,
+   "high_estimate": 1.86553,
+   "year_ago_eps": 1.6775
+  },
+  {
+   "date": "2026-12-31",
+   "period": "current_year",
+   "number_of_analysts": 16,
+   "avg_estimate": 7.39001,
+   "low_estimate": 6.92,
+   "high_estimate": 7.78,
+   "year_ago_eps": 6.5086
+  },
+  {
+   "date": "2027-12-31",
+   "period": "next_year",
+   "number_of_analysts": 16,
+   "avg_estimate": 8.2954,
+   "low_estimate": 7.82,
+   "high_estimate": 8.94,
+   "year_ago_eps": 7.39001
+  }
+ ],
+ "status": "ok"
+}
+
+=== UCG (XMIL) / revenue_estimate {'period': 'annual', 'symbol': 'UCG', 'mic_code': 'XMIL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "UCG",
+  "name": "UniCredit S.p.A.",
+  "currency": "EUR",
+  "exchange_timezone": "Europe/Rome",
+  "exchange": "MTA",
+  "mic_code": "XMIL",
+  "type": "Common Stock"
+ },
+ "revenue_estimate": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "number_of_analysts": 2,
+   "avg_estimate": 6362726220,
+   "low_estimate": 6315021000,
+   "high_estimate": 6410431440,
+   "year_ago_sales": 6167000000,
+   "sales_growth": 0.03
+  },
+  {
+   "date": "2026-12-31",
+   "period": "current_year",
+   "number_of_analysts": 15,
+   "avg_estimate": 26145527300,
+   "low_estimate": 25004000000,
+   "high_estimate": 26678000000,
+   "year_ago_sales": 24536000000,
+   "sales_growth": 0.07
+  },
+  {
+   "date": "2027-12-31",
+   "period": "next_year",
+   "number_of_analysts": 15,
+   "avg_estimate": 27410467770,
+   "low_estimate": 25952000000,
+   "high_estimate": 28521000000,
+   "year_ago_sales": 26145527300,
+   "sales_growth": 0.05
+  }
+ ],
+ "status": "ok"
+}
+
+=== UCG (XMIL) / eps_trend {'period': 'annual', 'symbol': 'UCG', 'mic_code': 'XMIL', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "UCG",
+  "name": "UniCredit S.p.A.",
+  "currency": "EUR",
+  "exchange_timezone": "Europe/Rome",
+  "exchange": "MTA",
+  "mic_code": "XMIL",
+  "type": "Common Stock"
+ },
+ "eps_trend": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "current_estimate": 1.85522,
+   "7_days_ago": 1.83475,
+   "30_days_ago": 1.8347,
+   "60_days_ago": 1.83968,
+   "90_days_ago": 1.85576
+  },
+  {
+   "date": "2026-12-31",
+   "period": "current_year",
+   "current_estimate": 7.39001,
+   "7_days_ago": 7.35525,
+   "30_days_ago": 7.36495,
+   "60_days_ago": 7.32393,
+   "90_days_ago": 7.21382
+  },
+  {
+   "date": "2027-12-31",
+   "period": "next_year",
+   "current_estimate": 8.2954,
+   "7_days_ago": 8.28524,
+   "30_days_ago": 8.25144,
+   "60_days_ago": 8.21963,
+   "90_days_ago": 8.13209
+  }
+ ],
+ "status": "ok"
+}
+
+=== UCG (XMIL) / statistics  (status 200) ===
+{
+ "meta": {
+  "symbol": "UCG",
+  "name": "UniCredit S.p.A.",
+  "currency": "EUR",
+  "exchange": "MTA",
+  "mic_code": "XMIL",
+  "exchange_timezone": "Europe/Rome"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 106435787410,
+   "enterprise_value": 143018541056,
+   "trailing_pe": 11.240715,
+   "forward_pe": 9.851243,
+   "peg_ratio": 0.5589133291666666,
+   "price_to_sales_ttm": 4.8083267,
+   "price_to_book_mrq": 1.7875971,
+   "enterprise_to_revenue": 5.616,
+   "enterprise_to_ebitda": null
+  },
+  "financials": {
+   "fiscal_year_ends": "2025-12-31",
+   "most_recent_quarter": "2026-03-31",
+   "gross_margin": null,
+   "profit_margin": 0.44619998,
+   "operating_margin": 0.62253,
+   "return_on_assets_ttm": 0.01345,
+   "return_on_equity_ttm": 0.16984,
+   "income_statement": {
+    "revenue_ttm": 25464000512,
+    "revenue_per_share_ttm": 16.719,
+    "quarterly_revenue_growth": 0.064,
+    "gross_profit_ttm": 25464000512,
+    "ebitda": 0,
+    "net_income_to_common_ttm": 11155999744,
+    "diluted_eps_ttm": 7.27,
+    "quarterly_earnings_growth_yoy": 0.161
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 113316003840,
+    "total_cash_per_share_mrq": 75.708,
+    "total_debt_mrq": 132993998848,
+    "total_debt_to_equity_mrq": 1.9328556520121498,
+    "current_ratio_mrq": null,
+    "book_value_per_share_mrq": 45.715
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 14106000000,
+    "levered_free_cash_flow_ttm": 10709000000
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 1498277375,
+   "float_shares": 1493900372,
+   "avg_10_volume": 4458114,
+   "avg_90_volume": 5419582,
+   "shares_short": null,
+   "short_ratio": null,
+   "short_percent_of_shares_outstanding": null,
+   "percent_held_by_insiders": 0,
+   "percent_held_by_institutions": 0.54375
+  },
+  "stock_price_summary": {
+   "fifty_two_week_low": 57.14,
+   "fifty_two_week_high": 83.52,
+   "fifty_two_week_change": 29.873,
+   "beta": 1.061,
+   "day_50_ma": 75.4954,
+   "day_200_ma": 69.37975
+  },
+  "dividends_and_splits": {
+   "forward_annual_dividend_rate": 6.8832,
+   "forward_annual_dividend_yield": 0.08345295489638667,
+   "trailing_annual_dividend_rate": 1.7208,
+   "trailing_annual_dividen
+
+=== MSFT (default) / earnings  (status 200) ===
+{
+ "meta": {
+  "symbol": "MSFT",
+  "name": "Microsoft Corp.",
+  "currency": "USD",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "exchange_timezone": "America/New_York"
+ },
+ "earnings": [
+  {
+   "date": "2026-04-29",
+   "time": "",
+   "eps_estimate": 4.06,
+   "eps_actual": 4.27,
+   "difference": 0.21,
+   "surprise_prc": 5.17
+  },
+  {
+   "date": "2026-01-28",
+   "time": "",
+   "eps_estimate": 3.92,
+   "eps_actual": 4.14,
+   "difference": 0.22,
+   "surprise_prc": 5.61
+  },
+  {
+   "date": "2025-10-29",
+   "time": "",
+   "eps_estimate": 3.66,
+   "eps_actual": 4.13,
+   "difference": 0.47,
+   "surprise_prc": 12.84
+  },
+  {
+   "date": "2025-07-30",
+   "time": "",
+   "eps_estimate": 3.38,
+   "eps_actual": 3.65,
+   "difference": 0.27,
+   "surprise_prc": 7.99
+  },
+  {
+   "date": "2025-04-30",
+   "time": "",
+   "eps_estimate": 3.22,
+   "eps_actual": 3.46,
+   "difference": 0.24,
+   "surprise_prc": 7.45
+  }
+ ],
+ "status": "ok"
+}
+
+=== MSFT (default) / earnings_estimate {'period': 'annual', 'symbol': 'MSFT', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "MSFT",
+  "name": "Microsoft Corp.",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "type": "Common Stock"
+ },
+ "earnings_estimate": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "number_of_analysts": 26,
+   "avg_estimate": 4.62319,
+   "low_estimate": 4.38,
+   "high_estimate": 4.91,
+   "year_ago_eps": 4.13
+  },
+  {
+   "date": "2027-06-30",
+   "period": "next_year",
+   "number_of_analysts": 36,
+   "avg_estimate": 19.35995,
+   "low_estimate": 18.12644,
+   "high_estimate": 20.52,
+   "year_ago_eps": 16.81954
+  }
+ ],
+ "status": "ok"
+}
+
+=== MSFT (default) / revenue_estimate {'period': 'annual', 'symbol': 'MSFT', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "MSFT",
+  "name": "Microsoft Corp.",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "type": "Common Stock"
+ },
+ "revenue_estimate": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "number_of_analysts": 35,
+   "avg_estimate": 89690837270,
+   "low_estimate": 87795000000,
+   "high_estimate": 91451000000,
+   "year_ago_sales": 77673000000,
+   "sales_growth": 0.15
+  },
+  {
+   "date": "2027-06-30",
+   "period": "next_year",
+   "number_of_analysts": 54,
+   "avg_estimate": 384465061750,
+   "low_estimate": 369086000000,
+   "high_estimate": 406005429770,
+   "year_ago_sales": 329509571480,
+   "sales_growth": 0.17
+  }
+ ],
+ "status": "ok"
+}
+
+=== MSFT (default) / eps_trend {'period': 'annual', 'symbol': 'MSFT', 'apikey': 'e8ee8c5225bf46feb5873bce01d03e5f'} (status 200) ===
+{
+ "meta": {
+  "symbol": "MSFT",
+  "name": "Microsoft Corp.",
+  "currency": "USD",
+  "exchange_timezone": "America/New_York",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "type": "Common Stock"
+ },
+ "eps_trend": [
+  {
+   "date": "2026-09-30",
+   "period": "next_quarter",
+   "current_estimate": 4.62319,
+   "7_days_ago": 4.62381,
+   "30_days_ago": 4.61546,
+   "60_days_ago": 4.61567,
+   "90_days_ago": 4.55139
+  },
+  {
+   "date": "2027-06-30",
+   "period": "next_year",
+   "current_estimate": 19.35995,
+   "7_days_ago": 19.36884,
+   "30_days_ago": 19.34238,
+   "60_days_ago": 19.33773,
+   "90_days_ago": 18.83231
+  }
+ ],
+ "status": "ok"
+}
+
+=== MSFT (default) / statistics  (status 200) ===
+{
+ "meta": {
+  "symbol": "MSFT",
+  "name": "Microsoft Corp.",
+  "currency": "USD",
+  "exchange": "NASDAQ",
+  "mic_code": "XNGS",
+  "exchange_timezone": "America/New_York"
+ },
+ "statistics": {
+  "valuations_metrics": {
+   "market_capitalization": 2938911621943,
+   "enterprise_value": 2951647592448,
+   "trailing_pe": 23.314846,
+   "forward_pe": 20.195818,
+   "peg_ratio": 0.998796489135802,
+   "price_to_sales_ttm": 9.125636,
+   "price_to_book_mrq": 7.009878,
+   "enterprise_to_revenue": 9.274,
+   "enterprise_to_ebitda": 16.002
+  },
+  "financials": {
+   "fiscal_year_ends": "2025-06-30",
+   "most_recent_quarter": "2026-03-31",
+   "gross_margin": 0.6763265207634582,
+   "profit_margin": 0.39341998,
+   "operating_margin": 0.46326,
+   "return_on_assets_ttm": 0.14814,
+   "return_on_equity_ttm": 0.34013999,
+   "income_statement": {
+    "revenue_ttm": 318272995328,
+    "revenue_per_share_ttm": 42.836,
+    "quarterly_revenue_growth": 0.183,
+    "gross_profit_ttm": 217409994752,
+    "ebitda": 198164000000,
+    "net_income_to_common_ttm": 125215997952,
+    "diluted_eps_ttm": 16.77,
+    "quarterly_earnings_growth_yoy": 0.231
+   },
+   "balance_sheet": {
+    "total_cash_mrq": 78227996672,
+    "total_cash_per_share_mrq": 10.531,
+    "total_debt_mrq": 125431996416,
+    "total_debt_to_equity_mrq": 30.271,
+    "current_ratio_mrq": 1.283,
+    "book_value_per_share_mrq": 55.777
+   },
+   "cash_flow": {
+    "operating_cash_flow_ttm": 170141007872,
+    "levered_free_cash_flow_ttm": 37011251200
+   }
+  },
+  "stock_statistics": {
+   "shares_outstanding": 7429000000,
+   "float_shares": 7417366336,
+   "avg_10_volume": 30907132,
+   "avg_90_volume": 42731331,
+   "shares_short": 89063316,
+   "short_ratio": 1.84,
+   "short_percent_of_shares_outstanding": 0.012,
+   "percent_held_by_insiders": 0.00078,
+   "percent_held_by_institutions": 0.75663
+  },
+  "stock_price_summary": {
+   "fifty_two_week_low": 349.2,
+   "fifty_two_week_high": 555.45,
+   "fifty_two_week_change": -27.853,
+   "beta": 1.13,
+   "day_50_ma": 402.9464,
+   "day_200_ma": 441.68735
+  },
+  "dividends_and_splits": {
+   "forward_annual_dividend_rate": 3.64,
+   "forward_annual_dividend_yield": 0.00909533863894754,
+   "trailing_annual_divide
