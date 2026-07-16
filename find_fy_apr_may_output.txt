@@ -1,2 +1,6 @@
-Fiscal year fine aprile (mese=4):
-Fiscal year fine maggio (mese=5):
+Totale con fiscal_month popolato: 1000
+Distribuzione: {12: 1000}
+
+Mese 4: 0 titoli
+
+Mese 5: 0 titoli
