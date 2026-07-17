@@ -1,35 +1,35 @@
 ======================================================================
-HEALTH CHECK — 2026-07-16 10:58 UTC
+HEALTH CHECK — 2026-07-17 11:11 UTC
 ======================================================================
-US       count= 3001/3000   campione_fresco=19/20  eta_max_campione=6gg  [OK]
-TSX      count=  400/400    campione_fresco=17/20  eta_max_campione=6gg  [PROBLEMA]
-LSE      count=  423/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-XETRA    count=  211/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-PA       count=  217/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-OM       count=  206/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-SWX      count=  161/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-MIL      count=  117/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-AS       count=   98/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
-MC       count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
-BR       count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
-HE       count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
-CPSE     count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
-OB       count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
-GR       count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
-VI       count=   53/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-IR       count=   15/-      campione_fresco=15/15  eta_max_campione=2gg  [OK]
-LS       count=   35/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-TSE      count= 1000/1000   campione_fresco=0/20  eta_max_campione=6gg  [PROBLEMA]
-SEHK     count=  500/500    campione_fresco=0/20  eta_max_campione=8gg  [PROBLEMA]
-ASX      count=  350/350    campione_fresco=0/20  eta_max_campione=6gg  [PROBLEMA]
-KRX      count=  400/400    campione_fresco=0/20  eta_max_campione=8gg  [PROBLEMA]
-SGX      count=  100/100    campione_fresco=0/20  eta_max_campione=9gg  [PROBLEMA]
+US       count= 3001/3000   campione_fresco=19/20  eta_max_campione=7gg  [OK]
+TSX      count=  400/400    campione_fresco=17/20  eta_max_campione=7gg  [PROBLEMA]
+LSE      count=  423/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+XETRA    count=  211/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+PA       count=  217/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+OM       count=  206/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+SWX      count=  161/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+MIL      count=  117/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+AS       count=   98/100    campione_fresco=20/20  eta_max_campione=3gg  [OK]
+MC       count=  100/100    campione_fresco=20/20  eta_max_campione=3gg  [OK]
+BR       count=  100/100    campione_fresco=20/20  eta_max_campione=3gg  [OK]
+HE       count=  100/100    campione_fresco=20/20  eta_max_campione=3gg  [OK]
+CPSE     count=  100/100    campione_fresco=20/20  eta_max_campione=3gg  [OK]
+OB       count=  100/100    campione_fresco=20/20  eta_max_campione=3gg  [OK]
+GR       count=  100/100    campione_fresco=20/20  eta_max_campione=3gg  [OK]
+VI       count=   53/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+IR       count=   15/-      campione_fresco=15/15  eta_max_campione=3gg  [OK]
+LS       count=   35/-      campione_fresco=20/20  eta_max_campione=3gg  [OK]
+TSE      count= 1000/1000   campione_fresco=0/20  eta_max_campione=7gg  [PROBLEMA]
+SEHK     count=  500/500    campione_fresco=0/20  eta_max_campione=9gg  [PROBLEMA]
+ASX      count=  350/350    campione_fresco=0/20  eta_max_campione=7gg  [PROBLEMA]
+KRX      count=  400/400    campione_fresco=0/20  eta_max_campione=9gg  [PROBLEMA]
+SGX      count=  100/100    campione_fresco=0/20  eta_max_campione=10gg  [PROBLEMA]
 ----------------------------------------------------------------------
 STATO GENERALE: PROBLEMA (6 mercati)
-  - TSX: count=400/400 fresh=17/20 eta_max=6gg
-  - TSE: count=1000/1000 fresh=0/20 eta_max=6gg
-  - SEHK: count=500/500 fresh=0/20 eta_max=8gg
-  - ASX: count=350/350 fresh=0/20 eta_max=6gg
-  - KRX: count=400/400 fresh=0/20 eta_max=8gg
-  - SGX: count=100/100 fresh=0/20 eta_max=9gg
+  - TSX: count=400/400 fresh=17/20 eta_max=7gg
+  - TSE: count=1000/1000 fresh=0/20 eta_max=7gg
+  - SEHK: count=500/500 fresh=0/20 eta_max=9gg
+  - ASX: count=350/350 fresh=0/20 eta_max=7gg
+  - KRX: count=400/400 fresh=0/20 eta_max=9gg
+  - SGX: count=100/100 fresh=0/20 eta_max=10gg
 ======================================================================
