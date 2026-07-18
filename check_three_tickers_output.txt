@@ -1,2 +1,9 @@
-NVDA: [{'ticker': 'NVDA', 'rank_mom6_adj': 45, 'rank_mom12_adj': 61, 'mom6m': 0.1426, 'mom12m': 0.2873, 'mom1w': 0.0828, 'mom1m': 0.0526}]
-JNJ: [{'ticker': 'JNJ', 'rank_mom6_adj': 68, 'rank_mom12_adj': 79, 'mom6m': 0.2828, 'mom12m': 0.7334, 'mom1w': 0.0742, 'mom1m': 0.1801}]
+AAPL (fundamentals): [{'ticker': 'AAPL', 'price': 315.32, 'eps_ntm_dcf': 9.2754, 'implied_growth': None, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
+AAPL (prices_eod ultimi 3): [{'date': '2026-07-14', 'adj_close': 314.86}, {'date': '2026-07-13', 'adj_close': 317.31}, {'date': '2026-07-10', 'adj_close': 315.32}]
+
+MSFT (fundamentals): [{'ticker': 'MSFT', 'price': 385.1, 'eps_ntm_dcf': 19.0121, 'implied_growth': None, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
+MSFT (prices_eod ultimi 3): [{'date': '2026-07-15', 'adj_close': 395.63}, {'date': '2026-07-14', 'adj_close': 384.93}, {'date': '2026-07-13', 'adj_close': 390.99}]
+
+NVDA (fundamentals): [{'ticker': 'NVDA', 'price': 210.96, 'eps_ntm_dcf': 10.0084, 'implied_growth': None, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
+NVDA (prices_eod ultimi 3): [{'date': '2026-07-15', 'adj_close': 212.5}, {'date': '2026-07-14', 'adj_close': 211.8}, {'date': '2026-07-13', 'adj_close': 203.53}]
+
