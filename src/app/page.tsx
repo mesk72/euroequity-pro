@@ -711,6 +711,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   }, [])
 
   useEffect(() => {
+    const load = () => {
     setStocks([]); setSelected(null); setLoading(true)
     const ALL_GLOBAL_EXCHANGES = 'US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX'
     const exchToLoad = initEpsMom ? 'EZ' : (exchange === 'GLOBAL' ? ALL_GLOBAL_EXCHANGES : exchange)
@@ -759,6 +760,11 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       setStocks(data)
       setLoading(false)
     })
+    }
+    load()
+    // Refresh automatico ogni 5 minuti - stesso meccanismo delle altre pagine.
+    const interval = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [exchange, initEpsMom])
 
   // Applica conversione USD->EUR alla market cap
@@ -988,8 +994,10 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
-    apiExchange('EZ').then(data => { setStocks(data); setLoading(false) })
+    const load = () => { setLoading(true); apiExchange('EZ').then(data => { setStocks(data); setLoading(false) }) }
+    load()
+    const interval = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const stocksEur = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
@@ -1137,8 +1145,10 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
-    apiExchange('US').then(data => { setStocks(data); setLoading(false) })
+    const load = () => { setLoading(true); apiExchange('US').then(data => { setStocks(data); setLoading(false) }) }
+    load()
+    const interval = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const stocksUS = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
@@ -2026,8 +2036,10 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
-    apiExchange('TSE,SEHK,ASX,KRX,SGX').then(data => { setStocks(data); setLoading(false) })
+    const load = () => { setLoading(true); apiExchange('TSE,SEHK,ASX,KRX,SGX').then(data => { setStocks(data); setLoading(false) }) }
+    load()
+    const interval = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const stocksAP = stocks.map(s => ({ ...s, mktCap: s.mktCap ?? null }))
