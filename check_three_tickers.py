@@ -4,5 +4,5 @@ SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
 r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
-    params={"select":"*","exchange":"eq.KRX","limit":"3"})
-print("Esempio righe stocks KRX:", r.json())
+    params={"select":"ticker,exchange,company","company":"ilike.*samsung*","limit":"15"})
+print("Ricerca Samsung:", r.json())
