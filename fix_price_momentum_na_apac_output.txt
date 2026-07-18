@@ -1,0 +1,25 @@
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN US: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+US: 1789/2989 aggiornati (price+mom1w+mom1m) | saltati per storico insufficiente: 12
+  WARN TSX: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+TSX: 300/400 aggiornati (price+mom1w+mom1m) | saltati per storico insufficiente: 0
+TSE: 1000/1000 aggiornati (price+mom1w+mom1m) | saltati per storico insufficiente: 0
+  WARN SEHK: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN SEHK: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN SEHK: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+SEHK: 200/500 aggiornati (price+mom1w+mom1m) | saltati per storico insufficiente: 0
+ASX: 350/350 aggiornati (price+mom1w+mom1m) | saltati per storico insufficiente: 0
+KRX: 400/400 aggiornati (price+mom1w+mom1m) | saltati per storico insufficiente: 0
+SGX: 100/100 aggiornati (price+mom1w+mom1m) | saltati per storico insufficiente: 0
+
+TOTALE aggiornati: 4139 | saltati: 12
