@@ -2666,3 +2666,23 @@ Andrea ha correttamente notato: aggiornare mom1w/mom1m (fatto per APAC, non anco
 3. `best_score` (che dipende da growth_score insieme a value_score)
 
 **Nessuno di questi ricalcoli a cascata e' stato fatto in questa sessione** — il fix APAC ha aggiornato solo mom1w/mom1m grezzi, lasciando Growth Score e Best Score CALCOLATI SU DATI VECCHI, quindi temporaneamente INCONSISTENTI con i nuovi valori di momentum. Andrebbe completata la cascata prima che i nuovi numeri siano davvero affidabili sul sito, non solo il primo anello della catena.
+
+---
+
+## REGOLA PERMANENTE — Coerenza dati tra pagine (18 luglio 2026), da consultare SEMPRE in caso di dubbio
+
+**Andrea ha segnalato ripetutamente (Samsung grafico/tabella, poi Screener/pagina titolo per NVDA) lo stesso tipo di problema: pagine diverse dello stesso sito che mostrano valori diversi per lo stesso campo (change1d, mom1m).** Richiesta esplicita: un'unica fonte dati, stessi calcoli ovunque, nessuna discrepanza tollerata. Claude deve consultare questa sezione OGNI VOLTA che affronta un problema di dati incoerenti tra pagine, prima di ipotizzare altre cause.
+
+### Causa Tipo 1 — formule diverse per lo stesso campo (RISOLTO)
+`/api/db/history` (dati grafico) calcolava mom1w/mom1m/mom6m/mom12m con **giorni di CALENDARIO**, mentre `fundamentals` (dati tabella) li salva con **giorni di TRADING** (5/21/127/253, standard ForwardAlpha). In periodi di alta volatilita' (es. Samsung inizio giugno 2026), pochi giorni di differenza nel punto di riferimento causavano scarti fino a 10 punti percentuali (-9% vs +0.3%). **Fix applicato**: `route.ts` di `/api/db/history` riscritto per usare indici fissi a giorni di trading, identici alla formula di fundamentals. File: `src/app/api/db/history/route.ts`.
+
+### Causa Tipo 2 — nome colonna sbagliato in uno script di scrittura (RISOLTO)
+Uno script di fix (`fix_implied_growth_real_beta.py`) scriveva nella colonna `implied_growth` e `beta_local`, ma il frontend (`/api/db/stocks/route.ts`) legge dalla colonna `implied_growth_10y` e `beta`. Il valore corretto veniva calcolato e salvato, ma in una colonna che il sito non leggeva mai — il sito continuava a mostrare un valore vecchio (17% invece di 18,3% per NVDA), dando l'impressione di un bug nel calcolo quando in realta' era solo un mismatch di nome colonna. **Prima di scrivere qualsiasi script che aggiorna `fundamentals`, verificare SEMPRE il nome esatto della colonna letta dal frontend in `src/app/api/db/stocks/route.ts` (righe con `.select(...)` e il blocco di mapping `impliedGrowth10y: f.implied_growth_10y ?? null` ecc.), non assumere il nome dal contesto/memoria.**
+
+### Causa Tipo 3 — pagine che non si aggiornano mai dopo il primo caricamento (RISOLTO)
+Sia `src/app/value/page.tsx` (Screener) sia `src/app/stock/[id]/page.tsx` (pagina singolo titolo) usavano `useEffect` con fetch **una sola volta** al montaggio del componente (dipendenze vuote o fisse), senza nessun meccanismo di refresh periodico. Se una tab veniva lasciata aperta per ore, i dati restavano "congelati" al momento del primo caricamento, mentre una pagina aperta/ricaricata più tardi mostrava dati piu' freschi — dando l'impressione di "due fonti diverse" quando in realta' era la stessa identica fonte (`/api/db/stocks`, gia' con cache disabilitata lato server: `revalidate=0`, `Cache-Control: no-store`), semplicemente non ri-interrogata nel tempo.
+
+**Fix applicato**: aggiunto refresh automatico ogni 5 minuti (`setInterval`) su entrambe le pagine, con cleanup (`clearInterval`) al momento dello smontaggio del componente. Il loading spinner iniziale resta invariato (mostrato solo al primo caricamento, dato `useState(true)` come default), i refresh successivi avvengono in silenzio senza interrompere la visualizzazione.
+
+### Verifica sistematica raccomandata per la prossima sessione
+Controllare se lo stesso pattern (fetch singolo senza polling) esiste su ALTRE pagine del sito non ancora verificate (sectors, dividends, research, news, about) — non e' stata fatta una verifica esaustiva di tutto il sito, solo delle due pagine specificamente segnalate da Andrea. Andrea ha detto esplicitamente di non tollerare altre istanze di questo problema — vale la pena una scansione sistematica di tutti i componenti che fanno fetch di dati da `/api/db/*`, verificando che tutti abbiano lo stesso meccanismo di refresh periodico, invece di scoprirli uno alla volta tramite segnalazioni.
