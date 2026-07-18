@@ -1,30 +1,13 @@
-Fundamentals A005930: [{'ticker': 'A005930', 'exchange': 'KRX', 'updated_at': '2026-07-05T18:36:44.049368+00:00', 'mkt_cap': 1368066.09, 'pe_trailing': 25.98, 'pe_forward': 5.88, 'pb': 4.51, 'ev_ebitda': None, 'roe': None, 'roa': None, 'roic': None, 'gross_margin': None, 'net_margin': None, 'eps_growth': 1.4327, 'rev_growth': 0.5948, 'div_yield': None, 'div_payout': None, 'beta': 1.479, 'eps_current': None, 'eps_next': None, 'eps_30d_ago': None, 'value_score': 59, 'growth_score': 100, 'fiscal_month': 12, 'last_report_date': None, 'eps_ntm': None, 'eps_ltm': None, 'rev_ntm': None, 'rev_ltm': None, 'eps_mom_30d': None, 'rev_mom_30d': None, 'mom1w': -0.1138, 'mom1m': 0.0028, 'mom6m': 1.1378, 'mom12m': 3.8575, 'eps_fy0': 4.62, 'eps_fy1': 29.73, 'eps_fy2': 40.07, 'rev_fy0': None, 'rev_fy1': None, 'rev_fy2': None, 'last_report': None, 'mrq': None, 'eps_ttm': None, 'div_yield_ttm': None, 'value_score_prev': None, 'growth_score_prev': None, 'rank_pe_ltm': 49, 'rank_pe_ntm': 87, 'rank_pb': 30, 'rank_eps_gr': 92, 'rank_rev_gr': 93, 'change1d': -0.069182, 'combined_rank': 96, 'price': 296000.0, 'rank_mom6_adj': 93, 'rank_mom12_adj': 96, 'eps_cagr_3y': None, 'implied_growth': None, 'ke': None, 'beta_local': None, 'rf_rate': None, 'eps_fy3': 41.09, 'eps_fy4': None, 'eps_fy5': None, 'eps_fwd24': None, 'eps_fwd36': None, 'eps_growth_12_24m': None, 'eps_growth_24_36m': None, 'eps_cagr_2y': None, 'implied_growth_10y': None, 'eps_ntm_dcf': None}]
+Fundamentals NVDA dopo il fix: [{'ticker': 'NVDA', 'price': 212.5, 'implied_growth': 0.183055, 'beta_local': 2.211, 'ke': 0.15605, 'eps_ntm_dcf': 10.0084}]
 
-Ultimi 25 prezzi:
-  {'date': '2026-07-07', 'adj_close': 296000.0}
-  {'date': '2026-07-06', 'adj_close': 318000.0}
-  {'date': '2026-07-03', 'adj_close': 309500.0}
-  {'date': '2026-07-02', 'adj_close': 286000.0}
-  {'date': '2026-07-01', 'adj_close': 314500.0}
-  {'date': '2026-06-30', 'adj_close': 334000.0}
-  {'date': '2026-06-29', 'adj_close': 323000.0}
-  {'date': '2026-06-26', 'adj_close': 339133.0}
-  {'date': '2026-06-25', 'adj_close': 358112.461}
-  {'date': '2026-06-24', 'adj_close': 340131.919}
-  {'date': '2026-06-23', 'adj_close': 309664.8895}
-  {'date': '2026-06-22', 'adj_close': 353117.866}
-  {'date': '2026-06-19', 'adj_close': 353617.3255}
-  {'date': '2026-06-18', 'adj_close': 362108.137}
-  {'date': '2026-06-17', 'adj_close': 346125.433}
-  {'date': '2026-06-16', 'adj_close': 342629.2165}
-  {'date': '2026-06-15', 'adj_close': 336635.7025}
-  {'date': '2026-06-12', 'adj_close': 322151.377}
-  {'date': '2026-06-11', 'adj_close': 298676.7806}
-  {'date': '2026-06-10', 'adj_close': 302172.9971}
-  {'date': '2026-06-09', 'adj_close': 321651.9175}
-  {'date': '2026-06-08', 'adj_close': 295180.5641}
-  {'date': '2026-06-05', 'adj_close': 328644.3505}
-  {'date': '2026-06-04', 'adj_close': 351120.028}
-  {'date': '2026-06-02', 'adj_close': 360110.299}
-
-mom1m ricalcolato ora: 296000.0/295180.5641 - 1 = 0.0028
+Ultimi 10 prezzi in prices_eod:
+  {'date': '2026-07-15', 'adj_close': 212.5}
+  {'date': '2026-07-14', 'adj_close': 211.8}
+  {'date': '2026-07-13', 'adj_close': 203.53}
+  {'date': '2026-07-10', 'adj_close': 210.96}
+  {'date': '2026-07-09', 'adj_close': 202.78}
+  {'date': '2026-07-08', 'adj_close': 204.12}
+  {'date': '2026-07-07', 'adj_close': 196.93}
+  {'date': '2026-07-06', 'adj_close': 195.55}
+  {'date': '2026-07-02', 'adj_close': 194.83}
+  {'date': '2026-07-01', 'adj_close': 197.58}
