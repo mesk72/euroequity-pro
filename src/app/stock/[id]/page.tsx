@@ -222,24 +222,31 @@ function StockPageInner() {
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
-    fetch(`/api/db/stocks?ticker=${ticker}&exchange=${exchangeCode}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (d?.stocks?.[0]) {
-          setStock(d.stocks[0])
-        } else {
+    const load = () => {
+      fetch(`/api/db/stocks?ticker=${ticker}&exchange=${exchangeCode}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          if (d?.stocks?.[0]) {
+            setStock(d.stocks[0])
+          } else {
+            const allStocks = computeScores([...DEMO_STOCKS])
+            const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
+            setStock(found || null)
+          }
+          setLoadingStock(false)
+        })
+        .catch(() => {
           const allStocks = computeScores([...DEMO_STOCKS])
           const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
           setStock(found || null)
-        }
-        setLoadingStock(false)
-      })
-      .catch(() => {
-        const allStocks = computeScores([...DEMO_STOCKS])
-        const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
-        setStock(found || null)
-        setLoadingStock(false)
-      })
+          setLoadingStock(false)
+        })
+    }
+    load()
+    // Refresh automatico ogni 5 minuti - stessa logica dello screener,
+    // per non mostrare mai dati piu' vecchi di quelli di altre pagine.
+    const interval = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [ticker, exchangeCode])
 
   const [chartDays, setChartDays] = useState(252)
