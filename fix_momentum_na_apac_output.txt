@@ -1,0 +1,11 @@
+Universo totale NA+APAC: 5751 titoli
+  US: 0 righe prezzo scaricate
+  TSX: 0 righe prezzo scaricate
+  TSE: 334000 righe prezzo scaricate
+  SEHK: 542000 righe prezzo scaricate
+  ASX: 150000 righe prezzo scaricate
+  KRX: 518000 righe prezzo scaricate
+  SGX: 48000 righe prezzo scaricate
+Totale chiavi (ticker,exchange) con dati prezzo: 1402
+Aggiornamenti calcolati: 1399
+TOTALE scritti: 1399/1399
