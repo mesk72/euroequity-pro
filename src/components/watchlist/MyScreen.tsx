@@ -34,6 +34,84 @@ const SECTOR_COLORS: Record<string, string> = {
 }
 const getSectorColor = (s: string | null | undefined) => SECTOR_COLORS[s || ''] || '#6b7280'
 
+const COUNTRY_COLORS = [
+  '#3b82f6','#f59e0b','#10b981','#f97316','#8b5cf6','#06b6d4',
+  '#84cc16','#ef4444','#a78bfa','#fb7185','#34d399','#eab308',
+  '#6366f1','#ec4899','#14b8a6','#f43f5e',
+]
+const countryColorMap = (countries: string[]) => {
+  const map: Record<string, string> = {}
+  countries.forEach((c, i) => { map[c] = COUNTRY_COLORS[i % COUNTRY_COLORS.length] })
+  return map
+}
+
+// Grafico a torta SVG puro — nessuna libreria esterna necessaria.
+// Pesi equal-weight: ogni titolo del wallet conta 1/N nella sua categoria.
+function PieChart({ data, size = 120 }: { data: { label: string; value: number; color: string }[]; size?: number }) {
+  const total = data.reduce((sum, d) => sum + d.value, 0)
+  if (total === 0) return null
+  const r = size / 2
+  const cx = r, cy = r
+  let angleStart = -90 // parte da ore 12
+
+  const slices = data.map((d) => {
+    const fraction = d.value / total
+    const angleSweep = fraction * 360
+    const angleEnd = angleStart + angleSweep
+    const largeArc = angleSweep > 180 ? 1 : 0
+    const startRad = (angleStart * Math.PI) / 180
+    const endRad = (angleEnd * Math.PI) / 180
+    const x1 = cx + r * Math.cos(startRad)
+    const y1 = cy + r * Math.sin(startRad)
+    const x2 = cx + r * Math.cos(endRad)
+    const y2 = cy + r * Math.sin(endRad)
+    const path = fraction >= 0.9999
+      ? `M ${cx} ${cy - r} A ${r} ${r} 0 1 1 ${cx - 0.01} ${cy - r} Z` // cerchio intero (1 sola categoria)
+      : `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`
+    angleStart = angleEnd
+    return { path, color: d.color, label: d.label, pct: fraction * 100 }
+  })
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {slices.map((s, i) => (
+        <path key={i} d={s.path} fill={s.color} stroke="var(--bg)" strokeWidth={1}>
+          <title>{s.label}: {s.pct.toFixed(1)}%</title>
+        </path>
+      ))}
+    </svg>
+  )
+}
+
+// Costruisce i dati aggregati per un grafico a torta a partire dai titoli
+// del wallet attivo, raggruppando per il campo indicato (sector o country).
+// Pesi equal-weight: ogni titolo vale 1, indipendentemente dal market cap.
+function buildPieData(stocks: WatchStock[], field: 'sector' | 'country', colorFn: (key: string) => string) {
+  const counts: Record<string, number> = {}
+  stocks.forEach(s => {
+    const key = (s[field] as string) || 'Unknown'
+    counts[key] = (counts[key] || 0) + 1
+  })
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([label, value]) => ({ label, value, color: colorFn(label) }))
+}
+
+// Legenda testuale accanto al grafico — mostra categoria, peso %, conteggio
+function PieLegend({ data, total }: { data: { label: string; value: number; color: string }[]; total: number }) {
+  return (
+    <div className="flex flex-col gap-1 text-[10px]">
+      {data.map((d, i) => (
+        <div key={i} className="flex items-center gap-1.5">
+          <span style={{ width: 8, height: 8, borderRadius: 2, background: d.color, flexShrink: 0 }} />
+          <span className="text-sub truncate max-w-[90px]">{d.label}</span>
+          <span className="text-muted ml-auto font-mono">{((d.value / total) * 100).toFixed(0)}%</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const WALLET_NAMES = ['My Wallet 1', 'My Wallet 2', 'My Wallet 3']
 
 interface WatchStock {
@@ -212,7 +290,39 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
           <p>{WALLET_NAMES[activeWallet]} is empty.</p>
           <p className="text-xs mt-1 opacity-70">Add stocks using the <strong>+</strong> button, then move them here.</p>
         </div>
-      ) : isMobile ? (
+      ) : (
+      <>
+      {/* Sector & Country allocation — equal weight, un titolo = un voto */}
+      <div className={isMobile ? "flex flex-col gap-3" : "flex gap-4"}>
+        {(() => {
+          const sectorData = buildPieData(stocks, 'sector', getSectorColor)
+          const cMap = countryColorMap(Array.from(new Set(stocks.map(s => s.country || 'Unknown'))))
+          const countryData = buildPieData(stocks, 'country', (k) => cMap[k] || '#6b7280')
+          return (
+            <>
+              <div className="border border-border rounded p-3 flex items-center gap-3 flex-1">
+                <PieChart data={sectorData} size={isMobile ? 90 : 100} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] text-muted mb-1.5 font-600">Sector Exposure</div>
+                  <PieLegend data={sectorData} total={stocks.length} />
+                </div>
+              </div>
+              <div className="border border-border rounded p-3 flex items-center gap-3 flex-1">
+                <PieChart data={countryData} size={isMobile ? 90 : 100} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] text-muted mb-1.5 font-600">Country Exposure</div>
+                  <PieLegend data={countryData} total={stocks.length} />
+                </div>
+              </div>
+            </>
+          )
+        })()}
+      </div>
+      </>
+      )}
+
+      {stocks.length === 0 ? null :
+       isMobile ? (
         <div className="border border-border rounded overflow-hidden">
           <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-surface/50">
             <span className="text-[9px] text-muted">Sort:</span>
@@ -295,6 +405,32 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
               </div>
             </a>
           ))}
+          {stocks.length > 1 && (
+            <div className="px-3 py-2.5 bg-orange-500/5 border-t-2 border-orange-500/30">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-700 text-xs text-orange-400">∅ Wallet Average</span>
+                <span className="text-[9px] text-muted">{stocks.length} stocks</span>
+              </div>
+              <div className="flex gap-2 text-[10px] font-mono flex-wrap">
+                <span className="text-muted">1D: <span style={clrStyle(avg('change1d'))}>{avg('change1d') != null ? fpd((avg('change1d') as number) / 100) : '-'}</span></span>
+                <span className="text-[#444]">|</span>
+                <span className="text-muted">PEv: <span style={{color: rankClr(avg('rankPeLtm'))}}>{fn(avg('rankPeLtm'))}</span></span>
+                <span className="text-[#444]">|</span>
+                <span className="text-muted">EPS: <span style={{color: rankClr(avg('rankEpsGr'))}}>{fn(avg('rankEpsGr'))}</span></span>
+              </div>
+              <div className="flex gap-2 text-[10px] font-mono mt-0.5 flex-wrap">
+                <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{fn(avg('valueScore'))}</span></span>
+                <span className="text-[#444]">|</span>
+                <span className="text-muted">Grw: <span style={{color:'#22c55e'}}>{fn(avg('growthScore'))}</span></span>
+                <span className="text-[#444]">|</span>
+                <span className="text-muted">Best: <span style={{color:'var(--orange)'}}>{fn(avg('combinedRank'))}</span></span>
+                <span className="text-[#444]">|</span>
+                <span className="text-muted">1M: <span style={clrStyle(avg('mom1m'))}>{fpd(avg('mom1m'))}</span></span>
+                <span className="text-[#444]">|</span>
+                <span className="text-muted">12M: <span style={clrStyle(avg('mom12m'))}>{fpd(avg('mom12m'))}</span></span>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="overflow-x-auto rounded border border-border" style={{ WebkitOverflowScrolling: 'touch' }}>
