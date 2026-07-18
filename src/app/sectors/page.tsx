@@ -21,11 +21,15 @@ export default function SectorsPage() {
   const [exchange, setExchange] = useState('All')
 
   useEffect(() => {
-    setLoading(true)
-    fetch('/api/db/stocks')
-      .then(r => r.ok ? r.json() : { stocks: [] })
-      .then(d => { setStocks(d.stocks||[]); setLoading(false) })
-      .catch(() => setLoading(false))
+    const load = () => {
+      fetch('/api/db/stocks')
+        .then(r => r.ok ? r.json() : { stocks: [] })
+        .then(d => { setStocks(d.stocks||[]); setLoading(false) })
+        .catch(() => setLoading(false))
+    }
+    load()
+    const interval = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const exchanges = ['All', ...Array.from(new Set(stocks.map((s:any)=>s.exchange))).sort()] as string[]
