@@ -282,44 +282,6 @@ export async function GET(req: NextRequest) {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
 
-    // Ricalcola change1d fresco da prices_eod per l'intera lista, stessa
-    // logica gia' usata nel ramo singolo-ticker sopra. Prima lo screener
-    // usava solo il valore statico di fundamentals.change1d (aggiornato
-    // solo dai run settimanali), causando discrepanze fino al 4% rispetto
-    // alla pagina del singolo titolo, che invece ricalcola sempre fresco.
-    // Query aggregata per exchange, filtrata sugli ultimi 10 giorni per
-    // evitare il timeout osservato su query prices_eod senza filtro data.
-    try {
-      const cutoff = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
-      const exchangesInList = Array.from(new Set(stocks.map((s: any) => s.exchange)))
-      const priceMap: Record<string, { date: string; adj_close: number }[]> = {}
-      await Promise.all(exchangesInList.map(async (ex: string) => {
-        const { data } = await supabase
-          .from('prices_eod')
-          .select('ticker,exchange,date,adj_close')
-          .eq('exchange', ex)
-          .gte('date', cutoff)
-          .order('date', { ascending: false })
-        for (const row of (data || [])) {
-          const key = `${row.ticker}.${row.exchange}`
-          if (!priceMap[key]) priceMap[key] = []
-          if (priceMap[key].length < 2) priceMap[key].push(row as any)
-        }
-      }))
-      stocks = stocks.map((s: any) => {
-        const key = `${s.ticker}.${s.exchange}`
-        const rows = priceMap[key]
-        if (rows && rows.length >= 2 && rows[1].adj_close) {
-          return { ...s, change1d: (rows[0].adj_close / rows[1].adj_close - 1) * 100 }
-        }
-        return s
-      })
-    } catch {
-      // Se il ricalcolo fresco fallisce per qualsiasi motivo, restano i
-      // valori statici di fundamentals.change1d gia' presenti — nessuna
-      // interruzione del caricamento della pagina.
-    }
-
     return jsonNoCache({ stocks, source: 'supabase' })
 
   } catch (e) {
