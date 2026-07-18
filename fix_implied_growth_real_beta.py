@@ -91,7 +91,7 @@ for row in universe:
         ig = implied_growth(price, eps_ntm, ke)
         if ig is not None:
             updates.append({"ticker": ticker, "exchange": exchange, "price": price,
-                             "beta_local": round(beta,4), "ke": round(ke,6), "implied_growth": ig})
+                             "beta": round(beta,4), "ke": round(ke,6), "implied_growth_10y": ig})
     except Exception as e:
         errors += 1
 
