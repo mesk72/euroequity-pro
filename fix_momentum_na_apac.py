@@ -14,9 +14,10 @@ for ex in NA_EXCHANGES:
     offset = 0
     count_ex = 0
     while True:
+        # Ordinamento solo su date (singola colonna, piu' leggero), niente ticker.asc
         r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
             params={"select":"ticker,exchange,date,adj_close","exchange":f"eq.{ex}","date":f"gte.{cutoff}",
-                     "order":"ticker.asc,date.desc","limit":"1000","offset":str(offset)})
+                     "order":"date.desc","limit":"1000","offset":str(offset)}, timeout=25)
         batch = r.json()
         if not isinstance(batch,list):
             print(f"  ERRORE {ex} offset {offset}: {batch}")
@@ -27,7 +28,10 @@ for ex in NA_EXCHANGES:
         count_ex += len(batch)
         offset += 1000
         if len(batch) < 1000: break
-    print(f"  {ex}: {count_ex} righe scaricate (ultimi 35gg)")
+        if offset > 100000:  # sicurezza anti-loop infinito
+            print(f"  STOP {ex}: superato limite sicurezza offset")
+            break
+    print(f"  {ex}: {count_ex} righe scaricate")
 
 print(f"Chiavi totali: {len(all_prices)}")
 
