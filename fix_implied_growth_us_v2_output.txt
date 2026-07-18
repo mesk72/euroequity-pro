@@ -1,0 +1,50 @@
+Titoli US con eps_ntm_dcf: 2472
+  ...processati 100/2472, aggiornamenti finora 92, errori 0
+  ...processati 200/2472, aggiornamenti finora 179, errori 0
+  ...processati 300/2472, aggiornamenti finora 264, errori 0
+  ...processati 400/2472, aggiornamenti finora 350, errori 0
+  ERRORE NVST: Failed to perform, curl: (28) Operation timed out after 30002 milliseconds with 0 bytes received. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+  ...processati 500/2472, aggiornamenti finora 430, errori 1
+  ...processati 600/2472, aggiornamenti finora 516, errori 1
+  ...processati 700/2472, aggiornamenti finora 603, errori 1
+  ...processati 800/2472, aggiornamenti finora 692, errori 1
+  ...processati 900/2472, aggiornamenti finora 778, errori 1
+  ...processati 1000/2472, aggiornamenti finora 868, errori 1
+  ...processati 1100/2472, aggiornamenti finora 952, errori 1
+  ...processati 1200/2472, aggiornamenti finora 1038, errori 1
+  ...processati 1300/2472, aggiornamenti finora 1124, errori 1
+  ...processati 1400/2472, aggiornamenti finora 1212, errori 1
+  ...processati 1500/2472, aggiornamenti finora 1298, errori 1
+  ...processati 1600/2472, aggiornamenti finora 1385, errori 1
+  ...processati 1700/2472, aggiornamenti finora 1476, errori 1
+  ...processati 1800/2472, aggiornamenti finora 1560, errori 1
+  ...processati 1900/2472, aggiornamenti finora 1640, errori 1
+  ...processati 2000/2472, aggiornamenti finora 1728, errori 1
+  ...processati 2100/2472, aggiornamenti finora 1814, errori 1
+  ...processati 2200/2472, aggiornamenti finora 1905, errori 1
+  ...processati 2300/2472, aggiornamenti finora 1996, errori 1
+  ...processati 2400/2472, aggiornamenti finora 2078, errori 1
+Calcolati: 2134 | Errori totali: 1
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+  WARN: HTTP 400 {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'beta_yf' column of 'fundamentals' in the schema cache"}
+TOTALE scritti: 0/2134
