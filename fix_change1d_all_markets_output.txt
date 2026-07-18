@@ -1,0 +1,44 @@
+Universo totale tutti i mercati: 7887 titoli
+  300/7887 | calcolati 300 | errori 0
+  Scrittura parziale: 500/500
+  600/7887 | calcolati 99 | errori 0
+  900/7887 | calcolati 398 | errori 0
+  Scrittura parziale: 500/500
+  1200/7887 | calcolati 196 | errori 0
+  1500/7887 | calcolati 493 | errori 0
+  Scrittura parziale: 500/500
+  1800/7887 | calcolati 293 | errori 0
+  Scrittura parziale: 500/500
+  2100/7887 | calcolati 91 | errori 0
+  2400/7887 | calcolati 390 | errori 0
+  Scrittura parziale: 500/500
+  2700/7887 | calcolati 189 | errori 0
+  3000/7887 | calcolati 489 | errori 0
+  Scrittura parziale: 500/500
+  3300/7887 | calcolati 289 | errori 0
+  Scrittura parziale: 500/500
+  3600/7887 | calcolati 89 | errori 0
+  3900/7887 | calcolati 389 | errori 0
+  Scrittura parziale: 500/500
+  4200/7887 | calcolati 189 | errori 0
+  4500/7887 | calcolati 489 | errori 0
+  Scrittura parziale: 500/500
+  4800/7887 | calcolati 289 | errori 0
+  Scrittura parziale: 500/500
+  5100/7887 | calcolati 89 | errori 0
+  5400/7887 | calcolati 389 | errori 0
+  Scrittura parziale: 500/500
+  5700/7887 | calcolati 189 | errori 0
+  6000/7887 | calcolati 489 | errori 0
+  Scrittura parziale: 500/500
+  6300/7887 | calcolati 289 | errori 0
+  Scrittura parziale: 500/500
+  6600/7887 | calcolati 89 | errori 0
+  6900/7887 | calcolati 389 | errori 0
+  Scrittura parziale: 500/500
+  7200/7887 | calcolati 189 | errori 0
+  7500/7887 | calcolati 489 | errori 0
+  Scrittura parziale: 500/500
+  7800/7887 | calcolati 289 | errori 0
+  Scrittura finale: 376/376
+COMPLETATO. Processati 7887, errori 0
