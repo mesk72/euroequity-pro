@@ -1,2 +1,2 @@
-
-Ricerca per nome: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
+005930 KRX fundamentals: []
+005930 prezzi ultimi 25gg: []
