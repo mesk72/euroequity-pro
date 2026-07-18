@@ -1,0 +1,25 @@
+Universo NA totale: 3401 titoli
+  Processati 200/3401 | calcolati 200 | errori 0
+  Processati 400/3401 | calcolati 400 | errori 0
+  Scrittura parziale: 500/500 salvati
+  Processati 600/3401 | calcolati 100 | errori 0
+  Processati 800/3401 | calcolati 300 | errori 0
+  Processati 1000/3401 | calcolati 500 | errori 0
+  Scrittura parziale: 500/500 salvati
+  Processati 1200/3401 | calcolati 200 | errori 0
+  Processati 1400/3401 | calcolati 400 | errori 0
+  Scrittura parziale: 500/500 salvati
+  Processati 1600/3401 | calcolati 100 | errori 0
+  Processati 1800/3401 | calcolati 300 | errori 0
+  Processati 2000/3401 | calcolati 500 | errori 0
+  Scrittura parziale: 500/500 salvati
+  Processati 2200/3401 | calcolati 200 | errori 0
+  Processati 2400/3401 | calcolati 400 | errori 0
+  Scrittura parziale: 500/500 salvati
+  Processati 2600/3401 | calcolati 100 | errori 0
+  Processati 2800/3401 | calcolati 300 | errori 0
+  Processati 3000/3401 | calcolati 500 | errori 0
+  Scrittura parziale: 500/500 salvati
+  Processati 3200/3401 | calcolati 200 | errori 0
+  Scrittura finale: 374/374 salvati
+COMPLETATO. Processati 3374/3401, errori 0
