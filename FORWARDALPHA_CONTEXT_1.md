@@ -2616,3 +2616,53 @@ momentum_30d = NTM_oggi / NTM_30gg_fa - 1
 ```
 
 Verificato su ORCL (16 luglio 2026): FY27 quasi fermo (8,05266->8,04521), FY28 in rialzo (10,7212->10,9216, +1,87%) -> momentum finale calcolato correttamente = **+0,22%** (positivo, coerente con la direzione attesa). Un primo tentativo con pesi ricalcolati a 30gg fa aveva dato erroneamente un numero gonfiato (+2,90%, sbagliato per doppio conteggio), poi un secondo tentativo con errore aritmetico aveva dato -0,37% (segno sbagliato). La versione corretta e verificata e' +0,22%.
+
+---
+
+## Sessione 17 luglio 2026 (pomeriggio) — tentativo di fix urgente momentum/DCF, risultato parziale
+
+**Contesto**: Andrea ha chiesto un fix urgente perché un amico stava per guardare il sito lo stesso giorno. Sessione condotta sotto pressione di tempo, alla fine di una sessione precedente durata l'intera notte — energie già esaurite da entrambe le parti.
+
+### STATO FINALE — NON RISOLTO COMPLETAMENTE, da riprendere con calma
+
+**APAC (TSE/SEHK/ASX/KRX/SGX) — RISOLTO**: mom1w e mom1m ricalcolati con successo per 1.399 titoli, usando prezzi freschi da `prices_eod` (fino al 15 luglio). Query aggregata per exchange con filtro sugli ultimi ~30gg piu' recenti, raggruppamento in Python, scrittura batch — ha funzionato bene, nessun timeout.
+
+**US e Canada (TSX) — NON RISOLTO, bloccato da timeout database**: tre tentativi falliti in sequenza:
+1. Query aggregata senza filtro data, ordinamento `ticker.asc,date.desc` — ha scaricato "0 righe" silenziosamente (l'errore vero non veniva stampato, bug nello script che interpretava una risposta di errore come lista vuota)
+2. Query aggregata CON filtro data (ultimi 35gg), stesso ordinamento — errore esplicito: `57014 canceling statement due to statement timeout` (timeout diretto lato Postgres/Supabase, non timeout applicativo)
+3. Query aggregata CON filtro data, ordinamento semplificato (solo `date.desc`, non piu' combinato con ticker) — STESSO identico errore di timeout
+
+**Diagnosi**: il volume di dati storici in `prices_eod` per US (~3.000 titoli, anni di storico) e TSX rende qualunque query aggregata (anche filtrata sugli ultimi 35gg) troppo pesante per il database, indipendentemente da come viene scritta la query o l'ordinamento. Il problema NON e' nella logica della formula, e' un problema di performance/scala della query.
+
+**Soluzione probabile per la prossima sessione**: tornare a query per singolo titolo (come fatto con successo decine di volte durante tutta la sessione precedente, per singoli controlli) invece di query aggregate per l'intero mercato. Per ~3.000 titoli USA + qualche centinaio TSX, significa migliaia di chiamate HTTP individuali — richiede probabilmente 1-2 ore di esecuzione reale, non un fix rapido. Andrebbe pianificato con tempo dedicato, non tentato sotto pressione.
+
+**Alternativa da valutare**: verificare con Supabase se esiste un indice mancante su `prices_eod(exchange, date)` che spiegherebbe il timeout — se l'indice fosse ottimizzato, le query aggregate potrebbero tornare fattibili. Non verificato in questa sessione per mancanza di tempo.
+
+### Bug Samsung segnalato da Andrea — NON RISOLTO, causa probabile trovata ma non confermata
+
+Andrea ha segnalato: il grafico mostra Samsung a -9% a 1 mese, la tabella mostra +0,3% — chiara discrepanza da correggere.
+
+**Tentativo di verifica fallito**: cercato ticker "005930" (Samsung Electronics, KRX) sia in `fundamentals` sia in `prices_eod` — **nessun risultato trovato in nessuna delle due tabelle**. Il ticker Samsung nel nostro database probabilmente usa un formato diverso da quello standard (potrebbe avere suffisso, o essere salvato con una convenzione diversa — non verificato per mancanza di tempo).
+
+**Prossimo passo per la prossima sessione**: cercare Samsung nella tabella `stocks` con il nome esatto della colonna che contiene il nome societa' (NON "company_name", quella colonna non esiste — verificare lo schema esatto prima di ripetere l'errore), per trovare il ticker/exchange corretti prima di indagare la discrepanza grafico/tabella.
+
+### Il DCF/Implied Growth — bloccato in attesa di conferma su una semplificazione della formula
+
+Confermato lo stesso problema di staleness gia' visto per il momentum: `fundamentals.price` usato nel calcolo del Reverse DCF e' fermo al 7 giugno (stesso timestamp del bug momentum), disallineato rispetto ai prezzi freschi in `prices_eod`. Inoltre **`implied_growth` risulta NULL per tutti i titoli controllati** (AAPL, MSFT, NVDA) nonostante `eps_ntm_dcf` sia popolato — un secondo problema distinto, il passaggio finale del calcolo non sta scrivendo risultati.
+
+**Script di fix preparato ma NON lanciato**: `fix_implied_growth_us.py`, usa un Reverse DCF con bisection (10 anni, gTV=2.5%) — MA usa **Ke fisso all'8%** come placeholder, invece della vera formula (`Rf + Beta×ERP`, con Beta calcolato dai prezzi storici a 5 anni per ogni titolo). Claude ha correttamente fermato l'esecuzione per chiedere consenso esplicito ad Andrea prima di usare questa semplificazione (per la regola permanente sulle modifiche di formula), ma la sessione e' terminata prima di ricevere una risposta chiara. **Da riprendere chiedendo di nuovo la conferma, o implementando il vero calcolo Beta se c'e' tempo sufficiente.**
+
+### Richiesta esplicita di Andrea — sistema piu' solido, non piu' fix a pezzi
+
+Andrea ha chiesto esplicitamente: *"Dobbiamo trovare un modo semplice per implementare tutto: aggiornamento fondamentali e aggiornamento prezzi da Twelvedata. Non e' possibile andare avanti a pezzi e a tentativi."*
+
+**Non ancora affrontato in questa sessione** per mancanza di tempo — ma e' la richiesta piu' importante da riprendere: probabilmente serve ripensare l'intera pipeline di aggiornamento (`daily_us.py`, `daily_eu.py`, `daily_apac.py`) per usare Twelvedata invece di Leeway per fondamentali/stime, con un design che eviti sia (a) i timeout di query aggregate su larga scala visti oggi, sia (b) il problema di staleness silenziosa (fundamentals fermo da settimane senza errori visibili) che ha causato sia il bug momentum sia il bug DCF.
+
+### Ricalcolo a cascata necessario, non ancora fatto
+
+Andrea ha correttamente notato: aggiornare mom1w/mom1m (fatto per APAC, non ancora per US/Canada) richiede POI ricalcolare a cascata:
+1. `mom6_adj` e `mom12_adj` (che dipendono da mom1w/mom1m come sottrazione)
+2. `growth_score` (che dipende da mom6_adj/mom12_adj insieme a eps_growth/rev_growth)
+3. `best_score` (che dipende da growth_score insieme a value_score)
+
+**Nessuno di questi ricalcoli a cascata e' stato fatto in questa sessione** — il fix APAC ha aggiornato solo mom1w/mom1m grezzi, lasciando Growth Score e Best Score CALCOLATI SU DATI VECCHI, quindi temporaneamente INCONSISTENTI con i nuovi valori di momentum. Andrebbe completata la cascata prima che i nuovi numeri siano davvero affidabili sul sito, non solo il primo anello della catena.
