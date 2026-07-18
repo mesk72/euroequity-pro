@@ -52,37 +52,26 @@ export async function GET(req: NextRequest) {
     }))
 
     // Calcola TUTTI i momentum da prices_eod — fonte unica
-    const dates = all.map((d: any) => d.date) as string[]
+    // FIX: usa giorni di TRADING (indici fissi), non giorni di calendario,
+    // per allinearsi esattamente alla convenzione ForwardAlpha standard
+    // gia' usata per il valore salvato in fundamentals (1w=5, 1m=21, 6m=127, 12m=253 trading days).
     const closes = all.map((d: any) => d.adj_close) as number[]
-    const lastDate = new Date(dates[dates.length - 1])
     const lastPrice = closes[closes.length - 1]
 
-    const getClosestPrice = (targetDate: Date): number | null => {
-      const target = targetDate.getTime()
-      let closest = null
-      let minDiff = Infinity
-      for (let i = 0; i < dates.length; i++) {
-        const diff = Math.abs(new Date(dates[i]).getTime() - target)
-        if (diff < minDiff) { minDiff = diff; closest = closes[i] }
-      }
-      return closest
+    const momBack = (tradingDaysBack: number): number | null => {
+      const idx = closes.length - 1 - tradingDaysBack
+      if (idx < 0) return null
+      const p = closes[idx]
+      return p && p > 0 ? (lastPrice / p - 1) * 100 : null
     }
-
-    const daysBack = (days: number): Date => {
-      const d = new Date(lastDate)
-      d.setDate(d.getDate() - days)
-      return d
-    }
-
-    const mom = (p: number | null) => p && p > 0 ? (lastPrice / p - 1) * 100 : null
 
     const momentum = {
-      mom1w: mom(getClosestPrice(daysBack(7))),
-      mom1m: mom(getClosestPrice(daysBack(31))),
-      mom6m: mom(getClosestPrice(daysBack(182))),
-      mom12m: mom(getClosestPrice(daysBack(365))),
-      mom3y: mom(getClosestPrice(daysBack(1095))),
-      mom5y: mom(getClosestPrice(daysBack(1826))),
+      mom1w: momBack(5),
+      mom1m: momBack(21),
+      mom6m: momBack(127),
+      mom12m: momBack(253),
+      mom3y: momBack(756),
+      mom5y: momBack(1260),
     }
 
     return NextResponse.json({ history, momentum })
