@@ -1,11 +1,7 @@
-Universo totale NA+APAC: 5751 titoli
-  US: 0 righe prezzo scaricate
-  TSX: 0 righe prezzo scaricate
-  TSE: 334000 righe prezzo scaricate
-  SEHK: 542000 righe prezzo scaricate
-  ASX: 150000 righe prezzo scaricate
-  KRX: 518000 righe prezzo scaricate
-  SGX: 48000 righe prezzo scaricate
-Totale chiavi (ticker,exchange) con dati prezzo: 1402
-Aggiornamenti calcolati: 1399
-TOTALE scritti: 1399/1399
+  ERRORE US offset 0: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
+  US: 0 righe scaricate (ultimi 35gg)
+  ERRORE TSX offset 0: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
+  TSX: 0 righe scaricate (ultimi 35gg)
+Chiavi totali: 0
+Calcolati: 0
+TOTALE scritti: 0/0
