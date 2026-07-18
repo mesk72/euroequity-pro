@@ -103,20 +103,25 @@ async function fetchAllByExchange(table: string, select: string, exchangeList: s
 
 async function fetchAll(table: string, select: string, exchangeList: string[]) {
   const PAGE = 1000
-  let all: any[] = []
-  let from = 0
-  while (true) {
-    const { data, error } = await supabase
+  const MAX_PAGES = 12 // fino a 12.000 righe, ampio margine anche per "Global"
+  // Lancia tutte le pagine in PARALLELO invece che in sequenza: prima la
+  // paginazione sequenziale (una richiesta alla volta, aspettando ognuna)
+  // rendeva "Global" (23 mercati) e i continenti piu' popolati lentissimi
+  // o percepiti come bloccati, sommando la latenza di ogni singola pagina.
+  const pagePromises = Array.from({ length: MAX_PAGES }, (_, i) =>
+    supabase
       .from(table)
       .select(select)
       .in('exchange', exchangeList)
       .order('ticker', { ascending: true })
-      .range(from, from + PAGE - 1)
+      .range(i * PAGE, i * PAGE + PAGE - 1)
       .limit(PAGE)
-    if (error || !data || data.length === 0) break
+  )
+  const results = await Promise.all(pagePromises)
+  let all: any[] = []
+  for (const { data, error } of results) {
+    if (error || !data) continue
     all = all.concat(data)
-    if (data.length < PAGE) break
-    from += PAGE
   }
   return all
 }
