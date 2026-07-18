@@ -1,0 +1,9 @@
+US: 2975/2975 aggiornati (price+mom1w+mom1m da prices_eod fresco)
+TSX: 399/399 aggiornati (price+mom1w+mom1m da prices_eod fresco)
+TSE: 1000/1000 aggiornati (price+mom1w+mom1m da prices_eod fresco)
+SEHK: 497/497 aggiornati (price+mom1w+mom1m da prices_eod fresco)
+ASX: 350/350 aggiornati (price+mom1w+mom1m da prices_eod fresco)
+KRX: 400/400 aggiornati (price+mom1w+mom1m da prices_eod fresco)
+SGX: 100/100 aggiornati (price+mom1w+mom1m da prices_eod fresco)
+
+TOTALE aggiornati: 5721 | saltati (storico insufficiente): 30
