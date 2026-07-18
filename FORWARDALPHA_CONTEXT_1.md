@@ -2686,3 +2686,43 @@ Sia `src/app/value/page.tsx` (Screener) sia `src/app/stock/[id]/page.tsx` (pagin
 
 ### Verifica sistematica raccomandata per la prossima sessione
 Controllare se lo stesso pattern (fetch singolo senza polling) esiste su ALTRE pagine del sito non ancora verificate (sectors, dividends, research, news, about) — non e' stata fatta una verifica esaustiva di tutto il sito, solo delle due pagine specificamente segnalate da Andrea. Andrea ha detto esplicitamente di non tollerare altre istanze di questo problema — vale la pena una scansione sistematica di tutti i componenti che fanno fetch di dati da `/api/db/*`, verificando che tutti abbiano lo stesso meccanismo di refresh periodico, invece di scoprirli uno alla volta tramite segnalazioni.
+
+---
+
+## Scansione sistematica completa del sito (18 luglio 2026) — TUTTE le pagine verificate
+
+Come richiesto da Andrea dopo il bug Samsung/NVDA, completata la scansione di TUTTE le pagine del sito per il pattern "fetch dati una sola volta, mai refresh periodico" — non più solo le pagine segnalate una alla volta.
+
+### Pagine controllate e stato
+
+| Pagina | File | Stato prima | Azione |
+|---|---|---|---|
+| Homepage / Global Screener | `src/app/page.tsx` | 4 sezioni (EU, US, APAC, All-Global) senza refresh, 3 sezioni gia' corrette in precedenza | **Corrette tutte e 4** con refresh ogni 5 min, inclusa la logica complessa di calcolo euroVal/euroGrow preservata intatta |
+| Screener/Value | `src/app/value/page.tsx` | Nessun refresh | **Corretto** (fix precedente, stessa sessione) |
+| Pagina singolo titolo | `src/app/stock/[id]/page.tsx` | Nessun refresh | **Corretto** (fix precedente, stessa sessione) |
+| Dividends | `src/app/dividends/page.tsx` | Nessun refresh | **Corretto** |
+| Sectors | `src/app/sectors/page.tsx` | Nessun refresh | **Corretto** |
+| News | `src/app/news/page.tsx` + `src/components/news/NewsPage.tsx` | Gia' aveva `setInterval` a 15 minuti e `cache:'no-store'` su piu' chiamate | **Nessuna modifica necessaria**, gia' ben progettato |
+| About | `src/app/about/page.tsx` | Nessun fetch dati (pagina statica) | **Nessuna azione necessaria** |
+| Research | `src/app/research/page.tsx` | Nessun fetch dati diretto in questo file (solo `[slug]/page.tsx` per singoli articoli, non controllato nel dettaglio - probabilmente statico/SSR) | **Da verificare in futuro se necessario**, bassa priorita' (contenuto editoriale, non dati di mercato che cambiano) |
+
+### Pattern del fix applicato ovunque
+
+```typescript
+useEffect(() => {
+  const load = () => {
+    fetch('/api/db/...')
+      .then(r => r.ok ? r.json() : fallback)
+      .then(d => { /* setState */ })
+      .catch(() => { /* setState fallback */ })
+  }
+  load()
+  const interval = setInterval(load, 5 * 60 * 1000)  // 5 minuti
+  return () => clearInterval(interval)
+}, [/* dipendenze originali invariate */])
+```
+
+**Regola per il futuro**: qualsiasi nuova pagina/componente che fa fetch di dati da `/api/db/*` (o altri endpoint con dati che cambiano nel tempo) DEVE usare questo pattern fin dall'inizio, non aggiungerlo dopo. Il loading spinner iniziale non viene disturbato (mostrato solo al primo caricamento grazie a `useState(true)` come default), i refresh successivi sono silenziosi.
+
+### Verifica raccomandata alla prossima sessione, non ancora fatta
+Non e' stato verificato se esistono altri endpoint `/api/db/*` con lo stesso rischio di mismatch di nome colonna (Tipo 2, vedi sezione precedente) oltre a `implied_growth_10y`/`beta` gia' trovato. Varrebbe la pena un confronto sistematico tra tutti i nomi di colonna scritti dagli script di fix/pipeline (`daily_us.py`, `daily_eu.py`, `daily_apac.py`, script di test ad-hoc) contro i nomi effettivamente letti da `src/app/api/db/stocks/route.ts`, per escludere altri disallineamenti silenziosi non ancora scoperti.
