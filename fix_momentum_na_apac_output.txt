@@ -1,7 +1,7 @@
   ERRORE US offset 0: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
-  US: 0 righe scaricate (ultimi 35gg)
+  US: 0 righe scaricate
   ERRORE TSX offset 0: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
-  TSX: 0 righe scaricate (ultimi 35gg)
+  TSX: 0 righe scaricate
 Chiavi totali: 0
 Calcolati: 0
 TOTALE scritti: 0/0
