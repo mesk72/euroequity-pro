@@ -416,7 +416,11 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                 <span className="text-[#444]">|</span>
                 <span className="text-muted">PEv: <span style={{color: rankClr(avg('rankPeLtm'))}}>{fn(avg('rankPeLtm'))}</span></span>
                 <span className="text-[#444]">|</span>
+                <span className="text-muted">PEf: <span style={{color: rankClr(avg('rankPeNtm'))}}>{fn(avg('rankPeNtm'))}</span></span>
+                <span className="text-[#444]">|</span>
                 <span className="text-muted">EPS: <span style={{color: rankClr(avg('rankEpsGr'))}}>{fn(avg('rankEpsGr'))}</span></span>
+                <span className="text-[#444]">|</span>
+                <span className="text-muted">Rev: <span style={{color: rankClr(avg('rankRevGr'))}}>{fn(avg('rankRevGr'))}</span></span>
               </div>
               <div className="flex gap-2 text-[10px] font-mono mt-0.5 flex-wrap">
                 <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{fn(avg('valueScore'))}</span></span>
