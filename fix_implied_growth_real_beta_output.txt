@@ -1,33 +1,32 @@
 Titoli US con eps_ntm_dcf: 2472
-  100/2472 | calcolati 91 | no_beta 0 | errori 1
-  200/2472 | calcolati 176 | no_beta 1 | errori 1
-  300/2472 | calcolati 258 | no_beta 2 | errori 2
+  100/2472 | calcolati 89 | no_beta 0 | errori 3
+  200/2472 | calcolati 171 | no_beta 2 | errori 19
+  300/2472 | calcolati 257 | no_beta 2 | errori 22
   Scrittura parziale: 300/300
-  400/2472 | calcolati 44 | no_beta 2 | errori 2
-  500/2472 | calcolati 126 | no_beta 2 | errori 2
-  600/2472 | calcolati 208 | no_beta 3 | errori 4
-  700/2472 | calcolati 292 | no_beta 3 | errori 6
+  400/2472 | calcolati 38 | no_beta 3 | errori 22
+  500/2472 | calcolati 119 | no_beta 4 | errori 25
+  600/2472 | calcolati 194 | no_beta 5 | errori 25
+  700/2472 | calcolati 281 | no_beta 5 | errori 25
   Scrittura parziale: 300/300
-  800/2472 | calcolati 81 | no_beta 4 | errori 6
-  900/2472 | calcolati 156 | no_beta 5 | errori 17
-  1000/2472 | calcolati 242 | no_beta 5 | errori 19
+  900/2472 | calcolati 153 | no_beta 7 | errori 25
+  1000/2472 | calcolati 235 | no_beta 8 | errori 26
   Scrittura parziale: 300/300
-  1100/2472 | calcolati 27 | no_beta 5 | errori 19
-  1200/2472 | calcolati 107 | no_beta 8 | errori 20
-  1300/2472 | calcolati 194 | no_beta 9 | errori 20
-  1400/2472 | calcolati 278 | no_beta 10 | errori 22
+  1100/2472 | calcolati 20 | no_beta 8 | errori 26
+  1200/2472 | calcolati 101 | no_beta 11 | errori 26
+  1300/2472 | calcolati 188 | no_beta 12 | errori 26
+  1400/2472 | calcolati 274 | no_beta 13 | errori 26
   Scrittura parziale: 300/300
-  1500/2472 | calcolati 60 | no_beta 10 | errori 26
-  1600/2472 | calcolati 144 | no_beta 11 | errori 27
-  1700/2472 | calcolati 233 | no_beta 12 | errori 30
+  1500/2472 | calcolati 59 | no_beta 14 | errori 26
+  1600/2472 | calcolati 143 | no_beta 16 | errori 26
+  1700/2472 | calcolati 235 | no_beta 16 | errori 26
   Scrittura parziale: 300/300
-  1800/2472 | calcolati 17 | no_beta 12 | errori 31
-  1900/2472 | calcolati 94 | no_beta 12 | errori 32
-  2000/2472 | calcolati 181 | no_beta 12 | errori 34
-  2100/2472 | calcolati 265 | no_beta 13 | errori 36
+  1800/2472 | calcolati 19 | no_beta 16 | errori 26
+  1900/2472 | calcolati 98 | no_beta 16 | errori 26
+  2000/2472 | calcolati 185 | no_beta 16 | errori 27
+  2100/2472 | calcolati 271 | no_beta 17 | errori 27
   Scrittura parziale: 300/300
-  2200/2472 | calcolati 55 | no_beta 13 | errori 36
-  2300/2472 | calcolati 144 | no_beta 14 | errori 37
-  2400/2472 | calcolati 224 | no_beta 15 | errori 37
-  Scrittura finale: 281/281
-COMPLETATO. Processati 2472, no_beta 15, errori 38
+  2200/2472 | calcolati 54 | no_beta 17 | errori 36
+  2300/2472 | calcolati 143 | no_beta 18 | errori 36
+  2400/2472 | calcolati 225 | no_beta 18 | errori 36
+  Scrittura finale: 279/279
+COMPLETATO. Processati 2472, no_beta 18, errori 41
