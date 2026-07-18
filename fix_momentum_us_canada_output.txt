@@ -1,0 +1,21 @@
+Universo US+TSX: 3401 titoli
+  ...processati 200/3401
+  ...processati 400/3401
+  ...processati 600/3401
+  ...processati 800/3401
+  ...processati 1000/3401
+  ...processati 1200/3401
+  ...processati 1400/3401
+  ...processati 1600/3401
+  ...processati 1800/3401
+  ...processati 2000/3401
+  ...processati 2200/3401
+  ...processati 2400/3401
+  ...processati 2600/3401
+  ...processati 2800/3401
+  ...processati 3000/3401
+  ...processati 3200/3401
+  ...processati 3400/3401
+Titoli con dati prezzo: 3390
+Aggiornamenti calcolati: 3374
+TOTALE scritti: 3374/3374
