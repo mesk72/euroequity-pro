@@ -23,15 +23,19 @@ export default function DividendsPage() {
   const [exchange, setExchange] = useState('All')
 
   useEffect(() => {
-    setLoading(true)
-    fetch('/api/db/stocks')
-      .then(r => r.ok ? r.json() : { stocks: [] })
-      .then(d => {
-        const divStocks = (d.stocks || []).filter((s: any) => s.divYield && s.divYield > 0)
-        setStocks(divStocks)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
+    const load = () => {
+      fetch('/api/db/stocks')
+        .then(r => r.ok ? r.json() : { stocks: [] })
+        .then(d => {
+          const divStocks = (d.stocks || []).filter((s: any) => s.divYield && s.divYield > 0)
+          setStocks(divStocks)
+          setLoading(false)
+        })
+        .catch(() => setLoading(false))
+    }
+    load()
+    const interval = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const sectors   = ['All', ...Array.from(new Set(stocks.map((s:any)=>s.sector).filter(Boolean))).sort()] as string[]
