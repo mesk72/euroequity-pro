@@ -32,7 +32,7 @@ Our Value Score combines three rank components, each calculated relative to all 
 • PE NTM Rank — ranks stocks by PE NTM.
 • PB Rank — ranks stocks by Price/Book ratio. 
 
-Each component is ranked from 1 to 100 within the stock's country. The three ranks are averaged and re-ranked to produce the final Value Score.
+Each component is ranked from 1 to 100, ranked against comparable peers. The three ranks are averaged and re-ranked to produce the final Value Score.
 
 A Value Score of 80 means the stock is cheaper than 80% of its peers on our combined valuation metrics.`,
     },
@@ -53,9 +53,9 @@ A Growth Score of 70 means the stock has stronger growth characteristics than 70
     },
     {
       title: 'The Best Score',
-      content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to its continental universe.
+      content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to a broad, comparable universe of peers.
 
-It is calculated as the sum of the Value Score and Growth Score, then re-ranked from 1 to 100 within Europe or North America respectively.
+It is calculated as the sum of the Value Score and Growth Score, then re-ranked from 1 to 100.
 
 A Best Score of 80 or above places a stock in the top 20% of its universe — combining both attractive valuation and strong growth momentum.`,
     },
@@ -74,7 +74,7 @@ It is a way to read what growth the market is currently pricing in — not a pri
       content: `Key parameters to focus on:
 
 • Best Score ≥ 80 — the top 20% of equities combining Value and Growth. Agood idea when combined with Value Score and/or Growth Score.
-• Value Score — use to identify attractively valued stocks within a sector or country.
+• Value Score — use to identify attractively valued stocks within a sector or comparable peer group.
 • Growth Score — use to identify companies with strong earnings, revenue and price momentum.
 • Momentum 1W, 1M, 6M, 12M — short, medium and long-term price performance indicators, calculated on calendar days.
 
