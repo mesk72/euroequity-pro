@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     // ne ha migliaia (bug che causava conteggi sbagliati, es. 85 invece
     // di 373 per Information Technology in Nord America).
     const PAGE = 1000
-    async function fetchAllPaged(table: string, select: string, applySectorFilter: boolean) {
+    const fetchAllPaged = async (table: string, select: string, applySectorFilter: boolean) => {
       let all: any[] = []
       let from = 0
       while (true) {
