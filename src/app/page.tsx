@@ -2618,9 +2618,9 @@ function AppContent() {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
                 {[
-                  { t: 'Value Score', d: 'PE trailing, PE forward, and Price/Book ranked against same-market peers.' },
-                  { t: 'Growth Score', d: 'EPS growth, revenue growth, and 6/12-month price momentum, combined.' },
-                  { t: 'Best Score', d: 'Value + Growth, re-ranked — the shortlist of what deserves a closer look.' },
+                  { t: 'Value Score', d: 'Three value parameters, ranked against comparable peers.' },
+                  { t: 'Growth Score', d: 'Four growth parameters, combined and re-ranked.' },
+                  { t: 'Best Score', d: 'A combination of Value and Growth — the shortlist of what deserves a closer look.' },
                 ].map(x => (
                   <div key={x.t} style={{ borderLeft: '2px solid var(--orange)', paddingLeft: 14 }}>
                     <div style={{ fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: 13, color: 'var(--text)', marginBottom: 5 }}>{x.t}</div>
