@@ -1,1 +1,6 @@
-NVDA fundamentals ORA: [{'ticker': 'NVDA', 'growth_score': 90.69, 'combined_rank': 73.49, 'value_score': 34, 'eps_growth': 0.6906, 'rev_growth': 0.6494, 'mom6m': 0.1425, 'mom1w': 0.0479, 'mom12m': 0.2417, 'mom1m': 0.0245, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
+Totale titoli US: 3963
+
+NVDA - eps_rank: 91.82, rev_rank: 94.26, m6_rank: 54.54, m12_rank: 55.05
+NVDA - somma: 295.66999999999996
+NVDA - growth_score RICALCOLATO ORA: 90.69
+NVDA - growth_score SALVATO NEL DB: 90.69
