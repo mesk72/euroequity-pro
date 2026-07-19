@@ -95,22 +95,27 @@ for cname, exlist in CONTINENTS.items():
 print(f"Best Score calcolati: {len(best_updates)}", flush=True)
 
 # Scrittura
-all_keys = set(growth_updates.keys()) | set(best_updates.keys())
-updates = []
-for (t, ex) in all_keys:
-    upd = {"ticker": t, "exchange": ex}
-    if (t,ex) in growth_updates: upd["growth_score"] = growth_updates[(t,ex)]
-    if (t,ex) in best_updates: upd["combined_rank"] = best_updates[(t,ex)]
-    updates.append(upd)
+growth_list = [{"ticker": t, "exchange": ex, "growth_score": g} for (t,ex), g in growth_updates.items()]
+best_list = [{"ticker": t, "exchange": ex, "combined_rank": b} for (t,ex), b in best_updates.items()]
 
-print(f"Totale da scrivere: {len(updates)}", flush=True)
-ok = 0
-for i in range(0, len(updates), 200):
-    chunk = updates[i:i+200]
+print(f"Growth da scrivere: {len(growth_list)} | Best da scrivere: {len(best_list)}", flush=True)
+
+ok_growth = 0
+for i in range(0, len(growth_list), 200):
+    chunk = growth_list[i:i+200]
     resp = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
         headers=headers_up, json=chunk, timeout=30)
-    if resp.status_code in (200,201,204): ok += len(chunk)
-    else: print(f"  WARN: HTTP {resp.status_code} {resp.text[:150]}")
-    if i % 2000 == 0: print(f"  Scritti finora: {ok}", flush=True)
+    if resp.status_code in (200,201,204): ok_growth += len(chunk)
+    else: print(f"  WARN growth: HTTP {resp.status_code} {resp.text[:150]}")
+print(f"Growth scritti: {ok_growth}/{len(growth_list)}", flush=True)
 
-print(f"COMPLETATO. Scritti {ok}/{len(updates)}", flush=True)
+ok_best = 0
+for i in range(0, len(best_list), 200):
+    chunk = best_list[i:i+200]
+    resp = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
+        headers=headers_up, json=chunk, timeout=30)
+    if resp.status_code in (200,201,204): ok_best += len(chunk)
+    else: print(f"  WARN best: HTTP {resp.status_code} {resp.text[:150]}")
+print(f"Best scritti: {ok_best}/{len(best_list)}", flush=True)
+
+print(f"COMPLETATO.", flush=True)
