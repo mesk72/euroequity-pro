@@ -1,0 +1,1 @@
+Ricerca Siemens: [{'ticker': 'ENR', 'exchange': 'XETRA', 'company': 'Siemens Energy AG'}, {'ticker': 'SIE', 'exchange': 'XETRA', 'company': 'Siemens Aktiengesellschaft'}, {'ticker': 'SHL', 'exchange': 'XETRA', 'company': 'Siemens Healthineers AG'}]
