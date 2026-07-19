@@ -1,0 +1,45 @@
+Scarico fundamentals per tutti i mercati...
+Totale righe fundamentals: 11543
+Growth Score calcolati: 7517
+Best Score calcolati: 7435
+Totale da scrivere: 7517
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  Scritti finora: 0
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  Scritti finora: 200
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  Scritti finora: 200
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  Scritti finora: 400
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+  WARN: HTTP 400 {"code":"PGRST102","details":null,"hint":null,"message":"All object keys must match"}
+COMPLETATO. Scritti 517/7517
