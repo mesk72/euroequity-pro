@@ -333,6 +333,16 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+    } else if (exList.length > 20) {
+      // "Global" (tutti i 23 mercati insieme) — non serve mostrare l'intero
+      // universo, solo una classifica dei migliori. Cap a 200 titoli per
+      // combined_rank (Best Score), cosi' una singola chiamata non espone
+      // piu' l'intero database mondiale in un colpo solo.
+      const all = applyUniverseFilter(fundData, stocksData)
+      stocks = all
+        .filter((s: any) => s.combinedRank != null)
+        .sort((a: any, b: any) => (b.combinedRank ?? -1) - (a.combinedRank ?? -1))
+        .slice(0, 200)
     } else {
       // Unificato su applyUniverseFilter: si fida di in_universe=true, ora
       // affidabile su tutti i continenti grazie alla verifica Leeway
