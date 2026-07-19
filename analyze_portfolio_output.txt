@@ -63,3 +63,8 @@ Percentuale di copertura: 78.6%
   000660.KRX (peso 0.53%)
   VALE.US (peso 0.4%)
   NOVO-B.CPSE (peso 0.61%)
+
+=== MEDIE PESATE (sul sotto-portafoglio coperto) ===
+Value Score medio: 47.9 (base 76.40% di peso)
+Growth Score medio: 73.7 (base 74.84% di peso, 2 titoli esclusi per dati mancanti)
+Best Score medio: 66.1 (base 74.84% di peso, 2 titoli esclusi per dati mancanti)
