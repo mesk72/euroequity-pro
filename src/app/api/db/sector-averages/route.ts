@@ -54,33 +54,41 @@ export async function GET(req: NextRequest) {
       return all
     }
 
-    const stocksData = await fetchAllPaged('stocks', 'ticker, exchange, sector', true)
+    const stocksData = await fetchAllPaged('stocks', 'ticker, exchange, sector, mkt_cap', true)
     const fundData = await fetchAllPaged('fundamentals', 'ticker, exchange, value_score, growth_score, combined_rank', false)
 
-    const sectorMap: Record<string, string> = {}
-    for (const s of stocksData) sectorMap[`${s.ticker}.${s.exchange}`] = s.sector || 'Unknown'
+    const stockInfoMap: Record<string, { sector: string; mktCap: number }> = {}
+    for (const s of stocksData) {
+      stockInfoMap[`${s.ticker}.${s.exchange}`] = { sector: s.sector || 'Unknown', mktCap: s.mkt_cap || 0 }
+    }
 
     const data = fundData
-      .map((f: any) => ({ ...f, sector: sectorMap[`${f.ticker}.${f.exchange}`] }))
-      .filter((f: any) => f.sector)
+      .map((f: any) => {
+        const info = stockInfoMap[`${f.ticker}.${f.exchange}`]
+        return { ...f, sector: info?.sector, mktCap: info?.mktCap || 0 }
+      })
+      .filter((f: any) => f.sector && f.mktCap > 0)
 
-    // Aggregazione in JS: raggruppa per settore, calcola solo le medie.
-    // I dati grezzi per-titolo non escono mai da questa funzione.
-    const groups: Record<string, { valueSum: number; growthSum: number; rankSum: number; count: number }> = {}
+    // Aggregazione PESATA PER MARKET CAP (coerente con la pagina Sectors),
+    // non media semplice. I dati grezzi per-titolo non escono mai da qui,
+    // solo i pesi vengono usati internamente per il calcolo.
+    const groups: Record<string, { valueWSum: number; growthWSum: number; rankWSum: number; capSum: number; count: number }> = {}
     for (const row of data) {
-      const sec = row.sector || 'Unknown'
-      if (!groups[sec]) groups[sec] = { valueSum: 0, growthSum: 0, rankSum: 0, count: 0 }
-      groups[sec].valueSum += row.value_score || 0
-      groups[sec].growthSum += row.growth_score || 0
-      groups[sec].rankSum += row.combined_rank || 0
+      const sec = row.sector
+      if (!groups[sec]) groups[sec] = { valueWSum: 0, growthWSum: 0, rankWSum: 0, capSum: 0, count: 0 }
+      const w = row.mktCap
+      groups[sec].valueWSum += (row.value_score || 0) * w
+      groups[sec].growthWSum += (row.growth_score || 0) * w
+      groups[sec].rankWSum += (row.combined_rank || 0) * w
+      groups[sec].capSum += w
       groups[sec].count += 1
     }
 
     const result = Object.entries(groups).map(([sec, g]) => ({
       sector: sec,
-      avgValueScore: Math.round((g.valueSum / g.count) * 10) / 10,
-      avgGrowthScore: Math.round((g.growthSum / g.count) * 10) / 10,
-      avgCombinedRank: Math.round((g.rankSum / g.count) * 10) / 10,
+      avgValueScore: Math.round((g.valueWSum / g.capSum) * 10) / 10,
+      avgGrowthScore: Math.round((g.growthWSum / g.capSum) * 10) / 10,
+      avgCombinedRank: Math.round((g.rankWSum / g.capSum) * 10) / 10,
       stockCount: g.count,
     }))
 
