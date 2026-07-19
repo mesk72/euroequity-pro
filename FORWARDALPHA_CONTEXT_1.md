@@ -2726,3 +2726,19 @@ useEffect(() => {
 
 ### Verifica raccomandata alla prossima sessione, non ancora fatta
 Non e' stato verificato se esistono altri endpoint `/api/db/*` con lo stesso rischio di mismatch di nome colonna (Tipo 2, vedi sezione precedente) oltre a `implied_growth_10y`/`beta` gia' trovato. Varrebbe la pena un confronto sistematico tra tutti i nomi di colonna scritti dagli script di fix/pipeline (`daily_us.py`, `daily_eu.py`, `daily_apac.py`, script di test ad-hoc) contro i nomi effettivamente letti da `src/app/api/db/stocks/route.ts`, per escludere altri disallineamenti silenziosi non ancora scoperti.
+
+---
+
+## AVVISO URGENTE E PERMANENTE — Il sito e' ANCORA PUBBLICO (correzione 18/19 luglio 2026)
+
+**IMPORTANTE**: contrariamente a quanto annotato in sessioni precedenti (previsto rendere il sito privato il 16 luglio dopo la scadenza Leeway), Andrea ha confermato esplicitamente il 18/19 luglio che **il sito e' ancora accessibile pubblicamente**. Qualsiasi sessione futura NON deve assumere che il sito sia gia' privato — verificare sempre con Andrea lo stato attuale prima di agire.
+
+### Vulnerabilita' di sicurezza trovata e parzialmente mitigata
+L'endpoint `/api/db/stocks/route.ts` non aveva ALCUN controllo di accesso (nessuna autenticazione, nessun rate limiting) fino al 18/19 luglio 2026 — chiunque poteva scaricare l'intero database (8.000+ titoli, tutti i punteggi Value/Growth/Best, tutte le formule derivate) senza registrarsi.
+
+**Fix applicato**: rate limiting per IP (40 richieste/minuto) — mitiga lo scraping rapido/massiccio ma NON e' una vera protezione, dato che (a) un attaccante paziente puo' comunque scaricare tutto rispettando il limite, (b) la mappa di rate limiting vive solo nella singola istanza serverless, aggirabile parzialmente su Vercel con traffico multi-istanza.
+
+**Soluzione vera raccomandata, MAI verificata se attivata**: controllare le impostazioni Vercel del progetto (Settings -> Deployment Protection) per un'opzione nativa di password protection o restrizione di accesso a livello di piattaforma — molto piu' affidabile di qualsiasi soluzione lato codice scritta in fretta. Da verificare con Andrea se questa e' stata attivata.
+
+### Prossimo passo tecnico non ancora completato
+Implementare vera autenticazione lato server (verifica sessione Supabase reale, non solo rate limiting) su TUTTI gli endpoint `/api/db/*` che restituiscono dati proprietari — richiede `@supabase/ssr` per leggere correttamente le sessioni via cookie in un Next.js API route. Non implementato per prudenza (rischio di rompere l'accesso agli utenti legittimi senza possibilita' di testare in un browser reale) — da affrontare con calma, con tempo dedicato per il testing, non sotto pressione di sessione notturna.
