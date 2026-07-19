@@ -32,21 +32,30 @@ export async function GET(req: NextRequest) {
 
   try {
     // "sector" vive in stocks, i punteggi in fundamentals — servono
-    // entrambe le tabelle, unite lato server.
-    let stocksQuery = supabase
-      .from('stocks')
-      .select('ticker, exchange, sector')
-      .in('exchange', exchangeList)
-    if (sector) stocksQuery = stocksQuery.eq('sector', sector)
-    const { data: stocksData, error: stocksErr } = await stocksQuery
-    if (stocksErr || !stocksData) return jsonNoCache({ error: 'Database error' }, { status: 500 })
+    // entrambe le tabelle, unite lato server. Paginazione esplicita:
+    // senza, il client si ferma silenziosamente alle prime ~1000 righe,
+    // tagliando fuori la maggior parte dei titoli quando il continente
+    // ne ha migliaia (bug che causava conteggi sbagliati, es. 85 invece
+    // di 373 per Information Technology in Nord America).
+    const PAGE = 1000
+    async function fetchAllPaged(table: string, select: string, applySectorFilter: boolean) {
+      let all: any[] = []
+      let from = 0
+      while (true) {
+        let q = supabase.from(table).select(select).in('exchange', exchangeList)
+        if (applySectorFilter && sector) q = q.eq('sector', sector)
+        if (table === 'fundamentals') q = q.not('value_score', 'is', null)
+        const { data, error } = await q.range(from, from + PAGE - 1)
+        if (error || !data || data.length === 0) break
+        all = all.concat(data)
+        if (data.length < PAGE) break
+        from += PAGE
+      }
+      return all
+    }
 
-    const { data: fundData, error: fundErr } = await supabase
-      .from('fundamentals')
-      .select('ticker, exchange, value_score, growth_score, combined_rank')
-      .in('exchange', exchangeList)
-      .not('value_score', 'is', null)
-    if (fundErr || !fundData) return jsonNoCache({ error: 'Database error' }, { status: 500 })
+    const stocksData = await fetchAllPaged('stocks', 'ticker, exchange, sector', true)
+    const fundData = await fetchAllPaged('fundamentals', 'ticker, exchange, value_score, growth_score, combined_rank', false)
 
     const sectorMap: Record<string, string> = {}
     for (const s of stocksData) sectorMap[`${s.ticker}.${s.exchange}`] = s.sector || 'Unknown'
