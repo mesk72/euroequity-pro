@@ -1,0 +1,1 @@
+NVDA: {'code': '42703', 'details': None, 'hint': None, 'message': 'column fundamentals.sector does not exist'}
