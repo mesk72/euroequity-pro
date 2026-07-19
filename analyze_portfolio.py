@@ -92,12 +92,19 @@ print("\n=== NON TROVATI ===")
 for t, ex, w in not_found:
     print(f"  {t}.{ex} (peso {w}%)")
 
-# Medie pesate sul sotto-portafoglio coperto
-if covered_weight > 0:
-    wv = sum(f[3].get("value_score",0) * f[2] for f in found) / covered_weight
-    wg = sum(f[3].get("growth_score",0) * f[2] for f in found) / covered_weight
-    wb = sum(f[3].get("combined_rank",0) * f[2] for f in found) / covered_weight
-    print(f"\n=== MEDIE PESATE (sul sotto-portafoglio coperto, {covered_weight:.2f}% del totale) ===")
-    print(f"Value Score medio: {wv:.1f}")
-    print(f"Growth Score medio: {wg:.1f}")
-    print(f"Best Score medio: {wb:.1f}")
+# Medie pesate — escludendo esplicitamente i None (2 titoli senza Growth/Best), non trattandoli come zero
+def weighted_avg(field):
+    valid = [(f[3].get(field), f[2]) for f in found if f[3].get(field) is not None]
+    if not valid: return None, 0
+    wsum = sum(v*w for v,w in valid)
+    wtot = sum(w for v,w in valid)
+    return wsum/wtot, wtot
+
+wv, wv_base = weighted_avg("value_score")
+wg, wg_base = weighted_avg("growth_score")
+wb, wb_base = weighted_avg("combined_rank")
+
+print(f"\n=== MEDIE PESATE (sul sotto-portafoglio coperto) ===")
+print(f"Value Score medio: {wv:.1f} (base {wv_base:.2f}% di peso)")
+print(f"Growth Score medio: {wg:.1f} (base {wg_base:.2f}% di peso, 2 titoli esclusi per dati mancanti)")
+print(f"Best Score medio: {wb:.1f} (base {wb_base:.2f}% di peso, 2 titoli esclusi per dati mancanti)")
