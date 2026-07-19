@@ -418,14 +418,12 @@ function StockPageInner() {
           </div>
         </div>
 
-        {user && (
-          <button onClick={openSectorPopup} style={{
-            background:'transparent', border:'1px solid var(--border)', borderRadius:4,
-            color:'var(--text3)', fontSize:11, fontFamily:'IBM Plex Sans Condensed',
-            padding:'6px 12px', cursor:'pointer', marginBottom:16 }}>
-            📊 Compare vs sector average
-          </button>
-        )}
+        <button onClick={openSectorPopup} style={{
+          background:'transparent', border:'1px solid var(--border)', borderRadius:4,
+          color:'var(--text3)', fontSize:11, fontFamily:'IBM Plex Sans Condensed',
+          padding:'6px 12px', cursor:'pointer', marginBottom:16 }}>
+          📊 Compare vs sector average
+        </button>
 
         {sectorPopupOpen && (
           <div onClick={() => setSectorPopupOpen(false)} style={{
