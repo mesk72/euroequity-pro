@@ -1,0 +1,20 @@
+Siemens (SIE.XETRA) - dati disponibili: 800 righe
+Oggi (ultimo dato): 2026-07-15 = 270.1
+
+=== METODOLOGIA VECCHIA (indici fissi a giorni di trading: 5/21/127/253) ===
+5 giorni: riferimento 2026-07-08 = 265.55 | var = 1.71%
+1 mese: riferimento 2026-06-16 = 273.05 | var = -1.08%
+6 mesi: riferimento 2026-01-14 = 253.6573 | var = 6.48%
+12 mesi: riferimento 2025-07-15 = 213.7556 | var = 26.36%
+
+=== METODOLOGIA NUOVA (calendario +1gg, snap a trading day, verificata con Yahoo) ===
+5 giorni: riferimento 2026-07-09 = 273.8 | var = -1.35%
+1 mese: calendario 2026-06-15 +1gg=2026-06-16 -> riferimento reale 2026-06-16 = 273.05 | var = -1.08%
+6 mesi: calendario 2026-01-15 +1gg=2026-01-16 -> riferimento reale 2026-01-16 = 254.8323 | var = 5.99%
+12 mesi: calendario 2025-07-15 +1gg=2025-07-16 -> riferimento reale 2025-07-16 = 212.6296 | var = 27.03%
+
+=== DIFFERENZA (nuova - vecchia) ===
+5 giorni: vecchia=1.71% | nuova=-1.35% | differenza=-3.06 punti percentuali
+1 mese: vecchia=-1.08% | nuova=-1.08% | differenza=0.0 punti percentuali
+6 mesi: vecchia=6.48% | nuova=5.99% | differenza=-0.49 punti percentuali
+12 mesi: vecchia=26.36% | nuova=27.03% | differenza=0.67 punti percentuali
