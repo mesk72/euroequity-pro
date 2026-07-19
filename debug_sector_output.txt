@@ -1,5 +1,1 @@
-Totale titoli IT in stocks (US+TSX), TUTTI: 398
-  di cui in_universe=true: 390
-
-Campione controllato: 398
-  di cui con value_score non nullo: 386
+NVDA fundamentals ORA: [{'ticker': 'NVDA', 'growth_score': 90.69, 'combined_rank': 73.49, 'value_score': 34, 'eps_growth': 0.6906, 'rev_growth': 0.6494, 'mom6m': 0.1425, 'mom1w': 0.0479, 'mom12m': 0.2417, 'mom1m': 0.0245, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
