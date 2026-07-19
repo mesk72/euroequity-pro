@@ -44,9 +44,9 @@ function isRateLimited(ip: string): boolean {
 // all'infinito nelle istanze a lunga durata.
 setInterval(() => {
   const now = Date.now()
-  for (const [ip, entry] of rateLimitMap.entries()) {
+  rateLimitMap.forEach((entry, ip) => {
     if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS * 5) rateLimitMap.delete(ip)
-  }
+  })
 }, RATE_LIMIT_WINDOW_MS * 5)
 
 const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM','TSE','SEHK','TSX','ASX','KRX','SGX','US']
