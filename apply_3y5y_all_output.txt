@@ -1,0 +1,45 @@
+Universo totale: 7887 titoli
+  300/7887 | calcolati 246 | insuff.storico 54 | errori 0
+  Scrittura parziale: 0/400
+  600/7887 | calcolati 120 | insuff.storico 80 | errori 0
+  Scrittura parziale: 0/400
+  1200/7887 | calcolati 256 | insuff.storico 144 | errori 0
+  Scrittura parziale: 0/400
+  1500/7887 | calcolati 122 | insuff.storico 178 | errori 0
+  1800/7887 | calcolati 397 | insuff.storico 203 | errori 0
+  Scrittura parziale: 0/400
+  2100/7887 | calcolati 268 | insuff.storico 232 | errori 0
+  Scrittura parziale: 0/400
+  2400/7887 | calcolati 144 | insuff.storico 256 | errori 0
+  2700/7887 | calcolati 397 | insuff.storico 303 | errori 0
+  Scrittura parziale: 0/400
+  3000/7887 | calcolati 280 | insuff.storico 320 | errori 0
+  Scrittura parziale: 0/400
+  3300/7887 | calcolati 169 | insuff.storico 331 | errori 0
+  Scrittura parziale: 0/400
+  3600/7887 | calcolati 57 | insuff.storico 343 | errori 0
+  3900/7887 | calcolati 339 | insuff.storico 361 | errori 0
+  Scrittura parziale: 0/400
+  4200/7887 | calcolati 234 | insuff.storico 366 | errori 0
+  Scrittura parziale: 0/400
+  4500/7887 | calcolati 123 | insuff.storico 377 | errori 0
+  Scrittura parziale: 0/400
+  5100/7887 | calcolati 262 | insuff.storico 438 | errori 0
+  Scrittura parziale: 0/400
+  5400/7887 | calcolati 125 | insuff.storico 475 | errori 0
+  Scrittura parziale: 0/400
+  5700/7887 | calcolati 7 | insuff.storico 493 | errori 0
+  6000/7887 | calcolati 298 | insuff.storico 502 | errori 0
+  Scrittura parziale: 0/400
+  6300/7887 | calcolati 197 | insuff.storico 503 | errori 0
+  Scrittura parziale: 0/400
+  6600/7887 | calcolati 88 | insuff.storico 512 | errori 0
+  6900/7887 | calcolati 336 | insuff.storico 564 | errori 0
+  Scrittura parziale: 0/400
+  7200/7887 | calcolati 201 | insuff.storico 599 | errori 0
+  Scrittura parziale: 0/400
+  7500/7887 | calcolati 93 | insuff.storico 607 | errori 0
+  7800/7887 | calcolati 360 | insuff.storico 640 | errori 0
+  Scrittura parziale: 0/400
+  Scrittura finale: 0/43
+COMPLETATO. Processati 7887, insuff.storico 644, errori 0
