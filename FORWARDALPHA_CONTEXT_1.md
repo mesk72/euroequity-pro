@@ -2742,3 +2742,54 @@ L'endpoint `/api/db/stocks/route.ts` non aveva ALCUN controllo di accesso (nessu
 
 ### Prossimo passo tecnico non ancora completato
 Implementare vera autenticazione lato server (verifica sessione Supabase reale, non solo rate limiting) su TUTTI gli endpoint `/api/db/*` che restituiscono dati proprietari — richiede `@supabase/ssr` per leggere correttamente le sessioni via cookie in un Next.js API route. Non implementato per prudenza (rischio di rompere l'accesso agli utenti legittimi senza possibilita' di testare in un browser reale) — da affrontare con calma, con tempo dedicato per il testing, non sotto pressione di sessione notturna.
+
+---
+
+## RIEPILOGO FINE SESSIONE 18-19 luglio 2026 — stato e priorita' per la prossima ripresa
+
+### COMPLETATO STANOTTE, verificato funzionante
+
+1. **Nuova formula momentum (stile Yahoo Finance)**: 1 settimana = 4 giorni di trading indietro (non 5), 1/6/12 mesi = calendario indietro +1 giorno, poi primo giorno di trading disponibile. Verificata con precisione matematica (caso Martin Luther King Day per i 6 mesi). Applicata a TUTTI i mercati con successo (job completato). Aggiunti anche mom3y/mom5y con la stessa logica.
+
+2. **Fix bug ×100 su change1d** (doppia moltiplicazione, causava 6%→600%) — corretto in tutti gli script pipeline e ricalcolato nel database.
+
+3. **Fix discrepanza screener vs pagina titolo** — causa vera trovata: due rami di codice diversi nello stesso endpoint, uno ricalcolava fresco da prices_eod, l'altro usava un valore statico settimanale. Ora entrambi coerenti.
+
+4. **Fix performance paginazione** — era sequenziale (una pagina alla volta), ora parallela. Dovrebbe aver risolto "Global non si apre" e la lentezza generale.
+
+5. **Sicurezza — SITO ANCORA PUBBLICO, misure applicate stanotte**:
+   - Middleware Basic Auth su tutto il sito (richiede `SITE_BASIC_AUTH_USER`/`SITE_BASIC_AUTH_PASS` su Vercel per attivarsi — Andrea le ha impostate e fatto redeploy, DA VERIFICARE se funziona davvero)
+   - Rate limiting per IP su `/api/db/stocks` (40 richieste/minuto)
+   - Limite di volume orario per IP (15.000 righe/ora)
+   - "Global" limitato ai top 200 per Best Score (non piu' l'intero universo mondiale in una chiamata)
+
+6. **Reverse Earnings Model**: ora usa Beta reale da Yahoo (via libreria yfinance, l'endpoint diretto Yahoo da' 401) invece di Ke fisso, e prezzo fresco da prices_eod. Bug di nome colonna trovato e corretto (scriveva `implied_growth`/`beta_local` invece di `implied_growth_10y`/`beta`, il sito non leggeva mai i valori aggiornati).
+
+7. **Metodologia nascosta dal pubblico**: rimossi riferimenti a "country"/"continent" e ai parametri specifici (PE trailing, PE forward, ecc.) dalle pagine About e Home — ora genericizzati ("comparable peers", "three value parameters" ecc.) per non facilitare la copiatura.
+
+8. **MyScreen (watchlist/wallet)**: aggiunti grafici a torta SVG (Sector Exposure, Country Exposure, equal-weight) sopra la lista titoli, sia mobile sia desktop. Aggiunta la media anche in vista mobile (prima solo desktop), con tutti i campi (PEv, PEf, EPS, Rev, Val, Grw, Best, 1M, 12M).
+
+### NON COMPLETATO — PRIORITA' PER LA PROSSIMA SESSIONE, IN ORDINE
+
+**1. PRIORITA' MASSIMA — Ricalcolo Growth Score e Best Score con i nuovi valori momentum.**
+Il momentum e' stato aggiornato con la nuova formula, ma Growth Score e Best Score (che dipendono da mom6_adj = mom6m-mom1w e mom12_adj = mom12m-mom1m) NON sono stati ricalcolati. Il sito mostra quindi momentum nuovo ma Growth/Best Score ancora basati sui vecchi valori — INCONSISTENTE. Da fare con calma, non sotto pressione, verificando 2-3 titoli manualmente prima di lanciare su tutto l'universo.
+
+**2. PRIORITA' ALTA — Vulnerabilita' di sicurezza seria nelle pagine "Best Value/Growth/Ideas" (per Europa/US/Asia Pacific).**
+Scoperta stanotte, NON ancora corretta: queste pagine (protette da LoginGate, quindi visibili solo a utenti registrati) scaricano l'INTERO dataset del continente lato client e calcolano i punteggi (value/growth score) nel browser con percentili ricalcolati da zero — NON usando i punteggi gia' pronti e salvati nel database (`value_score`, `growth_score`, `combined_rank`). Il filtro ">=80" e' solo visivo, non limita i dati trasferiti. Un utente registrato puo' vedere/scaricare l'intero universo di un continente tramite gli strumenti sviluppatore del browser, anche se la UI mostra solo i "migliori".
+
+**Soluzione corretta (non ancora implementata)**: riscrivere queste pagine per filtrare LATO SERVER usando i punteggi gia' calcolati (`WHERE combined_rank >= 80` ecc.), restituendo solo i titoli che qualificano — non l'intero continente. Risolverebbe sicurezza E velocita' insieme (elimina anche il calcolo pesante lato client). E' un intervento serio che tocca piu' pagine — richiede tempo e test, non da affrontare in fretta o a fine sessione.
+
+**3. Verificare se la Basic Auth funziona davvero end-to-end.**
+Andrea ha impostato le variabili d'ambiente su Vercel e fatto redeploy dopo aver corretto un errore di build (iterazione Map incompatibile col target TypeScript, corretto). Non confermato esplicitamente nella sessione se il popup di autenticazione appare davvero visitando il sito da incognito.
+
+**4. Homepage — titolo H1 "ranked across three continents".**
+Lasciato intenzionalmente non modificato (e' il titolo SEO principale) — Andrea ha detto "va bene cosi'" quindi NON toccare, era una decisione gia' presa.
+
+**5. Bug Samsung (grafico vs tabella) — gia' risolto** (era il bug calendario vs trading-day nell'endpoint /api/db/history, corretto stanotte). Non richiede piu' azione.
+
+**6. Rendere il sito privato per davvero.**
+Andrea non ha un piano Vercel che include "Deployment Protection" nativa (costerebbe $150/mese extra, scartato). La Basic Auth di stanotte e' la soluzione-tampone gratuita. Un vero sistema di login per-utente (non password condivisa) resta da costruire con calma.
+
+### Note tecniche utili per la prossima sessione
+- Token GitHub aggiornato durante questa sessione: [vedi variabile ambiente/messaggio precedente, non salvato qui per sicurezza] (verificare scadenza prima di riusarlo)
+- Pattern ormai consolidato e affidabile per query pesanti su tutto l'universo: script Python per-titolo (non aggregate, vanno in timeout su query grandi come US/TSX senza filtro) via GitHub Actions con timeout esteso (fino a 340 minuti), scrittura incrementale ogni 300-500 record per non perdere lavoro se il job si interrompe
