@@ -20,6 +20,35 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+// Rate limiting semplice per IP — protegge contro scraping massiccio
+// dell'intero database. Non e' una difesa perfetta (la mappa vive solo
+// nella singola istanza serverless), ma blocca gli script piu' semplici
+// che farebbero centinaia di richieste rapide per scaricare tutto.
+const RATE_LIMIT_WINDOW_MS = 60_000 // 1 minuto
+const RATE_LIMIT_MAX = 40 // richieste massime per IP nella finestra
+const rateLimitMap = new Map<string, { count: number; windowStart: number }>()
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now })
+    return false
+  }
+  entry.count++
+  if (entry.count > RATE_LIMIT_MAX) return true
+  return false
+}
+
+// Pulizia periodica della mappa per non far crescere la memoria
+// all'infinito nelle istanze a lunga durata.
+setInterval(() => {
+  const now = Date.now()
+  for (const [ip, entry] of rateLimitMap.entries()) {
+    if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS * 5) rateLimitMap.delete(ip)
+  }
+}, RATE_LIMIT_WINDOW_MS * 5)
+
 const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM','TSE','SEHK','TSX','ASX','KRX','SGX','US']
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR']
 const FILTER_500M = new Set(['LSE','XETRA','PA','OM','SWX','MIL'])
@@ -182,6 +211,14 @@ function applyAPACFilter(fundData: any[], stocksData: any[]) {
 
 
 export async function GET(req: NextRequest) {
+  // Rate limiting per IP — blocca scraping massiccio
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('x-real-ip')
+    || 'unknown'
+  if (isRateLimited(ip)) {
+    return jsonNoCache({ error: 'Too many requests. Please slow down.' }, { status: 429 })
+  }
+
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
   const search = req.nextUrl.searchParams.get('search') || ''
