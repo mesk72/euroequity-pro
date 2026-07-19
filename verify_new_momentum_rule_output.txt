@@ -1,0 +1,21 @@
+
+=== NORD AMERICA: NVDA.US ===
+Oggi (ultimo dato disponibile): 2026-07-15 = 212.5
+5 giorni -> riferimento: 2026-07-09 = 202.78 | var = 4.79%
+1 mese -> calendario esatto: 2026-06-15 | +1gg: 2026-06-16 | riferimento reale: 2026-06-16 = 207.41 | var = 2.45%
+6 mesi -> calendario esatto: 2026-01-15 | +1gg: 2026-01-16 | riferimento reale: 2026-01-16 = 186.0031 | var = 14.25%
+12 mesi -> calendario esatto: 2025-07-15 | +1gg: 2025-07-16 | riferimento reale: 2025-07-16 = 171.1421 | var = 24.17%
+
+=== EUROPA: ASML.AS ===
+Oggi (ultimo dato disponibile): 2026-07-14 = 1555.8
+5 giorni -> riferimento: 2026-07-08 = 1529.0 | var = 1.75%
+1 mese -> calendario esatto: 2026-06-14 | +1gg: 2026-06-15 | riferimento reale: 2026-06-15 = 1622.2 | var = -4.09%
+6 mesi -> calendario esatto: 2026-01-14 | +1gg: 2026-01-15 | riferimento reale: 2026-01-15 = 1145.3271 | var = 35.84%
+12 mesi -> calendario esatto: 2025-07-14 | +1gg: 2025-07-15 | riferimento reale: 2025-07-15 = 700.5004 | var = 122.1%
+
+=== ASIA PACIFIC: A005930.KRX ===
+Oggi (ultimo dato disponibile): 2026-07-07 = 296000.0
+5 giorni -> riferimento: 2026-07-01 = 314500.0 | var = -5.88%
+1 mese -> calendario esatto: 2026-06-07 | +1gg: 2026-06-08 | riferimento reale: 2026-06-08 = 295180.5641 | var = 0.28%
+6 mesi -> calendario esatto: 2026-01-07 | +1gg: 2026-01-08 | riferimento reale: 2026-01-08 = 138362.9354 | var = 113.93%
+12 mesi -> calendario esatto: 2025-07-07 | +1gg: 2025-07-08 | riferimento reale: 2025-07-08 = 60640.0139 | var = 388.13%
