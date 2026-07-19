@@ -2619,7 +2619,7 @@ function AppContent() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
                 {[
                   { t: 'Value Score', d: 'Three value parameters, ranked against comparable peers.' },
-                  { t: 'Growth Score', d: 'Four growth parameters, combined and re-ranked.' },
+                  { t: 'Growth Score', d: 'Four growth parameters, combined.' },
                   { t: 'Best Score', d: 'A combination of Value and Growth — the shortlist of what deserves a closer look.' },
                 ].map(x => (
                   <div key={x.t} style={{ borderLeft: '2px solid var(--orange)', paddingLeft: 14 }}>
