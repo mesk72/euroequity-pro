@@ -28,6 +28,26 @@ const RATE_LIMIT_WINDOW_MS = 60_000 // 1 minuto
 const RATE_LIMIT_MAX = 40 // richieste massime per IP nella finestra
 const rateLimitMap = new Map<string, { count: number; windowStart: number }>()
 
+// Secondo livello: limite sul VOLUME totale di righe servite per IP
+// nell'ultima ora — una singola chiamata puo' gia' restituire migliaia
+// di righe (Global/ALL), quindi il solo conteggio delle richieste non
+// basta a impedire di scaricare l'intero database in poche chiamate.
+const ROWS_WINDOW_MS = 60 * 60_000 // 1 ora
+const ROWS_MAX = 15_000 // righe totali massime servite per IP all'ora
+const rowsServedMap = new Map<string, { rows: number; windowStart: number }>()
+
+function isRowVolumeLimited(ip: string, rowsInThisResponse: number): boolean {
+  const now = Date.now()
+  const entry = rowsServedMap.get(ip)
+  if (!entry || now - entry.windowStart > ROWS_WINDOW_MS) {
+    rowsServedMap.set(ip, { rows: rowsInThisResponse, windowStart: now })
+    return false
+  }
+  if (entry.rows > ROWS_MAX) return true
+  entry.rows += rowsInThisResponse
+  return false
+}
+
 function isRateLimited(ip: string): boolean {
   const now = Date.now()
   const entry = rateLimitMap.get(ip)
@@ -324,10 +344,11 @@ export async function GET(req: NextRequest) {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
 
-    return jsonNoCache({ stocks, source: 'supabase' })
+    if (isRowVolumeLimited(ip, stocks.length)) {
+      return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
+    }
 
-  } catch (e) {
-    return jsonNoCache({ error: 'Database error' }, { status: 500 })
+    return jsonNoCache({ stocks, source: 'supabase' })
   }
 }
 
