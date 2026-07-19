@@ -1,6 +1,5 @@
-Colonne disponibili in fundamentals per NVDA:
+Totale titoli IT in stocks (US+TSX), TUTTI: 398
+  di cui in_universe=true: 390
 
-Tutte le colonne: ['beta', 'beta_local', 'change1d', 'combined_rank', 'div_payout', 'div_yield', 'div_yield_ttm', 'eps_30d_ago', 'eps_cagr_2y', 'eps_cagr_3y', 'eps_current', 'eps_fwd24', 'eps_fwd36', 'eps_fy0', 'eps_fy1', 'eps_fy2', 'eps_fy3', 'eps_fy4', 'eps_fy5', 'eps_growth', 'eps_growth_12_24m', 'eps_growth_24_36m', 'eps_ltm', 'eps_mom_30d', 'eps_next', 'eps_ntm', 'eps_ntm_dcf', 'eps_ttm', 'ev_ebitda', 'exchange', 'fiscal_month', 'gross_margin', 'growth_score', 'growth_score_prev', 'implied_growth', 'implied_growth_10y', 'ke', 'last_report', 'last_report_date', 'mkt_cap', 'mom12m', 'mom1m', 'mom1w', 'mom6m', 'mrq', 'net_margin', 'pb', 'pe_forward', 'pe_trailing', 'price', 'rank_eps_gr', 'rank_mom12_adj', 'rank_mom6_adj', 'rank_pb', 'rank_pe_ltm', 'rank_pe_ntm', 'rank_rev_gr', 'rev_fy0', 'rev_fy1', 'rev_fy2', 'rev_growth', 'rev_ltm', 'rev_mom_30d', 'rev_ntm', 'rf_rate', 'roa', 'roe', 'roic', 'ticker', 'updated_at', 'value_score', 'value_score_prev']
-
-Colonne disponibili in stocks per NVDA:
-  >>> sector: Information Technology
+Campione controllato: 398
+  di cui con value_score non nullo: 386
