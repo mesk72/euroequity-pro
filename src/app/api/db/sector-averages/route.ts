@@ -31,16 +31,29 @@ export async function GET(req: NextRequest) {
   else return jsonNoCache({ error: 'Invalid continent parameter' }, { status: 400 })
 
   try {
-    let query = supabase
+    // "sector" vive in stocks, i punteggi in fundamentals — servono
+    // entrambe le tabelle, unite lato server.
+    let stocksQuery = supabase
+      .from('stocks')
+      .select('ticker, exchange, sector')
+      .in('exchange', exchangeList)
+    if (sector) stocksQuery = stocksQuery.eq('sector', sector)
+    const { data: stocksData, error: stocksErr } = await stocksQuery
+    if (stocksErr || !stocksData) return jsonNoCache({ error: 'Database error' }, { status: 500 })
+
+    const { data: fundData, error: fundErr } = await supabase
       .from('fundamentals')
-      .select('sector, value_score, growth_score, combined_rank')
+      .select('ticker, exchange, value_score, growth_score, combined_rank')
       .in('exchange', exchangeList)
       .not('value_score', 'is', null)
+    if (fundErr || !fundData) return jsonNoCache({ error: 'Database error' }, { status: 500 })
 
-    if (sector) query = query.eq('sector', sector)
+    const sectorMap: Record<string, string> = {}
+    for (const s of stocksData) sectorMap[`${s.ticker}.${s.exchange}`] = s.sector || 'Unknown'
 
-    const { data, error } = await query
-    if (error || !data) return jsonNoCache({ error: 'Database error' }, { status: 500 })
+    const data = fundData
+      .map((f: any) => ({ ...f, sector: sectorMap[`${f.ticker}.${f.exchange}`] }))
+      .filter((f: any) => f.sector)
 
     // Aggregazione in JS: raggruppa per settore, calcola solo le medie.
     // I dati grezzi per-titolo non escono mai da questa funzione.
