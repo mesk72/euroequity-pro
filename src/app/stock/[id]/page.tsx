@@ -219,6 +219,26 @@ function StockPageInner() {
 
   const [stock, setStock] = useState<any>(null)
   const [loadingStock, setLoadingStock] = useState(true)
+  const [sectorPopupOpen, setSectorPopupOpen] = useState(false)
+  const [sectorAvgData, setSectorAvgData] = useState<any>(null)
+  const [sectorAvgLoading, setSectorAvgLoading] = useState(false)
+
+  const getContinent = (ex: string) => {
+    if (['US','TSX'].includes(ex)) return 'north_america'
+    if (['TSE','SEHK','ASX','KRX','SGX'].includes(ex)) return 'asia_pacific'
+    return 'europe'
+  }
+
+  const openSectorPopup = () => {
+    setSectorPopupOpen(true)
+    if (sectorAvgData || !stock) return
+    setSectorAvgLoading(true)
+    const continent = getContinent(exchangeCode)
+    fetch(`/api/db/sector-averages?continent=${continent}&sector=${encodeURIComponent(stock.sector || '')}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { setSectorAvgData(d); setSectorAvgLoading(false) })
+      .catch(() => setSectorAvgLoading(false))
+  }
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
@@ -397,6 +417,64 @@ function StockPageInner() {
             ))}
           </div>
         </div>
+
+        {user && (
+          <button onClick={openSectorPopup} style={{
+            background:'transparent', border:'1px solid var(--border)', borderRadius:4,
+            color:'var(--text3)', fontSize:11, fontFamily:'IBM Plex Sans Condensed',
+            padding:'6px 12px', cursor:'pointer', marginBottom:16 }}>
+            📊 Compare vs sector average
+          </button>
+        )}
+
+        {sectorPopupOpen && (
+          <div onClick={() => setSectorPopupOpen(false)} style={{
+            position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.6)',
+            display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:16 }}>
+            <div onClick={(e) => e.stopPropagation()} style={{
+              background:'var(--bg)', border:'1px solid var(--border)', borderRadius:8,
+              padding:20, maxWidth:420, width:'100%' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+                <div style={{ fontSize:13, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                  color:'var(--text)' }}>Sector Comparison — {stock?.sector || 'N/A'}</div>
+                <button onClick={() => setSectorPopupOpen(false)} style={{
+                  background:'none', border:'none', color:'var(--text4)', fontSize:18, cursor:'pointer' }}>✕</button>
+              </div>
+              {sectorAvgLoading ? (
+                <div style={{ fontSize:12, color:'var(--text4)', textAlign:'center', padding:20 }}>Loading...</div>
+              ) : sectorAvgData?.averages?.length ? (
+                <div>
+                  {sectorAvgData.averages.map((g: any, i: number) => (
+                    <div key={i}>
+                      <div style={{ fontSize:10, color:'var(--text4)', marginBottom:8 }}>
+                        Based on {g.stockCount} stocks in this sector, {sectorAvgData.continent.replace('_',' ')}
+                      </div>
+                      {[
+                        { label: 'Value Score', stockVal: stock?.valueScore, avgVal: g.avgValueScore },
+                        { label: 'Growth Score', stockVal: stock?.growthScore, avgVal: g.avgGrowthScore },
+                        { label: 'Best Score', stockVal: stock?.combinedRank, avgVal: g.avgCombinedRank },
+                      ].map(({ label, stockVal, avgVal }) => (
+                        <div key={label} style={{ display:'flex', justifyContent:'space-between',
+                          alignItems:'center', padding:'8px 0', borderBottom:'1px solid var(--border)' }}>
+                          <span style={{ fontSize:11, color:'var(--text3)' }}>{label}</span>
+                          <span style={{ fontSize:13, fontFamily:'IBM Plex Mono' }}>
+                            <strong style={{ color:'var(--orange)' }}>{fn(stockVal)}</strong>
+                            <span style={{ color:'var(--text4)', margin:'0 6px' }}>vs</span>
+                            <span style={{ color:'var(--text3)' }}>{avgVal ?? '-'}</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ fontSize:12, color:'var(--text4)', textAlign:'center', padding:20 }}>
+                  No sector data available.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
           borderRadius:4, padding:16, marginBottom:16 }}>
