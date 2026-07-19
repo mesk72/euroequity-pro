@@ -1,0 +1,46 @@
+Universo totale: 7887 titoli
+  300/7887 | calcolati 265 | errori 0
+  Scrittura parziale: 400/400
+  600/7887 | calcolati 156 | errori 0
+  Scrittura parziale: 400/400
+  900/7887 | calcolati 35 | errori 0
+  1200/7887 | calcolati 320 | errori 0
+  Scrittura parziale: 400/400
+  1500/7887 | calcolati 202 | errori 0
+  Scrittura parziale: 400/400
+  1800/7887 | calcolati 94 | errori 0
+  2100/7887 | calcolati 381 | errori 0
+  Scrittura parziale: 400/400
+  2400/7887 | calcolati 267 | errori 0
+  Scrittura parziale: 400/400
+  2700/7887 | calcolati 140 | errori 0
+  Scrittura parziale: 400/400
+  3000/7887 | calcolati 33 | errori 0
+  3300/7887 | calcolati 327 | errori 0
+  Scrittura parziale: 400/400
+  3600/7887 | calcolati 221 | errori 0
+  Scrittura parziale: 400/400
+  3900/7887 | calcolati 114 | errori 0
+  Scrittura parziale: 400/400
+  4200/7887 | calcolati 13 | errori 0
+  4500/7887 | calcolati 308 | errori 0
+  Scrittura parziale: 400/400
+  Scrittura parziale: 400/400
+  5100/7887 | calcolati 88 | errori 0
+  5400/7887 | calcolati 373 | errori 0
+  Scrittura parziale: 400/400
+  5700/7887 | calcolati 270 | errori 0
+  Scrittura parziale: 400/400
+  6000/7887 | calcolati 167 | errori 0
+  Scrittura parziale: 400/400
+  6300/7887 | calcolati 67 | errori 0
+  6600/7887 | calcolati 361 | errori 0
+  Scrittura parziale: 400/400
+  6900/7887 | calcolati 226 | errori 0
+  Scrittura parziale: 400/400
+  7200/7887 | calcolati 110 | errori 0
+  Scrittura parziale: 400/400
+  7500/7887 | calcolati 7 | errori 0
+  7800/7887 | calcolati 297 | errori 0
+  Scrittura finale: 382/382
+COMPLETATO. Processati 7887, errori 0
