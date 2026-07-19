@@ -1,0 +1,65 @@
+Peso totale analizzato: 97.15%
+Peso coperto nel DB (con score validi): 76.40%
+Percentuale di copertura: 78.6%
+
+=== TROVATI ===
+  PLTR.US (peso 1.1%): Value=12, Growth=65.3, Best=26.22
+  RHM.XETRA (peso 1.17%): Value=10, Growth=49.65, Best=15.45
+  MU.US (peso 9.43%): Value=65, Growth=99.83, Best=95.47
+  UBSG.SWX (peso 2.31%): Value=85, Growth=89.52, Best=97.74
+  JPM.US (peso 1.42%): Value=72, Growth=52.76, Best=73.52
+  NVDA.US (peso 5.37%): Value=34, Growth=90.69, Best=73.49
+  AAPL.US (peso 1.21%): Value=22, Growth=80.98, Best=51.88
+  GS.US (peso 1.83%): Value=63, Growth=78.22, Best=84.74
+  RIOT.US (peso 0.9%): Value=10, Growth=60.28, Best=20.66
+  GOOGL.US (peso 2.7%): Value=32, Growth=89.82, Best=71.12
+  ASML.AS (peso 3.08%): Value=11, Growth=98.12, Best=57.88
+  META.US (peso 2.35%): Value=48, Growth=53.1, Best=48.93
+  NDA.XETRA (peso 0.64%): Value=78, Growth=95.33, Best=97.52
+  ABBN.SWX (peso 3.22%): Value=8, Growth=96.11, Best=52.5
+  NKT.CPSE (peso 1.09%): Value=8, Growth=87.5, Best=40.97
+  FSLR.US (peso 1.52%): Value=79, Growth=65.83, Best=86.6
+  PGNY.US (peso 0.74%): Value=48, Growth=68.55, Best=66.1
+  1810.SEHK (peso 0.39%): Value=39, Growth=5.88, Best=6.52
+  VRTX.US (peso 1.97%): Value=34, Growth=46.09, Best=28.81
+  BOL.OM (peso 1.58%): Value=86, Growth=82.95, Best=96.36
+  MSFT.US (peso 1.68%): Value=44, Growth=39.76, Best=31.86
+  AMZN.US (peso 1.37%): Value=36, Growth=68.02, Best=53.35
+  ORK.OB (peso 0.45%): Value=41, Growth=21.97, Best=17.3
+  NBIX.US (peso 1.81%): Value=53, Growth=92.58, Best=87.07
+  FCX.US (peso 3.21%): Value=46, Growth=86.23, Best=79.34
+  HST.US (peso 2.61%): Value=63, Growth=54.46, Best=66.89
+  NOC.US (peso 0.56%): Value=56, Growth=22.99, Best=27.78
+  EQT.US (peso 2.96%): Value=89, Growth=41.01, Best=77.95
+  AGRO.US (peso 0.5%): Value=84, Growth=91.29, Best=97.99
+  MC.PA (peso 0.26%): Value=23, Growth=24.77, Best=9.8
+  CDI.PA (peso 0.92%): Value=16, Growth=None, Best=None
+  NHY.OB (peso 0.56%): Value=57, Growth=72.29, Best=75.92
+  LMT.US (peso 0.53%): Value=42, Growth=48.45, Best=37.73
+  LDOS.US (peso 0.66%): Value=86, Growth=7.39, Best=40.7
+  D.US (peso 1.32%): Value=64, Growth=61.52, Best=74.1
+  SMT.LSE (peso 0.64%): Value=52, Growth=None, Best=None
+  RL.US (peso 0.32%): Value=40, Growth=67.6, Best=56.51
+  VST.US (peso 3.05%): Value=41, Growth=65.6, Best=55.54
+  GAW.LSE (peso 0.52%): Value=2, Growth=71.96, Best=23.5
+  HAS.US (peso 0.34%): Value=30, Growth=33.45, Best=16.43
+  CNC.US (peso 0.94%): Value=44, Growth=84.38, Best=76.58
+  BE.US (peso 1.33%): Value=10, Growth=99.72, Best=58.67
+  HO.PA (peso 0.69%): Value=17, Growth=45.14, Best=16.78
+  AVAV.US (peso 0.74%): Value=32, Growth=29.79, Best=15.43
+  CEG.US (peso 2.35%): Value=60, Growth=40.69, Best=48.22
+  RRC.US (peso 1.81%): Value=89, Growth=69.83, Best=93.19
+  ETOR.US (peso 0.25%): Value=73, Growth=65.38, Best=83.17
+
+=== NON TROVATI ===
+  TSM.US (peso 8.84%)
+  ASML.US (peso 1.96%)
+  005930.KRX (peso 1.2%)
+  B.US (peso 2.72%)
+  FORTUM.OB (peso 0.56%)
+  INDA.US (peso 1.29%)
+  SPY5.LSE (peso 2.64%)
+  NOC2.US (peso 0.0%)
+  000660.KRX (peso 0.53%)
+  VALE.US (peso 0.4%)
+  NOVO-B.CPSE (peso 0.61%)
