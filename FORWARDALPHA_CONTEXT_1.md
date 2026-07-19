@@ -2793,3 +2793,17 @@ Andrea non ha un piano Vercel che include "Deployment Protection" nativa (coster
 ### Note tecniche utili per la prossima sessione
 - Token GitHub aggiornato durante questa sessione: [vedi variabile ambiente/messaggio precedente, non salvato qui per sicurezza] (verificare scadenza prima di riusarlo)
 - Pattern ormai consolidato e affidabile per query pesanti su tutto l'universo: script Python per-titolo (non aggregate, vanno in timeout su query grandi come US/TSX senza filtro) via GitHub Actions con timeout esteso (fino a 340 minuti), scrittura incrementale ogni 300-500 record per non perdere lavoro se il job si interrompe
+
+---
+
+## AGGIORNAMENTO — Growth Score e Best Score ricalcolati con successo (notte 18-19 luglio, tardi)
+
+**PRIORITA' 1 della sessione precedente COMPLETATA**: Growth Score (7.517/7.517 titoli) e Best Score (7.435/7.435 titoli) ricalcolati con successo su tutto l'universo, usando i nuovi valori di momentum (formula stile Yahoo). Rank a due stadi rispettato: Growth Score rankato per singolo exchange (proxy paese), Best Score rankato per continente (NA=US+TSX, EU=16 mercati, APAC=5 mercati).
+
+**Nota tecnica per il futuro**: attenzione all'errore PostgREST "All object keys must match" quando si fa un upsert batch con oggetti che hanno chiavi diverse tra loro (es. alcuni con solo growth_score, altri solo combined_rank) — Supabase/PostgREST richiede schema omogeneo in ogni batch. Soluzione: fare batch separati per campo, non un batch misto.
+
+**Rimane aperta la vulnerabilita' sulle pagine Best Value/Growth/Ideas** (espongono l'intero continente lato client) — non toccata in questa sessione, resta la priorita' per la prossima.
+
+**Aggiunta nuova**: popup "Compare vs sector average" sulla pagina del singolo titolo, funzionante — usa endpoint `/api/db/sector-averages` che aggrega live da `fundamentals` (punteggi) + `stocks` (campo sector, che vive li' non in fundamentals) per continente. Solo numeri aggregati esposti, mai dati grezzi per titolo.
+
+**Sicurezza — stato finale sessione**: Basic Auth rimossa su richiesta esplicita (si e' scelto di non rendere il sito privato). Restano attivi: rate limiting (40 req/min), tetto volume orario (15.000 righe/ora), cap Global a 200 titoli, controllo Origin/Referer contro chiamate dirette da script esterni.
