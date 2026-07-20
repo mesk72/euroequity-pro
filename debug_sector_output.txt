@@ -1,4 +1,11 @@
-SectorScreenUS + pagina Sectors (US+TSX, in_universe=true): 390
-Sector Comparison popup (stessa query): 390 (usa identica logica)
+=== Conteggio Europa (16 mercati, NGM escluso, in_universe=true) ===
+Stesso identico filtro usato ora da: SectorScreen, pagina Sectors, popup Sector Comparison
 
-Per riferimento, solo US (senza TSX): 373
+Information Technology: 166 titoli
+Financials: 595 titoli
+Healthcare: 145 titoli
+
+=== Controllo di sicurezza: quanti NGM ci sarebbero se INCLUSI per errore ===
+  Information Technology su NGM: 0 (questi NON devono essere contati)
+  Financials su NGM: 0 (questi NON devono essere contati)
+  Healthcare su NGM: 0 (questi NON devono essere contati)
