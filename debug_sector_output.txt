@@ -1,3 +1,3 @@
-Information Technology: mkt cap totale $26635.6B | mkt cap coperto $25918.2B | copertura per capitalizzazione: 97.3%
-Financials: mkt cap totale $10725.2B | mkt cap coperto $9957.8B | copertura per capitalizzazione: 92.8%
-Healthcare: mkt cap totale $7803.1B | mkt cap coperto $6861.8B | copertura per capitalizzazione: 87.9%
+Information Technology: Value Score medio pesato = 30.5 (su 366 titoli, $26625.0B)
+Financials: Value Score medio pesato = 64.3 (su 609 titoli, $10556.1B)
+Healthcare: Value Score medio pesato = 38.4 (su 477 titoli, $7798.5B)
