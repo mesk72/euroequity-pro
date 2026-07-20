@@ -1,9 +1,6 @@
-Stocks IT trovati: 398
-Fundamentals totali US+TSX: 4139
-Righe finali unite (IT, con mktCap valido): 386
+TROVATO Barclays (BARC.LSE): Value=87, Growth=78.59, Best=95.5
+TROVATO NatWest (NWG.LSE): Value=88, Growth=71.13, Best=93.08
+TROVATO Unilever (ULVR.LSE): Value=17, Growth=15.33, Best=4.2
+TROVATO Shell (SHEL.LSE): Value=89, Growth=90.47, Best=98.88
 
-Information Technology, North America:
-  Titoli: 386
-  Value Score medio (weighted): 30.5
-  Growth Score medio (weighted): 78.5
-  Best Score medio (weighted): 57.4
+Ricerca Itau per nome: []
