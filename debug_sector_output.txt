@@ -1,1 +1,4 @@
-Titoli con exchange=NGM: 0-85/86
+SectorScreenUS + pagina Sectors (US+TSX, in_universe=true): 390
+Sector Comparison popup (stessa query): 390 (usa identica logica)
+
+Per riferimento, solo US (senza TSX): 373
