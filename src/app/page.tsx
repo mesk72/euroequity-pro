@@ -140,7 +140,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
 type Page = 'home' | 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'globalscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'KRX' | 'SGX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
 
 // - API CALLS -
-async function apiExchange(code: string, thresholds?: { minValue?: number; minGrowth?: number; minCombined?: number }): Promise<Stock[]> {
+async function apiExchange(code: string, thresholds?: { minValue?: number; minGrowth?: number; minCombined?: number; capRows?: number }): Promise<Stock[]> {
   if (USE_DEMO) {
     const scored = computeScores([...DEMO_STOCKS])
     if (code === 'EZ') return scored
@@ -165,6 +165,7 @@ async function apiExchange(code: string, thresholds?: { minValue?: number; minGr
       if (thresholds?.minValue) url += `&minValue=${thresholds.minValue}`
       if (thresholds?.minGrowth) url += `&minGrowth=${thresholds.minGrowth}`
       if (thresholds?.minCombined) url += `&minCombined=${thresholds.minCombined}`
+      if (thresholds?.capRows) url += `&capRows=${thresholds.capRows}`
       // Rate limiting per utente, non solo per IP — recuperato qui
       // internamente cosi' TUTTE le chiamate esistenti a apiExchange lo
       // includono automaticamente, senza dover modificare ogni chiamante.
@@ -1336,7 +1337,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
 
     setLoading(true)
     // Carica da tutti gli exchange - EMU + ex-EMU
-    apiExchange('ALL').then(stocks => {
+    apiExchange('ALL', { capRows: 600 }).then(stocks => {
       setAllStocks(stocks)
       setLoading(false)
     })
@@ -1620,7 +1621,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
 
     setLoading(true)
     // North America = US + Canada (TSX), coerente con la definizione usata ovunque nel sito
-    apiExchange('US,TSX').then(stocks => {
+    apiExchange('US,TSX', { capRows: 600 }).then(stocks => {
       const seen = new Set()
       const deduped = stocks.filter((s: any) => {
         const key = `${s.ticker}.${s.exchange}`
@@ -1900,7 +1901,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
     loadIndices()
     const timer = setInterval(loadIndices, 60000)
     setLoading(true)
-    apiExchange('TSE,SEHK,ASX,KRX,SGX').then(stocks => { setAllStocks(stocks); setLoading(false) })
+    apiExchange('TSE,SEHK,ASX,KRX,SGX', { capRows: 600 }).then(stocks => { setAllStocks(stocks); setLoading(false) })
     return () => clearInterval(timer)
   }, [])
 
