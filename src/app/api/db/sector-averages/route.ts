@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
       while (true) {
         let q = supabase.from(table).select(select).in('exchange', exchangeList)
         if (applySectorFilter && sector) q = q.eq('sector', sector)
+        if (table === 'stocks') q = q.eq('in_universe', true)
         if (table === 'fundamentals') q = q.not('value_score', 'is', null)
         const { data, error } = await q.range(from, from + PAGE - 1)
         if (error || !data || data.length === 0) break
@@ -79,12 +80,23 @@ export async function GET(req: NextRequest) {
       groups[sec].count += 1
     }
 
+    // Conteggio "universo totale" per settore (in_universe=true, come lo
+    // Screener) — separato dal conteggio "con punteggio" usato per la
+    // media, cosi' i due numeri non si confondono ma restano entrambi
+    // visibili e coerenti con le altre pagine del sito.
+    const universeCounts: Record<string, number> = {}
+    for (const s of stocksData) {
+      const sec = s.sector || 'Unknown'
+      universeCounts[sec] = (universeCounts[sec] || 0) + 1
+    }
+
     const result = Object.entries(groups).map(([sec, g]) => ({
       sector: sec,
       avgValueScore: Math.round((g.valueWSum / g.capSum) * 10) / 10,
       avgGrowthScore: Math.round((g.growthWSum / g.capSum) * 10) / 10,
       avgCombinedRank: Math.round((g.rankWSum / g.capSum) * 10) / 10,
       stockCount: g.count,
+      universeCount: universeCounts[sec] || g.count,
     }))
 
     return jsonNoCache({ continent, averages: result })
