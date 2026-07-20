@@ -165,6 +165,13 @@ async function apiExchange(code: string, thresholds?: { minValue?: number; minGr
       if (thresholds?.minValue) url += `&minValue=${thresholds.minValue}`
       if (thresholds?.minGrowth) url += `&minGrowth=${thresholds.minGrowth}`
       if (thresholds?.minCombined) url += `&minCombined=${thresholds.minCombined}`
+      // Rate limiting per utente, non solo per IP — recuperato qui
+      // internamente cosi' TUTTE le chiamate esistenti a apiExchange lo
+      // includono automaticamente, senza dover modificare ogni chiamante.
+      try {
+        const { data: { user: currentUser } } = await supabase.auth.getUser()
+        if (currentUser?.id) url += `&uid=${encodeURIComponent(currentUser.id)}`
+      } catch {}
       const r = await fetch(url, { cache: 'no-store' })
       if (r.ok) {
         const d = await r.json()
