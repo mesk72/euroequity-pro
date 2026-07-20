@@ -242,8 +242,13 @@ function StockPageInner() {
 
   useEffect(() => {
     if (!ticker || !exchangeCode) return
-    const load = () => {
-      fetch(`/api/db/stocks?ticker=${ticker}&exchange=${exchangeCode}`)
+    const load = async () => {
+      let authHeader: Record<string, string> = {}
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+      } catch {}
+      fetch(`/api/db/stocks?ticker=${ticker}&exchange=${exchangeCode}`, { headers: authHeader })
         .then(r => r.ok ? r.json() : null)
         .then(d => {
           if (d?.stocks?.[0]) {
