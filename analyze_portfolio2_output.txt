@@ -1,0 +1,31 @@
+Peso totale portafoglio: 94.21%
+Peso coperto nel DB: 64.01%
+Percentuale di copertura: 67.9%
+
+=== TROVATI ===
+  ADBE.US (peso 3.08%): Value=74, Growth=23.63, Best=45.07
+  DBK.XETRA (peso 5.31%): Value=93, Growth=43.77, Best=81.54
+  RKT.LSE (peso 3.26%): Value=40, Growth=5.39, Best=8.81
+  GRI.LSE (peso 0.98%): Value=83, Growth=28.04, Best=60.0
+  WKL.AS (peso 4.77%): Value=66, Growth=6.88, Best=22.83
+  IWG.LSE (peso 3.81%): Value=3, Growth=36.88, Best=6.48
+  1299.SEHK (peso 1.04%): Value=43, Growth=73.02, Best=65.71
+  GFC.PA (peso 6.26%): Value=89, Growth=13.53, Best=50.28
+  VNA.XETRA (peso 6.19%): Value=91, Growth=17.82, Best=57.58
+  RI.PA (peso 5.06%): Value=80, Growth=5.93, Best=32.64
+  SAN.PA (peso 6.31%): Value=71, Growth=45.44, Best=64.95
+  CLNX.MC (peso 6.05%): Value=22, Growth=1.52, Best=2.13
+  RF.PA (peso 6.61%): Value=48, Growth=48.78, Best=42.55
+  KGX.XETRA (peso 5.28%): Value=86, Growth=20.59, Best=54.91
+
+=== NON TROVATI ===
+  BCS.US (peso 6.85%)
+  NWG.US (peso 6.5%)
+  UL.US (peso 3.72%)
+  ITUB.US (peso 6.37%)
+  SHEL.US (peso 6.76%)
+
+=== MEDIE PESATE (normalizzate come se il sotto-portafoglio coperto fosse il 100%) ===
+Value Score medio: 65.3
+Growth Score medio: 24.2
+Best Score medio: 42.0
