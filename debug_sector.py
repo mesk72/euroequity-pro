@@ -3,43 +3,39 @@ SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-def fetch_all(table, params_extra, limit=1000):
-    all_rows = []
-    offset = 0
-    while True:
-        p = {**params_extra, "limit": str(limit), "offset": str(offset)}
-        r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}", headers=headers_r, params=p)
-        batch = r.json()
-        if not isinstance(batch, list) or not batch: break
-        all_rows.extend(batch)
-        offset += limit
-        if len(batch) < limit: break
-    return all_rows
+all_rows = []
+offset = 0
+while True:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
+        params={"select":"ticker,mkt_cap,implied_growth_10y","exchange":"eq.US",
+                 "mkt_cap":"not.is.null","implied_growth_10y":"not.is.null",
+                 "limit":"1000","offset":str(offset)})
+    batch = r.json()
+    if not isinstance(batch,list) or not batch: break
+    all_rows.extend(batch)
+    offset += 1000
+    if len(batch) < 1000: break
 
-sector = "Information Technology"
+print(f"Totale titoli US con mkt_cap e implied_growth_10y validi: {len(all_rows)}")
 
-# A) stocks con sector=IT, US+TSX, TUTTI (nessun filtro universo)
-a = fetch_all("stocks", {"select":"ticker,exchange,in_universe","exchange":"in.(US,TSX)","sector":f"eq.{sector}"})
-print(f"A) stocks IT US+TSX, TUTTI: {len(a)}")
+sorted_rows = sorted(all_rows, key=lambda x: x["mkt_cap"], reverse=True)
 
-# B) + in_universe=true
-b = [x for x in a if x.get("in_universe")]
-print(f"B) + in_universe=true: {len(b)}")
+top1000 = sorted_rows[:1000]
+rest = sorted_rows[1000:]
 
-# C) + esistenza in fundamentals (qualsiasi riga, anche senza value_score)
-fund_all = fetch_all("fundamentals", {"select":"ticker,exchange","exchange":"in.(US,TSX)"})
-fund_keys = set((f["ticker"], f["exchange"]) for f in fund_all)
-c = [x for x in b if (x["ticker"], x["exchange"]) in fund_keys]
-print(f"C) B + esiste riga in fundamentals: {len(c)}")
+def weighted_avg_ig(rows):
+    total_cap = sum(r["mkt_cap"] for r in rows)
+    if total_cap == 0: return None
+    wsum = sum(r["implied_growth_10y"] * r["mkt_cap"] for r in rows)
+    return wsum / total_cap
 
-# D) + value_score non nullo specificamente
-fund_with_score = fetch_all("fundamentals", {"select":"ticker,exchange","exchange":"in.(US,TSX)","value_score":"not.is.null"})
-score_keys = set((f["ticker"], f["exchange"]) for f in fund_with_score)
-d = [x for x in b if (x["ticker"], x["exchange"]) in score_keys]
-print(f"D) B + value_score non nullo: {len(d)}")
+wg_top = weighted_avg_ig(top1000)
+wg_rest = weighted_avg_ig(rest)
 
-# E) + mkt_cap valido (>0) in fundamentals, quello richiesto dal mio endpoint sector-averages
-fund_with_cap = fetch_all("fundamentals", {"select":"ticker,exchange,mkt_cap","exchange":"in.(US,TSX)","value_score":"not.is.null"})
-cap_keys = set((f["ticker"], f["exchange"]) for f in fund_with_cap if f.get("mkt_cap") and f["mkt_cap"] > 0)
-e = [x for x in b if (x["ticker"], x["exchange"]) in cap_keys]
-print(f"E) B + value_score non nullo + mkt_cap>0: {len(e)}")
+print(f"\nTop 1000 per market cap ({len(top1000)} titoli):")
+print(f"  Implied Growth 10Y medio (weighted by mkt cap): {round(wg_top*100,2)}%")
+print(f"  Mkt cap totale gruppo: ${sum(r['mkt_cap'] for r in top1000)/1000:.1f}B")
+
+print(f"\nRestanti ({len(rest)} titoli):")
+print(f"  Implied Growth 10Y medio (weighted by mkt cap): {round(wg_rest*100,2)}%")
+print(f"  Mkt cap totale gruppo: ${sum(r['mkt_cap'] for r in rest)/1000:.1f}B")
