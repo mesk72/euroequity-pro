@@ -1,6 +1,11 @@
-TROVATO Barclays (BARC.LSE): Value=87, Growth=78.59, Best=95.5
-TROVATO NatWest (NWG.LSE): Value=88, Growth=71.13, Best=93.08
-TROVATO Unilever (ULVR.LSE): Value=17, Growth=15.33, Best=4.2
-TROVATO Shell (SHEL.LSE): Value=89, Growth=90.47, Best=98.88
+Peso totale portafoglio: 94.21%
+Peso coperto nel DB: 87.84%
+Percentuale di copertura: 93.2%
 
-Ricerca Itau per nome: []
+=== NON TROVATI (rimasti) ===
+  ITUB.US (peso 6.37%)
+
+=== MEDIE PESATE FINALI (18/19 titoli, 87.84% del portafoglio) ===
+Value Score medio: 68.5
+Growth Score medio: 36.7
+Best Score medio: 52.8
