@@ -1,4 +1,5 @@
-TOTALE stocks sector=Financials US+TSX: 0-763/764
-Con in_universe=true: 0-751/752
-Solo US, in_universe=true: 0-680/681
-Campione 300 con in_universe=true, di cui con value_score valido: 250
+A) stocks IT US+TSX, TUTTI: 398
+B) + in_universe=true: 390
+C) B + esiste riga in fundamentals: 390
+D) B + value_score non nullo: 383
+E) B + value_score non nullo + mkt_cap>0: 383
