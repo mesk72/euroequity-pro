@@ -21,6 +21,21 @@ const ASIA_PACIFIC = ['TSE','SEHK','ASX','KRX','SGX']
 // quindi riflette sempre l'ultimo aggiornamento degli score, senza bisogno
 // di una tabella separata da mantenere sincronizzata.
 export async function GET(req: NextRequest) {
+  // Stessa verifica reale usata negli altri endpoint stanotte — senza un
+  // token valido, nessun dato aggregato viene restituito.
+  let verifiedUserId: string | null = null
+  const authHeader = req.headers.get('authorization') || ''
+  if (authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7)
+    try {
+      const { data: { user: verifiedUser } } = await supabase.auth.getUser(token)
+      if (verifiedUser?.id) verifiedUserId = verifiedUser.id
+    } catch {}
+  }
+  if (!verifiedUserId) {
+    return jsonNoCache({ continent: '', averages: [] })
+  }
+
   const continent = req.nextUrl.searchParams.get('continent') || ''
   const sector = req.nextUrl.searchParams.get('sector') || ''
 
