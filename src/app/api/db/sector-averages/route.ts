@@ -54,19 +54,14 @@ export async function GET(req: NextRequest) {
       return all
     }
 
-    const stocksData = await fetchAllPaged('stocks', 'ticker, exchange, sector, mkt_cap', true)
-    const fundData = await fetchAllPaged('fundamentals', 'ticker, exchange, value_score, growth_score, combined_rank', false)
+    const stocksData = await fetchAllPaged('stocks', 'ticker, exchange, sector', true)
+    const fundData = await fetchAllPaged('fundamentals', 'ticker, exchange, value_score, growth_score, combined_rank, mkt_cap', false)
 
-    const stockInfoMap: Record<string, { sector: string; mktCap: number }> = {}
-    for (const s of stocksData) {
-      stockInfoMap[`${s.ticker}.${s.exchange}`] = { sector: s.sector || 'Unknown', mktCap: s.mkt_cap || 0 }
-    }
+    const sectorMap: Record<string, string> = {}
+    for (const s of stocksData) sectorMap[`${s.ticker}.${s.exchange}`] = s.sector || 'Unknown'
 
     const data = fundData
-      .map((f: any) => {
-        const info = stockInfoMap[`${f.ticker}.${f.exchange}`]
-        return { ...f, sector: info?.sector, mktCap: info?.mktCap || 0 }
-      })
+      .map((f: any) => ({ ...f, sector: sectorMap[`${f.ticker}.${f.exchange}`], mktCap: f.mkt_cap || 0 }))
       .filter((f: any) => f.sector && f.mktCap > 0)
 
     // Aggregazione PESATA PER MARKET CAP (coerente con la pagina Sectors),
