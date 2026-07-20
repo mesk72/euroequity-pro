@@ -169,11 +169,18 @@ async function apiExchange(code: string, thresholds?: { minValue?: number; minGr
       // Rate limiting per utente, non solo per IP — recuperato qui
       // internamente cosi' TUTTE le chiamate esistenti a apiExchange lo
       // includono automaticamente, senza dover modificare ogni chiamante.
+      // Include anche il vero token di sessione (non solo l'id) come
+      // header Authorization, cosi' il server puo' VERIFICARE davvero
+      // che l'utente sia autenticato, non solo fidarsi di un id scritto
+      // nell'URL — necessario perche' i punteggi reali vengono inviati
+      // solo a chi supera questa verifica.
+      let authHeader: Record<string, string> = {}
       try {
-        const { data: { user: currentUser } } = await supabase.auth.getUser()
-        if (currentUser?.id) url += `&uid=${encodeURIComponent(currentUser.id)}`
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        if (currentSession?.user?.id) url += `&uid=${encodeURIComponent(currentSession.user.id)}`
+        if (currentSession?.access_token) authHeader = { Authorization: `Bearer ${currentSession.access_token}` }
       } catch {}
-      const r = await fetch(url, { cache: 'no-store' })
+      const r = await fetch(url, { cache: 'no-store', headers: authHeader })
       if (r.ok) {
         const d = await r.json()
         return d.stocks || []
