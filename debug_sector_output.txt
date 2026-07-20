@@ -1,11 +1,4 @@
-Peso totale portafoglio: 94.21%
-Peso coperto nel DB: 87.84%
-Percentuale di copertura: 93.2%
-
-=== NON TROVATI (rimasti) ===
-  ITUB.US (peso 6.37%)
-
-=== MEDIE PESATE FINALI (18/19 titoli, 87.84% del portafoglio) ===
-Value Score medio: 68.5
-Growth Score medio: 36.7
-Best Score medio: 52.8
+Citigroup sector esatto: [{'ticker': 'C', 'sector': 'Financials'}]
+Conteggio stocks per sector='Financials' (US+TSX): 0-763/764
+Conteggio stocks per sector='Financial' (US+TSX): */0
+Conteggio stocks per sector='Financial Services' (US+TSX): */0
