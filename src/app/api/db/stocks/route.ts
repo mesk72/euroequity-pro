@@ -252,6 +252,22 @@ export async function GET(req: NextRequest) {
     return jsonNoCache({ error: 'Too many requests. Please slow down.' }, { status: 429 })
   }
 
+  // Verifica VERA dell'autenticazione — legge il token Bearer dalla
+  // richiesta e lo verifica con Supabase stesso (non ci si fida di un
+  // parametro auto-dichiarato dal client, che sarebbe banale falsificare
+  // scrivendo un id a mano nell'URL). Solo se questo controllo passa,
+  // i punteggi reali (value_score, growth_score, combined_rank e le
+  // altre metriche derivate) vengono inclusi nella risposta piu' sotto.
+  let verifiedUserId: string | null = null
+  const authHeader = req.headers.get('authorization') || ''
+  if (authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7)
+    try {
+      const { data: { user: verifiedUser } } = await supabase.auth.getUser(token)
+      if (verifiedUser?.id) verifiedUserId = verifiedUser.id
+    } catch {}
+  }
+
   // Rate limiting anche per utente loggato, non solo per IP — un IP con
   // VPN/dispositivi multipli aggirerebbe il solo limite IP. Nota onesta:
   // lo userId qui arriva dal client, non e' verificato con una vera
@@ -423,12 +439,33 @@ export async function GET(req: NextRequest) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
-    // Aggiunge il campo di fingerprinting SOLO se l'utente e' identificato
-    // (uid presente) — nessun impatto per chi naviga senza account.
-    if (uid) {
+    // Se l'utente NON e' verificato con una vera sessione, i campi
+    // proprietari (punteggi, rank, crescita implicita, beta) vengono
+    // rimossi qui, lato server — prima erano sempre inclusi e solo
+    // nascosti visivamente dal frontend (lucchetto), quindi chiunque,
+    // anche senza account, poteva vederli con gli strumenti sviluppatore.
+    if (!verifiedUserId) {
       finalStocks = finalStocks.map((s: any) => ({
         ...s,
-        _ref: shortHash(uid + ':' + s.ticker + ':' + s.exchange),
+        valueScore: null,
+        growthScore: null,
+        combinedRank: null,
+        impliedGrowth10y: null,
+        beta: null,
+        rankPeLtm: null,
+        rankPeNtm: null,
+        rankEpsGr: null,
+        rankRevGr: null,
+      }))
+    }
+
+    // Aggiunge il campo di fingerprinting SOLO per utenti verificati —
+    // usa l'id reale confermato da Supabase, non il parametro auto-
+    // dichiarato dal client (piu' robusto per l'attribuzione).
+    if (verifiedUserId) {
+      finalStocks = finalStocks.map((s: any) => ({
+        ...s,
+        _ref: shortHash(verifiedUserId + ':' + s.ticker + ':' + s.exchange),
       }))
     }
 
