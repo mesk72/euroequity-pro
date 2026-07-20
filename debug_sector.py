@@ -6,23 +6,30 @@ headers_count = {**headers_r, "Prefer": "count=exact"}
 
 sectors = ["Information Technology", "Financials", "Healthcare"]
 
+# Scarica UNA VOLTA tutti i fundamentals US con implied_growth valido (poche chiamate)
+fund_with_data = []
+offset = 0
+while True:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
+        params={"select":"ticker","exchange":"eq.US","mkt_cap":"not.is.null","implied_growth_10y":"not.is.null",
+                 "limit":"1000","offset":str(offset)})
+    batch = r.json()
+    if not isinstance(batch,list) or not batch: break
+    fund_with_data.extend(batch)
+    offset += 1000
+    if len(batch) < 1000: break
+
+tickers_with_data = set(f["ticker"] for f in fund_with_data)
+print(f"Totale ticker US con implied_growth valido: {len(tickers_with_data)}\n")
+
 for sec in sectors:
-    # Totale vero (Screener US)
     r1 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
         params={"select":"ticker","exchange":"eq.US","sector":f"eq.{sec}","in_universe":"eq.true"})
-    total = r1.headers.get("content-range","").split("/")[-1]
+    total = int(r1.headers.get("content-range","").split("/")[-1])
 
-    # Quanti di questi hanno anche implied_growth_10y e mkt_cap validi
     r2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
         params={"select":"ticker","exchange":"eq.US","sector":f"eq.{sec}","in_universe":"eq.true","limit":"1000"})
-    tickers = [s["ticker"] for s in r2.json()]
+    sector_tickers = set(s["ticker"] for s in r2.json())
 
-    count_with_data = 0
-    for t in tickers:
-        rf = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
-            params={"select":"mkt_cap,implied_growth_10y","ticker":f"eq.{t}","exchange":"eq.US"})
-        d = rf.json()
-        if d and d[0].get("mkt_cap") and d[0].get("implied_growth_10y") is not None:
-            count_with_data += 1
-
-    print(f"{sec}: {count_with_data} su {total} hanno implied growth calcolabile ({round(count_with_data/int(total)*100,1)}% copertura)")
+    count_with_data = len(sector_tickers & tickers_with_data)
+    print(f"{sec}: {count_with_data} su {total} hanno implied growth calcolabile ({round(count_with_data/total*100,1)}% copertura)")
