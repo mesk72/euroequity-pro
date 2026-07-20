@@ -458,7 +458,7 @@ function StockPageInner() {
                   {sectorAvgData.averages.map((g: any, i: number) => (
                     <div key={i}>
                       <div style={{ fontSize:10, color:'var(--text4)', marginBottom:8 }}>
-                        Based on {g.stockCount} stocks in this sector, {sectorAvgData.continent.replace('_',' ')}
+                        Based on {g.universeCount ?? g.stockCount} stocks in this sector, {sectorAvgData.continent.replace('_',' ')}
                       </div>
                       {[
                         { label: 'Value Score', stockVal: stock?.valueScore, avgVal: g.avgValueScore },
