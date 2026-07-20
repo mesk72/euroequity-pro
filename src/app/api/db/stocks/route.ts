@@ -295,12 +295,14 @@ export async function GET(req: NextRequest) {
   // i punteggi reali (value_score, growth_score, combined_rank e le
   // altre metriche derivate) vengono inclusi nella risposta piu' sotto.
   let verifiedUserId: string | null = null
+  let isOwner = false
   const authHeader = req.headers.get('authorization') || ''
   if (authHeader.startsWith('Bearer ')) {
     const token = authHeader.slice(7)
     try {
       const { data: { user: verifiedUser } } = await supabase.auth.getUser(token)
       if (verifiedUser?.id) verifiedUserId = verifiedUser.id
+      if (verifiedUser?.email === 'andreameschini19@gmail.com') isOwner = true
     } catch {}
   }
 
@@ -401,7 +403,9 @@ export async function GET(req: NextRequest) {
       // utenti loggati vedono anche punteggi/momentum ma MAI i dati
       // grezzi (formula stessa) — vedi redactForGuest/redactRawData.
       let finalMapped: any = mapped
-      if (!verifiedUserId) {
+      if (isOwner) {
+        // nessuna restrizione
+      } else if (!verifiedUserId) {
         finalMapped = redactForGuest(mapped)
       } else {
         finalMapped = redactRawData(mapped)
@@ -490,11 +494,23 @@ export async function GET(req: NextRequest) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
+    // Cap a 200 titoli per chiunque non sia il proprietario — protegge
+    // dalla raccolta sistematica dell'output del modello su larga scala.
+    // Se il risultato naturale e' gia' sotto 200 (es. un mercato piccolo),
+    // resta cosi' com'e', nessun padding artificiale.
+    if (!isOwner && finalStocks.length > 200) {
+      finalStocks = [...finalStocks]
+        .sort((a: any, b: any) => (b.combinedRank ?? -1) - (a.combinedRank ?? -1))
+        .slice(0, 200)
+    }
+
     // Oscuramento a due livelli anche sul ramo bulk (Screener/Sector/
     // Dashboard) — ultimo ramo rimasto scoperto. Effetto collaterale
     // noto e accettato: la colonna "EPS Growth" nella Sector Heatmap
     // mostrera' vuoto (usava un dato grezzo), il resto resta intatto.
-    if (!verifiedUserId) {
+    if (isOwner) {
+      // nessuna restrizione sui dati grezzi per il proprietario
+    } else if (!verifiedUserId) {
       finalStocks = finalStocks.map((s: any) => redactForGuest(s))
     } else {
       finalStocks = finalStocks.map((s: any) => redactRawData(s))
