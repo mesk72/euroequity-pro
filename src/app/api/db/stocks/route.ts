@@ -490,9 +490,14 @@ export async function GET(req: NextRequest) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
-    // Oscuramento robusto basato su allowlist — vedi redactForGuest.
+    // Oscuramento a due livelli anche sul ramo bulk (Screener/Sector/
+    // Dashboard) — ultimo ramo rimasto scoperto. Effetto collaterale
+    // noto e accettato: la colonna "EPS Growth" nella Sector Heatmap
+    // mostrera' vuoto (usava un dato grezzo), il resto resta intatto.
     if (!verifiedUserId) {
       finalStocks = finalStocks.map((s: any) => redactForGuest(s))
+    } else {
+      finalStocks = finalStocks.map((s: any) => redactRawData(s))
     }
 
     // Aggiunge il campo di fingerprinting SOLO per utenti verificati —
