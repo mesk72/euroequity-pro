@@ -1145,7 +1145,7 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const load = () => { setLoading(true); apiExchange('US').then(data => { setStocks(data); setLoading(false) }) }
+    const load = () => { setLoading(true); apiExchange('US,TSX').then(data => { setStocks(data); setLoading(false) }) }
     load()
     const interval = setInterval(load, 5 * 60 * 1000)
     return () => clearInterval(interval)
@@ -1602,8 +1602,8 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
       .catch(() => {})
 
     setLoading(true)
-    // Carica da tutti gli exchange - EMU + ex-EMU
-    apiExchange('US').then(stocks => {
+    // North America = US + Canada (TSX), coerente con la definizione usata ovunque nel sito
+    apiExchange('US,TSX').then(stocks => {
       const seen = new Set()
       const deduped = stocks.filter((s: any) => {
         const key = `${s.ticker}.${s.exchange}`
