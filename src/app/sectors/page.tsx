@@ -14,15 +14,21 @@ function fp(v?:number|null,d=1):string{ if(v==null||isNaN(v))return'-'; return `
 function fv(v?:number|null,d=2):string{ if(v==null||isNaN(v))return'-'; return (v as number).toFixed(d) }
 function fn(v?:number|null):string{ if(v==null||isNaN(v as number))return'-'; return String(Math.round(v as number)) }
 
+const NORTH_AMERICA = ['US', 'TSX']
+const EUROPE = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM']
+const ASIA_PACIFIC = ['TSE','SEHK','ASX','KRX','SGX']
+
 export default function SectorsPage() {
   const [stocks, setStocks] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<string|null>(null)
-  const [exchange, setExchange] = useState('All')
+  const [continent, setContinent] = useState('north_america')
 
   useEffect(() => {
     const load = () => {
-      fetch('/api/db/stocks')
+      // "ALL" esplicito — senza, l'endpoint potrebbe non restituire tutti
+      // i mercati, causando conteggi incompleti rispetto allo Screener.
+      fetch('/api/db/stocks?exchange=ALL')
         .then(r => r.ok ? r.json() : { stocks: [] })
         .then(d => { setStocks(d.stocks||[]); setLoading(false) })
         .catch(() => setLoading(false))
@@ -32,8 +38,14 @@ export default function SectorsPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const exchanges = ['All', ...Array.from(new Set(stocks.map((s:any)=>s.exchange))).sort()] as string[]
-  const filtered = exchange === 'All' ? stocks : stocks.filter((s:any)=>s.exchange===exchange)
+  const continentExchanges = continent === 'north_america' ? NORTH_AMERICA
+    : continent === 'europe' ? EUROPE
+    : continent === 'asia_pacific' ? ASIA_PACIFIC
+    : NORTH_AMERICA.concat(EUROPE, ASIA_PACIFIC)
+
+  // Stesso filtro dello Screener: solo titoli in_universe=true, stesso
+  // raggruppamento a tre continenti usato ovunque nel sito.
+  const filtered = stocks.filter((s:any) => continentExchanges.includes(s.exchange) && s.inUniverse !== false)
 
   // Aggrega per settore
   const sectorMap: Record<string, any[]> = {}
@@ -87,9 +99,12 @@ export default function SectorsPage() {
 
       {/* Filter */}
       <div style={{ marginBottom:16,display:'flex',alignItems:'center',gap:12 }}>
-        <span style={{ fontSize:11,color:'#6b7280' }}>Exchange:</span>
-        <select value={exchange} onChange={e=>setExchange(e.target.value)}>
-          {exchanges.map(e=><option key={e}>{e}</option>)}
+        <span style={{ fontSize:11,color:'#6b7280' }}>Continent:</span>
+        <select value={continent} onChange={e=>setContinent(e.target.value)}>
+          <option value="north_america">North America</option>
+          <option value="europe">Europe</option>
+          <option value="asia_pacific">Asia Pacific</option>
+          <option value="all">All (Global)</option>
         </select>
         <span style={{ fontSize:11,color:'#6b7280' }}>{filtered.length} stocks</span>
       </div>
