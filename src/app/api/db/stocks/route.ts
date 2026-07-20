@@ -376,7 +376,7 @@ export async function GET(req: NextRequest) {
         mapped.rankEpsGr = null
         mapped.rankRevGr = null
       } else {
-        mapped._ref = shortHash(verifiedUserId + ':' + mapped.ticker + ':' + mapped.exchange)
+        ;(mapped as any)._ref = shortHash(verifiedUserId + ':' + mapped.ticker + ':' + mapped.exchange)
       }
       return jsonNoCache({ stocks: [mapped], source: 'supabase' })
     }
