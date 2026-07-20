@@ -149,7 +149,7 @@ async function apiExchange(code: string): Promise<Stock[]> {
   if (USE_DB) {
     try {
       const EMU_EXCHANGES = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR'
-      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE,NGM'
+      const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE'
       // Gestisce exchange multipli separati da virgola (es. "US,TSX" o "TSE,SEHK,ASX,KRX,SGX")
       const isMulti = code.includes(',')
       const url = code === 'EZ' || code === 'ALL'
