@@ -1,5 +1,9 @@
-A) stocks IT US+TSX, TUTTI: 398
-B) + in_universe=true: 390
-C) B + esiste riga in fundamentals: 390
-D) B + value_score non nullo: 383
-E) B + value_score non nullo + mkt_cap>0: 383
+Totale titoli US con mkt_cap e implied_growth_10y validi: 2131
+
+Top 1000 per market cap (1000 titoli):
+  Implied Growth 10Y medio (weighted by mkt cap): 11.08%
+  Mkt cap totale gruppo: $75180.4B
+
+Restanti (1131 titoli):
+  Implied Growth 10Y medio (weighted by mkt cap): 4.0%
+  Mkt cap totale gruppo: $2475.1B
