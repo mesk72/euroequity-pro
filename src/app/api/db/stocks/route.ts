@@ -28,6 +28,27 @@ function shortHash(input: string): string {
   return (hash >>> 0).toString(16).padStart(8, '0')
 }
 
+// Campi visibili SENZA login — solo identificazione base e prezzo grezzo,
+// gia' pubblicamente disponibile altrove (Yahoo Finance ecc.). TUTTO il
+// resto (punteggi, rank, momentum, multipli, Ke, beta...) viene rimosso
+// per chi non e' verificato. Lista di CIO' CHE RESTA (allowlist), non di
+// cio' che si nasconde — piu' sicura: un campo nuovo aggiunto in futuro
+// resta nascosto di default finche' non lo si aggiunge qui esplicitamente,
+// invece di essere esposto per errore come e' successo con la prima lista.
+const PUBLIC_FIELDS = new Set([
+  'ticker', 'exchange', 'isin', 'company', 'sector', 'country', 'flag',
+  'website', 'description', 'primaryExchange', 'yahooTicker', 'inUniverse',
+  'price', 'mktCap', 'lastPriceDate',
+])
+
+function redactForGuest<T extends Record<string, any>>(obj: T): T {
+  const out: any = {}
+  for (const key of Object.keys(obj)) {
+    out[key] = PUBLIC_FIELDS.has(key) ? obj[key] : null
+  }
+  return out
+}
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -361,24 +382,14 @@ export async function GET(req: NextRequest) {
         // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
         // fonte per il momentum, gia' corretta e verificata.
       }
-      // Stesso oscuramento applicato alla lista bulk — questo ramo (singolo
-      // titolo, usato dalla pagina di dettaglio) era rimasto scoperto,
-      // causa esatta per cui i punteggi restavano visibili in chiaro
-      // anche senza login.
+      // Oscuramento robusto basato su allowlist — vedi redactForGuest.
+      let finalMapped: any = mapped
       if (!verifiedUserId) {
-        mapped.valueScore = null
-        mapped.growthScore = null
-        mapped.combinedRank = null
-        mapped.impliedGrowth10y = null
-        mapped.beta = null
-        mapped.rankPeLtm = null
-        mapped.rankPeNtm = null
-        mapped.rankEpsGr = null
-        mapped.rankRevGr = null
+        finalMapped = redactForGuest(mapped)
       } else {
-        ;(mapped as any)._ref = shortHash(verifiedUserId + ':' + mapped.ticker + ':' + mapped.exchange)
+        finalMapped._ref = shortHash(verifiedUserId + ':' + mapped.ticker + ':' + mapped.exchange)
       }
-      return jsonNoCache({ stocks: [mapped], source: 'supabase' })
+      return jsonNoCache({ stocks: [finalMapped], source: 'supabase' })
     }
 
     if (search) {
@@ -398,11 +409,7 @@ export async function GET(req: NextRequest) {
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
       let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
       if (!verifiedUserId) {
-        stocks = stocks.map((s: any) => ({
-          ...s, valueScore: null, growthScore: null, combinedRank: null,
-          impliedGrowth10y: null, beta: null, rankPeLtm: null, rankPeNtm: null,
-          rankEpsGr: null, rankRevGr: null,
-        }))
+        stocks = stocks.map((s: any) => redactForGuest(s))
       }
       return jsonNoCache({ stocks, source: 'supabase' })
     }
@@ -463,24 +470,9 @@ export async function GET(req: NextRequest) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
-    // Se l'utente NON e' verificato con una vera sessione, i campi
-    // proprietari (punteggi, rank, crescita implicita, beta) vengono
-    // rimossi qui, lato server — prima erano sempre inclusi e solo
-    // nascosti visivamente dal frontend (lucchetto), quindi chiunque,
-    // anche senza account, poteva vederli con gli strumenti sviluppatore.
+    // Oscuramento robusto basato su allowlist — vedi redactForGuest.
     if (!verifiedUserId) {
-      finalStocks = finalStocks.map((s: any) => ({
-        ...s,
-        valueScore: null,
-        growthScore: null,
-        combinedRank: null,
-        impliedGrowth10y: null,
-        beta: null,
-        rankPeLtm: null,
-        rankPeNtm: null,
-        rankEpsGr: null,
-        rankRevGr: null,
-      }))
+      finalStocks = finalStocks.map((s: any) => redactForGuest(s))
     }
 
     // Aggiunge il campo di fingerprinting SOLO per utenti verificati —
