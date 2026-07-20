@@ -1,5 +1,3 @@
-Totale ticker US con implied_growth valido: 2131
-
-Information Technology: 280 su 373 hanno implied growth calcolabile (75.1% copertura)
-Financials: 468 su 681 hanno implied growth calcolabile (68.7% copertura)
-Healthcare: 222 su 480 hanno implied growth calcolabile (46.2% copertura)
+Information Technology: mkt cap totale $26635.6B | mkt cap coperto $25918.2B | copertura per capitalizzazione: 97.3%
+Financials: mkt cap totale $10725.2B | mkt cap coperto $9957.8B | copertura per capitalizzazione: 92.8%
+Healthcare: mkt cap totale $7803.1B | mkt cap coperto $6861.8B | copertura per capitalizzazione: 87.9%
