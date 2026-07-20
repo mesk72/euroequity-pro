@@ -1,6 +1,2 @@
-Totale titoli US: 3963
-
-NVDA - eps_rank: 91.82, rev_rank: 94.26, m6_rank: 54.54, m12_rank: 55.05
-NVDA - somma: 295.66999999999996
-NVDA - growth_score RICALCOLATO ORA: 90.69
-NVDA - growth_score SALVATO NEL DB: 90.69
+NVDA in stocks: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.mkt_cap does not exist'}
+NVDA in fundamentals: [{'ticker': 'NVDA', 'exchange': 'US', 'mkt_cap': 4769748.03}]
