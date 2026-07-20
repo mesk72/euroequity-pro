@@ -56,7 +56,7 @@ function redactForGuest<T extends Record<string, any>>(obj: T): T {
 }
 
 function redactRawData<T extends Record<string, any>>(obj: T): T {
-  const allowed = new Set([...PUBLIC_FIELDS, ...SCORE_MOMENTUM_FIELDS])
+  const allowed = new Set(Array.from(PUBLIC_FIELDS).concat(Array.from(SCORE_MOMENTUM_FIELDS)))
   const out: any = {}
   for (const key of Object.keys(obj)) {
     out[key] = allowed.has(key) ? obj[key] : null
