@@ -4,19 +4,23 @@ SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_count = {**headers_r, "Prefer": "count=exact"}
 
-sector = "Information Technology"
+EUROPE = "MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE"
 
-# Fonte 1 e 2: SectorScreenUS + pagina Sectors, entrambe ora US+TSX, in_universe=true
-r1 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
-    params={"select":"ticker","exchange":"in.(US,TSX)","sector":f"eq.{sector}","in_universe":"eq.true"})
-count_na = r1.headers.get("content-range","").split("/")[-1]
-print(f"SectorScreenUS + pagina Sectors (US+TSX, in_universe=true): {count_na}")
+sectors = ["Information Technology", "Financials", "Healthcare"]
 
-# Fonte 3: Sector Comparison popup (mio endpoint sector-averages) - stesso filtro
-print(f"Sector Comparison popup (stessa query): {count_na} (usa identica logica)")
+print("=== Conteggio Europa (16 mercati, NGM escluso, in_universe=true) ===")
+print("Stesso identico filtro usato ora da: SectorScreen, pagina Sectors, popup Sector Comparison\n")
 
-# Per confronto: solo US (il "373" originale)
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
-    params={"select":"ticker","exchange":"eq.US","sector":f"eq.{sector}","in_universe":"eq.true"})
-count_us_only = r2.headers.get("content-range","").split("/")[-1]
-print(f"\nPer riferimento, solo US (senza TSX): {count_us_only}")
+for sec in sectors:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
+        params={"select":"ticker","exchange":f"in.({EUROPE})","sector":f"eq.{sec}","in_universe":"eq.true"})
+    count = r.headers.get("content-range","").split("/")[-1]
+    print(f"{sec}: {count} titoli")
+
+# Verifica extra: conferma che NGM sia davvero escluso (differenza rispetto a includerlo)
+print("\n=== Controllo di sicurezza: quanti NGM ci sarebbero se INCLUSI per errore ===")
+for sec in sectors:
+    r2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
+        params={"select":"ticker","exchange":"eq.NGM","sector":f"eq.{sec}","in_universe":"eq.true"})
+    count_ngm = r2.headers.get("content-range","").split("/")[-1]
+    print(f"  {sec} su NGM: {count_ngm} (questi NON devono essere contati)")
