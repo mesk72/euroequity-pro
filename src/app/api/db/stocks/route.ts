@@ -361,6 +361,23 @@ export async function GET(req: NextRequest) {
         // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
         // fonte per il momentum, gia' corretta e verificata.
       }
+      // Stesso oscuramento applicato alla lista bulk — questo ramo (singolo
+      // titolo, usato dalla pagina di dettaglio) era rimasto scoperto,
+      // causa esatta per cui i punteggi restavano visibili in chiaro
+      // anche senza login.
+      if (!verifiedUserId) {
+        mapped.valueScore = null
+        mapped.growthScore = null
+        mapped.combinedRank = null
+        mapped.impliedGrowth10y = null
+        mapped.beta = null
+        mapped.rankPeLtm = null
+        mapped.rankPeNtm = null
+        mapped.rankEpsGr = null
+        mapped.rankRevGr = null
+      } else {
+        mapped._ref = shortHash(verifiedUserId + ':' + mapped.ticker + ':' + mapped.exchange)
+      }
       return jsonNoCache({ stocks: [mapped], source: 'supabase' })
     }
 
@@ -379,7 +396,14 @@ export async function GET(req: NextRequest) {
         .in('ticker', tickers)
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
-      const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+      let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+      if (!verifiedUserId) {
+        stocks = stocks.map((s: any) => ({
+          ...s, valueScore: null, growthScore: null, combinedRank: null,
+          impliedGrowth10y: null, beta: null, rankPeLtm: null, rankPeNtm: null,
+          rankEpsGr: null, rankRevGr: null,
+        }))
+      }
       return jsonNoCache({ stocks, source: 'supabase' })
     }
 
