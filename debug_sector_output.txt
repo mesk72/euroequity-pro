@@ -1,3 +1,4 @@
-Information Technology: Value Score medio pesato = 30.5 (su 366 titoli, $26625.0B)
-Financials: Value Score medio pesato = 64.3 (su 609 titoli, $10556.1B)
-Healthcare: Value Score medio pesato = 38.4 (su 477 titoli, $7798.5B)
+SectorScreenUS + pagina Sectors (US+TSX, in_universe=true): 390
+Sector Comparison popup (stessa query): 390 (usa identica logica)
+
+Per riferimento, solo US (senza TSX): 373
