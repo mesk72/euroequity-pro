@@ -29,22 +29,37 @@ function shortHash(input: string): string {
 }
 
 // Campi visibili SENZA login — solo identificazione base e prezzo grezzo,
-// gia' pubblicamente disponibile altrove (Yahoo Finance ecc.). TUTTO il
-// resto (punteggi, rank, momentum, multipli, Ke, beta...) viene rimosso
-// per chi non e' verificato. Lista di CIO' CHE RESTA (allowlist), non di
-// cio' che si nasconde — piu' sicura: un campo nuovo aggiunto in futuro
-// resta nascosto di default finche' non lo si aggiunge qui esplicitamente,
-// invece di essere esposto per errore come e' successo con la prima lista.
+// gia' pubblicamente disponibile altrove (Yahoo Finance ecc.).
 const PUBLIC_FIELDS = new Set([
   'ticker', 'exchange', 'isin', 'company', 'sector', 'country', 'flag',
   'website', 'description', 'primaryExchange', 'yahooTicker', 'inUniverse',
   'price', 'mktCap', 'lastPriceDate',
 ])
 
+// Campi aggiuntivi visibili SOLO se loggato — risultati finali (punteggi,
+// momentum), MAI i dati grezzi/i singoli fattori che li compongono (PE,
+// PB, EPS growth, revenue growth, Beta, Ke, i rank dei singoli fattori).
+// Questi restano nascosti SEMPRE, loggati o no — e' la formula stessa,
+// non un risultato: se visibili insieme al punteggio finale, un utente
+// competente potrebbe ricostruire i pesi della formula per regressione.
+const SCORE_MOMENTUM_FIELDS = new Set([
+  'valueScore', 'growthScore', 'combinedRank',
+  'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m', 'mom3y', 'mom5y',
+])
+
 function redactForGuest<T extends Record<string, any>>(obj: T): T {
   const out: any = {}
   for (const key of Object.keys(obj)) {
     out[key] = PUBLIC_FIELDS.has(key) ? obj[key] : null
+  }
+  return out
+}
+
+function redactRawData<T extends Record<string, any>>(obj: T): T {
+  const allowed = new Set([...PUBLIC_FIELDS, ...SCORE_MOMENTUM_FIELDS])
+  const out: any = {}
+  for (const key of Object.keys(obj)) {
+    out[key] = allowed.has(key) ? obj[key] : null
   }
   return out
 }
@@ -382,11 +397,14 @@ export async function GET(req: NextRequest) {
         // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
         // fonte per il momentum, gia' corretta e verificata.
       }
-      // Oscuramento robusto basato su allowlist — vedi redactForGuest.
+      // Oscuramento a due livelli: ospiti vedono solo campi pubblici,
+      // utenti loggati vedono anche punteggi/momentum ma MAI i dati
+      // grezzi (formula stessa) — vedi redactForGuest/redactRawData.
       let finalMapped: any = mapped
       if (!verifiedUserId) {
         finalMapped = redactForGuest(mapped)
       } else {
+        finalMapped = redactRawData(mapped)
         finalMapped._ref = shortHash(verifiedUserId + ':' + mapped.ticker + ':' + mapped.exchange)
       }
       return jsonNoCache({ stocks: [finalMapped], source: 'supabase' })
@@ -410,6 +428,8 @@ export async function GET(req: NextRequest) {
       let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
       if (!verifiedUserId) {
         stocks = stocks.map((s: any) => redactForGuest(s))
+      } else {
+        stocks = stocks.map((s: any) => redactRawData(s))
       }
       return jsonNoCache({ stocks, source: 'supabase' })
     }
