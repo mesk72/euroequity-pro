@@ -275,6 +275,12 @@ export async function GET(req: NextRequest) {
   const minValue = parseFloat(req.nextUrl.searchParams.get('minValue') || '0')
   const minGrowth = parseFloat(req.nextUrl.searchParams.get('minGrowth') || '0')
   const minCombined = parseFloat(req.nextUrl.searchParams.get('minCombined') || '0')
+  // Cap opzionale sul numero di righe, usato dalle dashboard per
+  // continente — mostrano solo i migliori N titoli (top movers, ecc.),
+  // non serve l'intero universo. Diverso dal filtro soglia sopra: qui
+  // si prende sempre e comunque il numero massimo richiesto, ordinato
+  // per punteggio, non un filtro su un valore minimo.
+  const capRows = parseInt(req.nextUrl.searchParams.get('capRows') || '0')
 
   try {
     let exList: string[] = []
@@ -394,6 +400,11 @@ export async function GET(req: NextRequest) {
     if (minValue > 0) finalStocks = finalStocks.filter((s: any) => (s.valueScore ?? -1) >= minValue)
     if (minGrowth > 0) finalStocks = finalStocks.filter((s: any) => (s.growthScore ?? -1) >= minGrowth)
     if (minCombined > 0) finalStocks = finalStocks.filter((s: any) => (s.combinedRank ?? -1) >= minCombined)
+    if (capRows > 0 && finalStocks.length > capRows) {
+      finalStocks = [...finalStocks]
+        .sort((a: any, b: any) => (b.mktCap ?? -1) - (a.mktCap ?? -1))
+        .slice(0, capRows)
+    }
 
     if (isRowVolumeLimited(ip, finalStocks.length)) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
