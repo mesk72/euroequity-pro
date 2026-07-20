@@ -1,0 +1,5 @@
+Totale ticker US con implied_growth valido: 2131
+
+Information Technology: 280 su 373 hanno implied growth calcolabile (75.1% copertura)
+Financials: 468 su 681 hanno implied growth calcolabile (68.7% copertura)
+Healthcare: 222 su 480 hanno implied growth calcolabile (46.2% copertura)
