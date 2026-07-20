@@ -15,6 +15,19 @@ function jsonNoCache(body: any, init?: any) {
   return res
 }
 
+// Fingerprinting strutturale — un breve identificatore tecnico, univoco
+// per utente+titolo, aggiunto ad ogni riga. Non altera NESSUN valore
+// reale (punteggi, prezzi, ecc. restano esattamente quelli veri) — serve
+// solo per attribuzione se un dataset copiato dovesse comparire altrove.
+// Simple deterministic hash (djb2), nessuna libreria esterna necessaria.
+function shortHash(input: string): string {
+  let hash = 5381
+  for (let i = 0; i < input.length; i++) {
+    hash = ((hash << 5) + hash + input.charCodeAt(i)) | 0
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0')
+}
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -408,6 +421,15 @@ export async function GET(req: NextRequest) {
 
     if (isRowVolumeLimited(ip, finalStocks.length)) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
+    }
+
+    // Aggiunge il campo di fingerprinting SOLO se l'utente e' identificato
+    // (uid presente) — nessun impatto per chi naviga senza account.
+    if (uid) {
+      finalStocks = finalStocks.map((s: any) => ({
+        ...s,
+        _ref: shortHash(uid + ':' + s.ticker + ':' + s.exchange),
+      }))
     }
 
     return jsonNoCache({ stocks: finalStocks, source: 'supabase' })
