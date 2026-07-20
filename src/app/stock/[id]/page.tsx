@@ -229,12 +229,17 @@ function StockPageInner() {
     return 'europe'
   }
 
-  const openSectorPopup = () => {
+  const openSectorPopup = async () => {
     setSectorPopupOpen(true)
     if (sectorAvgData || !stock) return
     setSectorAvgLoading(true)
     const continent = getContinent(exchangeCode)
-    fetch(`/api/db/sector-averages?continent=${continent}&sector=${encodeURIComponent(stock.sector || '')}`)
+    let authHeader: Record<string, string> = {}
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+    } catch {}
+    fetch(`/api/db/sector-averages?continent=${continent}&sector=${encodeURIComponent(stock.sector || '')}`, { headers: authHeader })
       .then(r => r.ok ? r.json() : null)
       .then(d => { setSectorAvgData(d); setSectorAvgLoading(false) })
       .catch(() => setSectorAvgLoading(false))
