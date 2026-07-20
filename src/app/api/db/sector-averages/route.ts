@@ -13,7 +13,7 @@ function jsonNoCache(data: any, init?: any) {
 }
 
 const NORTH_AMERICA = ['US', 'TSX']
-const EUROPE = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM']
+const EUROPE = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE']
 const ASIA_PACIFIC = ['TSE','SEHK','ASX','KRX','SGX']
 
 // Restituisce SOLO medie aggregate per settore, su un continente specifico
