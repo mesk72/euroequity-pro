@@ -239,6 +239,17 @@ export async function GET(req: NextRequest) {
     return jsonNoCache({ error: 'Too many requests. Please slow down.' }, { status: 429 })
   }
 
+  // Rate limiting anche per utente loggato, non solo per IP — un IP con
+  // VPN/dispositivi multipli aggirerebbe il solo limite IP. Nota onesta:
+  // lo userId qui arriva dal client, non e' verificato con una vera
+  // sessione server-side (che richiederebbe integrare @supabase/ssr) —
+  // e' comunque un secondo livello utile in aggiunta all'IP, non un
+  // sostituto di una vera autenticazione a prova di manomissione.
+  const uid = req.nextUrl.searchParams.get('uid') || ''
+  if (uid && isRateLimited('uid:' + uid)) {
+    return jsonNoCache({ error: 'Too many requests for this account. Please slow down.' }, { status: 429 })
+  }
+
   // Blocca chiamate dirette da script esterni (curl, scraper) che non
   // passano dal sito vero. Un vero browser che naviga il sito invia
   // sempre Origin o Referer corrispondenti al dominio del sito stesso.
