@@ -1,8 +1,13 @@
-S&P 500 (approssimato: top 500 US per market cap), 500 titoli
-Implied Growth 10Y medio (weighted by mkt cap): 11.45%
-Mkt cap totale: $70221.3B
+=== VERO conteggio Screener US (exchange=US esatto, in_universe=true) ===
 
-Confronto:
-  Dow Jones (30 titoli, pesi indice): 8.12%
-  S&P 500 (top 500 mkt cap): 11.45%
-  Differenza: 3.33 punti percentuali
+  Information Technology: 373
+  Financials: 681
+  Healthcare: 480
+  Consumer Discretionary: 320
+  Industrials: 431
+  Communication Services: 119
+  Consumer Staples: 112
+  Energy: 150
+  Materials: 137
+  Utilities: 71
+  Real Estate: 127
