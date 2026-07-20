@@ -1,2 +1,9 @@
-NVDA in stocks: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.mkt_cap does not exist'}
-NVDA in fundamentals: [{'ticker': 'NVDA', 'exchange': 'US', 'mkt_cap': 4769748.03}]
+Stocks IT trovati: 398
+Fundamentals totali US+TSX: 4139
+Righe finali unite (IT, con mktCap valido): 386
+
+Information Technology, North America:
+  Titoli: 386
+  Value Score medio (weighted): 30.5
+  Growth Score medio (weighted): 78.5
+  Best Score medio (weighted): 57.4
