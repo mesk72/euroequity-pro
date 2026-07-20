@@ -1,4 +1,4 @@
-Citigroup sector esatto: [{'ticker': 'C', 'sector': 'Financials'}]
-Conteggio stocks per sector='Financials' (US+TSX): 0-763/764
-Conteggio stocks per sector='Financial' (US+TSX): */0
-Conteggio stocks per sector='Financial Services' (US+TSX): */0
+TOTALE stocks sector=Financials US+TSX: 0-763/764
+Con in_universe=true: 0-751/752
+Solo US, in_universe=true: 0-680/681
+Campione 300 con in_universe=true, di cui con value_score valido: 250
