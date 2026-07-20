@@ -15,7 +15,7 @@ function fv(v?:number|null,d=2):string{ if(v==null||isNaN(v))return'-'; return (
 function fn(v?:number|null):string{ if(v==null||isNaN(v as number))return'-'; return String(Math.round(v as number)) }
 
 const NORTH_AMERICA = ['US', 'TSX']
-const EUROPE = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM']
+const EUROPE = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE']
 const ASIA_PACIFIC = ['TSE','SEHK','ASX','KRX','SGX']
 
 export default function SectorsPage() {
