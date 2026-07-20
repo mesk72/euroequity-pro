@@ -16,6 +16,24 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing params' }, { status: 400 })
   }
 
+  // Stessa verifica reale usata in /api/db/stocks — senza un token
+  // valido, niente storico prezzi ne' momentum.
+  let verifiedUserId: string | null = null
+  const authHeader = req.headers.get('authorization') || ''
+  if (authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7)
+    try {
+      const { data: { user: verifiedUser } } = await supabase.auth.getUser(token)
+      if (verifiedUser?.id) verifiedUserId = verifiedUser.id
+    } catch {}
+  }
+  if (!verifiedUserId) {
+    return NextResponse.json({
+      history: [],
+      momentum: { mom1w: null, mom1m: null, mom6m: null, mom12m: null, mom3y: null, mom5y: null }
+    })
+  }
+
   try {
     // Legge tutta la serie storica con paginazione
     let all: any[] = []
