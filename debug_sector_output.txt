@@ -1,38 +1,8 @@
-Somma pesi forniti: 99.88%
+S&P 500 (approssimato: top 500 US per market cap), 500 titoli
+Implied Growth 10Y medio (weighted by mkt cap): 11.45%
+Mkt cap totale: $70221.3B
 
-=== TROVATI ===
-  GS (peso 12.13%): Implied Growth = 8.49%
-  CAT (peso 10.02%): Implied Growth = 19.85%
-  UNH (peso 4.85%): Implied Growth = 3.91%
-  MSFT (peso 4.48%): Implied Growth = 8.65%
-  TRV (peso 4.2%): Implied Growth = -5.63%
-  AMGN (peso 4.17%): Implied Growth = -3.21%
-  V (peso 4.08%): Implied Growth = 7.07%
-  AXP (peso 4.04%): Implied Growth = 6.66%
-  GOOGL (peso 3.95%): Implied Growth = 12.79%
-  JPM (peso 3.88%): Implied Growth = 2.61%
-  HD (peso 3.86%): Implied Growth = 7.93%
-  AAPL (peso 3.8%): Implied Growth = 14.98%
-  SHW (peso 3.77%): Implied Growth = 11.77%
-  MCD (peso 3.04%): Implied Growth = -0.08%
-  JNJ (peso 2.88%): Implied Growth = -2.57%
-  AMZN (peso 2.82%): Implied Growth = 15.94%
-  HON (peso 2.56%): Implied Growth = 9.31%
-  BA (peso 2.43%): Implied Growth = 38.97%
-  IBM (peso 2.42%): Implied Growth = 0.74%
-  NVDA (peso 2.31%): Implied Growth = 18.31%
-  CVX (peso 2.14%): Implied Growth = -4.18%
-  CRM (peso 1.95%): Implied Growth = 0.81%
-  MMM (peso 1.82%): Implied Growth = 6.08%
-  PG (peso 1.71%): Implied Growth = -0.03%
-  MRK (peso 1.45%): Implied Growth = -1.72%
-  WMT (peso 1.3%): Implied Growth = 10.27%
-  CSCO (peso 1.28%): Implied Growth = 9.92%
-  DIS (peso 1.11%): Implied Growth = 4.97%
-  KO (peso 0.93%): Implied Growth = 1.66%
-  NKE (peso 0.5%): Implied Growth = 11.23%
-
-=== NON TROVATI ===
-
-Peso coperto: 99.88% su 99.88% totale
-IMPLIED GROWTH MEDIO PESATO (Dow Jones): 8.12%
+Confronto:
+  Dow Jones (30 titoli, pesi indice): 8.12%
+  S&P 500 (top 500 mkt cap): 11.45%
+  Differenza: 3.33 punti percentuali
