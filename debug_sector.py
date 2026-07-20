@@ -2,34 +2,38 @@ import os, requests
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-headers_count = {**headers_r, "Prefer": "count=exact"}
 
 sectors = ["Information Technology", "Financials", "Healthcare"]
 
-# Scarica UNA VOLTA tutti i fundamentals US con implied_growth valido (poche chiamate)
-fund_with_data = []
+# Tutti i fundamentals US con mkt_cap (indipendentemente da implied_growth)
+fund_all_cap = []
 offset = 0
 while True:
     r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker","exchange":"eq.US","mkt_cap":"not.is.null","implied_growth_10y":"not.is.null",
+        params={"select":"ticker,mkt_cap,implied_growth_10y","exchange":"eq.US","mkt_cap":"not.is.null",
                  "limit":"1000","offset":str(offset)})
     batch = r.json()
     if not isinstance(batch,list) or not batch: break
-    fund_with_data.extend(batch)
+    fund_all_cap.extend(batch)
     offset += 1000
     if len(batch) < 1000: break
 
-tickers_with_data = set(f["ticker"] for f in fund_with_data)
-print(f"Totale ticker US con implied_growth valido: {len(tickers_with_data)}\n")
+fund_map = {f["ticker"]: f for f in fund_all_cap}
 
 for sec in sectors:
-    r1 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
-        params={"select":"ticker","exchange":"eq.US","sector":f"eq.{sec}","in_universe":"eq.true"})
-    total = int(r1.headers.get("content-range","").split("/")[-1])
-
     r2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
         params={"select":"ticker","exchange":"eq.US","sector":f"eq.{sec}","in_universe":"eq.true","limit":"1000"})
-    sector_tickers = set(s["ticker"] for s in r2.json())
+    sector_tickers = [s["ticker"] for s in r2.json()]
 
-    count_with_data = len(sector_tickers & tickers_with_data)
-    print(f"{sec}: {count_with_data} su {total} hanno implied growth calcolabile ({round(count_with_data/total*100,1)}% copertura)")
+    total_cap = 0.0
+    covered_cap = 0.0
+    for t in sector_tickers:
+        f = fund_map.get(t)
+        if f:
+            cap = f.get("mkt_cap") or 0
+            total_cap += cap
+            if f.get("implied_growth_10y") is not None:
+                covered_cap += cap
+
+    pct = round(covered_cap/total_cap*100, 1) if total_cap > 0 else 0
+    print(f"{sec}: mkt cap totale ${total_cap/1000:.1f}B | mkt cap coperto ${covered_cap/1000:.1f}B | copertura per capitalizzazione: {pct}%")
