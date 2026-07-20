@@ -284,10 +284,18 @@ function StockPageInner() {
   useEffect(() => {
     if (!ticker || !exchangeCode) return
     setLoading(true)
-    fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store' })
-      .then(r => r.ok ? r.json() : { history: [] })
-      .then(d => { setHistory(d.history || []); setMomentum(d.momentum || null); setLoading(false) })
-      .catch(() => setLoading(false))
+    const load = async () => {
+      let authHeader: Record<string, string> = {}
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+      } catch {}
+      fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store', headers: authHeader })
+        .then(r => r.ok ? r.json() : { history: [] })
+        .then(d => { setHistory(d.history || []); setMomentum(d.momentum || null); setLoading(false) })
+        .catch(() => setLoading(false))
+    }
+    load()
   }, [ticker, exchangeCode, chartDays])
 
 
