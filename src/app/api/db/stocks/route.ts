@@ -258,6 +258,12 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get('search') || ''
   const ticker = req.nextUrl.searchParams.get('ticker') || ''
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
+  // Soglie opzionali per le viste "Best Value/Growth/Ideas" — filtrando
+  // qui, prima di restituire i dati, il client non riceve mai l'intero
+  // universo del continente per poi filtrarlo lui stesso nel browser.
+  const minValue = parseFloat(req.nextUrl.searchParams.get('minValue') || '0')
+  const minGrowth = parseFloat(req.nextUrl.searchParams.get('minGrowth') || '0')
+  const minCombined = parseFloat(req.nextUrl.searchParams.get('minCombined') || '0')
 
   try {
     let exList: string[] = []
@@ -368,11 +374,21 @@ export async function GET(req: NextRequest) {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
 
-    if (isRowVolumeLimited(ip, stocks.length)) {
+    // Filtro per soglie di punteggio (Best Value/Growth/Ideas) — applicato
+    // qui, lato server, PRIMA di restituire i dati. Cosi' chi apre "Best
+    // Ideas" riceve solo i pochi titoli che gia' qualificano, non l'intero
+    // universo del continente da filtrare poi nel browser — che avrebbe
+    // esposto tutti i dati grezzi di migliaia di titoli non richiesti.
+    let finalStocks = stocks
+    if (minValue > 0) finalStocks = finalStocks.filter((s: any) => (s.valueScore ?? -1) >= minValue)
+    if (minGrowth > 0) finalStocks = finalStocks.filter((s: any) => (s.growthScore ?? -1) >= minGrowth)
+    if (minCombined > 0) finalStocks = finalStocks.filter((s: any) => (s.combinedRank ?? -1) >= minCombined)
+
+    if (isRowVolumeLimited(ip, finalStocks.length)) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
-    return jsonNoCache({ stocks, source: 'supabase' })
+    return jsonNoCache({ stocks: finalStocks, source: 'supabase' })
 
   } catch (e) {
     return jsonNoCache({ error: 'Database error' }, { status: 500 })
