@@ -140,7 +140,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
 type Page = 'home' | 'dashboard' | 'screener' | 'eurozone' | 'bestideas' | 'bestvalue' | 'bestgrowth' | 'about' | 'sectors' | 'news' | 'bestvalue_us' | 'bestideas_us' | 'bestgrowth_us' | 'sectors_us' | 'portfolio' | 'legal' | 'research' | 'myscreen' | 'northamerica' | 'usscreen' | 'globalscreen' | 'MIL' | 'PA' | 'XETRA' | 'LSE' | 'OM' | 'OB' | 'SWX' | 'MC' | 'AS' | 'HE' | 'BR' | 'GR' | 'CPSE' | 'VI' | 'LS' | 'IR' | 'asiapacific' | 'nascreen' | 'apdashboard' | 'TSE' | 'SEHK' | 'TSX' | 'ASX' | 'KRX' | 'SGX' | 'bestideas_ap' | 'bestvalue_ap' | 'bestgrowth_ap' | 'sectors_ap'
 
 // - API CALLS -
-async function apiExchange(code: string): Promise<Stock[]> {
+async function apiExchange(code: string, thresholds?: { minValue?: number; minGrowth?: number; minCombined?: number }): Promise<Stock[]> {
   if (USE_DEMO) {
     const scored = computeScores([...DEMO_STOCKS])
     if (code === 'EZ') return scored
@@ -152,13 +152,19 @@ async function apiExchange(code: string): Promise<Stock[]> {
       const ALL_EX = 'MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE'
       // Gestisce exchange multipli separati da virgola (es. "US,TSX" o "TSE,SEHK,ASX,KRX,SGX")
       const isMulti = code.includes(',')
-      const url = code === 'EZ' || code === 'ALL'
+      let url = code === 'EZ' || code === 'ALL'
         ? `/api/db/stocks?exchanges=${ALL_EX}`
         : code === 'EMU'
           ? `/api/db/stocks?exchanges=${EMU_EXCHANGES}`
           : isMulti
             ? `/api/db/stocks?exchanges=${encodeURIComponent(code)}`
             : `/api/db/stocks?exchange=${encodeURIComponent(code)}`
+      // Soglie di punteggio (Best Value/Growth/Ideas): filtra lato server,
+      // cosi' il browser non riceve mai l'intero universo del continente
+      // per poi filtrarlo localmente — solo i titoli che gia' qualificano.
+      if (thresholds?.minValue) url += `&minValue=${thresholds.minValue}`
+      if (thresholds?.minGrowth) url += `&minGrowth=${thresholds.minGrowth}`
+      if (thresholds?.minCombined) url += `&minCombined=${thresholds.minCombined}`
       const r = await fetch(url, { cache: 'no-store' })
       if (r.ok) {
         const d = await r.json()
@@ -715,7 +721,11 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     setStocks([]); setSelected(null); setLoading(true)
     const ALL_GLOBAL_EXCHANGES = 'US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX'
     const exchToLoad = initEpsMom ? 'EZ' : (exchange === 'GLOBAL' ? ALL_GLOBAL_EXCHANGES : exchange)
-    apiExchange(exchToLoad).then(data => {
+    apiExchange(exchToLoad, {
+      minValue: initValMin > 0 ? initValMin : undefined,
+      minGrowth: initGrowMin > 0 ? initGrowMin : undefined,
+      minCombined: initCombinedMin > 0 ? initCombinedMin : undefined,
+    }).then(data => {
       // Calcola euroRank su All Europe usando metriche raw
       const ey = (pe: number | null) => (pe && pe !== 0 && Math.abs(pe) <= 200) ? 1/pe : null
       const pctRk = (vals: number[], v: number) => {
