@@ -2807,3 +2807,13 @@ Andrea non ha un piano Vercel che include "Deployment Protection" nativa (coster
 **Aggiunta nuova**: popup "Compare vs sector average" sulla pagina del singolo titolo, funzionante — usa endpoint `/api/db/sector-averages` che aggrega live da `fundamentals` (punteggi) + `stocks` (campo sector, che vive li' non in fundamentals) per continente. Solo numeri aggregati esposti, mai dati grezzi per titolo.
 
 **Sicurezza — stato finale sessione**: Basic Auth rimossa su richiesta esplicita (si e' scelto di non rendere il sito privato). Restano attivi: rate limiting (40 req/min), tetto volume orario (15.000 righe/ora), cap Global a 200 titoli, controllo Origin/Referer contro chiamate dirette da script esterni.
+
+---
+
+## SICUREZZA - vulnerabilita Best X RISOLTA (notte 19-20 luglio)
+
+Le pagine Best Value/Growth/Ideas ora filtrano lato server (nuovi parametri minValue/minGrowth/minCombined su /api/db/stocks, letti da apiExchange() e passati dal componente Screener quando initValMin/initGrowMin/initCombinedMin sono impostati). Non piu' l'intero continente scaricato e filtrato nel browser.
+
+LIMITE RESIDUO NOTO, non risolto per design: lo Screener generico (senza soglie) continua a esporre l'intero universo a chiunque sia loggato - e' la sua funzione (navigazione libera). Un utente loggato determinato puo' comunque vedere tutti i dati grezzi tramite lo Screener normale. Non c'e' fix software per questo senza limitare la funzionalita' stessa dello Screener.
+
+Contesto: Andrea e' in contatto con un programmatore londinese interessato ai dati - raccomandato NON dare accesso account finche' non si decide consapevolmente il livello di rischio accettabile.
