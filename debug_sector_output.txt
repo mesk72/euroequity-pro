@@ -1,9 +1,13 @@
-Totale titoli US con mkt_cap e implied_growth_10y validi: 2131
-
-Top 1000 per market cap (1000 titoli):
-  Implied Growth 10Y medio (weighted by mkt cap): 11.08%
-  Mkt cap totale gruppo: $75180.4B
-
-Restanti (1131 titoli):
-  Implied Growth 10Y medio (weighted by mkt cap): 4.0%
-  Mkt cap totale gruppo: $2475.1B
+Settore                       Implied Growth   Titoli   Mkt Cap ($B)
+--------------------------------------------------------------------
+Information Technology                17.14%      280       25918.2
+Financials                             3.01%      468        9957.8
+Consumer Discretionary                16.68%      272        8398.6
+Communication Services                10.24%       84        7786.2
+Industrials                           12.23%      347        7469.7
+Healthcare                             2.16%      222        6861.8
+Consumer Staples                       3.80%       87        3699.3
+Energy                                -4.61%      115        2707.0
+Materials                              4.97%      108        1830.0
+Utilities                              1.53%       66        1619.4
+Real Estate                           21.20%       82        1407.6
