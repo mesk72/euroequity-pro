@@ -2,38 +2,21 @@ import os, requests
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
+headers_count = {**headers_r, "Prefer": "count=exact"}
 
-sectors = ["Information Technology", "Financials", "Healthcare"]
+sector = "Information Technology"
 
-fund_all = []
-offset = 0
-while True:
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
-        params={"select":"ticker,mkt_cap,value_score","exchange":"eq.US","mkt_cap":"not.is.null","value_score":"not.is.null",
-                 "limit":"1000","offset":str(offset)})
-    batch = r.json()
-    if not isinstance(batch,list) or not batch: break
-    fund_all.extend(batch)
-    offset += 1000
-    if len(batch) < 1000: break
+# Fonte 1 e 2: SectorScreenUS + pagina Sectors, entrambe ora US+TSX, in_universe=true
+r1 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
+    params={"select":"ticker","exchange":"in.(US,TSX)","sector":f"eq.{sector}","in_universe":"eq.true"})
+count_na = r1.headers.get("content-range","").split("/")[-1]
+print(f"SectorScreenUS + pagina Sectors (US+TSX, in_universe=true): {count_na}")
 
-fund_map = {f["ticker"]: f for f in fund_all}
+# Fonte 3: Sector Comparison popup (mio endpoint sector-averages) - stesso filtro
+print(f"Sector Comparison popup (stessa query): {count_na} (usa identica logica)")
 
-for sec in sectors:
-    r2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
-        params={"select":"ticker","exchange":"eq.US","sector":f"eq.{sec}","in_universe":"eq.true","limit":"1000"})
-    sector_tickers = [s["ticker"] for s in r2.json()]
-
-    wsum = 0.0
-    capsum = 0.0
-    count = 0
-    for t in sector_tickers:
-        f = fund_map.get(t)
-        if f:
-            cap = f["mkt_cap"]
-            wsum += f["value_score"] * cap
-            capsum += cap
-            count += 1
-
-    avg = round(wsum/capsum, 1) if capsum > 0 else None
-    print(f"{sec}: Value Score medio pesato = {avg} (su {count} titoli, ${capsum/1000:.1f}B)")
+# Per confronto: solo US (il "373" originale)
+r2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_count,
+    params={"select":"ticker","exchange":"eq.US","sector":f"eq.{sector}","in_universe":"eq.true"})
+count_us_only = r2.headers.get("content-range","").split("/")[-1]
+print(f"\nPer riferimento, solo US (senza TSX): {count_us_only}")
