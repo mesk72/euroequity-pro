@@ -15,55 +15,6 @@ function jsonNoCache(body: any, init?: any) {
   return res
 }
 
-// Fingerprinting strutturale — un breve identificatore tecnico, univoco
-// per utente+titolo, aggiunto ad ogni riga. Non altera NESSUN valore
-// reale (punteggi, prezzi, ecc. restano esattamente quelli veri) — serve
-// solo per attribuzione se un dataset copiato dovesse comparire altrove.
-// Simple deterministic hash (djb2), nessuna libreria esterna necessaria.
-function shortHash(input: string): string {
-  let hash = 5381
-  for (let i = 0; i < input.length; i++) {
-    hash = ((hash << 5) + hash + input.charCodeAt(i)) | 0
-  }
-  return (hash >>> 0).toString(16).padStart(8, '0')
-}
-
-// Campi visibili SENZA login — solo identificazione base e prezzo grezzo,
-// gia' pubblicamente disponibile altrove (Yahoo Finance ecc.).
-const PUBLIC_FIELDS = new Set([
-  'ticker', 'exchange', 'isin', 'company', 'sector', 'country', 'flag',
-  'website', 'description', 'primaryExchange', 'yahooTicker', 'inUniverse',
-  'price', 'mktCap', 'lastPriceDate',
-])
-
-// Campi aggiuntivi visibili SOLO se loggato — risultati finali (punteggi,
-// momentum), MAI i dati grezzi/i singoli fattori che li compongono (PE,
-// PB, EPS growth, revenue growth, Beta, Ke, i rank dei singoli fattori).
-// Questi restano nascosti SEMPRE, loggati o no — e' la formula stessa,
-// non un risultato: se visibili insieme al punteggio finale, un utente
-// competente potrebbe ricostruire i pesi della formula per regressione.
-const SCORE_MOMENTUM_FIELDS = new Set([
-  'valueScore', 'growthScore', 'combinedRank',
-  'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m', 'mom3y', 'mom5y',
-])
-
-function redactForGuest<T extends Record<string, any>>(obj: T): T {
-  const out: any = {}
-  for (const key of Object.keys(obj)) {
-    out[key] = PUBLIC_FIELDS.has(key) ? obj[key] : null
-  }
-  return out
-}
-
-function redactRawData<T extends Record<string, any>>(obj: T): T {
-  const allowed = new Set(Array.from(PUBLIC_FIELDS).concat(Array.from(SCORE_MOMENTUM_FIELDS)))
-  const out: any = {}
-  for (const key of Object.keys(obj)) {
-    out[key] = allowed.has(key) ? obj[key] : null
-  }
-  return out
-}
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -288,35 +239,6 @@ export async function GET(req: NextRequest) {
     return jsonNoCache({ error: 'Too many requests. Please slow down.' }, { status: 429 })
   }
 
-  // Verifica VERA dell'autenticazione — legge il token Bearer dalla
-  // richiesta e lo verifica con Supabase stesso (non ci si fida di un
-  // parametro auto-dichiarato dal client, che sarebbe banale falsificare
-  // scrivendo un id a mano nell'URL). Solo se questo controllo passa,
-  // i punteggi reali (value_score, growth_score, combined_rank e le
-  // altre metriche derivate) vengono inclusi nella risposta piu' sotto.
-  let verifiedUserId: string | null = null
-  let isOwner = false
-  const authHeader = req.headers.get('authorization') || ''
-  if (authHeader.startsWith('Bearer ')) {
-    const token = authHeader.slice(7)
-    try {
-      const { data: { user: verifiedUser } } = await supabase.auth.getUser(token)
-      if (verifiedUser?.id) verifiedUserId = verifiedUser.id
-      if (verifiedUser?.email === 'andreameschini19@gmail.com') isOwner = true
-    } catch {}
-  }
-
-  // Rate limiting anche per utente loggato, non solo per IP — un IP con
-  // VPN/dispositivi multipli aggirerebbe il solo limite IP. Nota onesta:
-  // lo userId qui arriva dal client, non e' verificato con una vera
-  // sessione server-side (che richiederebbe integrare @supabase/ssr) —
-  // e' comunque un secondo livello utile in aggiunta all'IP, non un
-  // sostituto di una vera autenticazione a prova di manomissione.
-  const uid = req.nextUrl.searchParams.get('uid') || ''
-  if (uid && isRateLimited('uid:' + uid)) {
-    return jsonNoCache({ error: 'Too many requests for this account. Please slow down.' }, { status: 429 })
-  }
-
   // Blocca chiamate dirette da script esterni (curl, scraper) che non
   // passano dal sito vero. Un vero browser che naviga il sito invia
   // sempre Origin o Referer corrispondenti al dominio del sito stesso.
@@ -336,18 +258,6 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get('search') || ''
   const ticker = req.nextUrl.searchParams.get('ticker') || ''
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
-  // Soglie opzionali per le viste "Best Value/Growth/Ideas" — filtrando
-  // qui, prima di restituire i dati, il client non riceve mai l'intero
-  // universo del continente per poi filtrarlo lui stesso nel browser.
-  const minValue = parseFloat(req.nextUrl.searchParams.get('minValue') || '0')
-  const minGrowth = parseFloat(req.nextUrl.searchParams.get('minGrowth') || '0')
-  const minCombined = parseFloat(req.nextUrl.searchParams.get('minCombined') || '0')
-  // Cap opzionale sul numero di righe, usato dalle dashboard per
-  // continente — mostrano solo i migliori N titoli (top movers, ecc.),
-  // non serve l'intero universo. Diverso dal filtro soglia sopra: qui
-  // si prende sempre e comunque il numero massimo richiesto, ordinato
-  // per punteggio, non un filtro su un valore minimo.
-  const capRows = parseInt(req.nextUrl.searchParams.get('capRows') || '0')
 
   try {
     let exList: string[] = []
@@ -399,19 +309,7 @@ export async function GET(req: NextRequest) {
         // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
         // fonte per il momentum, gia' corretta e verificata.
       }
-      // Oscuramento a due livelli: ospiti vedono solo campi pubblici,
-      // utenti loggati vedono anche punteggi/momentum ma MAI i dati
-      // grezzi (formula stessa) — vedi redactForGuest/redactRawData.
-      let finalMapped: any = mapped
-      if (isOwner) {
-        // nessuna restrizione
-      } else if (!verifiedUserId) {
-        finalMapped = redactForGuest(mapped)
-      } else {
-        finalMapped = redactRawData(mapped)
-        finalMapped._ref = shortHash(verifiedUserId + ':' + mapped.ticker + ':' + mapped.exchange)
-      }
-      return jsonNoCache({ stocks: [finalMapped], source: 'supabase' })
+      return jsonNoCache({ stocks: [mapped], source: 'supabase' })
     }
 
     if (search) {
@@ -429,12 +327,7 @@ export async function GET(req: NextRequest) {
         .in('ticker', tickers)
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
-      let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
-      if (!verifiedUserId) {
-        stocks = stocks.map((s: any) => redactForGuest(s))
-      } else {
-        stocks = stocks.map((s: any) => redactRawData(s))
-      }
+      const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
       return jsonNoCache({ stocks, source: 'supabase' })
     }
 
@@ -475,58 +368,11 @@ export async function GET(req: NextRequest) {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
 
-    // Filtro per soglie di punteggio (Best Value/Growth/Ideas) — applicato
-    // qui, lato server, PRIMA di restituire i dati. Cosi' chi apre "Best
-    // Ideas" riceve solo i pochi titoli che gia' qualificano, non l'intero
-    // universo del continente da filtrare poi nel browser — che avrebbe
-    // esposto tutti i dati grezzi di migliaia di titoli non richiesti.
-    let finalStocks = stocks
-    if (minValue > 0) finalStocks = finalStocks.filter((s: any) => (s.valueScore ?? -1) >= minValue)
-    if (minGrowth > 0) finalStocks = finalStocks.filter((s: any) => (s.growthScore ?? -1) >= minGrowth)
-    if (minCombined > 0) finalStocks = finalStocks.filter((s: any) => (s.combinedRank ?? -1) >= minCombined)
-    if (capRows > 0 && finalStocks.length > capRows) {
-      finalStocks = [...finalStocks]
-        .sort((a: any, b: any) => (b.mktCap ?? -1) - (a.mktCap ?? -1))
-        .slice(0, capRows)
-    }
-
-    if (isRowVolumeLimited(ip, finalStocks.length)) {
+    if (isRowVolumeLimited(ip, stocks.length)) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
-    // Cap a 200 titoli per chiunque non sia il proprietario — protegge
-    // dalla raccolta sistematica dell'output del modello su larga scala.
-    // Se il risultato naturale e' gia' sotto 200 (es. un mercato piccolo),
-    // resta cosi' com'e', nessun padding artificiale.
-    if (!isOwner && finalStocks.length > 200) {
-      finalStocks = [...finalStocks]
-        .sort((a: any, b: any) => (b.combinedRank ?? -1) - (a.combinedRank ?? -1))
-        .slice(0, 200)
-    }
-
-    // Oscuramento a due livelli anche sul ramo bulk (Screener/Sector/
-    // Dashboard) — ultimo ramo rimasto scoperto. Effetto collaterale
-    // noto e accettato: la colonna "EPS Growth" nella Sector Heatmap
-    // mostrera' vuoto (usava un dato grezzo), il resto resta intatto.
-    if (isOwner) {
-      // nessuna restrizione sui dati grezzi per il proprietario
-    } else if (!verifiedUserId) {
-      finalStocks = finalStocks.map((s: any) => redactForGuest(s))
-    } else {
-      finalStocks = finalStocks.map((s: any) => redactRawData(s))
-    }
-
-    // Aggiunge il campo di fingerprinting SOLO per utenti verificati —
-    // usa l'id reale confermato da Supabase, non il parametro auto-
-    // dichiarato dal client (piu' robusto per l'attribuzione).
-    if (verifiedUserId) {
-      finalStocks = finalStocks.map((s: any) => ({
-        ...s,
-        _ref: shortHash(verifiedUserId + ':' + s.ticker + ':' + s.exchange),
-      }))
-    }
-
-    return jsonNoCache({ stocks: finalStocks, source: 'supabase' })
+    return jsonNoCache({ stocks, source: 'supabase' })
 
   } catch (e) {
     return jsonNoCache({ error: 'Database error' }, { status: 500 })
