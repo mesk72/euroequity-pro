@@ -2380,10 +2380,15 @@ function AppContent() {
   const [scrEpsMom,   setScrEpsMom]   = useState<string>('')
   const [detailStock, setDetailStock] = useState<Stock | null>(null)
 
+  const [showAccessPopup, setShowAccessPopup] = useState(false)
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
-    const { data: sub } = supabase.auth.onAuthStateChange((_, sess) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
       setUser(sess?.user ?? null)
+      if (event === 'SIGNED_IN' && sess?.user?.email !== 'andreameschini19@gmail.com') {
+        setShowAccessPopup(true)
+      }
     })
     return () => sub.subscription.unsubscribe()
   }, [])
@@ -2847,6 +2852,30 @@ function AppContent() {
 
       {showAuth && (
         <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} initialMode={authMode} />
+      )}
+
+      {showAccessPopup && (
+        <div onClick={() => setShowAccessPopup(false)} style={{
+          position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.6)',
+          display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000, padding:16 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{
+            background:'var(--bg)', border:'1px solid var(--border)', borderRadius:8,
+            padding:24, maxWidth:440, width:'100%' }}>
+            <div style={{ fontSize:14, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+              color:'var(--orange)', marginBottom:12 }}>ForwardAlpha — Free Access</div>
+            <div style={{ fontSize:13, color:'var(--text2)', lineHeight:1.6, marginBottom:16 }}>
+              You're viewing our top 500 companies by global market capitalization — a curated
+              selection covering the world's largest and most liquid names across all markets we track.
+              <br /><br />
+              For full access to our complete global universe of 8,000+ stocks, institutional-grade
+              coverage, and professional features, contact us at{' '}
+              <a href="mailto:andrea@forwardalpha.pro" style={{ color:'var(--orange)' }}>andrea@forwardalpha.pro</a>.
+            </div>
+            <button onClick={() => setShowAccessPopup(false)} style={{
+              background:'var(--orange)', border:'none', borderRadius:4, color:'#000',
+              fontSize:12, fontWeight:700, padding:'8px 16px', cursor:'pointer' }}>Got it</button>
+          </div>
+        </div>
       )}
 
       <CookieBanner />
