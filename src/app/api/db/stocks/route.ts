@@ -70,6 +70,42 @@ setInterval(() => {
 }, RATE_LIMIT_WINDOW_MS * 5)
 
 const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM','TSE','SEHK','TSX','ASX','KRX','SGX','US']
+
+// Sottoinsieme visibile per chi NON e' il proprietario — i primi 500
+// titoli al mondo per capitalizzazione di mercato. Query leggerissima
+// (solo 3 campi, non l'intero oggetto titolo), per evitare il timeout
+// gia' incontrato stanotte con query pesanti su tutto l'universo.
+// NON ricalcola nessun punteggio — decide solo QUALI righe includere
+// nella risposta finale, i valori restano sempre quelli veri.
+let cachedTop500: { keys: Set<string>; fetchedAt: number } | null = null
+const TOP500_CACHE_MS = 5 * 60 * 1000
+
+async function getTop500Keys(): Promise<Set<string>> {
+  if (cachedTop500 && Date.now() - cachedTop500.fetchedAt < TOP500_CACHE_MS) {
+    return cachedTop500.keys
+  }
+  let all: { ticker: string; exchange: string; mkt_cap: number }[] = []
+  for (const ex of ALL_RANKED) {
+    let from = 0
+    while (true) {
+      const { data, error } = await supabase
+        .from('fundamentals')
+        .select('ticker,exchange,mkt_cap')
+        .eq('exchange', ex)
+        .not('mkt_cap', 'is', null)
+        .range(from, from + 999)
+      if (error || !data || data.length === 0) break
+      all = all.concat(data as any)
+      if (data.length < 1000) break
+      from += 1000
+    }
+  }
+  const top500 = all.sort((a, b) => (b.mkt_cap ?? -1) - (a.mkt_cap ?? -1)).slice(0, 500)
+  const keys = new Set(top500.map(s => `${s.ticker}.${s.exchange}`))
+  cachedTop500 = { keys, fetchedAt: Date.now() }
+  return keys
+}
+
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR']
 const FILTER_500M = new Set(['LSE','XETRA','PA','OM','SWX','MIL'])
 const TOP_100_EX = new Set(['OB','MC','AS','BR','CPSE','HE','GR'])
@@ -239,6 +275,17 @@ export async function GET(req: NextRequest) {
     return jsonNoCache({ error: 'Too many requests. Please slow down.' }, { status: 429 })
   }
 
+  // Verifica proprietario — solo Andrea vede l'universo completo, senza
+  // nessun ricalcolo di nulla. Chiunque altro vede un sottoinsieme.
+  let isOwner = false
+  const authHeader = req.headers.get('authorization') || ''
+  if (authHeader.startsWith('Bearer ')) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser(authHeader.slice(7))
+      if (user?.email === 'andreameschini19@gmail.com') isOwner = true
+    } catch {}
+  }
+
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
   const search = req.nextUrl.searchParams.get('search') || ''
@@ -295,6 +342,12 @@ export async function GET(req: NextRequest) {
         // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
         // fonte per il momentum, gia' corretta e verificata.
       }
+      if (!isOwner) {
+        const top500 = await getTop500Keys()
+        if (!top500.has(`${mapped.ticker}.${mapped.exchange}`)) {
+          return jsonNoCache({ stocks: [] })
+        }
+      }
       return jsonNoCache({ stocks: [mapped], source: 'supabase' })
     }
 
@@ -313,7 +366,11 @@ export async function GET(req: NextRequest) {
         .in('ticker', tickers)
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
-      const stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+      let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+      if (!isOwner) {
+        const top500 = await getTop500Keys()
+        stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
+      }
       return jsonNoCache({ stocks, source: 'supabase' })
     }
 
@@ -342,6 +399,13 @@ export async function GET(req: NextRequest) {
       // serve piu' ed era la causa dello scarto tra "US" (corretto) e
       // "North America"/"Asia Pacific" combinati (gonfiati).
       stocks = applyUniverseFilter(fundData, stocksData)
+    }
+
+    // Sottoinsieme dei 500 per il proprietario escluso — decide solo
+    // QUALI righe includere, nessun valore viene mai ricalcolato.
+    if (!isOwner) {
+      const top500 = await getTop500Keys()
+      stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
     }
 
     if (isRowVolumeLimited(ip, stocks.length)) {
