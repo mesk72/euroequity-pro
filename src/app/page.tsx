@@ -955,11 +955,17 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
             <div className="space-y-1.5">
               <div className="text-muted font-700 uppercase tracking-wide text-[10px]">Scores</div>
               {userId ? (
+                initValMin > 0 || initGrowMin > 0 || initCombinedMin > 0 ? (
+                  <div style={{ fontSize:11, color:'var(--text4)', padding:'8px 0' }}>
+                    Curated selection — criteria not shown
+                  </div>
+                ) : (
                 <>
                   <input type="number" placeholder="Value Score min" value={valMin || ''} onChange={e => setValMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
                   <input type="number" placeholder="Growth Score min" value={growMin || ''} onChange={e => setGrowMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
                   <input type="number" placeholder="Best Rank min" value={combinedMin || ''} onChange={e => setCombinedMin(+e.target.value || 0)} className="input-field" min={0} max={100} />
                 </>
+                )
               ) : (
                 <div onClick={() => alert('Sign up for free to filter by Value, Growth and Best Score.')}
                   style={{ cursor:'pointer', background:'var(--surface2)', border:'1px solid var(--border)',
