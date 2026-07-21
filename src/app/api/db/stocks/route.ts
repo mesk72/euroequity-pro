@@ -239,20 +239,6 @@ export async function GET(req: NextRequest) {
     return jsonNoCache({ error: 'Too many requests. Please slow down.' }, { status: 429 })
   }
 
-  // Blocca chiamate dirette da script esterni (curl, scraper) che non
-  // passano dal sito vero. Un vero browser che naviga il sito invia
-  // sempre Origin o Referer corrispondenti al dominio del sito stesso.
-  // Confronto dinamico con l'host della richiesta, cosi' funziona sia
-  // in produzione sia nei deploy di anteprima senza dover fissare un
-  // dominio specifico nel codice.
-  const host = req.headers.get('host') || ''
-  const origin = req.headers.get('origin') || ''
-  const referer = req.headers.get('referer') || ''
-  const hasValidSource = (origin && origin.includes(host)) || (referer && referer.includes(host))
-  if (host && !hasValidSource) {
-    return jsonNoCache({ error: 'Direct API access not allowed.' }, { status: 403 })
-  }
-
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
   const search = req.nextUrl.searchParams.get('search') || ''
@@ -347,16 +333,6 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
-    } else if (exList.length > 20) {
-      // "Global" (tutti i 23 mercati insieme) — non serve mostrare l'intero
-      // universo, solo una classifica dei migliori. Cap a 200 titoli per
-      // combined_rank (Best Score), cosi' una singola chiamata non espone
-      // piu' l'intero database mondiale in un colpo solo.
-      const all = applyUniverseFilter(fundData, stocksData)
-      stocks = all
-        .filter((s: any) => s.combinedRank != null)
-        .sort((a: any, b: any) => (b.combinedRank ?? -1) - (a.combinedRank ?? -1))
-        .slice(0, 200)
     } else {
       // Unificato su applyUniverseFilter: si fida di in_universe=true, ora
       // affidabile su tutti i continenti grazie alla verifica Leeway
@@ -373,9 +349,6 @@ export async function GET(req: NextRequest) {
     }
 
     return jsonNoCache({ stocks, source: 'supabase' })
-
-  } catch (e) {
-    return jsonNoCache({ error: 'Database error' }, { status: 500 })
   }
 }
 
