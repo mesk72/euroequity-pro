@@ -84,41 +84,35 @@ async function getTop500Keys(): Promise<Set<string>> {
   if (cachedTop500 && Date.now() - cachedTop500.fetchedAt < TOP500_CACHE_MS) {
     return cachedTop500.keys
   }
-  let all: { ticker: string; exchange: string; mkt_cap: number }[] = []
-  let universeKeys = new Set<string>()
-  for (const ex of ALL_RANKED) {
-    // in_universe vive in stocks, mkt_cap in fundamentals — serve
-    // rispettare in_universe qui, altrimenti titoli esclusi dall'universo
-    // ufficiale (es. dati incompleti) finiscono comunque nella top 500
-    // per market cap ma non hanno mai corrispondenza nei dati mostrati,
-    // facendo scendere il conteggio finale sotto 500.
+  // Parallelizzato invece di sequenziale — con 23 mercati in fila, uno
+  // alla volta, la funzione rischiava il timeout prima di raggiungere
+  // "US" (ultimo nella lista), escludendo sistematicamente tutti i
+  // titoli USA (IBM inclusa) dal calcolo dei 500, pur avendo dati corretti.
+  async function fetchAllPages(table: string, select: string, ex: string, extraFilter?: (q: any) => any) {
+    let rows: any[] = []
     let from = 0
     while (true) {
-      const { data, error } = await supabase
-        .from('stocks')
-        .select('ticker,exchange')
-        .eq('exchange', ex)
-        .eq('in_universe', true)
-        .range(from, from + 999)
+      let q = supabase.from(table).select(select).eq('exchange', ex)
+      if (extraFilter) q = extraFilter(q)
+      const { data, error } = await q.range(from, from + 999)
       if (error || !data || data.length === 0) break
-      for (const s of data) universeKeys.add(`${s.ticker}.${s.exchange}`)
+      rows = rows.concat(data)
       if (data.length < 1000) break
       from += 1000
     }
-    from = 0
-    while (true) {
-      const { data, error } = await supabase
-        .from('fundamentals')
-        .select('ticker,exchange,mkt_cap')
-        .eq('exchange', ex)
-        .not('mkt_cap', 'is', null)
-        .range(from, from + 999)
-      if (error || !data || data.length === 0) break
-      all = all.concat(data as any)
-      if (data.length < 1000) break
-      from += 1000
-    }
+    return rows
   }
+
+  const [universeResults, fundResults] = await Promise.all([
+    Promise.all(ALL_RANKED.map(ex => fetchAllPages('stocks', 'ticker,exchange', ex, q => q.eq('in_universe', true)))),
+    Promise.all(ALL_RANKED.map(ex => fetchAllPages('fundamentals', 'ticker,exchange,mkt_cap', ex, q => q.not('mkt_cap', 'is', null)))),
+  ])
+
+  const universeKeys = new Set<string>()
+  for (const rows of universeResults) for (const s of rows) universeKeys.add(`${s.ticker}.${s.exchange}`)
+  let all: { ticker: string; exchange: string; mkt_cap: number }[] = []
+  for (const rows of fundResults) all = all.concat(rows as any)
+
   const filtered = all.filter(s => universeKeys.has(`${s.ticker}.${s.exchange}`))
   const top500 = filtered.sort((a, b) => (b.mkt_cap ?? -1) - (a.mkt_cap ?? -1)).slice(0, 500)
   const keys = new Set(top500.map(s => `${s.ticker}.${s.exchange}`))
