@@ -196,6 +196,12 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
         const d = await r.json()
         const s = (d.stocks || [])[0]
         if (s) liveMap[`${s.ticker}.${s.exchange}`] = s
+        else if (d.restricted) {
+          liveMap[`${w.ticker}.${w.exchange}`] = {
+            ticker: d.ticker || w.ticker, exchange: w.exchange,
+            company: d.company || w.ticker, restricted: true,
+          }
+        }
       } catch {}
     }))
 
@@ -376,6 +382,11 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
               </div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
+                {s.restricted && (
+                  <span style={{ fontSize:9, color:'var(--text4)', border:'1px solid var(--border)', borderRadius:3, padding:'1px 4px', marginLeft:6 }}>
+                    Not in free selection
+                  </span>
+                )}
                 <span className="text-[9px] font-600" style={{ color: getSectorColor(s.sector) }}>{s.sector || '-'}</span>
               </div>
               <div className="flex gap-2 text-[10px] font-mono">
