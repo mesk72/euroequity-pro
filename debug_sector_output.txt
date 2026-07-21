@@ -1,3 +1,4 @@
-Totale righe fundamentals in tutti i mercati: 11630
-Con mkt_cap non nullo: 10683
-Senza mkt_cap (esclusi dal calcolo top 500): 947
+IBM in stocks: [{'ticker': 'IBM', 'exchange': 'US', 'company': 'International Business Machines Corporation', 'in_universe': True}]
+IBM in fundamentals: [{'ticker': 'IBM', 'exchange': 'US', 'mkt_cap': 287727.08}]
+
+Mkt cap IBM: 287727.08
