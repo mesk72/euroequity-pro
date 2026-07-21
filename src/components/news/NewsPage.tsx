@@ -424,7 +424,7 @@ export default function NewsPage() {
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
       if (n.valueScore != null) {
-        line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+        line += ' | Val ' + Math.round(n.valueScore) + ' Grw ' + Math.round(n.growthScore) + ' Best ' + Math.round(n.bestScore)
       }
       if (n.link) line += '\n  📰 Read article → ' + n.link
       if (n.ticker && n.exchange) {
@@ -482,7 +482,7 @@ export default function NewsPage() {
       let line = '• '
       if (n.ticker) line += '[' + n.ticker + '] '
       line += n.title
-      if (n.valueScore != null) line += ' | Val ' + n.valueScore + ' Grw ' + n.growthScore + ' Best ' + n.bestScore
+      if (n.valueScore != null) line += ' | Val ' + Math.round(n.valueScore) + ' Grw ' + Math.round(n.growthScore) + ' Best ' + Math.round(n.bestScore)
       if (n.link) line += '\n  📰 Read article → ' + n.link
       if (n.ticker && n.exchange) line += '\n  📊 View on ForwardAlpha → https://forwardalpha.pro/stock/' + n.ticker + '-' + n.exchange
       return line
@@ -880,9 +880,9 @@ ${body}
                   {item.ticker && item.valueScore != null && (
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center' }}>
                       <span style={{ fontSize: 9, color: 'var(--text4)' }}>ForwardAlpha:</span>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: '#3b82f6' }}>Val {item.valueScore}</span>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: '#22c55e' }}>Grw {item.growthScore}</span>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--orange)' }}>Best {item.bestScore}</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#3b82f6' }}>Val {Math.round(item.valueScore)}</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#22c55e' }}>Grw {Math.round(item.growthScore)}</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--orange)' }}>Best {Math.round(item.bestScore)}</span>
                     </div>
                   )}
                 </div>
