@@ -183,10 +183,15 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
 
     // Carica ogni titolo singolarmente con ticker+exchange
     // Questo bypassa i filtri top N e funziona per qualsiasi titolo
+    let authHeader: Record<string, string> = {}
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+    } catch {}
     const liveMap: Record<string, any> = {}
     await Promise.all(data.map(async (w: any) => {
       try {
-        const r = await fetch(`/api/db/stocks?ticker=${encodeURIComponent(w.ticker)}&exchange=${encodeURIComponent(w.exchange)}`)
+        const r = await fetch(`/api/db/stocks?ticker=${encodeURIComponent(w.ticker)}&exchange=${encodeURIComponent(w.exchange)}`, { headers: authHeader })
         if (!r.ok) return
         const d = await r.json()
         const s = (d.stocks || [])[0]
