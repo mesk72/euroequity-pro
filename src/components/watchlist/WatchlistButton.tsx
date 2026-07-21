@@ -72,7 +72,7 @@ export default function WatchlistButton({ stock, userId }: Props) {
         setLoading(false)
         return
       }
-      await supabase.from('watchlist').insert({
+      const { error: insertError } = await supabase.from('watchlist').insert({
         user_id: userId,
         ticker: stock.ticker,
         exchange: stock.exchange,
@@ -80,6 +80,11 @@ export default function WatchlistButton({ stock, userId }: Props) {
         combined_rank: (stock as any).combinedRank ?? null,
         wallet: walletIdx,
       })
+      if (insertError) {
+        toast.error(`Failed to add: ${insertError.message}`)
+        setLoading(false)
+        return
+      }
       const next = new Set(walletSet); next.add(walletIdx)
       setWalletSet(next)
       toast.success(`${stock.ticker} → ${WALLET_NAMES[walletIdx]}`)
