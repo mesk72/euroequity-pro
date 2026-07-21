@@ -455,12 +455,15 @@ export async function GET(req: NextRequest) {
       for (const f of fundData) fundMap[`${f.ticker}.${f.exchange}`] = f
       stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
     } else if (exList.length > 20) {
-      // "Global" (tutti i 23 mercati insieme) — il taglio ai migliori 200
-      // avviene ora a valle, con la stessa identica logica di intersezione
-      // usata per tutti gli altri screener (vedi piu' sotto), invece di un
-      // secondo calcolo separato che rischiava di produrre un ordine/set
-      // leggermente diverso.
-      stocks = applyUniverseFilter(fundData, stocksData)
+      // "Global" (tutti i 23 mercati insieme) — non serve mostrare l'intero
+      // universo, solo una classifica dei migliori. Cap a 200 titoli per
+      // combined_rank (Best Score), cosi' una singola chiamata non espone
+      // piu' l'intero database mondiale in un colpo solo.
+      const all = applyUniverseFilter(fundData, stocksData)
+      stocks = all
+        .filter((s: any) => s.combinedRank != null)
+        .sort((a: any, b: any) => (b.combinedRank ?? -1) - (a.combinedRank ?? -1))
+        .slice(0, 200)
     } else {
       // Unificato su applyUniverseFilter: si fida di in_universe=true, ora
       // affidabile su tutti i continenti grazie alla verifica Leeway
@@ -491,24 +494,14 @@ export async function GET(req: NextRequest) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
-    // Intersezione con i migliori 200 al mondo — non un semplice cap sul
-    // risultato locale, ma il filtro vero: solo i titoli che, per questo
-    // screener specifico, fanno GIA' parte della classifica globale dei
-    // 200 migliori (stessa logica gia' usata per la vista "Global").
-    // Es: se l'Italia ha solo 10 titoli nella top 200 mondiale, ne vede
-    // 10, non tutti i titoli italiani dell'universo.
-    if (!isOwner) {
-      const globalTop = await fetchAllByExchange(
-        'fundamentals', 'ticker,exchange,combined_rank', ALL_RANKED, false
-      )
-      const top200Keys = new Set(
-        globalTop
-          .filter((f: any) => f.combined_rank != null)
-          .sort((a: any, b: any) => (b.combined_rank ?? -1) - (a.combined_rank ?? -1))
-          .slice(0, 200)
-          .map((f: any) => `${f.ticker}.${f.exchange}`)
-      )
-      finalStocks = finalStocks.filter((s: any) => top200Keys.has(`${s.ticker}.${s.exchange}`))
+    // Cap a 200 titoli per chiunque non sia il proprietario — protegge
+    // dalla raccolta sistematica dell'output del modello su larga scala.
+    // Se il risultato naturale e' gia' sotto 200 (es. un mercato piccolo),
+    // resta cosi' com'e', nessun padding artificiale.
+    if (!isOwner && finalStocks.length > 200) {
+      finalStocks = [...finalStocks]
+        .sort((a: any, b: any) => (b.combinedRank ?? -1) - (a.combinedRank ?? -1))
+        .slice(0, 200)
     }
 
     // Oscuramento a due livelli anche sul ramo bulk (Screener/Sector/
