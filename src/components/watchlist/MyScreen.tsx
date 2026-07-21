@@ -382,7 +382,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
               </div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-sub truncate max-w-[180px]">{s.company}</span>
-                {s.restricted && (
+                {(s as any).restricted && (
                   <span style={{ fontSize:9, color:'var(--text4)', border:'1px solid var(--border)', borderRadius:3, padding:'1px 4px', marginLeft:6 }}>
                     Not in free selection
                   </span>
