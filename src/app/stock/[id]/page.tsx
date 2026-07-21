@@ -218,6 +218,7 @@ function StockPageInner() {
   const [ticker, exchangeCode] = id.split('-')
 
   const [stock, setStock] = useState<any>(null)
+  const [restrictedInfo, setRestrictedInfo] = useState<{ ticker: string; company: string } | null>(null)
   const [loadingStock, setLoadingStock] = useState(true)
   const [sectorPopupOpen, setSectorPopupOpen] = useState(false)
   const [sectorAvgData, setSectorAvgData] = useState<any>(null)
@@ -258,6 +259,10 @@ function StockPageInner() {
         .then(d => {
           if (d?.stocks?.[0]) {
             setStock(d.stocks[0])
+            setRestrictedInfo(null)
+          } else if (d?.restricted) {
+            setRestrictedInfo({ ticker: d.ticker, company: d.company })
+            setStock(null)
           } else {
             const allStocks = computeScores([...DEMO_STOCKS])
             const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
@@ -315,7 +320,19 @@ function StockPageInner() {
             background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:24 }}>
           <ArrowLeft size={16} /> Back
         </button>
-        <p style={{ color:'var(--text3)' }}>Stock not found: {ticker}.{exchangeCode}</p>
+        {restrictedInfo ? (
+          <div>
+            <p style={{ color:'var(--text2)', fontSize:15, marginBottom:8 }}>
+              {restrictedInfo.company || restrictedInfo.ticker}
+            </p>
+            <p style={{ color:'var(--text3)', fontSize:13 }}>
+              This stock isn't included in our free top-500 selection.<br />
+              Contact <a href="mailto:andrea@forwardalpha.pro" style={{ color:'var(--orange)' }}>andrea@forwardalpha.pro</a> for full access.
+            </p>
+          </div>
+        ) : (
+          <p style={{ color:'var(--text3)' }}>Stock not found: {ticker}.{exchangeCode}</p>
+        )}
       </div>
     )
   }
