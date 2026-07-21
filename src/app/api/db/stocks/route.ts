@@ -365,7 +365,7 @@ export async function GET(req: NextRequest) {
       if (!isOwner) {
         const top500 = await getTop500Keys()
         if (!top500.has(`${mapped.ticker}.${mapped.exchange}`)) {
-          return jsonNoCache({ stocks: [] })
+          return jsonNoCache({ stocks: [], restricted: true, ticker: mapped.ticker, company: mapped.company })
         }
       }
       return jsonNoCache({ stocks: [mapped], source: 'supabase' })
