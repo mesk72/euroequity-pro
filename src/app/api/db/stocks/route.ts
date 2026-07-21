@@ -85,8 +85,27 @@ async function getTop500Keys(): Promise<Set<string>> {
     return cachedTop500.keys
   }
   let all: { ticker: string; exchange: string; mkt_cap: number }[] = []
+  let universeKeys = new Set<string>()
   for (const ex of ALL_RANKED) {
+    // in_universe vive in stocks, mkt_cap in fundamentals — serve
+    // rispettare in_universe qui, altrimenti titoli esclusi dall'universo
+    // ufficiale (es. dati incompleti) finiscono comunque nella top 500
+    // per market cap ma non hanno mai corrispondenza nei dati mostrati,
+    // facendo scendere il conteggio finale sotto 500.
     let from = 0
+    while (true) {
+      const { data, error } = await supabase
+        .from('stocks')
+        .select('ticker,exchange')
+        .eq('exchange', ex)
+        .eq('in_universe', true)
+        .range(from, from + 999)
+      if (error || !data || data.length === 0) break
+      for (const s of data) universeKeys.add(`${s.ticker}.${s.exchange}`)
+      if (data.length < 1000) break
+      from += 1000
+    }
+    from = 0
     while (true) {
       const { data, error } = await supabase
         .from('fundamentals')
@@ -100,7 +119,8 @@ async function getTop500Keys(): Promise<Set<string>> {
       from += 1000
     }
   }
-  const top500 = all.sort((a, b) => (b.mkt_cap ?? -1) - (a.mkt_cap ?? -1)).slice(0, 500)
+  const filtered = all.filter(s => universeKeys.has(`${s.ticker}.${s.exchange}`))
+  const top500 = filtered.sort((a, b) => (b.mkt_cap ?? -1) - (a.mkt_cap ?? -1)).slice(0, 500)
   const keys = new Set(top500.map(s => `${s.ticker}.${s.exchange}`))
   cachedTop500 = { keys, fetchedAt: Date.now() }
   return keys
