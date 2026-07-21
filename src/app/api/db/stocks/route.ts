@@ -349,6 +349,9 @@ export async function GET(req: NextRequest) {
     }
 
     return jsonNoCache({ stocks, source: 'supabase' })
+
+  } catch (e) {
+    return jsonNoCache({ error: 'Database error' }, { status: 500 })
   }
 }
 
