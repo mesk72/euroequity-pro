@@ -1,4 +1,2 @@
-Esempio righe (conferma che la tabella e' ancora intatta):
-  {'ticker': 'SWTQ', 'exchange': 'SWX', 'date': '2025-01-31'}
-  {'ticker': 'SWTQ', 'exchange': 'SWX', 'date': '2025-02-03'}
-  {'ticker': 'SWTQ', 'exchange': 'SWX', 'date': '2025-02-04'}
+Delete status: 500
+Righe rimaste dopo delete: [{'ticker': '8591'}, {'ticker': '8591'}, {'ticker': '8591'}]
