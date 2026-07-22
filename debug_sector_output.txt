@@ -1,8 +1,3 @@
-Campione: [{'ticker': 'APG', 'exchange': 'US', 'value_score': 26, 'growth_score': 57.56}, {'ticker': 'TWST', 'exchange': 'US', 'value_score': 10, 'growth_score': 84.79}, {'ticker': 'PENN', 'exchange': 'US', 'value_score': 37, 'growth_score': 85.06}, {'ticker': 'SNDK', 'exchange': 'US', 'value_score': 48, 'growth_score': 99.98}, {'ticker': 'CSWC', 'exchange': 'US', 'value_score': 90, 'growth_score': 36.4}]
-
-Test payload: [{'ticker': 'APG', 'exchange': 'US', 'combined_rank': 50}, {'ticker': 'TWST', 'exchange': 'US', 'combined_rank': 50}, {'ticker': 'PENN', 'exchange': 'US', 'combined_rank': 50}, {'ticker': 'SNDK', 'exchange': 'US', 'combined_rank': 50}, {'ticker': 'CSWC', 'exchange': 'US', 'combined_rank': 50}]
-
-Risultato POST: HTTP 200
-Corpo risposta: 
-
-Verifica dopo scrittura: [{'ticker': 'APG', 'combined_rank': 50}]
+XETRA: quanti con Best Score = 0-0/279
+TSE: quanti con Best Score = 0-0/976
+US: quanti con Best Score = 0-0/5
