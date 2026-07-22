@@ -1,14 +1,8 @@
-=== US campione ===
-  {'ticker': 'TEM', 'value_score': 6, 'growth_score': 22.1, 'combined_rank': None}
-  {'ticker': 'CSWC', 'value_score': 90, 'growth_score': 36.4, 'combined_rank': None}
-  {'ticker': 'MSFT', 'value_score': 44, 'growth_score': 39.76, 'combined_rank': None}
-  {'ticker': 'ACO.X', 'value_score': 61, 'growth_score': None, 'combined_rank': None}
-  {'ticker': 'GSBC', 'value_score': 86, 'growth_score': 38.4, 'combined_rank': None}
-=== TSX campione ===
-  {'ticker': '^GSPTSE', 'value_score': None, 'growth_score': None, 'combined_rank': None}
-  {'ticker': 'AAUC', 'value_score': 37, 'growth_score': 88.54, 'combined_rank': None}
-  {'ticker': 'AAV', 'value_score': 88, 'growth_score': 47.93, 'combined_rank': None}
-  {'ticker': 'ABRA', 'value_score': 5, 'growth_score': 39.64, 'combined_rank': None}
-  {'ticker': 'ABX', 'value_score': 86, 'growth_score': 72.24, 'combined_rank': None}
+Righe totali in news_cache: 0-0/35294
 
-AAPL.US: [{'ticker': 'AAPL', 'exchange': 'US', 'value_score': 22, 'growth_score': 80.98, 'combined_rank': None}]
+Ultime 5 righe inserite:
+  {'ticker': 'DBIN', 'exchange': 'US', 'pub_date': 'Sun, 09 Feb 2020 05:13:29 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
+  {'ticker': 'DBIN', 'exchange': 'US', 'pub_date': 'Thu, 15 Mar 2018 18:06:21 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
+  {'ticker': 'OWLS', 'exchange': 'US', 'pub_date': 'Thu, 09 Oct 2025 15:18:57 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
+  {'ticker': 'KRT', 'exchange': 'US', 'pub_date': 'Sat, 13 Jun 2026 07:00:00 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
+  {'ticker': 'STEL', 'exchange': 'US', 'pub_date': 'Tue, 21 Jul 2026 14:20:01 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
