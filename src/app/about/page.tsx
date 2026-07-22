@@ -10,13 +10,13 @@ We combine two of the most proven investment philosophies — Value Investing an
     },
     {
       title: 'Who We Are',
-      content: `ForwardAlpha was founded by Andrea Meschini, a professional investor with over 15 years of experience in European equity research and portfolio management.
+      content: `ForwardAlpha was founded by Andrea Meschini, a professional investor with over 15 years of experience in global equity research and portfolio management.
 
 Andrea began his career at Gestiveneto SGR, one of Italy's established asset management firms, before moving to JPMorgan Asset Management in London, where he worked as a European equity analyst covering multiple sectors.
 
-He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as Investment Analyst on Hedge Fund and Value Fund strategies, and five years as Portfolio Manager running long-only Euroequity and Italian Equity portfolios equity mandates, followed by five years as Head of Equity Research, overseeing a team of analysts covering the Italian and broader European equity universe.
+He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as Investment Analyst on Hedge Fund and Value Fund strategies, and five years as Portfolio Manager running long-only Euroequity and Italian Equity portfolios equity mandates.
 
-Prior to founding ForwardAlpha, Andrea served as Senior Hedge Fund Analyst at Integrated Alternative Investments, focusing on manager selection and due diligencee diligence across European long/short equity strategies.
+Prior to founding ForwardAlpha, Andrea served as Senior Hedge Fund Analyst at Integrated Alternative Investments, focusing on manager selection and due diligence across global long/short equity strategies.
 
 This background informs every aspect of ForwardAlpha's methodology — from the way we construct our scoring models to the metrics we prioritise and the rigour we apply to data quality.`,
     },
@@ -32,7 +32,7 @@ Our Value Score combines three rank components, each calculated relative to all 
 • PE NTM Rank — ranks stocks by PE NTM.
 • PB Rank — ranks stocks by Price/Book ratio. 
 
-Each component is ranked from 1 to 100, ranked against comparable peers. The three ranks are averaged and re-ranked to produce the final Value Score.
+Each component is ranked from 1 to 100, ranked against comparable peers.
 
 A Value Score of 80 means the stock is cheaper than 80% of its peers on our combined valuation metrics.`,
     },
@@ -47,15 +47,13 @@ Our Growth Score combines four rank components, each calculated relative to all 
 • Price Momentum 6M — 6-month price return, adjusted.
 • Price Momentum 12M — 12-month price return, adjusted.
 
-The four components are averaged and re-ranked to produce the final Growth Score.
-
 A Growth Score of 70 means the stock has stronger growth characteristics than 70% of its peers.`,
     },
     {
       title: 'The Best Score',
       content: `The Best Score is ForwardAlpha's combined ranking — a single number that captures both the valuation attractiveness and growth momentum of a stock relative to a broad, comparable universe of peers.
 
-It is calculated as the sum of the Value Score and Growth Score, then re-ranked from 1 to 100.
+It is calculated on the basis of the Value Score and the Growth Score.
 
 A Best Score of 80 or above places a stock in the top 20% of its universe — combining both attractive valuation and strong growth momentum.`,
     },
