@@ -371,11 +371,10 @@ for i in range(0, len(rank_updates), 100):
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print(f"  Rank US+CA: {ok}/{len(rank_updates)}")
 
-# Combined rank NA = US+TSX insieme
-requests.patch(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange",
-    headers={**headers_up, "Prefer": "return=minimal"},
-    params={"exchange": "in.(US,TSX)"},
-    json={"combined_rank": None})
+# Combined rank NA = US+TSX insieme — nessun reset preventivo (rimosso,
+# non presente in EU/APAC che funzionano correttamente — probabile causa
+# del fallimento: l'upsert con on_conflict sovrascrive gia' correttamente
+# i valori vecchi, il reset esplicito era ridondante e causava il problema)
 all_scores = [d for d in rank_updates if d.get('value_score') is not None and d.get('growth_score') is not None]
 print(f"  DEBUG: rank_updates totali={len(rank_updates)}, all_scores (con entrambi i punteggi)={len(all_scores)}")
 comb_arr   = [d['value_score'] + d['growth_score'] for d in all_scores]
