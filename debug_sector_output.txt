@@ -1,25 +1,28 @@
-FATTO — scritto in minimal_check_result.txt
-MIL: ERRORE: 0
-XETRA: ERRORE: 0
-PA: ERRORE: 0
-AS: ERRORE: 0
-MC: ERRORE: 0
-BR: ERRORE: HTTPSConnectionPool(host='mlqkisnizgyvvqajdvbh.supabase.co', port=443): Read timed out. (read timeout=10)
-LS: ERRORE: 0
-VI: ERRORE: 0
-HE: ERRORE: 0
-IR: ERRORE: HTTPSConnectionPool(host='mlqkisnizgyvvqajdvbh.supabase.co', port=443): Read timed out. (read timeout=10)
-GR: ERRORE: 0
-LSE: ERRORE: 0
-SWX: ERRORE: 0
-OM: ERRORE: 0
-OB: ERRORE: 0
-CPSE: ERRORE: 0
-NGM: ERRORE: 0
-TSE: 2026-07-21
-SEHK: ERRORE: 0
-TSX: ERRORE: 0
-ASX: ERRORE: 0
-KRX: ERRORE: 0
-SGX: ERRORE: 0
-US: 2026-07-21
+=== Campione per mercato: quanti hanno dati, a che data ===
+
+  MIL: 15/15 campione con dati (100%), universo=117, data piu' recente nel campione=2026-07-21
+  XETRA: 15/15 campione con dati (100%), universo=211, data piu' recente nel campione=2026-07-21
+  PA: 15/15 campione con dati (100%), universo=217, data piu' recente nel campione=2026-07-21
+  AS: 15/15 campione con dati (100%), universo=98, data piu' recente nel campione=2026-07-21
+  MC: 15/15 campione con dati (100%), universo=100, data piu' recente nel campione=2026-07-21
+  BR: 15/15 campione con dati (100%), universo=100, data piu' recente nel campione=2026-07-21
+  LS: 15/15 campione con dati (100%), universo=35, data piu' recente nel campione=2026-07-21
+  VI: 15/15 campione con dati (100%), universo=53, data piu' recente nel campione=2026-07-21
+  HE: 15/15 campione con dati (100%), universo=100, data piu' recente nel campione=2026-07-21
+  IR: 15/15 campione con dati (100%), universo=15, data piu' recente nel campione=2026-07-21
+  GR: 15/15 campione con dati (100%), universo=100, data piu' recente nel campione=2026-07-21
+  LSE: 15/15 campione con dati (100%), universo=423, data piu' recente nel campione=2026-07-21
+  SWX: 15/15 campione con dati (100%), universo=161, data piu' recente nel campione=2026-07-21
+  OM: 15/15 campione con dati (100%), universo=206, data piu' recente nel campione=2026-07-21
+  OB: 15/15 campione con dati (100%), universo=100, data piu' recente nel campione=2026-07-21
+  CPSE: 15/15 campione con dati (100%), universo=101, data piu' recente nel campione=2026-07-21
+  NGM: universo vuoto
+  TSE: 15/15 campione con dati (100%), universo=1000, data piu' recente nel campione=2026-07-21
+  SEHK: 15/15 campione con dati (100%), universo=500, data piu' recente nel campione=2026-07-21
+  TSX: 14/15 campione con dati (93%), universo=400, data piu' recente nel campione=2026-07-21
+  ASX: 15/15 campione con dati (100%), universo=350, data piu' recente nel campione=2026-07-21
+  KRX: 14/15 campione con dati (93%), universo=400, data piu' recente nel campione=2026-07-21
+  SGX: 15/15 campione con dati (100%), universo=100, data piu' recente nel campione=2026-07-21
+  US: 15/15 campione con dati (100%), universo=1000, data piu' recente nel campione=2026-07-21
+
+=== Data piu' recente in assoluto trovata: 2026-07-21 ===
