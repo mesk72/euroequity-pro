@@ -1,2 +1,2 @@
-Righe in top500_universe: 0-0/500
-Status: 206
+AAPL: [{'ticker': 'AAPL', 'combined_rank': None}]
+Quanti con Best Score in US+TSX: */0
