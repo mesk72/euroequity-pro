@@ -17,4 +17,14 @@ jobs:
       - name: Run US daily Yahoo
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python daily_us_yahoo.py
+        run: python daily_us_yahoo.py | tee daily_us_yahoo_last_output.txt
+      - name: Commit log
+        continue-on-error: true
+        if: always()
+        run: |
+          git config user.name "debug-bot"
+          git config user.email "debug-bot@users.noreply.github.com"
+          git add daily_us_yahoo_last_output.txt
+          git commit -m "log daily_us_yahoo output" || echo "nothing to commit"
+          git pull --rebase
+          git push
