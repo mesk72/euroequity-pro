@@ -219,14 +219,17 @@ def process_ticker(args):
     region       = stock.get('_region', 'americas')
     yahoo_ticker = stock.get('yahoo_ticker') or (ticker + YAHOO_SUFFIX.get(exchange, ''))
     news = fetch_ticker_news(ticker, exchange, company, yahoo_ticker)
+    def _round_or_none(v):
+        return round(v) if v is not None else None
+
     rows = [{
         "ticker": ticker, "exchange": exchange, "region": region,
         "company": company, "yahoo_ticker": yahoo_ticker,
         "title": n['title'], "link": n['link'],
         "pub_date": n['pubDate'], "source": n['source'],
-        "value_score": fund.get('value_score'),
-        "growth_score": fund.get('growth_score'),
-        "best_score": fund.get('combined_rank'),
+        "value_score": _round_or_none(fund.get('value_score')),
+        "growth_score": _round_or_none(fund.get('growth_score')),
+        "best_score": _round_or_none(fund.get('combined_rank')),
         "mkt_cap": fund.get('mkt_cap'),
         "fetched_at": NOW,
     } for n in news]
