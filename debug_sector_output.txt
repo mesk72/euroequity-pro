@@ -1,8 +1,1 @@
-Prezzo piu' recente: 327.74 al 2026-07-21
-
-mom1w atteso: rif=2026-07-15 prezzo=327.5 -> 0.000733
-mom1m atteso: rif=2026-06-22 prezzo=297.01 -> 0.103465
-mom6m atteso: rif=2026-01-22 prezzo=247.8895 -> 0.322121
-mom12m atteso: rif=2025-07-22 prezzo=213.5528 -> 0.534702
-
-Valori REALI nel database: {'mom1w': 0.0007, 'mom1m': 0.1035, 'mom6m': 0.3221, 'mom12m': 0.5347}
+Status: 404 {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.top500_universe' in the schema cache"}
