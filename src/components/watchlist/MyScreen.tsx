@@ -230,6 +230,21 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
 
   const stocks = allStocks.filter(s => (s.wallet ?? 0) === activeWallet)
 
+  // Notizie delle ultime 24 ore per i titoli del wallet attivo — riusa
+  // la stessa cache news_cache gia' popolata per la pagina News, filtrata
+  // solo sui ticker presenti in questo specifico wallet.
+  const [walletNews, setWalletNews] = useState<any[]>([])
+  const [newsLoading, setNewsLoading] = useState(false)
+  useEffect(() => {
+    if (stocks.length === 0) { setWalletNews([]); return }
+    const tickersParam = stocks.map(s => `${s.ticker}.${s.exchange}`).join(',')
+    setNewsLoading(true)
+    fetch(`/api/news-cache?tickers=${encodeURIComponent(tickersParam)}&limit=50`, { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : { items: [] })
+      .then(d => { setWalletNews(d.items || []); setNewsLoading(false) })
+      .catch(() => setNewsLoading(false))
+  }, [activeWallet, stocks.length])
+
   // Ordinamento per colonna — clic sull'intestazione per Settore, Market
   // Cap, 1D/1W/1M/6M/12M, Value/Growth/Best
   const [sortField, setSortField] = useState<keyof WatchStock | null>(null)
@@ -562,6 +577,31 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
         </div>
       )}
       <div className="text-xs text-muted text-right">{100 - stocks.length} slots remaining in {WALLET_NAMES[activeWallet]}</div>
+
+      <div style={{ marginTop:20 }}>
+        <div style={{ fontSize:11, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+          letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--orange)', marginBottom:8 }}>
+          📰 News — last 24h for {WALLET_NAMES[activeWallet]}
+        </div>
+        {newsLoading ? (
+          <div style={{ fontSize:12, color:'var(--text4)' }}>Loading news...</div>
+        ) : walletNews.length === 0 ? (
+          <div style={{ fontSize:12, color:'var(--text4)' }}>No news in the last 24 hours for these tickers.</div>
+        ) : (
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {walletNews.map((n: any, i: number) => (
+              <a key={i} href={n.link} target="_blank" rel="noopener noreferrer" style={{
+                display:'block', padding:'8px 10px', border:'1px solid var(--border)',
+                borderRadius:4, textDecoration:'none', color:'inherit' }}>
+                <div style={{ fontSize:12, color:'var(--text)', marginBottom:2 }}>
+                  <span style={{ color:'var(--orange)', fontWeight:700 }}>[{n.ticker}]</span> {n.title}
+                </div>
+                <div style={{ fontSize:10, color:'var(--text4)' }}>{n.source}</div>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
