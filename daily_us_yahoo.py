@@ -245,7 +245,7 @@ for stock in all_stocks:
     if len(data) < 2: fail += 1; continue
     last_px   = data[0]['close']
     last_date = datetime.strptime(data[0]['date'], "%Y-%m-%d")
-    chg1d = round((data[0]['close'] / data[1]['close'] - 1) * 100, 4)
+    chg1d = round(data[0]['close'] / data[1]['close'] - 1, 6)
 
     def mom_new_weeks(trading_days_back):
         # 1 settimana = 4 giorni di trading indietro (non 5, non calendario)
