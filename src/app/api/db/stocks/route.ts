@@ -72,52 +72,17 @@ setInterval(() => {
 const ALL_RANKED = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR','LSE','SWX','OM','OB','CPSE','NGM','TSE','SEHK','TSX','ASX','KRX','SGX','US']
 
 // Sottoinsieme visibile per chi NON e' il proprietario — i primi 500
-// titoli al mondo per capitalizzazione di mercato. Query leggerissima
-// (solo 3 campi, non l'intero oggetto titolo), per evitare il timeout
-// gia' incontrato stanotte con query pesanti su tutto l'universo.
+// titoli al mondo per capitalizzazione di mercato. Ora letto da una
+// tabella dedicata (top500_universe), calcolata una volta e stabile —
+// NON piu' una cache in memoria per istanza, che su Vercel (piu'
+// istanze serverless parallele) causava numeri diversi a seconda di
+// quale istanza rispondeva, ciascuna con la propria cache locale.
 // NON ricalcola nessun punteggio — decide solo QUALI righe includere
 // nella risposta finale, i valori restano sempre quelli veri.
-let cachedTop500: { keys: Set<string>; fetchedAt: number } | null = null
-const TOP500_CACHE_MS = 5 * 60 * 1000
-
 async function getTop500Keys(): Promise<Set<string>> {
-  if (cachedTop500 && Date.now() - cachedTop500.fetchedAt < TOP500_CACHE_MS) {
-    return cachedTop500.keys
-  }
-  // Parallelizzato invece di sequenziale — con 23 mercati in fila, uno
-  // alla volta, la funzione rischiava il timeout prima di raggiungere
-  // "US" (ultimo nella lista), escludendo sistematicamente tutti i
-  // titoli USA (IBM inclusa) dal calcolo dei 500, pur avendo dati corretti.
-  async function fetchAllPages(table: string, select: string, ex: string, extraFilter?: (q: any) => any) {
-    let rows: any[] = []
-    let from = 0
-    while (true) {
-      let q = supabase.from(table).select(select).eq('exchange', ex)
-      if (extraFilter) q = extraFilter(q)
-      const { data, error } = await q.range(from, from + 999)
-      if (error || !data || data.length === 0) break
-      rows = rows.concat(data)
-      if (data.length < 1000) break
-      from += 1000
-    }
-    return rows
-  }
-
-  const [universeResults, fundResults] = await Promise.all([
-    Promise.all(ALL_RANKED.map(ex => fetchAllPages('stocks', 'ticker,exchange', ex, q => q.eq('in_universe', true)))),
-    Promise.all(ALL_RANKED.map(ex => fetchAllPages('fundamentals', 'ticker,exchange,mkt_cap', ex, q => q.not('mkt_cap', 'is', null)))),
-  ])
-
-  const universeKeys = new Set<string>()
-  for (const rows of universeResults) for (const s of rows) universeKeys.add(`${s.ticker}.${s.exchange}`)
-  let all: { ticker: string; exchange: string; mkt_cap: number }[] = []
-  for (const rows of fundResults) all = all.concat(rows as any)
-
-  const filtered = all.filter(s => universeKeys.has(`${s.ticker}.${s.exchange}`))
-  const top500 = filtered.sort((a, b) => (b.mkt_cap ?? -1) - (a.mkt_cap ?? -1)).slice(0, 500)
-  const keys = new Set(top500.map(s => `${s.ticker}.${s.exchange}`))
-  cachedTop500 = { keys, fetchedAt: Date.now() }
-  return keys
+  const { data, error } = await supabase.from('top500_universe').select('ticker,exchange')
+  if (error || !data) return new Set()
+  return new Set(data.map((s: any) => `${s.ticker}.${s.exchange}`))
 }
 
 const EMU_EXCHANGES = ['MIL','XETRA','PA','AS','MC','BR','LS','VI','HE','IR','GR']
