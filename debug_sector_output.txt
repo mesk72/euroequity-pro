@@ -1,5 +1,2 @@
-AAPL.US: [{'ticker': 'AAPL', 'exchange': 'US', 'change1d': 0.003521, 'value_score': 22, 'growth_score': 80.98, 'combined_rank': None}]
-
-Campione con Best Score popolato (US/TSX): []
-
-Quanti in US+TSX hanno Best Score: */0
+Righe in news_cache ora: 0-0/35294
+Ultime righe: [{'ticker': 'OWLS', 'fetched_at': '2026-07-22T21:30:25.762601'}, {'ticker': 'KRT', 'fetched_at': '2026-07-22T21:30:25.762601'}, {'ticker': 'DBIN', 'fetched_at': '2026-07-22T21:30:25.762601'}]
