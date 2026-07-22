@@ -6,6 +6,12 @@
 # ============================================================
 
 import os, math, time, time as time_module, requests
+try:
+    from dateutil.relativedelta import relativedelta
+except ImportError:
+    import subprocess
+    subprocess.run(["pip", "install", "python-dateutil", "--break-system-packages", "-q"])
+    from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
 from collections import defaultdict
 import yfinance as yf
@@ -255,16 +261,26 @@ for stock in all_stocks:
     last_date = datetime.strptime(data[0]["date"], "%Y-%m-%d")
     chg1d = round((data[0]["close"] / data[1]["close"] - 1) * 100, 4)
 
-    def mom_cal(days):
-        target  = last_date - timedelta(days=days)
-        closest = min(data, key=lambda x: abs((datetime.strptime(x["date"], "%Y-%m-%d") - target).days))
-        if closest["close"] and closest["close"] != 0:
-            return round(last_px / closest["close"] - 1, 6)
+    def mom_new_weeks(trading_days_back):
+        if len(data) <= trading_days_back: return None
+        ref_price = data[trading_days_back]["close"]
+        if ref_price and ref_price != 0:
+            return round(last_px / ref_price - 1, 6)
+        return None
+
+    def mom_new_months(months):
+        target = last_date.date() - relativedelta(months=months)
+        target_plus1 = target + timedelta(days=1)
+        candidates = [p for p in data if p["date"] >= target_plus1.isoformat()]
+        if not candidates: return None
+        ref = min(candidates, key=lambda p: p["date"])
+        if ref["close"] and ref["close"] != 0:
+            return round(last_px / ref["close"] - 1, 6)
         return None
 
     mom_updates.append({"ticker": ticker, "exchange": exchange,
-                         "mom1w": mom_cal(7), "mom1m": mom_cal(31),
-                         "mom6m": mom_cal(182), "mom12m": mom_cal(365),
+                         "mom1w": mom_new_weeks(4), "mom1m": mom_new_months(1),
+                         "mom6m": mom_new_months(6), "mom12m": mom_new_months(12),
                          "change1d": chg1d, "price": last_px})
     ok += 1
 
