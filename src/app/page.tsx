@@ -2726,15 +2726,15 @@ function AppContent() {
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
           )}
           {page === 'bestvalue_us' && (user
-            ? <Screener key="bestvalue_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} initCombinedMin={0} />
+            ? <Screener key="bestvalue_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value US" />
           )}
           {page === 'bestideas_us' && (user
-            ? <Screener key="bestideas_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} />
+            ? <Screener key="bestideas_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas US" />
           )}
           {page === 'bestgrowth_us' && (user
-            ? <Screener key="bestgrowth_us" initExchange="US" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
+            ? <Screener key="bestgrowth_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
           {page === 'northamerica' && (
