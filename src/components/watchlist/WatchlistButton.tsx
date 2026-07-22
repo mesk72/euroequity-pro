@@ -77,7 +77,7 @@ export default function WatchlistButton({ stock, userId }: Props) {
         ticker: stock.ticker,
         exchange: stock.exchange,
         company: stock.company,
-        combined_rank: (stock as any).combinedRank ?? null,
+        combined_rank: (stock as any).combinedRank != null ? Math.round((stock as any).combinedRank) : null,
         wallet: walletIdx,
       })
       if (insertError) {
