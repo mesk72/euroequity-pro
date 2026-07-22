@@ -1,7 +1,14 @@
-Universo totale (in_universe=true): 7251
-Con mkt_cap e in_universe: 7251
-Top 500 selezionati: 500
-  batch 0: HTTP 201
-  batch 200: HTTP 201
-  batch 400: HTTP 201
-Righe totali nella tabella: 0-0/500
+=== US campione ===
+  {'ticker': 'TEM', 'value_score': 6, 'growth_score': 22.1, 'combined_rank': None}
+  {'ticker': 'CSWC', 'value_score': 90, 'growth_score': 36.4, 'combined_rank': None}
+  {'ticker': 'MSFT', 'value_score': 44, 'growth_score': 39.76, 'combined_rank': None}
+  {'ticker': 'ACO.X', 'value_score': 61, 'growth_score': None, 'combined_rank': None}
+  {'ticker': 'GSBC', 'value_score': 86, 'growth_score': 38.4, 'combined_rank': None}
+=== TSX campione ===
+  {'ticker': '^GSPTSE', 'value_score': None, 'growth_score': None, 'combined_rank': None}
+  {'ticker': 'AAUC', 'value_score': 37, 'growth_score': 88.54, 'combined_rank': None}
+  {'ticker': 'AAV', 'value_score': 88, 'growth_score': 47.93, 'combined_rank': None}
+  {'ticker': 'ABRA', 'value_score': 5, 'growth_score': 39.64, 'combined_rank': None}
+  {'ticker': 'ABX', 'value_score': 86, 'growth_score': 72.24, 'combined_rank': None}
+
+AAPL.US: [{'ticker': 'AAPL', 'exchange': 'US', 'value_score': 22, 'growth_score': 80.98, 'combined_rank': None}]
