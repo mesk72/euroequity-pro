@@ -71,10 +71,10 @@ It is a way to read what growth the market is currently pricing in — not a pri
       title: 'How to Use ForwardAlpha',
       content: `Key parameters to focus on:
 
-• Best Score ≥ 80 — the top 20% of equities combining Value and Growth. Agood idea when combined with Value Score and/or Growth Score.
+• Best Score — a selection of stocks with high appreciation potential.
 • Value Score — use to identify attractively valued stocks within a sector or comparable peer group.
 • Growth Score — use to identify companies with strong earnings, revenue and price momentum.
-• Momentum 1W, 1M, 6M, 12M — short, medium and long-term price performance indicators, calculated on calendar days.
+• Momentum 1W, 1M, 6M, 12M — short, medium and long-term price performance indicators.
 
 Prices are updated automatically every trading day. Fundamental data (PE, PB, Revenue, EPS) reflects the latest available consensus estimates and is updated weekly.
 
