@@ -377,14 +377,22 @@ requests.patch(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange
     params={"exchange": "in.(US,TSX)"},
     json={"combined_rank": None})
 all_scores = [d for d in rank_updates if d.get('value_score') is not None and d.get('growth_score') is not None]
+print(f"  DEBUG: rank_updates totali={len(rank_updates)}, all_scores (con entrambi i punteggi)={len(all_scores)}")
 comb_arr   = [d['value_score'] + d['growth_score'] for d in all_scores]
 combined_updates = [{"ticker": d['ticker'], "exchange": d['exchange'],
                      "combined_rank": min(99, int(round(pct_rank(comb_arr, d['value_score'] + d['growth_score']))))}
                     for d in all_scores]
+if combined_updates:
+    print(f"  DEBUG: esempio combined_updates[0] = {combined_updates[0]}")
 ok = 0
+first_error_shown = False
 for i in range(0, len(combined_updates), 100):
     r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=combined_updates[i:i+100])
-    if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
+    if r.status_code in (200, 201, 204):
+        ok += len(combined_updates[i:i+100])
+    elif not first_error_shown:
+        print(f"  DEBUG ERRORE POST combined_rank: HTTP {r.status_code} — {r.text[:500]}")
+        first_error_shown = True
 print(f"  Combined rank NA (US+TSX): {ok}/{len(combined_updates)}")
 ok_rank = ok
 
