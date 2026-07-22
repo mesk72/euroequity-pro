@@ -48,10 +48,19 @@ MARKET_WINDOWS = {
 def active_regions_now():
     rome_now = datetime.now(ZoneInfo("Europe/Rome"))
     hour = rome_now.hour
+    # Finestra speciale di recupero: dalle 12:00 alle 13:00 si torna
+    # esclusivamente sull'Asia, con chunk piu' grandi — cattura notizie
+    # pubblicate dopo la chiusura della finestra normale asiatica (che
+    # finisce alle 10:00), prima di riprendere Europa/Americhe alle 13:00.
+    if hour == 12:
+        return ['asia']
     active = [r for r, (start, end) in MARKET_WINDOWS.items() if start <= hour < end]
     return active or list(REGIONS.keys())  # fallback: se fuori da tutte le finestre, copre tutto piano piano
 
-CHUNK_SIZE = 2000
+def chunk_size_now():
+    rome_now = datetime.now(ZoneInfo("Europe/Rome"))
+    return 4000 if rome_now.hour == 12 else 2000
+
 STATE_FILE = "news_rotation_state.json"
 
 def load_state():
@@ -182,12 +191,15 @@ if sorted(state.get("active_regions", [])) != sorted(active):
 else:
     index = state.get("index", 0)
 
+chunk_size = chunk_size_now()
+print(f"Chunk size questa esecuzione: {chunk_size}")
+
 total = len(sorted_tickers)
 if total == 0:
     chunk = []
 else:
     index = index % total
-    end = index + CHUNK_SIZE
+    end = index + chunk_size
     chunk = sorted_tickers[index:end]
     if end > total:
         chunk += sorted_tickers[0:end - total]  # wrap-around
@@ -257,8 +269,8 @@ for i in range(0, len(all_rows), 200):
 print(f"ok={ok} fail={fail} notizie_scritte={write_ok} notizie_fallite={write_fail}")
 
 # Salva stato per la prossima rotazione
-save_state({"active_regions": active, "index": index + CHUNK_SIZE})
-print(f"Stato salvato: prossimo indice {(index + CHUNK_SIZE) % max(total,1)}")
+save_state({"active_regions": active, "index": index + chunk_size})
+print(f"Stato salvato: prossimo indice {(index + chunk_size) % max(total,1)}")
 
 
 print("Fetch news cache completato")
