@@ -1,8 +1,5 @@
-Righe totali in news_cache: 0-0/35294
+AAPL.US: [{'ticker': 'AAPL', 'exchange': 'US', 'change1d': 0.003521, 'value_score': 22, 'growth_score': 80.98, 'combined_rank': None}]
 
-Ultime 5 righe inserite:
-  {'ticker': 'DBIN', 'exchange': 'US', 'pub_date': 'Sun, 09 Feb 2020 05:13:29 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
-  {'ticker': 'DBIN', 'exchange': 'US', 'pub_date': 'Thu, 15 Mar 2018 18:06:21 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
-  {'ticker': 'OWLS', 'exchange': 'US', 'pub_date': 'Thu, 09 Oct 2025 15:18:57 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
-  {'ticker': 'KRT', 'exchange': 'US', 'pub_date': 'Sat, 13 Jun 2026 07:00:00 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
-  {'ticker': 'STEL', 'exchange': 'US', 'pub_date': 'Tue, 21 Jul 2026 14:20:01 GMT', 'fetched_at': '2026-07-22T21:30:25.762601'}
+Campione con Best Score popolato (US/TSX): []
+
+Quanti in US+TSX hanno Best Score: */0
