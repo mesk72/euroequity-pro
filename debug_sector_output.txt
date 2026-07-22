@@ -1,1 +1,4 @@
-IBM in stocks ORA: [{'ticker': 'IBM', 'exchange': 'US', 'company': 'International Business Machines Corporation', 'in_universe': True}]
+Totale candidati con in_universe + mkt_cap: 7876
+Top 500 calcolati: 500
+IBM.US e' nella top 500? True
+Posizione di IBM per market cap: #55
