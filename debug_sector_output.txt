@@ -1,2 +1,18 @@
-Rolls-Royce varianti: [{'ticker': 'RR.', 'exchange': 'LSE', 'company': 'Rolls-Royce Holdings plc'}]
-Alphabet varianti: [{'ticker': 'GOOGL', 'exchange': 'US', 'company': 'Alphabet Inc.'}]
+Coperti: 14/14
+
+Peso totale coperto: 99.99%  (ribilanciato su questo totale)
+
+Weighted Avg Value Score:  42.10
+Weighted Avg Growth Score: 87.22
+Weighted Avg Best Score:   73.58
+
+Sector allocation (ribilanciato):
+  Information Technology: 51.88%
+  Financials: 27.83%
+  Industrials: 13.95%
+  Consumer Discretionary: 3.22%
+  Communication Services: 3.12%
+
+Country allocation (ribilanciato):
+  USA: 92.66%
+  GBR: 7.34%
