@@ -1,1 +1,4 @@
-Righe attuali (prima di qualunque azione): None
+Esempio righe (conferma che la tabella e' ancora intatta):
+  {'ticker': 'SWTQ', 'exchange': 'SWX', 'date': '2025-01-31'}
+  {'ticker': 'SWTQ', 'exchange': 'SWX', 'date': '2025-02-03'}
+  {'ticker': 'SWTQ', 'exchange': 'SWX', 'date': '2025-02-04'}
