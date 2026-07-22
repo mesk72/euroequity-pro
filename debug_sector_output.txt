@@ -1,2 +1,1 @@
-=== Data piu' recente per mercato + copertura a campione (20 titoli) ===
-
+=== Data piu' recente + copertura a campione (8 titoli) ===
