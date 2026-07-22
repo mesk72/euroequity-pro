@@ -1,2 +1,2 @@
-Righe in news_cache ora: 0-0/35294
-Ultime righe: [{'ticker': 'OWLS', 'fetched_at': '2026-07-22T21:30:25.762601'}, {'ticker': 'KRT', 'fetched_at': '2026-07-22T21:30:25.762601'}, {'ticker': 'DBIN', 'fetched_at': '2026-07-22T21:30:25.762601'}]
+Righe in top500_universe: 0-0/500
+Status: 206
