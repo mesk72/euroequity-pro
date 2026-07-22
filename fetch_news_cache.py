@@ -185,30 +185,15 @@ sorted_tickers = sorted(
     reverse=True
 )
 
-# Rotazione: se il set di regioni attive e' cambiato dall'ultima
-# esecuzione (es. l'Asia ha appena chiuso, l'Europa e' subentrata),
-# riparte da zero sul nuovo pool. Altrimenti avanza di CHUNK_SIZE.
-state = load_state()
-if sorted(state.get("active_regions", [])) != sorted(active):
-    print("Regioni attive cambiate rispetto all'ultima esecuzione — indice resettato")
-    index = 0
-else:
-    index = state.get("index", 0)
-
-chunk_size = chunk_size_now()
-print(f"Chunk size questa esecuzione: {chunk_size}")
-
-total = len(sorted_tickers)
-if total == 0:
-    chunk = []
-else:
-    index = index % total
-    end = index + chunk_size
-    chunk = sorted_tickers[index:end]
-    if end > total:
-        chunk += sorted_tickers[0:end - total]  # wrap-around
-
-print(f"Chunk processato: {len(chunk)} titoli (indice {index} su {total})")
+# Nessuna rotazione a chunk — GitHub Actions non garantisce la cadenza
+# di 20 minuti per schedule cosi' frequenti (li declassa/ritarda durante
+# i picchi di carico della piattaforma, comportamento documentato). Dato
+# che non possiamo contare su esecuzioni regolari, ogni volta che gira
+# processa SEMPRE l'intero pool delle regioni attualmente attive, non
+# un pezzo — cosi' qualunque sia il vero intervallo tra le esecuzioni,
+# quello che serve viene comunque coperto per intero.
+chunk = sorted_tickers
+print(f"Processato l'intero pool attivo: {len(chunk)} titoli")
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -276,8 +261,7 @@ for i in range(0, len(all_rows), 200):
 print(f"ok={ok} fail={fail} notizie_scritte={write_ok} notizie_fallite={write_fail}")
 
 # Salva stato per la prossima rotazione
-save_state({"active_regions": active, "index": index + chunk_size})
-print(f"Stato salvato: prossimo indice {(index + chunk_size) % max(total,1)}")
+print("Nessuno stato di rotazione da salvare — l'intero pool viene processato ad ogni esecuzione")
 
 
 print("Fetch news cache completato")
