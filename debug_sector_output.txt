@@ -1,3 +1,0 @@
-Righe totali da salvare: 
-Backup completato: 1000 righe
-Salvato in prices_eod_backup.json
