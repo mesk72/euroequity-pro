@@ -1,21 +1,29 @@
-import os, requests
+import os, requests, json
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
-headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
+headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY, "Prefer": "count=exact"}
 
-samples = [("AAPL","US"), ("SAP","XETRA"), ("7203","TSE")]
+# Conta prima quante righe ci sono in totale, per sapere cosa aspettarci
+r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r, params={"select":"ticker","limit":"1"})
+total = r.headers.get("content-range","").split("/")[-1]
+print(f"Righe totali da salvare: {total}")
 
-for ticker, exchange in samples:
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"date,adj_close","ticker":f"eq.{ticker}","exchange":f"eq.{exchange}",
-                 "order":"date.desc","limit":"40"})
-    rows = sorted(r.json(), key=lambda x: x["date"])
-    print(f"\n=== {ticker}.{exchange} — ultimi 40 giorni ===")
-    prev = None
-    for row in rows:
-        pct = None
-        if prev is not None and prev != 0:
-            pct = round((row["adj_close"]/prev - 1)*100, 2)
-        flag = "  <-- SALTO SOSPETTO" if pct is not None and abs(pct) > 8 else ""
-        print(f"  {row['date']}  {row['adj_close']}  {pct}%{flag}")
-        prev = row["adj_close"]
+# Backup a blocchi, salvato come file compresso per non superare limiti di dimensione
+all_rows = []
+offset = 0
+headers_plain = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
+while True:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_plain,
+        params={"select":"ticker,exchange,date,adj_close","limit":"5000","offset":str(offset)})
+    batch = r.json()
+    if not isinstance(batch,list) or not batch: break
+    all_rows.extend(batch)
+    offset += 5000
+    if offset % 50000 == 0:
+        print(f"  ...{offset} righe scaricate")
+    if len(batch) < 5000: break
+
+print(f"Backup completato: {len(all_rows)} righe")
+with open("prices_eod_backup.json", "w") as f:
+    json.dump(all_rows, f)
+print("Salvato in prices_eod_backup.json")
