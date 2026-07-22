@@ -1,1 +1,8 @@
-Nessuna riga o errore: []
+Righe totali in news_cache: 0-0/9859
+
+Esempio righe:
+{'ticker': '939', 'company': 'China Construction Bank Corporation', 'title': "China Construction Bank's Stock Price Dips to 8.54 HKD, Records 1.27% Decline: A Detailed Performance Analysis - Smartkarma", 'region': 'asia'}
+{'ticker': '939', 'company': 'China Construction Bank Corporation', 'title': "China Construction Bank (CICHY) Upgraded to Buy: Here's What You Should Know - Yahoo Finance", 'region': 'asia'}
+{'ticker': '939', 'company': 'China Construction Bank Corporation', 'title': 'Is China Construction Bank (SEHK:939) Undervalued Following Its Analyst Upgrade? - simplywall.st', 'region': 'asia'}
+{'ticker': '939', 'company': 'China Construction Bank Corporation', 'title': "China Construction Bank's Stock Price Soars to 8.65 HKD, Witnessing a Robust Increase of 4.34% - Smartkarma", 'region': 'asia'}
+{'ticker': '939', 'company': 'China Construction Bank Corporation', 'title': 'Is China Construction Bank (CICHY) Stock Undervalued Right Now? - qz.com', 'region': 'asia'}
