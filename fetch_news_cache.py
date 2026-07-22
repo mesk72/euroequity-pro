@@ -38,28 +38,32 @@ REGIONS = {
 # Fuori da queste finestre un mercato non pubblica notizie fresche,
 # quindi non ha senso processarlo — si segue il flusso informativo vero
 # invece di girare alla cieca su tutto l'universo ogni volta.
-MARKET_WINDOWS = {
-    'asia':     (2, 10),   # 02:00-10:00, nessuna sovrapposizione con Europa
-    'europe':   (10, 18),  # 10:00-18:00
-    'americas': (12, 23),  # 12:00-23:00 (pre-market da mezzogiorno) — si
-                            # sovrappone a Europa solo tra le 12:00 e le 18:00
-}
+# Programma esplicito ora per ora (ora italiana, Europe/Rome), ciclo di
+# 24h senza buchi: (ora_inizio, ora_fine, regioni, chunk_size)
+SCHEDULE = [
+    (0,  8,  ['asia'],                        2000),
+    (8,  10, ['asia', 'europe'],               2000),
+    (10, 12, ['europe'],                       2000),
+    (12, 13, ['asia', 'europe', 'americas'],   4000),  # finestra speciale
+    (13, 18, ['europe', 'americas'],           2000),
+    (18, 24, ['americas'],                     2000),
+]
 
-def active_regions_now():
+def _schedule_slot_now():
     rome_now = datetime.now(ZoneInfo("Europe/Rome"))
     hour = rome_now.hour
-    # Finestra speciale di recupero: dalle 12:00 alle 13:00 si torna
-    # esclusivamente sull'Asia, con chunk piu' grandi — cattura notizie
-    # pubblicate dopo la chiusura della finestra normale asiatica (che
-    # finisce alle 10:00), prima di riprendere Europa/Americhe alle 13:00.
-    if hour == 12:
-        return ['asia']
-    active = [r for r, (start, end) in MARKET_WINDOWS.items() if start <= hour < end]
-    return active or list(REGIONS.keys())  # fallback: se fuori da tutte le finestre, copre tutto piano piano
+    for start, end, regions, chunk in SCHEDULE:
+        if start <= hour < end:
+            return regions, chunk
+    return list(REGIONS.keys()), 2000  # fallback, non dovrebbe mai servire
+
+def active_regions_now():
+    regions, _ = _schedule_slot_now()
+    return regions
 
 def chunk_size_now():
-    rome_now = datetime.now(ZoneInfo("Europe/Rome"))
-    return 4000 if rome_now.hour == 12 else 2000
+    _, chunk = _schedule_slot_now()
+    return chunk
 
 STATE_FILE = "news_rotation_state.json"
 
