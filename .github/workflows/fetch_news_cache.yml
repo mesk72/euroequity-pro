@@ -2,13 +2,13 @@ name: Fetch News Cache
 
 on:
   schedule:
-    - cron: '0 * * * *'   # ogni ora, intero universo
+    - cron: '*/20 * * * *'   # ogni 20 minuti, rotazione intelligente per orario mercati
   workflow_dispatch:
 
 jobs:
   fetch-news:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -19,13 +19,13 @@ jobs:
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: python fetch_news_cache.py | tee fetch_news_cache_last_output.txt
-      - name: Commit log
+      - name: Commit log and rotation state
         continue-on-error: true
         if: always()
         run: |
           git config user.name "debug-bot"
           git config user.email "debug-bot@users.noreply.github.com"
-          git add fetch_news_cache_last_output.txt
-          git commit -m "log news cache output" || echo "nothing to commit"
+          git add fetch_news_cache_last_output.txt news_rotation_state.json
+          git commit -m "log news cache output + rotation state" || echo "nothing to commit"
           git pull --rebase
           git push
