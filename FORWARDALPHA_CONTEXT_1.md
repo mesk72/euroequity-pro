@@ -2817,3 +2817,19 @@ Le pagine Best Value/Growth/Ideas ora filtrano lato server (nuovi parametri minV
 LIMITE RESIDUO NOTO, non risolto per design: lo Screener generico (senza soglie) continua a esporre l'intero universo a chiunque sia loggato - e' la sua funzione (navigazione libera). Un utente loggato determinato puo' comunque vedere tutti i dati grezzi tramite lo Screener normale. Non c'e' fix software per questo senza limitare la funzionalita' stessa dello Screener.
 
 Contesto: Andrea e' in contatto con un programmatore londinese interessato ai dati - raccomandato NON dare accesso account finche' non si decide consapevolmente il livello di rischio accettabile.
+
+---
+
+## FIX MOMENTUM nei daily_us_yahoo.py / daily_eu_yahoo.py / daily_apac_yahoo.py (22 luglio 2026, notte)
+
+**Trovato un bug di regressione**: i tre script daily basati su Yahoo usavano ancora la VECCHIA formula momentum (`mom_cal`, giorno di trading piu' vicino alla data calendario target) invece della NUOVA formula stile Yahoo Finance gia' costruita e verificata in sessione precedente (vedi `apply_3y5y_all.py`, usata li' solo per mom3y/mom5y).
+
+**Formula corretta ora applicata in tutti e tre**:
+- mom1w = 4 giorni di TRADING indietro (non calendario, non 5 giorni) — `data[4]['close']` con data ordinata desc
+- mom1m/mom6m/mom12m = calendario indietro preciso (relativedelta) +1 giorno, poi il PRIMO giorno di trading disponibile con data >= target+1 (non il piu' vicino in assoluto)
+
+Stessa identica logica di `find_ref_date()` in `apply_3y5y_all.py`, ora duplicata (come `mom_new_weeks`/`mom_new_months`) dentro i tre daily script stessi, cosi' mom1w/1m/6m/12m/3y/5y usano tutti la stessa regola coerente.
+
+**Verificata solo per compilazione e coerenza logica** — NON ancora verificata con un run reale in produzione ne' con un controllo manuale su titoli noti (tipo il caso Martin Luther King Day gia' usato per validare mom6m in precedenza). Da fare alla prossima ripresa prima di fidarsi ciecamente dei numeri prodotti.
+
+**Ricalcolo Growth Score / Best Score**: come gia' notato in sessioni precedenti, ogni volta che il momentum cambia formula, Growth Score e Best Score (che dipendono da mom6_adj/mom12_adj) vanno ricalcolati sull'intero universo per restare coerenti — da fare dopo aver verificato che il nuovo momentum sia corretto.
