@@ -1,1 +1,25 @@
-=== Data piu' recente + copertura a campione (8 titoli) ===
+FATTO — scritto in minimal_check_result.txt
+MIL: ERRORE: 0
+XETRA: ERRORE: 0
+PA: ERRORE: 0
+AS: ERRORE: 0
+MC: ERRORE: 0
+BR: ERRORE: HTTPSConnectionPool(host='mlqkisnizgyvvqajdvbh.supabase.co', port=443): Read timed out. (read timeout=10)
+LS: ERRORE: 0
+VI: ERRORE: 0
+HE: ERRORE: 0
+IR: ERRORE: HTTPSConnectionPool(host='mlqkisnizgyvvqajdvbh.supabase.co', port=443): Read timed out. (read timeout=10)
+GR: ERRORE: 0
+LSE: ERRORE: 0
+SWX: ERRORE: 0
+OM: ERRORE: 0
+OB: ERRORE: 0
+CPSE: ERRORE: 0
+NGM: ERRORE: 0
+TSE: 2026-07-21
+SEHK: ERRORE: 0
+TSX: ERRORE: 0
+ASX: ERRORE: 0
+KRX: ERRORE: 0
+SGX: ERRORE: 0
+US: 2026-07-21
