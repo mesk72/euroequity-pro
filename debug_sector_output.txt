@@ -1,15 +1,2 @@
-Trovati: 12/14
-Non trovati: [('RR', 'LSE', 4.84), ('GOOG', 'US', 3.12)]
-
-{'ticker': 'BAC', 'exchange': 'US', 'weight': 7.44, 'company': 'Bank of America Corporation', 'sector': 'Financials', 'country': 'USA', 'value_score': 82, 'growth_score': 69.42, 'best_score': 89.86}
-{'ticker': 'JPM', 'exchange': 'US', 'weight': 7.19, 'company': 'JPMorgan Chase & Co.', 'sector': 'Financials', 'country': 'USA', 'value_score': 72, 'growth_score': 52.76, 'best_score': 73.52}
-{'ticker': 'GS', 'exchange': 'US', 'weight': 6.86, 'company': 'The Goldman Sachs Group, Inc.', 'sector': 'Financials', 'country': 'USA', 'value_score': 63, 'growth_score': 78.22, 'best_score': 84.74}
-{'ticker': 'C', 'exchange': 'US', 'weight': 6.34, 'company': 'Citigroup Inc.', 'sector': 'Financials', 'country': 'USA', 'value_score': 83, 'growth_score': 85.7, 'best_score': 96.92}
-{'ticker': 'AMD', 'exchange': 'US', 'weight': 10.75, 'company': 'Advanced Micro Devices, Inc.', 'sector': 'Information Technology', 'country': 'USA', 'value_score': 15, 'growth_score': 99.41, 'best_score': 63.9}
-{'ticker': 'NVDA', 'exchange': 'US', 'weight': 6.45, 'company': 'NVIDIA Corporation', 'sector': 'Information Technology', 'country': 'USA', 'value_score': 34, 'growth_score': 90.69, 'best_score': 73.49}
-{'ticker': 'AMZN', 'exchange': 'US', 'weight': 3.22, 'company': 'Amazon.com, Inc.', 'sector': 'Consumer Discretionary', 'country': 'USA', 'value_score': 36, 'growth_score': 68.02, 'best_score': 53.35}
-{'ticker': 'MU', 'exchange': 'US', 'weight': 11.91, 'company': 'Micron Technology, Inc.', 'sector': 'Information Technology', 'country': 'USA', 'value_score': 65, 'growth_score': 99.83, 'best_score': 95.47}
-{'ticker': 'IAG', 'exchange': 'LSE', 'weight': 2.5, 'company': 'International Consolidated Airlines Group S.A.', 'sector': 'Industrials', 'country': 'GBR', 'value_score': 84, 'growth_score': 45.99, 'best_score': 76.63}
-{'ticker': 'KLAC', 'exchange': 'US', 'weight': 11.74, 'company': 'KLA Corporation', 'sector': 'Information Technology', 'country': 'USA', 'value_score': 16, 'growth_score': 97.26, 'best_score': 62.37}
-{'ticker': 'CAT', 'exchange': 'US', 'weight': 6.61, 'company': 'Caterpillar Inc.', 'sector': 'Industrials', 'country': 'USA', 'value_score': 20, 'growth_score': 94.43, 'best_score': 63.93}
-{'ticker': 'INTC', 'exchange': 'US', 'weight': 11.02, 'company': 'Intel Corporation', 'sector': 'Information Technology', 'country': 'USA', 'value_score': 18, 'growth_score': 97.83, 'best_score': 65.33}
+Rolls-Royce varianti: [{'ticker': 'RR.', 'exchange': 'LSE', 'company': 'Rolls-Royce Holdings plc'}]
+Alphabet varianti: [{'ticker': 'GOOGL', 'exchange': 'US', 'company': 'Alphabet Inc.'}]
