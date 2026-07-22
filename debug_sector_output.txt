@@ -1,33 +1,28 @@
-=== Copertura per mercato ===
-  MIL: universo=117, con_dati(campione)=0
-  XETRA: universo=211, con_dati(campione)=3
-  PA: universo=217, con_dati(campione)=1
-  AS: universo=98, con_dati(campione)=1
-  MC: universo=100, con_dati(campione)=1
-  BR: universo=100, con_dati(campione)=1
-  LS: universo=35, con_dati(campione)=2
-  VI: universo=53, con_dati(campione)=1
-  HE: universo=100, con_dati(campione)=1
-  IR: universo=15, con_dati(campione)=1
-  GR: universo=100, con_dati(campione)=2
-  LSE: universo=423, con_dati(campione)=1
-  SWX: universo=161, con_dati(campione)=1
-  OM: universo=206, con_dati(campione)=1
-  OB: universo=100, con_dati(campione)=1
-  CPSE: universo=101, con_dati(campione)=1
-  NGM: universo=0, con_dati(campione)=0
-  TSE: universo=1000, con_dati(campione)=1
-  SEHK: universo=500, con_dati(campione)=1
-  TSX: universo=400, con_dati(campione)=2
-  ASX: universo=350, con_dati(campione)=1
-  KRX: universo=400, con_dati(campione)=1
-  SGX: universo=100, con_dati(campione)=1
-  US: universo=3002, con_dati(campione)=5
+=== Righe totali per mercato (stima copertura reale) ===
+  MIL: righe=?, stima_titoli_coperti~=?
+  XETRA: righe=?, stima_titoli_coperti~=?
+  PA: righe=?, stima_titoli_coperti~=?
+  AS: righe=?, stima_titoli_coperti~=?
+  MC: righe=?, stima_titoli_coperti~=?
+  BR: righe=?, stima_titoli_coperti~=?
+  LS: righe=?, stima_titoli_coperti~=?
+  VI: righe=?, stima_titoli_coperti~=?
+  HE: righe=?, stima_titoli_coperti~=?
+  IR: righe=?, stima_titoli_coperti~=?
+  GR: righe=?, stima_titoli_coperti~=?
+  LSE: righe=?, stima_titoli_coperti~=?
+  SWX: righe=?, stima_titoli_coperti~=?
+  OM: righe=?, stima_titoli_coperti~=?
+  OB: righe=?, stima_titoli_coperti~=?
+  CPSE: righe=?, stima_titoli_coperti~=?
+  NGM: righe=?, stima_titoli_coperti~=?
+  TSE: righe=1201626, stima_titoli_coperti~=953
+  SEHK: righe=?, stima_titoli_coperti~=?
+  TSX: righe=?, stima_titoli_coperti~=?
+  ASX: righe=?, stima_titoli_coperti~=?
+  KRX: righe=?, stima_titoli_coperti~=?
+  SGX: righe=?, stima_titoli_coperti~=?
+  US: righe=3446829, stima_titoli_coperti~=2735
 
-Totale universo: 7889
-
-=== Profondita' storica campione ===
-  AAPL.US: da [{'date': '2021-07-23'}] a [{'date': '2026-07-21'}]
-  SAP.XETRA: da [{'date': '2021-07-23'}] a [{'date': '2026-07-21'}]
-  7203.TSE: da [{'date': '2021-07-26'}] a [{'date': '2026-07-21'}]
-  NOVO B.CPSE: da [{'date': '2021-07-23'}] a [{'date': '2026-07-21'}]
+Totale righe in tutto prices_eod: 4648455
+Stima titoli totali coperti: ~3689
