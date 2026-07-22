@@ -58,14 +58,11 @@ def parse_rss(xml_text):
 def fetch_ticker_news(ticker, exchange, company, yahoo_ticker):
     results = []
     UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-    # Yahoo Finance RSS
-    try:
-        url = f"https://feeds.finance.yahoo.com/rss/2.0/headline?s={yahoo_ticker}&region=US&lang=en-US"
-        r = requests.get(url, headers={'User-Agent': UA}, timeout=8)
-        if r.status_code == 200:
-            results.extend(parse_rss(r.text))
-    except: pass
-    # Google News RSS
+    # Solo Google News RSS — aggrega gia' articoli di Yahoo Finance e altre
+    # fonti, osservato empiricamente (pagina titolo singolo usa solo Google
+    # come fonte dichiarata ma mostra spesso articoli originati da Yahoo).
+    # Rimossa la chiamata diretta a Yahoo: dimezza il carico totale di
+    # richieste esterne, riducendo rischio di timeout/blocco.
     name_words = [w for w in company.split() if len(w)>2 and w not in STOP][:2]
     if name_words:
         try:
@@ -135,14 +132,16 @@ for region, exchanges in REGIONS.items():
             offset += 1000
             if len(batch) < 1000: break
 
-    # 3. Ordina per mktcap (solo per ordine di priorita' in caso di
-    # rallentamenti — ma si processa comunque l'intero universo)
+    # 3. Ordina per mktcap — intero universo, ora con una sola fonte
+    # (Google News) il carico totale e' dimezzato rispetto a prima
+    # (Yahoo+Google), quindi si riprova l'intero universo per verificare
+    # in concreto se basta a evitare il timeout.
     sorted_tickers = sorted(
         [(k, v) for k, v in funds_map.items()],
         key=lambda x: x[1].get('mkt_cap') or 0,
         reverse=True
     )
-    print(f"  Da processare: {len(sorted_tickers)} titoli (intero universo, nessun taglio)")
+    print(f"  Da processare: {len(sorted_tickers)} titoli (intero universo, solo Google News)")
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
