@@ -285,7 +285,7 @@ for stock in all_stocks:
     ok += 1
 
 for i in range(0, len(mom_updates), 100):
-    requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=mom_updates[i:i+100])
+    requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=mom_updates[i:i+100])
 print("  Momentum ok=" + str(ok) + " fail=" + str(fail))
 ok_momentum = ok
 
@@ -402,7 +402,7 @@ if unranked:
 
 ok = 0
 for i in range(0, len(rank_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=rank_updates[i:i+100])
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=rank_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
 print("  Rank EU: " + str(ok) + "/" + str(len(rank_updates)))
 
@@ -414,7 +414,7 @@ combined_updates = [{"ticker": d["ticker"], "exchange": d["exchange"],
                     for d in all_scores]
 ok = 0
 for i in range(0, len(combined_updates), 100):
-    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_up, json=combined_updates[i:i+100])
+    r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=combined_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
 print("  Combined rank EU: " + str(ok) + "/" + str(len(combined_updates)))
 ok_rank = ok
