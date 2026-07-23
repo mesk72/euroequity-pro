@@ -113,6 +113,7 @@ const SCORE_MOMENTUM_FIELDS = new Set([
   'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m',
   'revGrowthQuintile', 'epsGrowthQuintile', 'peTrailingQuintile', 'peForwardQuintile', 'pbQuintile',
   'sectorEpsGrowthQuintile', 'sectorRevGrowthQuintile',
+  'continentEpsGrowthQuintile', 'continentRevGrowthQuintile',
 ])
 
 function quintileFrom(rank: number | null | undefined): string | null {
@@ -491,25 +492,33 @@ export async function GET(req: NextRequest) {
         if (!bySector[sec]) bySector[sec] = []
         bySector[sec].push(s)
       }
+      const wavgOver = (list: any[], field: string) => {
+        let num = 0, den = 0
+        for (const s of list) {
+          if (s[field] == null || s.mktCap == null) continue
+          num += s[field] * s.mktCap
+          den += s.mktCap
+        }
+        return den > 0 ? num / den : null
+      }
+      const toQ = (r: number | null) => r == null ? null :
+        r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile'
+
       const sectorQuintile: Record<string, { eps: string | null; rev: string | null }> = {}
       for (const [sec, list] of Object.entries(bySector)) {
-        const wavg = (field: string) => {
-          let num = 0, den = 0
-          for (const s of list) {
-            if (s[field] == null || s.mktCap == null) continue
-            num += s[field] * s.mktCap
-            den += s.mktCap
-          }
-          return den > 0 ? num / den : null
-        }
-        const toQ = (r: number | null) => r == null ? null :
-          r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile'
-        sectorQuintile[sec] = { eps: toQ(wavg('rankEpsGr')), rev: toQ(wavg('rankRevGr')) }
+        sectorQuintile[sec] = { eps: toQ(wavgOver(list, 'rankEpsGr')), rev: toQ(wavgOver(list, 'rankRevGr')) }
       }
+      // Aggregato sull'INTERO continente (tutti i settori insieme) — stessa
+      // logica provata, usata per la riga "totale" della Sector Heatmap.
+      const continentEps = toQ(wavgOver(stocks, 'rankEpsGr'))
+      const continentRev = toQ(wavgOver(stocks, 'rankRevGr'))
+
       for (const s of stocks) {
         const sec = s.sector || 'Unknown'
         s.sectorEpsGrowthQuintile = sectorQuintile[sec]?.eps ?? null
         s.sectorRevGrowthQuintile = sectorQuintile[sec]?.rev ?? null
+        s.continentEpsGrowthQuintile = continentEps
+        s.continentRevGrowthQuintile = continentRev
       }
     }
 
