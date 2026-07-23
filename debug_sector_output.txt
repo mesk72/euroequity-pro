@@ -1,20 +1,7 @@
-{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'UNI', 'exchange': 'MC', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'BIRG', 'exchange': 'IR', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'UNI', 'exchange': 'MC', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'FHZN', 'exchange': 'SWX', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
-{'ticker': 'UNI', 'exchange': 'MC', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+=== REVERSE EARNINGS MODEL (implied_growth_10y) ===
+AAPL: [{'ticker': 'AAPL', 'implied_growth_10y': 0.1574, 'beta': 1.097, 'ke': 0.1016}]
+
+=== PREZZI PER MERCATO ===
+AAPL.US: [{'date': '2026-07-21'}]
+SAP.XETRA: [{'date': '2026-07-23'}]
+7203.TSE: [{'date': '2026-07-21'}]
