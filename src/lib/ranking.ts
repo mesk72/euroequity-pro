@@ -88,6 +88,11 @@ export interface Stock {
   rankPb?:      number | null
   rankEpsGr?:   number | null
   rankRevGr?:   number | null
+  peTrailingQuintile?: string | null
+  peForwardQuintile?:  string | null
+  pbQuintile?:         string | null
+  epsGrowthQuintile?:  string | null
+  revGrowthQuintile?:  string | null
 }
 
 export function computeScores(stocks: Stock[]): Stock[] {
