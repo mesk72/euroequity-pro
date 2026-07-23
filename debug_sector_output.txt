@@ -1,1 +1,2 @@
-AAPL ultima data ORA: [{'date': '2026-07-22'}]
+Titoli US con implied_growth_10y popolato: 0-0/2156
+Campione: [{'ticker': 'AAPL', 'implied_growth_10y': 0.1574, 'beta': 1.097, 'ke': 0.1016}, {'ticker': 'MSFT', 'implied_growth_10y': 0.0889, 'beta': 1.13, 'ke': 0.1032}, {'ticker': 'NVDA', 'implied_growth_10y': 0.179, 'beta': 2.211, 'ke': 0.1573}]
