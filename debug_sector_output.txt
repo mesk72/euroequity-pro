@@ -1,2 +1,2 @@
-AAPL: [{'ticker': 'AAPL', 'value_score': 22, 'growth_score': 84, 'combined_rank': 54}]
-Quanti con Best Score in US+TSX: 0-0/3046
+top500_universe: 206 0-0/500
+institutional_viewers: 200 */0
