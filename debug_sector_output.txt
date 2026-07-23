@@ -1,4 +1,20 @@
-Righe totali ultime 24h (campione max 1000): 1000
-Ticker distinti con notizie fresche: 207
-Per regione: {'asia': 981, 'europe': 16, 'americas': 3}
-Esempio ticker coperti: [('257', 'SEHK'), ('9412', 'TSE'), ('9041', 'TSE'), ('9501', 'TSE'), ('IGO', 'ASX'), ('HWKN', 'US'), ('AJBU', 'SGX'), ('2880', 'SEHK'), ('A004170', 'KRX'), ('A267270', 'KRX')]
+{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'UNI', 'exchange': 'MC', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'BIRG', 'exchange': 'IR', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'UNI', 'exchange': 'MC', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'TIT', 'exchange': 'MIL', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'FHZN', 'exchange': 'SWX', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKER', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'AKRBP', 'exchange': 'OB', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
+{'ticker': 'UNI', 'exchange': 'MC', 'region': 'europe', 'fetched_at': '2026-07-23T09:00:45.79128'}
