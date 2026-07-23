@@ -257,11 +257,21 @@ export async function GET(req: NextRequest) {
   // Verifica proprietario — solo Andrea vede l'universo completo, senza
   // nessun ricalcolo di nulla. Chiunque altro vede un sottoinsieme.
   let isOwner = false
+  let isInstitutionalViewer = false
   const authHeader = req.headers.get('authorization') || ''
   if (authHeader.startsWith('Bearer ')) {
     try {
       const { data: { user } } = await supabase.auth.getUser(authHeader.slice(7))
       if (user?.email === 'andreameschini19@gmail.com') isOwner = true
+      // Livello "institutional viewer" — vede TUTTI gli 8.000 titoli
+      // (nessun limite ai 500), ma non vede MAI i dati grezzi, in nessuna
+      // vista — gestito da una lista email dedicata (institutional_viewers),
+      // che Andrea puo' aggiornare direttamente senza toccare codice.
+      if (!isOwner && user?.email) {
+        const { data: viewerRow } = await supabase
+          .from('institutional_viewers').select('email').eq('email', user.email).maybeSingle()
+        if (viewerRow) isInstitutionalViewer = true
+      }
     } catch {}
   }
 
@@ -321,7 +331,7 @@ export async function GET(req: NextRequest) {
         // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
         // fonte per il momentum, gia' corretta e verificata.
       }
-      if (!isOwner) {
+      if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
         if (!top500.has(`${mapped.ticker}.${mapped.exchange}`)) {
           return jsonNoCache({ stocks: [], restricted: true, ticker: mapped.ticker, company: mapped.company })
@@ -346,7 +356,7 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
       let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
-      if (!isOwner) {
+      if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
         stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
       }
@@ -382,7 +392,7 @@ export async function GET(req: NextRequest) {
 
     // Sottoinsieme dei 500 per il proprietario escluso — decide solo
     // QUALI righe includere, nessun valore viene mai ricalcolato.
-    if (!isOwner) {
+    if (!isOwner && !isInstitutionalViewer) {
       const top500 = await getTop500Keys()
       stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
     }
