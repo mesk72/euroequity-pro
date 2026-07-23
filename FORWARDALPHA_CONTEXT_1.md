@@ -2847,3 +2847,17 @@ Come usarlo (Andrea deve ricordarselo, da rispiegare bene alla prossima occasion
 4. Per cancellare l'account del tutto: Supabase -> Authentication -> Users -> cerca l'email -> Delete user (azione diversa, tocca l'autenticazione vera, non questa tabella)
 
 Compromesso noto e accettato: la colonna "EPS Gr %" nella Sector Heatmap resta vuota per questo livello (dipende da dati grezzi) - da sistemare con calma, Andrea ha detto "hai una settimana di tempo", non urgente.
+
+---
+
+## SISTEMA FASCE QUALITATIVE (23 luglio 2026, mattina)
+
+Trovato che il grande revert di stanotte aveva eliminato completamente la protezione sui dati grezzi (non solo per un campo, per tutti). Ricostruita in /api/db/stocks/route.ts, con un miglioramento rispetto a prima: invece di lasciare vuoti i campi nascosti (PE trailing/forward, PB, EPS growth, Revenue growth), il server ora manda anche una fascia qualitativa (High/Average/Low, soglie 70/30 sul percentile) per ciascuno di questi 5 fattori - calcolata da rank_pe_ltm/rank_pe_ntm/rank_pb/rank_eps_gr/rank_rev_gr, gia' esistenti nel database, nessun nuovo calcolo.
+
+Funzione unica condivisa (applyTiers) per tutti e 5 i fattori insieme, per evitare di dimenticarne uno quando si corregge un altro (errore fatto e poi corretto in questa stessa sessione).
+
+Frontend (src/app/page.tsx): aggiornato per mostrare la fascia quando il numero grezzo e' null, sia per singolo titolo nella Sector Heatmap (3 continenti) sia nel dettaglio titolo. La riga aggregata per settore (totalRow, media ponderata) mostra un trattino sicuro invece di NaN quando i dati grezzi non sono disponibili - NON ricostruisce un aggregato dalle fasce, quello resta un miglioramento futuro se richiesto.
+
+Regola stabilita: quando si nasconde un dato per motivi di sicurezza, se possibile va sostituito con qualcosa di visibile e coerente (fascia/rank), non lasciato vuoto - l'incoerenza tra campi "con fascia" e campi "vuoti" e' stata segnalata esplicitamente da Andrea come inaccettabile per un prodotto da vendere.
+
+PENDING: PE trailing/forward e PB hanno ora le fasce lato server (peTrailingTier/peForwardTier/pbTier) ma il frontend non e' ancora stato aggiornato per mostrarle - stesso lavoro fatto per EPS/Revenue growth va replicato per questi tre campi.
