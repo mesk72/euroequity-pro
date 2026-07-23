@@ -484,6 +484,25 @@ export async function GET(req: NextRequest) {
       stocks = applyUniverseFilter(fundData, stocksData)
     }
 
+    // FIX CRITICO: fetchLatestPrices esisteva ma non veniva mai chiamata
+    // — lo Screener/Sector Heatmap mostravano sempre fundamentals.price
+    // (statico, aggiornato solo dai run settimanali), MAI il prezzo
+    // fresco da prices_eod, causa reale del "due prezzi diversi" tra
+    // pagina titolo (sempre corretta, query diretta) e Screener
+    // (23/7/2026, es. 9984.TSE: 5751 vero vs 6370 statico mostrato).
+    try {
+      const freshPrices = await fetchLatestPrices(exList)
+      for (const s of stocks) {
+        const key = `${s.ticker}.${s.exchange}`
+        const fresh = freshPrices[key]
+        if (fresh) {
+          s.price = fresh.price
+          s.change1d = fresh.change1d
+          s.lastPriceDate = fresh.date
+        }
+      }
+    } catch {}
+
     // Sottoinsieme dei 500 per il proprietario escluso — decide solo
     // QUALI righe includere, nessun valore viene mai ricalcolato.
     if (!isOwner && !isInstitutionalViewer) {
