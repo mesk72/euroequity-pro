@@ -1,1 +1,8 @@
-AAPL rank sorgente nel DB: [{'ticker': 'AAPL', 'rank_pe_ltm': 47, 'rank_pe_ntm': 31, 'rank_pb': 9, 'rank_eps_gr': 57, 'rank_rev_gr': 63}]
+=== PREZZI ===
+AAPL.US: [{'date': '2026-07-21'}]
+7203.TSE: [{'date': '2026-07-21'}]
+SAP.XETRA: [{'date': '2026-07-21'}]
+
+=== NOTIZIE ===
+Righe totali news_cache: 0-0/37022
+Ultime righe inserite: [{'ticker': 'FHZN', 'fetched_at': '2026-07-23T09:00:45.79128'}, {'ticker': 'AKER', 'fetched_at': '2026-07-23T09:00:45.79128'}, {'ticker': 'AKER', 'fetched_at': '2026-07-23T09:00:45.79128'}]
