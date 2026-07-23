@@ -1075,6 +1075,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
+      rankEpsGr: mcw(list, 'rankEpsGr'),
+      rankRevGr: mcw(list, 'rankRevGr'),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -1088,6 +1090,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
     valueScore: mcw(stocksEur, 'valueScore'),
     growthScore: mcw(stocksEur, 'growthScore'),
     combinedRank: mcw(stocksEur, 'combinedRank'),
+    rankEpsGr: mcw(stocksEur, 'rankEpsGr'),
+    rankRevGr: mcw(stocksEur, 'rankRevGr'),
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
@@ -1226,6 +1230,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
+      rankEpsGr: mcw(list, 'rankEpsGr'),
+      rankRevGr: mcw(list, 'rankRevGr'),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -1239,6 +1245,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
     valueScore: mcw(stocksUS, 'valueScore'),
     growthScore: mcw(stocksUS, 'growthScore'),
     combinedRank: mcw(stocksUS, 'combinedRank'),
+    rankEpsGr: mcw(stocksUS, 'rankEpsGr'),
+    rankRevGr: mcw(stocksUS, 'rankRevGr'),
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
@@ -2110,6 +2118,7 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
       revGrowth: mcw(list, 'revGrowth'), mom12m: mcwReturn(list, 'mom12m'),
       valueScore: mcw(list, 'valueScore'), growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
+      rankEpsGr: mcw(list, 'rankEpsGr'), rankRevGr: mcw(list, 'rankRevGr'),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -2123,6 +2132,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
     valueScore: mcw(stocksAP, 'valueScore'),
     growthScore: mcw(stocksAP, 'growthScore'),
     combinedRank: mcw(stocksAP, 'combinedRank'),
+    rankEpsGr: mcw(stocksAP, 'rankEpsGr'),
+    rankRevGr: mcw(stocksAP, 'rankRevGr'),
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
