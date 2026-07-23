@@ -1,8 +1,4 @@
-=== PREZZI ===
-AAPL.US: [{'date': '2026-07-21'}]
-7203.TSE: [{'date': '2026-07-21'}]
-SAP.XETRA: [{'date': '2026-07-21'}]
-
-=== NOTIZIE ===
-Righe totali news_cache: 0-0/37022
-Ultime righe inserite: [{'ticker': 'FHZN', 'fetched_at': '2026-07-23T09:00:45.79128'}, {'ticker': 'AKER', 'fetched_at': '2026-07-23T09:00:45.79128'}, {'ticker': 'AKER', 'fetched_at': '2026-07-23T09:00:45.79128'}]
+Righe totali ultime 24h (campione max 1000): 1000
+Ticker distinti con notizie fresche: 207
+Per regione: {'asia': 981, 'europe': 16, 'americas': 3}
+Esempio ticker coperti: [('257', 'SEHK'), ('9412', 'TSE'), ('9041', 'TSE'), ('9501', 'TSE'), ('IGO', 'ASX'), ('HWKN', 'US'), ('AJBU', 'SGX'), ('2880', 'SEHK'), ('A004170', 'KRX'), ('A267270', 'KRX')]
