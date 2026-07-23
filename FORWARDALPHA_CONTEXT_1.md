@@ -2920,3 +2920,19 @@ Tabella `institutional_viewers` (email, note) in Supabase, RLS disabilitato. Chi
 ### File Python con logica gia' pronta ma mai collegata correttamente
 
 `fetch_beta_us.py` scarica GIA' sia Beta (Yahoo, 5 anni mensile) sia il risk-free rate (Treasury 10Y direttamente da treasury.gov, fonte ufficiale) — il problema era solo il trigger rotto, non la logica.
+
+---
+
+## ETICHETTE QUINTILE — due formati diversi a seconda dello spazio (23 luglio 2026)
+
+Andrea ha specificato due formati diversi per le etichette quintile, a seconda di dove appaiono, per motivi di spazio nelle colonne:
+
+**Formato corto — "1° Quintile" / "2° Quintile" / "3° Quintile" / "4° Quintile" / "5° Quintile"** (numero + simbolo grado + parola Quintile) usato in:
+- `src/app/page.tsx` — sia nel componente `Screener` (colonne strette, es. 70px) sia nella Sector Heatmap
+- `src/components/watchlist/MyScreen.tsx` — sia vista mobile sia tabella
+
+**Formato lungo — "First Quintile" / "Second Quintile" / "Third Quintile" / "Fourth Quintile" / "Fifth Quintile"** usato SOLO in:
+- `src/components/dashboard/StockDetailPage.tsx` (popup dettaglio titolo)
+- `src/app/stock/[id]/page.tsx` (pagina dedicata con URL proprio)
+
+Se in futuro si aggiunge un sesto punto che mostra questi campi, chiedere ad Andrea quale formato usare in base allo spazio disponibile in quel contesto specifico, seguendo questa stessa logica (tabelle/colonne strette = corto, pagine di dettaglio con piu' spazio = lungo).
