@@ -1,10 +1,15 @@
-Valore attuale in fundamentals: [{'ticker': '9984', 'price': 6370.0, 'change1d': 0.106479}]
-
-Ultimi prezzi:
-  {'date': '2026-07-21', 'adj_close': 5751.0}
-  {'date': '2026-07-17', 'adj_close': 5424.0}
-  {'date': '2026-07-16', 'adj_close': 5961.0}
-  {'date': '2026-07-15', 'adj_close': 6360.0}
-  {'date': '2026-07-14', 'adj_close': 6574.0}
-
-Variazione reale calcolata (2026-07-17 -> 2026-07-21): 6.03%
+1305: fundamentals.price=4226.0, prices_eod reale=4226.0 [OK]
+1320: fundamentals.price=68280.0, prices_eod reale=68280.0 [OK]
+1332: fundamentals.price=1266.0, prices_eod reale=1266.0 [OK]
+1333: fundamentals.price=1332.5, prices_eod reale=1332.5 [OK]
+1377: fundamentals.price=4400.0, prices_eod reale=4400.0 [OK]
+1407: fundamentals.price=2734.0, prices_eod reale=2734.0 [OK]
+1414: fundamentals.price=1276.0, prices_eod reale=1276.0 [OK]
+1417: fundamentals.price=3667.0, prices_eod reale=3667.0 [OK]
+141A: fundamentals.price=3015.0, prices_eod reale=3015.0 [OK]
+1515: fundamentals.price=2777.0, prices_eod reale=2777.0 [OK]
+1599: fundamentals.price=36470.0, prices_eod reale=36470.0 [OK]
+1605: fundamentals.price=3580.0, prices_eod reale=3580.0 [OK]
+1662: fundamentals.price=1718.0, prices_eod reale=1718.0 [OK]
+1663: fundamentals.price=1822.0, prices_eod reale=1822.0 [OK]
+167A: fundamentals.price=2799.0, prices_eod reale=2799.0 [OK]
