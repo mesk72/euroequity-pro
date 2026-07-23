@@ -427,7 +427,7 @@ function StockPageInner() {
               </span>
               <span style={{ fontSize:18, fontFamily:'IBM Plex Mono', fontWeight:600,
                 color: (stock.change1d ?? 0) >= 0 ? 'var(--green)' : 'var(--red)' }}>
-                {stock.change1d != null ? fp(stock.change1d, 2) : ''}
+                {stock.change1d != null ? fp(stock.change1d * 100, 2) : ''}
               </span>
             </div>
             <div style={{ fontSize:14, color:'var(--text3)', marginTop:4 }}>{stock.company}</div>
