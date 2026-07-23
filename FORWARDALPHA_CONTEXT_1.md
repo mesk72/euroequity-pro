@@ -2833,3 +2833,17 @@ Stessa identica logica di `find_ref_date()` in `apply_3y5y_all.py`, ora duplicat
 **Verificata solo per compilazione e coerenza logica** — NON ancora verificata con un run reale in produzione ne' con un controllo manuale su titoli noti (tipo il caso Martin Luther King Day gia' usato per validare mom6m in precedenza). Da fare alla prossima ripresa prima di fidarsi ciecamente dei numeri prodotti.
 
 **Ricalcolo Growth Score / Best Score**: come gia' notato in sessioni precedenti, ogni volta che il momentum cambia formula, Growth Score e Best Score (che dipendono da mom6_adj/mom12_adj) vanno ricalcolati sull'intero universo per restare coerenti — da fare dopo aver verificato che il nuovo momentum sia corretto.
+
+---
+
+## LIVELLO "INSTITUTIONAL VIEWER" (23 luglio 2026, notte)
+
+Nuova tabella `institutional_viewers` (email, added_at, note) in Supabase, RLS disabilitato. Aggiunta logica in `/api/db/stocks/route.ts`: se l'email verificata dell'utente e' presente in questa tabella, l'utente bypassa il limite dei 500 titoli (vede tutti gli 8.000) ma NON bypassa MAI l'oscuramento dei dati grezzi (resta identico a un utente normale su quel fronte — solo punteggi finali e momentum, mai PE/PB/EPS growth grezzi).
+
+Come usarlo (Andrea deve ricordarselo, da rispiegare bene alla prossima occasione):
+1. La persona (es. un investitore istituzionale) si registra normalmente sul sito con la propria email
+2. Andrea esegue su Supabase SQL Editor: `INSERT INTO institutional_viewers (email, note) VALUES ('email@esempio.com', 'nota');`
+3. Per togliere l'accesso esteso (senza cancellare l'account): `DELETE FROM institutional_viewers WHERE email = 'email@esempio.com';`
+4. Per cancellare l'account del tutto: Supabase -> Authentication -> Users -> cerca l'email -> Delete user (azione diversa, tocca l'autenticazione vera, non questa tabella)
+
+Compromesso noto e accettato: la colonna "EPS Gr %" nella Sector Heatmap resta vuota per questo livello (dipende da dati grezzi) - da sistemare con calma, Andrea ha detto "hai una settimana di tempo", non urgente.
