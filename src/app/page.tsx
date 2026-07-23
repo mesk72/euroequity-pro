@@ -420,13 +420,13 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
  <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
  <span className="text-muted">Cap: <span className="text-sub">{s.mktCap != null ? ('$'+s.mktCap.toFixed(1)+'B') : '-'}</span></span>
  <span className="text-[#444]">|</span>
- <span className="text-muted">PEv: <span style={{color:'#3b82f6'}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : '-'}</span></span>
+ <span className="text-muted">PEv: <span style={{color: (s as any).rankPeLtm != null ? '#3b82f6' : quintileDisplay((s as any).peTrailingQuintile).color}}>{(s as any).rankPeLtm != null ? Math.round((s as any).rankPeLtm) : quintileDisplay((s as any).peTrailingQuintile).text}</span></span>
  <span className="text-[#444]">|</span>
- <span className="text-muted">PEf: <span style={{color:'#3b82f6'}}>{(s as any).rankPeNtm != null ? Math.round((s as any).rankPeNtm) : '-'}</span></span>
+ <span className="text-muted">PEf: <span style={{color: (s as any).rankPeNtm != null ? '#3b82f6' : quintileDisplay((s as any).peForwardQuintile).color}}>{(s as any).rankPeNtm != null ? Math.round((s as any).rankPeNtm) : quintileDisplay((s as any).peForwardQuintile).text}</span></span>
  <span className="text-[#444]">|</span>
- <span className="text-muted">EPS: <span style={{color:'#22c55e'}}>{(s as any).rankEpsGr != null ? Math.round((s as any).rankEpsGr) : '-'}</span></span>
+ <span className="text-muted">EPS: <span style={{color: (s as any).rankEpsGr != null ? '#22c55e' : quintileDisplay((s as any).epsGrowthQuintile).color}}>{(s as any).rankEpsGr != null ? Math.round((s as any).rankEpsGr) : quintileDisplay((s as any).epsGrowthQuintile).text}</span></span>
  <span className="text-[#444]">|</span>
- <span className="text-muted">Rev: <span style={{color:'#22c55e'}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : '-'}</span></span>
+ <span className="text-muted">Rev: <span style={{color: (s as any).rankRevGr != null ? '#22c55e' : quintileDisplay((s as any).revGrowthQuintile).color}}>{(s as any).rankRevGr != null ? Math.round((s as any).rankRevGr) : quintileDisplay((s as any).revGrowthQuintile).text}</span></span>
  </div>
  <div className="flex items-center gap-2 text-[10px] font-mono mt-0.5">
  <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{userId ? (s.valueScore != null ? Math.round(s.valueScore) : '-') : '🔒'}</span></span>
