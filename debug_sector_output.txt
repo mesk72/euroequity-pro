@@ -1,2 +1,8 @@
-Titoli US con implied_growth_10y popolato: 0-0/2156
-Campione: [{'ticker': 'AAPL', 'implied_growth_10y': 0.1574, 'beta': 1.097, 'ke': 0.1016}, {'ticker': 'MSFT', 'implied_growth_10y': 0.0889, 'beta': 1.13, 'ke': 0.1032}, {'ticker': 'NVDA', 'implied_growth_10y': 0.179, 'beta': 2.211, 'ke': 0.1573}]
+Ultimi 5 prezzi reali per 9984.TSE:
+  {'date': '2026-07-21', 'adj_close': 5751.0}
+  {'date': '2026-07-17', 'adj_close': 5424.0}
+  {'date': '2026-07-16', 'adj_close': 5961.0}
+  {'date': '2026-07-15', 'adj_close': 6360.0}
+  {'date': '2026-07-14', 'adj_close': 6574.0}
+
+Campo fundamentals.price (statico, potrebbe essere una terza fonte): [{'ticker': '9984', 'price': 6370.0, 'change1d': 0.106479}]
