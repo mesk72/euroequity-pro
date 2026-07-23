@@ -101,36 +101,36 @@ const PUBLIC_FIELDS = new Set([
 ])
 
 // Campi aggiuntivi visibili SOLO se loggato — punteggi finali e momentum.
-// MAI i dati grezzi (PE, PB, EPS/Rev growth, i rank dei singoli fattori)
-// — insieme al punteggio finale permetterebbero di ricostruire la
-// formula per regressione statistica.
+// MAI i dati grezzi (PE, PB, EPS/Rev growth) ne' i rank esatti (0-100)
+// dei singoli fattori — insieme al punteggio finale permetterebbero di
+// ricostruire i pesi della formula per regressione statistica. Al posto
+// del rank esatto, si mostra il QUINTILE (Top/2nd/Mid/4th/Bottom) — uno
+// standard riconosciuto nell'analisi fattoriale (stile Fama-French), che
+// da' informazione utile senza la precisione numerica necessaria per
+// una regressione affidabile.
 const SCORE_MOMENTUM_FIELDS = new Set([
   'valueScore', 'growthScore', 'combinedRank',
   'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m',
-  // Fasce qualitative (High/Average/Low) per OGNI singolo fattore che
-  // alimenta Value/Growth Score — tutte insieme, stessa logica, cosi'
-  // nessuna resta vuota mentre le altre mostrano un'etichetta.
-  'revGrowthTier', 'epsGrowthTier', 'peTrailingTier', 'peForwardTier', 'pbTier',
-  // Rank veri dei singoli fattori — visibili su richiesta esplicita,
-  // nonostante il rischio di ricostruzione della formula gia' segnalato.
-  'rankPeLtm', 'rankPeNtm', 'rankPb', 'rankEpsGr', 'rankRevGr',
+  'revGrowthQuintile', 'epsGrowthQuintile', 'peTrailingQuintile', 'peForwardQuintile', 'pbQuintile',
 ])
 
-function tierFrom(rank: number | null | undefined): string | null {
+function quintileFrom(rank: number | null | undefined): string | null {
   if (rank == null) return null
-  if (rank >= 70) return 'High'
-  if (rank >= 30) return 'Average'
-  return 'Low'
+  if (rank >= 80) return 'Top Quintile'
+  if (rank >= 60) return '2nd Quintile'
+  if (rank >= 40) return 'Middle'
+  if (rank >= 20) return '4th Quintile'
+  return 'Bottom Quintile'
 }
 
-// Applica le fasce qualitative a TUTTI i fattori insieme, in un solo
-// posto — evita di dimenticarne uno quando se ne aggiunge un altro.
+// Applica i quintili a TUTTI i fattori insieme, in un solo posto — evita
+// di dimenticarne uno quando se ne aggiunge un altro.
 function applyTiers(out: any, src: any) {
-  out.revGrowthTier   = tierFrom(src.rankRevGr)
-  out.epsGrowthTier   = tierFrom(src.rankEpsGr)
-  out.peTrailingTier  = tierFrom(src.rankPeLtm)
-  out.peForwardTier   = tierFrom(src.rankPeNtm)
-  out.pbTier          = tierFrom(src.rankPb)
+  out.revGrowthQuintile   = quintileFrom(src.rankRevGr)
+  out.epsGrowthQuintile   = quintileFrom(src.rankEpsGr)
+  out.peTrailingQuintile  = quintileFrom(src.rankPeLtm)
+  out.peForwardQuintile   = quintileFrom(src.rankPeNtm)
+  out.pbQuintile          = quintileFrom(src.rankPb)
 }
 
 function redactForGuest<T extends Record<string, any>>(obj: T): T {
