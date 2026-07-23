@@ -24,7 +24,18 @@ jobs:
         run: |
           git config user.name "debug-bot"
           git config user.email "debug-bot@users.noreply.github.com"
-          git add daily_us_yahoo_last_output.txt
-          git commit -m "log daily_us_yahoo output" || echo "nothing to commit"
-          git pull --rebase
-          git push
+          cp daily_us_yahoo_last_output.txt /tmp/log_backup.txt
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/log_backup.txt daily_us_yahoo_last_output.txt
+            git add daily_us_yahoo_last_output.txt
+            git commit -m "log daily_us_yahoo output" || echo "nothing to commit"
+            if git push origin main; then
+              echo "Push riuscito al tentativo $i"
+              break
+            else
+              echo "Tentativo $i fallito, riprovo..."
+              sleep 5
+            fi
+          done
