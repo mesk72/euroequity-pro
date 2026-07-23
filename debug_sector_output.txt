@@ -1,7 +1,4 @@
-Dati scaricati: 300
-  val_sums len=282, gr_sums len=211
-rank_updates: 300
-Esempio: [{'ticker': 'APG', 'exchange': 'US', 'value_score': 31, 'growth_score': 61}, {'ticker': 'TWST', 'exchange': 'US', 'value_score': 15, 'growth_score': 83}, {'ticker': 'PENN', 'exchange': 'US', 'value_score': 40, 'growth_score': 84}]
-
-all_scores (con entrambi i punteggi non-null): 211
-Esempio all_scores[0]: {'ticker': 'APG', 'exchange': 'US', 'value_score': 31, 'growth_score': 61}
+Dati TSX scaricati: 506
+Liste base costruite OK
+mom6_adj_g=422, mom12_adj_g=422
+TUTTO OK, nessuna eccezione
