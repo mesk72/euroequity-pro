@@ -120,6 +120,10 @@ const SCORE_MOMENTUM_FIELDS = new Set([
   // sezione spariva dalla pagina titolo per chiunque non fosse
   // proprietario (23/7/2026).
   'ke', 'impliedGrowth10y',
+  // Stessi campi del Reverse Earnings Model, dimenticati insieme a ke —
+  // servono al calcolo interattivo del price target quando l'utente
+  // modifica la crescita implicita nella pagina titolo.
+  'epsNtmDcf', 'epsFwd24', 'epsFwd36', 'epsGrowth1224m', 'epsGrowth2436m', 'epsCagr2y',
 ])
 
 function quintileFrom(rank: number | null | undefined): string | null {
