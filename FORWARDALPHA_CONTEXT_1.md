@@ -2861,3 +2861,13 @@ Frontend (src/app/page.tsx): aggiornato per mostrare la fascia quando il numero 
 Regola stabilita: quando si nasconde un dato per motivi di sicurezza, se possibile va sostituito con qualcosa di visibile e coerente (fascia/rank), non lasciato vuoto - l'incoerenza tra campi "con fascia" e campi "vuoti" e' stata segnalata esplicitamente da Andrea come inaccettabile per un prodotto da vendere.
 
 PENDING: PE trailing/forward e PB hanno ora le fasce lato server (peTrailingTier/peForwardTier/pbTier) ma il frontend non e' ancora stato aggiornato per mostrarle - stesso lavoro fatto per EPS/Revenue growth va replicato per questi tre campi.
+
+---
+
+## CORREZIONE DECISIONE FASCE (23 luglio 2026, mattina) — Andrea ha deciso diversamente
+
+Andrea ha esplicitamente richiesto di mostrare i RANK VERI (numero, es. 15/20/50/60) dei singoli fattori (PE trailing, PE forward, PB, EPS growth, Revenue growth) invece delle fasce qualitative High/Average/Low costruite poco prima. Rischio di ricostruzione formula segnalato una volta, poi eseguito su richiesta esplicita.
+
+Stato attuale: rankPeLtm, rankPeNtm, rankPb, rankEpsGr, rankRevGr sono ora campi VISIBILI (in SCORE_MOMENTUM_FIELDS) per chiunque sia loggato (utente 500 titoli e institutional viewer), non solo per il proprietario. I dati grezzi originali (peTrail, peFwd, pb, epsGrowth, revGrowth come percentuali/multipli assoluti) restano nascosti - solo i RANK percentili sono visibili.
+
+Frontend aggiornato: quando il dato grezzo e' null, mostra il rank arrotondato invece del vecchio fallback a fascia testuale. Le funzioni tierFrom/applyTiers restano nel codice ma non sono piu' usate per popolare le colonne principali (potrebbero servire altrove in futuro, non rimosse per ora).
