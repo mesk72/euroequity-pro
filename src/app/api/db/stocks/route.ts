@@ -111,6 +111,9 @@ const SCORE_MOMENTUM_FIELDS = new Set([
   // alimenta Value/Growth Score — tutte insieme, stessa logica, cosi'
   // nessuna resta vuota mentre le altre mostrano un'etichetta.
   'revGrowthTier', 'epsGrowthTier', 'peTrailingTier', 'peForwardTier', 'pbTier',
+  // Rank veri dei singoli fattori — visibili su richiesta esplicita,
+  // nonostante il rischio di ricostruzione della formula gia' segnalato.
+  'rankPeLtm', 'rankPeNtm', 'rankPb', 'rankEpsGr', 'rankRevGr',
 ])
 
 function tierFrom(rank: number | null | undefined): string | null {
