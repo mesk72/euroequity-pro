@@ -1,2 +1,3 @@
-top500_universe: 206 0-0/500
-institutional_viewers: 200 */0
+AAPL in stocks: [{'ticker': 'AAPL', 'exchange': 'US', 'company': 'Apple Inc.', 'in_universe': True}]
+AAPL in top500_universe: []
+AAPL in fundamentals: [{'ticker': 'AAPL', 'mkt_cap': 4562774.01, 'value_score': 22, 'growth_score': 84, 'combined_rank': 54}]
