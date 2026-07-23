@@ -6,7 +6,11 @@
     },
     {
       "path": "/api/cron/trigger-news",
-      "schedule": "*/30 * * * *"
+      "schedule": "*/20 0-11,13-23 * * *"
+    },
+    {
+      "path": "/api/cron/trigger-news",
+      "schedule": "0,30 12 * * *"
     }
   ],
   "headers": [
