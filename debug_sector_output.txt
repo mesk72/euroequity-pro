@@ -1,3 +1,2 @@
-XETRA: quanti con Best Score = 0-0/279
-TSE: quanti con Best Score = 0-0/976
-US: quanti con Best Score = 0-0/5
+US con Best Score: 0-0/5
+AAPL: [{'ticker': 'AAPL', 'value_score': 22, 'growth_score': 80.98, 'combined_rank': None}]
