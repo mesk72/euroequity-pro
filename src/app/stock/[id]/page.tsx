@@ -339,11 +339,11 @@ function StockPageInner() {
 
   const s = stock as any
   const QLBL: Record<string, { t: string; c: string }> = {
-    'Top Quintile':    { t: 'Top 20%',    c: 'var(--green)' },
-    '2nd Quintile':    { t: '60-80%',     c: '#84cc16' },
-    'Middle':          { t: 'Mid',        c: '#f59e0b' },
-    '4th Quintile':    { t: '20-40%',     c: '#f59e0b' },
-    'Bottom Quintile': { t: 'Bottom 20%', c: '#e84560' },
+    'Top Quintile':    { t: 'First Quintile',    c: 'var(--green)' },
+    '2nd Quintile':    { t: 'Second Quintile',     c: '#84cc16' },
+    'Middle':          { t: 'Third Quintile',        c: '#f59e0b' },
+    '4th Quintile':    { t: 'Fourth Quintile',     c: '#f59e0b' },
+    'Bottom Quintile': { t: 'Fifth Quintile', c: '#e84560' },
   }
   const qText = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].t : '—'
   const qColor = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].c : 'var(--text3)'
