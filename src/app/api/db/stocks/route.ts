@@ -155,35 +155,40 @@ function redactRawData<T extends Record<string, any>>(obj: T): T {
 }
 
 async function fetchLatestPrices(exchangeList: string[]) {
-  // Legge gli ultimi ~6 giorni di prezzi per calcolare prezzo corrente e
+  // Legge gli ultimi giorni di prezzi per calcolare prezzo corrente e
   // variazione reale da prices_eod, invece di affidarsi a fundamentals.price
   // / change1d — campi statici aggiornati solo dai run settimanali, causa
   // reale del "prezzo fermo" segnalato su JPM e su tutti gli screener.
-  const cutoff = new Date()
-  cutoff.setDate(cutoff.getDate() - 6)
-  const cutoffStr = cutoff.toISOString().slice(0, 10)
-
+  //
+  // FIX: la versione precedente ordinava per data attraverso TUTTI i
+  // ticker insieme e limitava a 2 righe per ticker durante la paginazione
+  // — con molti titoli nello stesso exchange, la pagina (1000 righe)
+  // poteva tagliare a meta' un giorno, associando ad alcuni titoli un
+  // prezzo di un giorno diverso da quello vero (causa reale del prezzo
+  // doppio/diverso tra Screener e pagina titolo, 23/7/2026). Ora si
+  // processa un GIORNO alla volta, completo, prima di passare al
+  // precedente — nessun taglio possibile a meta' giorno.
   const byTicker: Record<string, { date: string; adj_close: number }[]> = {}
+
   for (const exchange of exchangeList) {
-    const PAGE = 1000
-    let from = 0
-    while (true) {
+    for (let daysAgo = 0; daysAgo < 10; daysAgo++) {
+      const d = new Date()
+      d.setDate(d.getDate() - daysAgo)
+      const dateStr = d.toISOString().slice(0, 10)
+
       const { data, error } = await supabase
         .from('prices_eod')
         .select('ticker,date,adj_close')
         .eq('exchange', exchange)
-        .gte('date', cutoffStr)
-        .order('date', { ascending: false })
-        .range(from, from + PAGE - 1)
-        .limit(PAGE)
-      if (error || !data || data.length === 0) break
-      for (const row of data) {
-        const key = `${row.ticker}.${exchange}`
-        if (!byTicker[key]) byTicker[key] = []
-        if (byTicker[key].length < 2) byTicker[key].push({ date: row.date, adj_close: row.adj_close })
+        .eq('date', dateStr)
+      if (error) continue
+      if (data && data.length > 0) {
+        for (const row of data) {
+          const key = `${row.ticker}.${exchange}`
+          if (!byTicker[key]) byTicker[key] = []
+          if (byTicker[key].length < 2) byTicker[key].push({ date: row.date, adj_close: row.adj_close })
+        }
       }
-      if (data.length < PAGE) break
-      from += PAGE
     }
   }
 
