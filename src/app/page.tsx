@@ -1172,8 +1172,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                     <td className="font-mono font-700">{totalRow.count}</td>
                     <td className="font-mono font-700">{fv(totalRow.mktCap, 0)}</td>
                     <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
+                    <td className="font-mono font-700" style={totalRow.epsGrowth != null ? {} : { color: quintileDisplay((totalRow as any).epsGrowthQuintile).color }}>{totalRow.epsGrowth != null ? fpDec(totalRow.epsGrowth) : quintileDisplay((totalRow as any).epsGrowthQuintile).text}</td>
+                    <td className="font-mono font-700" style={totalRow.revGrowth != null ? {} : { color: quintileDisplay((totalRow as any).revGrowthQuintile).color }}>{totalRow.revGrowth != null ? fpDec(totalRow.revGrowth) : quintileDisplay((totalRow as any).revGrowthQuintile).text}</td>
                     <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fv(totalRow.valueScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fv(totalRow.growthScore, 0)}</td>
@@ -1327,8 +1327,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
                     <td className="font-mono font-700">{totalRow.count}</td>
                     <td className="font-mono font-700">{fv(totalRow.mktCap, 0)}</td>
                     <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
+                    <td className="font-mono font-700" style={totalRow.epsGrowth != null ? {} : { color: quintileDisplay((totalRow as any).epsGrowthQuintile).color }}>{totalRow.epsGrowth != null ? fpDec(totalRow.epsGrowth) : quintileDisplay((totalRow as any).epsGrowthQuintile).text}</td>
+                    <td className="font-mono font-700" style={totalRow.revGrowth != null ? {} : { color: quintileDisplay((totalRow as any).revGrowthQuintile).color }}>{totalRow.revGrowth != null ? fpDec(totalRow.revGrowth) : quintileDisplay((totalRow as any).revGrowthQuintile).text}</td>
                     <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fv(totalRow.valueScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fv(totalRow.growthScore, 0)}</td>
@@ -2202,8 +2202,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                     <td className="font-mono font-700">{totalRow.count}</td>
                     <td className="font-mono font-700">{fvs(totalRow.mktCap, 0)}</td>
                     <td className="font-mono font-700" style={clrS(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
-                    <td className="font-mono font-700" style={clrS(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
-                    <td className="font-mono font-700" style={clrS(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
+                    <td className="font-mono font-700" style={totalRow.epsGrowth != null ? clrS(totalRow.epsGrowth) : { color: quintileDisplay((totalRow as any).epsGrowthQuintile).color }}>{totalRow.epsGrowth != null ? fpDec(totalRow.epsGrowth) : quintileDisplay((totalRow as any).epsGrowthQuintile).text}</td>
+                    <td className="font-mono font-700" style={totalRow.revGrowth != null ? clrS(totalRow.revGrowth) : { color: quintileDisplay((totalRow as any).revGrowthQuintile).color }}>{totalRow.revGrowth != null ? fpDec(totalRow.revGrowth) : quintileDisplay((totalRow as any).revGrowthQuintile).text}</td>
                     <td className="font-mono font-800" style={clrS(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fvs(totalRow.valueScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fvs(totalRow.growthScore, 0)}</td>
