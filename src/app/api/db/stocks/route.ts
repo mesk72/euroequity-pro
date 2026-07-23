@@ -443,6 +443,24 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
       let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+
+      // Stesso fix del ramo bulk: prezzo fresco da prices_eod, mai quello
+      // statico di fundamentals — un QUARTO ramo (ricerca) aveva lo
+      // stesso identico problema, mai corretto prima (23/7/2026).
+      try {
+        const searchExList = Array.from(new Set(stocks.map((s: any) => s.exchange)))
+        const freshPrices = await fetchLatestPrices(searchExList)
+        for (const s of stocks) {
+          const key = `${s.ticker}.${s.exchange}`
+          const fresh = freshPrices[key]
+          if (fresh) {
+            s.price = fresh.price
+            s.change1d = fresh.change1d
+            s.lastPriceDate = fresh.date
+          }
+        }
+      } catch {}
+
       if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
         stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
