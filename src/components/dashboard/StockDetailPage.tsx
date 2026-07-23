@@ -42,11 +42,11 @@ function scoreClr(v?: number | null): string {
 // dato grezzo non e' disponibile — stessa palette colori del resto del
 // sito, per coerenza visiva.
 const QUINTILE_LABELS: Record<string, { short: string; color: string }> = {
-  'Top Quintile':    { short: 'Top 20%',    color: '#22c55e' },
-  '2nd Quintile':    { short: '60-80%',     color: '#84cc16' },
-  'Middle':          { short: 'Mid',        color: '#f97316' },
-  '4th Quintile':    { short: '20-40%',     color: '#f97316' },
-  'Bottom Quintile': { short: 'Bottom 20%', color: '#ef4444' },
+  'Top Quintile':    { short: 'First Quintile',    color: '#22c55e' },
+  '2nd Quintile':    { short: 'Second Quintile',     color: '#84cc16' },
+  'Middle':          { short: 'Third Quintile',        color: '#f97316' },
+  '4th Quintile':    { short: 'Fourth Quintile',     color: '#f97316' },
+  'Bottom Quintile': { short: 'Fifth Quintile', color: '#ef4444' },
 }
 function quintileText(label?: string | null): string {
   if (!label) return '—'
