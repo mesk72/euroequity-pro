@@ -1,3 +1,8 @@
-AAPL in stocks: [{'ticker': 'AAPL', 'exchange': 'US', 'company': 'Apple Inc.', 'in_universe': True}]
-AAPL in top500_universe: []
-AAPL in fundamentals: [{'ticker': 'AAPL', 'mkt_cap': 4562774.01, 'value_score': 22, 'growth_score': 84, 'combined_rank': 54}]
+Universo totale: 7889
+Nuovo top 500 calcolato: 500
+Primi 3: [{'ticker': 'NVDA', 'exchange': 'US', 'mkt_cap': 4769748.03}, {'ticker': 'AAPL', 'exchange': 'US', 'mkt_cap': 4562774.01}, {'ticker': 'GOOGL', 'exchange': 'US', 'mkt_cap': 4460079.02}]
+AAPL presente nel nuovo calcolo: True
+  batch 0: HTTP 201
+  batch 200: HTTP 201
+  batch 400: HTTP 201
+Righe finali nella tabella: 0-0/500
