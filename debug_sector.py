@@ -1,17 +1,18 @@
-import os, requests
+import os, requests, datetime
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-print("=== PREZZI ===")
-for ticker, exchange in [("AAPL","US"), ("7203","TSE"), ("SAP","XETRA")]:
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"date","ticker":f"eq.{ticker}","exchange":f"eq.{exchange}","order":"date.desc","limit":"1"})
-    print(f"{ticker}.{exchange}:", r.json())
+cutoff = (datetime.datetime.utcnow() - datetime.timedelta(hours=24)).isoformat()
+r = requests.get(f"{SUPABASE_URL}/rest/v1/news_cache", headers=headers_r,
+    params={"select":"ticker,exchange,region,fetched_at","fetched_at":f"gte.{cutoff}","limit":"1000"})
+rows = r.json()
+tickers = set((row["ticker"], row["exchange"]) for row in rows)
+regions = {}
+for row in rows:
+    regions[row.get("region","?")] = regions.get(row.get("region","?"), 0) + 1
 
-print("\n=== NOTIZIE ===")
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/news_cache", headers={**headers_r,"Prefer":"count=exact"}, params={"select":"ticker","limit":"1"})
-print("Righe totali news_cache:", r2.headers.get("content-range"))
-r3 = requests.get(f"{SUPABASE_URL}/rest/v1/news_cache", headers=headers_r,
-    params={"select":"ticker,fetched_at","order":"fetched_at.desc","limit":"3"})
-print("Ultime righe inserite:", r3.json())
+print(f"Righe totali ultime 24h (campione max 1000): {len(rows)}")
+print(f"Ticker distinti con notizie fresche: {len(tickers)}")
+print(f"Per regione: {regions}")
+print(f"Esempio ticker coperti: {list(tickers)[:10]}")
