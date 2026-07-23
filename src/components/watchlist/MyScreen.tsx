@@ -25,6 +25,15 @@ const rankClr = (v: number | null | undefined) => {
   if (v == null) return 'var(--text3)'
   return (v as number) >= 70 ? '#22c55e' : (v as number) <= 30 ? '#e84560' : '#f59e0b'
 }
+const QLBL: Record<string, { t: string; c: string }> = {
+  'Top Quintile':    { t: 'Top 20%',    c: '#22c55e' },
+  '2nd Quintile':    { t: '60-80%',     c: '#84cc16' },
+  'Middle':          { t: 'Mid',        c: '#f59e0b' },
+  '4th Quintile':    { t: '20-40%',     c: '#f59e0b' },
+  'Bottom Quintile': { t: 'Bottom 20%', c: '#e84560' },
+}
+const qText = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].t : '-'
+const qClr = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].c : 'var(--text3)'
 
 const SECTOR_COLORS: Record<string, string> = {
   'Technology': '#3b82f6', 'Financials': '#f59e0b', 'Health Care': '#10b981',
@@ -405,13 +414,13 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                 <span className="text-[9px] font-600" style={{ color: getSectorColor(s.sector) }}>{s.sector || '-'}</span>
               </div>
               <div className="flex gap-2 text-[10px] font-mono">
-                <span className="text-muted">PEv: <span style={{color: rankClr(s.rankPeLtm)}}>{fn(s.rankPeLtm)}</span></span>
+                <span className="text-muted">PEv: <span style={{color: s.rankPeLtm != null ? rankClr(s.rankPeLtm) : qClr((s as any).peTrailingQuintile)}}>{s.rankPeLtm != null ? fn(s.rankPeLtm) : qText((s as any).peTrailingQuintile)}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">PEf: <span style={{color: rankClr(s.rankPeNtm)}}>{fn(s.rankPeNtm)}</span></span>
+                <span className="text-muted">PEf: <span style={{color: s.rankPeNtm != null ? rankClr(s.rankPeNtm) : qClr((s as any).peForwardQuintile)}}>{s.rankPeNtm != null ? fn(s.rankPeNtm) : qText((s as any).peForwardQuintile)}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">EPS: <span style={{color: rankClr(s.rankEpsGr)}}>{fn(s.rankEpsGr)}</span></span>
+                <span className="text-muted">EPS: <span style={{color: s.rankEpsGr != null ? rankClr(s.rankEpsGr) : qClr((s as any).epsGrowthQuintile)}}>{s.rankEpsGr != null ? fn(s.rankEpsGr) : qText((s as any).epsGrowthQuintile)}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">Rev: <span style={{color: rankClr(s.rankRevGr)}}>{fn(s.rankRevGr)}</span></span>
+                <span className="text-muted">Rev: <span style={{color: s.rankRevGr != null ? rankClr(s.rankRevGr) : qClr((s as any).revGrowthQuintile)}}>{s.rankRevGr != null ? fn(s.rankRevGr) : qText((s as any).revGrowthQuintile)}</span></span>
               </div>
               <div className="flex gap-2 text-[10px] font-mono mt-0.5">
                 <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{fn(s.valueScore)}</span></span>
@@ -517,11 +526,11 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                     {s.change1d != null ? fpd(s.change1d / 100) : '-'}
                   </td>
                   <td className="font-mono text-right text-[12px]">{s.mktCap != null ? fv(s.mktCap, 1) : '-'}</td>
-                  <td className="font-mono text-center text-[12px] font-600" style={{color: rankClr(s.rankPeLtm)}}>{fn(s.rankPeLtm)}</td>
-                  <td className="font-mono text-center text-[12px] font-600" style={{color: rankClr(s.rankPeNtm)}}>{fn(s.rankPeNtm)}</td>
-                  <td className="font-mono text-center text-[12px] font-600" style={{color: rankClr(s.rankPb)}}>{fn(s.rankPb)}</td>
-                  <td className="font-mono text-center text-[12px] font-600" style={{color: rankClr(s.rankEpsGr)}}>{fn(s.rankEpsGr)}</td>
-                  <td className="font-mono text-center text-[12px] font-600" style={{color: rankClr(s.rankRevGr)}}>{fn(s.rankRevGr)}</td>
+                  <td className="font-mono text-center text-[12px] font-600" style={{color: s.rankPeLtm != null ? rankClr(s.rankPeLtm) : qClr((s as any).peTrailingQuintile)}}>{s.rankPeLtm != null ? fn(s.rankPeLtm) : qText((s as any).peTrailingQuintile)}</td>
+                  <td className="font-mono text-center text-[12px] font-600" style={{color: s.rankPeNtm != null ? rankClr(s.rankPeNtm) : qClr((s as any).peForwardQuintile)}}>{s.rankPeNtm != null ? fn(s.rankPeNtm) : qText((s as any).peForwardQuintile)}</td>
+                  <td className="font-mono text-center text-[12px] font-600" style={{color: s.rankPb != null ? rankClr(s.rankPb) : qClr((s as any).pbQuintile)}}>{s.rankPb != null ? fn(s.rankPb) : qText((s as any).pbQuintile)}</td>
+                  <td className="font-mono text-center text-[12px] font-600" style={{color: s.rankEpsGr != null ? rankClr(s.rankEpsGr) : qClr((s as any).epsGrowthQuintile)}}>{s.rankEpsGr != null ? fn(s.rankEpsGr) : qText((s as any).epsGrowthQuintile)}</td>
+                  <td className="font-mono text-center text-[12px] font-600" style={{color: s.rankRevGr != null ? rankClr(s.rankRevGr) : qClr((s as any).revGrowthQuintile)}}>{s.rankRevGr != null ? fn(s.rankRevGr) : qText((s as any).revGrowthQuintile)}</td>
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.mom1w)}>{fpd(s.mom1w)}</td>
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.mom1m)}>{fpd(s.mom1m)}</td>
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.mom6m)}>{fpd(s.mom6m)}</td>
