@@ -338,14 +338,23 @@ function StockPageInner() {
   }
 
   const s = stock as any
+  const QLBL: Record<string, { t: string; c: string }> = {
+    'Top Quintile':    { t: 'Top 20%',    c: 'var(--green)' },
+    '2nd Quintile':    { t: '60-80%',     c: '#84cc16' },
+    'Middle':          { t: 'Mid',        c: '#f59e0b' },
+    '4th Quintile':    { t: '20-40%',     c: '#f59e0b' },
+    'Bottom Quintile': { t: 'Bottom 20%', c: '#e84560' },
+  }
+  const qText = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].t : '—'
+  const qColor = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].c : 'var(--text3)'
   const metrics = [
     { label:'Price', val: fv(stock.price, 2), color: 'var(--text)' },
     { label:'Mkt Cap $B', val: stock.mktCap ? fv(stock.mktCap, 1) : '—', color: 'var(--text)' },
-    { label:'PE LTM Rank', val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : '—', color: s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'PE NTM Rank', val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : '—', color: s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'PB Rank', val: s.rankPb != null ? String(Math.round(s.rankPb)) : '—', color: s.rankPb >= 70 ? 'var(--green)' : s.rankPb <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'EPS Gr Rank', val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '—', color: s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b' },
-    { label:'Rev Gr Rank', val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '—', color: s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b' },
+    { label:'PE LTM Rank', val: s.rankPeLtm != null ? String(Math.round(s.rankPeLtm)) : qText(s.peTrailingQuintile), color: s.rankPeLtm != null ? (s.rankPeLtm >= 70 ? 'var(--green)' : s.rankPeLtm <= 30 ? '#e84560' : '#f59e0b') : qColor(s.peTrailingQuintile) },
+    { label:'PE NTM Rank', val: s.rankPeNtm != null ? String(Math.round(s.rankPeNtm)) : qText(s.peForwardQuintile), color: s.rankPeNtm != null ? (s.rankPeNtm >= 70 ? 'var(--green)' : s.rankPeNtm <= 30 ? '#e84560' : '#f59e0b') : qColor(s.peForwardQuintile) },
+    { label:'PB Rank', val: s.rankPb != null ? String(Math.round(s.rankPb)) : qText(s.pbQuintile), color: s.rankPb != null ? (s.rankPb >= 70 ? 'var(--green)' : s.rankPb <= 30 ? '#e84560' : '#f59e0b') : qColor(s.pbQuintile) },
+    { label:'EPS Gr Rank', val: s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : qText(s.epsGrowthQuintile), color: s.rankEpsGr != null ? (s.rankEpsGr >= 70 ? 'var(--green)' : s.rankEpsGr <= 30 ? '#e84560' : '#f59e0b') : qColor(s.epsGrowthQuintile) },
+    { label:'Rev Gr Rank', val: s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : qText(s.revGrowthQuintile), color: s.rankRevGr != null ? (s.rankRevGr >= 70 ? 'var(--green)' : s.rankRevGr <= 30 ? '#e84560' : '#f59e0b') : qColor(s.revGrowthQuintile) },
     { label:'Mom 1 Week', val: stock.mom1w != null ? fp(stock.mom1w * 100, 1) : '—', color: clr(stock.mom1w) },
     { label:'Mom 1 Month', val: stock.mom1m != null ? fp(stock.mom1m * 100, 1) : '—', color: clr(stock.mom1m) },
     { label:'Mom 6 Months', val: stock.mom6m != null ? fp(stock.mom6m * 100, 1) : '—', color: clr(stock.mom6m) },
