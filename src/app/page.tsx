@@ -599,11 +599,11 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['Price',        fv(stock.price, 2),       ''],
     ['1D %',         fp(stock.change1d != null ? stock.change1d*100 : null),        clr(stock.change1d)],
     ['Mkt Cap B',    fv(stock.mktCap, 1),       ''],
-    ['P/E Trailing', stock.peTrail != null ? fv(stock.peTrail, 1) : (stock.rankPeLtm != null ? Math.round(stock.rankPeLtm) : '-'),      ''],
-    ['P/E Fwd',      stock.peFwd != null ? fv(stock.peFwd, 1) : (stock.rankPeNtm != null ? Math.round(stock.rankPeNtm) : '-'),        ''],
-    ['P/B',          stock.pb != null ? fv(stock.pb, 2) : (stock.rankPb != null ? Math.round(stock.rankPb) : '-'),           ''],
-    ['EPS Gr %',     stock.epsGrowth != null ? fpd(stock.epsGrowth) : (stock.rankEpsGr != null ? Math.round(stock.rankEpsGr) : '-'),      clr(stock.epsGrowth)],
-    ['Rev Gr %',     stock.revGrowth != null ? fpd(stock.revGrowth) : (stock.rankRevGr != null ? Math.round(stock.rankRevGr) : '-'),      clr(stock.revGrowth)],
+    ['P/E Trailing', fv(stock.peTrail, 1),      ''],
+    ['P/E Fwd',      fv(stock.peFwd, 1),        ''],
+    ['P/B',          fv(stock.pb, 2),           ''],
+    ['EPS Gr %',     fpd(stock.epsGrowth),      clr(stock.epsGrowth)],
+    ['Rev Gr %',     fpd(stock.revGrowth),      clr(stock.revGrowth)],
     ['Mom 1W %',     fpd(stock.mom1w),          clr(stock.mom1w)],
     ['Mom 1M %',     fpd(stock.mom1m),          clr(stock.mom1m)],
     ['Mom 6M %',     fpd(stock.mom6m),          clr(stock.mom6m)],
@@ -1140,8 +1140,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
-                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : (s.rankEpsGr != null ? Math.round(s.rankEpsGr) : '-')}</td>
-                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{s.revGrowth != null ? fpDec(s.revGrowth) : (s.rankRevGr != null ? Math.round(s.rankRevGr) : '-')}</td>
+                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
+                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
                       <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fv(s.valueScore, 0)}</td>
                       <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fv(s.growthScore, 0)}</td>
@@ -1153,8 +1153,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                     <td className="font-mono font-700">{totalRow.count}</td>
                     <td className="font-mono font-700">{fv(totalRow.mktCap, 0)}</td>
                     <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{totalRow.epsGrowth != null && !isNaN(totalRow.epsGrowth) ? fpDec(totalRow.epsGrowth) : '-'}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{totalRow.revGrowth != null && !isNaN(totalRow.revGrowth) ? fpDec(totalRow.revGrowth) : '-'}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
                     <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fv(totalRow.valueScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fv(totalRow.growthScore, 0)}</td>
@@ -1291,8 +1291,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
-                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : (s.rankEpsGr != null ? Math.round(s.rankEpsGr) : '-')}</td>
-                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{s.revGrowth != null ? fpDec(s.revGrowth) : (s.rankRevGr != null ? Math.round(s.rankRevGr) : '-')}</td>
+                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
+                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
                       <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fv(s.valueScore, 0)}</td>
                       <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fv(s.growthScore, 0)}</td>
@@ -1304,8 +1304,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
                     <td className="font-mono font-700">{totalRow.count}</td>
                     <td className="font-mono font-700">{fv(totalRow.mktCap, 0)}</td>
                     <td className="font-mono font-700" style={clr(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{totalRow.epsGrowth != null && !isNaN(totalRow.epsGrowth) ? fpDec(totalRow.epsGrowth) : '-'}</td>
-                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{totalRow.revGrowth != null && !isNaN(totalRow.revGrowth) ? fpDec(totalRow.revGrowth) : '-'}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
+                    <td className="font-mono font-700" style={clr(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
                     <td className="font-mono font-800" style={clr(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fv(totalRow.valueScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fv(totalRow.growthScore, 0)}</td>
@@ -2162,8 +2162,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fvs(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clrS(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
-                      <td className="font-mono font-600" style={clrS(s.epsGrowth)}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : (s.rankEpsGr != null ? Math.round(s.rankEpsGr) : '-')}</td>
-                      <td className="font-mono font-600" style={clrS(s.revGrowth)}>{s.revGrowth != null ? fpDec(s.revGrowth) : (s.rankRevGr != null ? Math.round(s.rankRevGr) : '-')}</td>
+                      <td className="font-mono font-600" style={clrS(s.epsGrowth)}>{fpDec(s.epsGrowth)}</td>
+                      <td className="font-mono font-600" style={clrS(s.revGrowth)}>{fpDec(s.revGrowth)}</td>
                       <td className="font-mono font-700" style={clrS(s.mom12m)}>{fpDec(s.mom12m)}</td>
                       <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fvs(s.valueScore, 0)}</td>
                       <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fvs(s.growthScore, 0)}</td>
@@ -2175,8 +2175,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                     <td className="font-mono font-700">{totalRow.count}</td>
                     <td className="font-mono font-700">{fvs(totalRow.mktCap, 0)}</td>
                     <td className="font-mono font-700" style={clrS(totalRow.change1d)}>{fpPct(totalRow.change1d != null ? totalRow.change1d*100 : null)}</td>
-                    <td className="font-mono font-700" style={clrS(totalRow.epsGrowth)}>{totalRow.epsGrowth != null && !isNaN(totalRow.epsGrowth) ? fpDec(totalRow.epsGrowth) : '-'}</td>
-                    <td className="font-mono font-700" style={clrS(totalRow.revGrowth)}>{totalRow.revGrowth != null && !isNaN(totalRow.revGrowth) ? fpDec(totalRow.revGrowth) : '-'}</td>
+                    <td className="font-mono font-700" style={clrS(totalRow.epsGrowth)}>{fpDec(totalRow.epsGrowth)}</td>
+                    <td className="font-mono font-700" style={clrS(totalRow.revGrowth)}>{fpDec(totalRow.revGrowth)}</td>
                     <td className="font-mono font-800" style={clrS(totalRow.mom12m)}>{fpDec(totalRow.mom12m)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.valueScore)}>{fvs(totalRow.valueScore, 0)}</td>
                     <td className="font-mono font-700" style={clrScore(totalRow.growthScore)}>{fvs(totalRow.growthScore, 0)}</td>
