@@ -92,6 +92,52 @@ const NO_FILTER = new Set(['VI','IR','LS'])
 // APAC + North America: top N per market cap, solo titoli con company e sector
 const APAC_TOP_N: Record<string, number> = { TSE: 1000, SEHK: 500, TSX: 400, ASX: 350, KRX: 400, SGX: 100, US: 2000 }
 
+// Campi visibili SENZA login — identificazione base e prezzo, gia'
+// pubblico altrove.
+const PUBLIC_FIELDS = new Set([
+  'ticker', 'exchange', 'isin', 'company', 'sector', 'country', 'flag',
+  'website', 'description', 'primaryExchange', 'yahooTicker', 'inUniverse',
+  'price', 'mktCap', 'lastPriceDate',
+])
+
+// Campi aggiuntivi visibili SOLO se loggato — punteggi finali e momentum.
+// MAI i dati grezzi (PE, PB, EPS/Rev growth, i rank dei singoli fattori)
+// — insieme al punteggio finale permetterebbero di ricostruire la
+// formula per regressione statistica.
+const SCORE_MOMENTUM_FIELDS = new Set([
+  'valueScore', 'growthScore', 'combinedRank',
+  'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m',
+  'revGrowthTier', // fascia qualitativa (Alto/Medio/Basso), non il dato grezzo
+])
+
+function revGrowthTierFrom(rankRevGr: number | null | undefined): string | null {
+  if (rankRevGr == null) return null
+  if (rankRevGr >= 70) return 'High'
+  if (rankRevGr >= 30) return 'Average'
+  return 'Low'
+}
+
+function redactForGuest<T extends Record<string, any>>(obj: T): T {
+  const out: any = {}
+  const tier = revGrowthTierFrom(obj.rankRevGr)
+  for (const key of Object.keys(obj)) {
+    out[key] = PUBLIC_FIELDS.has(key) ? obj[key] : null
+  }
+  out.revGrowthTier = tier
+  return out
+}
+
+function redactRawData<T extends Record<string, any>>(obj: T): T {
+  const allowed = new Set(Array.from(PUBLIC_FIELDS).concat(Array.from(SCORE_MOMENTUM_FIELDS)))
+  const out: any = {}
+  const tier = revGrowthTierFrom(obj.rankRevGr)
+  for (const key of Object.keys(obj)) {
+    out[key] = allowed.has(key) ? obj[key] : null
+  }
+  out.revGrowthTier = tier
+  return out
+}
+
 async function fetchLatestPrices(exchangeList: string[]) {
   // Legge gli ultimi ~6 giorni di prezzi per calcolare prezzo corrente e
   // variazione reale da prices_eod, invece di affidarsi a fundamentals.price
@@ -258,10 +304,12 @@ export async function GET(req: NextRequest) {
   // nessun ricalcolo di nulla. Chiunque altro vede un sottoinsieme.
   let isOwner = false
   let isInstitutionalViewer = false
+  let isLoggedIn = false
   const authHeader = req.headers.get('authorization') || ''
   if (authHeader.startsWith('Bearer ')) {
     try {
       const { data: { user } } = await supabase.auth.getUser(authHeader.slice(7))
+      if (user?.email) isLoggedIn = true
       if (user?.email === 'andreameschini19@gmail.com') isOwner = true
       // Livello "institutional viewer" — vede TUTTI gli 8.000 titoli
       // (nessun limite ai 500), ma non vede MAI i dati grezzi, in nessuna
@@ -337,7 +385,15 @@ export async function GET(req: NextRequest) {
           return jsonNoCache({ stocks: [], restricted: true, ticker: mapped.ticker, company: mapped.company })
         }
       }
-      return jsonNoCache({ stocks: [mapped], source: 'supabase' })
+      let finalMapped: any = mapped
+      if (isOwner) {
+        // nessuna restrizione
+      } else if (!isLoggedIn) {
+        finalMapped = redactForGuest(mapped)
+      } else {
+        finalMapped = redactRawData(mapped)
+      }
+      return jsonNoCache({ stocks: [finalMapped], source: 'supabase' })
     }
 
     if (search) {
@@ -359,6 +415,13 @@ export async function GET(req: NextRequest) {
       if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
         stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
+      }
+      if (isOwner) {
+        // nessuna restrizione
+      } else if (!isLoggedIn) {
+        stocks = stocks.map((s: any) => redactForGuest(s))
+      } else {
+        stocks = stocks.map((s: any) => redactRawData(s))
       }
       return jsonNoCache({ stocks, source: 'supabase' })
     }
@@ -395,6 +458,14 @@ export async function GET(req: NextRequest) {
     if (!isOwner && !isInstitutionalViewer) {
       const top500 = await getTop500Keys()
       stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
+    }
+
+    if (isOwner) {
+      // nessuna restrizione
+    } else if (!isLoggedIn) {
+      stocks = stocks.map((s: any) => redactForGuest(s))
+    } else {
+      stocks = stocks.map((s: any) => redactRawData(s))
     }
 
     if (isRowVolumeLimited(ip, stocks.length)) {
