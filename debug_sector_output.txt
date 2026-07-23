@@ -1,3 +1,9 @@
-AAPL.US ultima data prezzo: [{'date': '2026-07-21'}]
-7203.TSE ultima data prezzo: [{'date': '2026-07-21'}]
-SAP.XETRA ultima data prezzo: [{'date': '2026-07-21'}]
+Test disponibilita' dati Yahoo per AAPL, ultimi 5 giorni:
+Price            Close        High         Low        Open    Volume
+Ticker            AAPL        AAPL        AAPL        AAPL      AAPL
+Date                                                                
+2026-07-20  326.589996  333.709991  323.679993  333.510010  53468000
+2026-07-21  327.739990  329.600006  322.220001  323.130005  41338900
+2026-07-22  325.890015  329.000000  323.339996  327.869995  38700500
+
+Ultima data disponibile: 2026-07-22 00:00:00
