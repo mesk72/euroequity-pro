@@ -65,6 +65,21 @@ const fv = (v: number | null | undefined, d = 2): string => {
   if (v == null || isNaN(v)) return '-'
   return v.toFixed(d)
 }
+// Etichetta + colore per il sistema a quintili — sostituisce i vecchi
+// rank esatti quando il dato grezzo non e' disponibile. Riusa la stessa
+// palette gia' presente nel sito (verde/arancione/rosso) per coerenza.
+const QUINTILE_LABELS: Record<string, { short: string; color: string }> = {
+  'Top Quintile':    { short: 'Top 20%',   color: '#22c55e' },
+  '2nd Quintile':    { short: '60-80%',    color: '#84cc16' },
+  'Middle':          { short: 'Mid',       color: '#f97316' },
+  '4th Quintile':    { short: '20-40%',    color: '#f97316' },
+  'Bottom Quintile': { short: 'Bottom 20%',color: '#ef4444' },
+}
+function quintileDisplay(label: string | null | undefined) {
+  if (!label) return { text: '-', color: '#8a9ab8' }
+  const q = QUINTILE_LABELS[label]
+  return q ? { text: q.short, color: q.color } : { text: '-', color: '#8a9ab8' }
+}
 const fpd = (v: number | null | undefined, d = 1): string => {
   if (v == null) return '-'
   const pct = v * 100
@@ -599,11 +614,11 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
     ['Price',        fv(stock.price, 2),       ''],
     ['1D %',         fp(stock.change1d != null ? stock.change1d*100 : null),        clr(stock.change1d)],
     ['Mkt Cap B',    fv(stock.mktCap, 1),       ''],
-    ['P/E Trailing', stock.peTrail != null ? fv(stock.peTrail, 1) : (stock.rankPeLtm != null ? String(Math.round(stock.rankPeLtm)) : '-'),      ''],
-    ['P/E Fwd',      stock.peFwd != null ? fv(stock.peFwd, 1) : (stock.rankPeNtm != null ? String(Math.round(stock.rankPeNtm)) : '-'),        ''],
-    ['P/B',          stock.pb != null ? fv(stock.pb, 2) : (stock.rankPb != null ? String(Math.round(stock.rankPb)) : '-'),           ''],
-    ['EPS Gr %',     stock.epsGrowth != null ? fpd(stock.epsGrowth) : (stock.rankEpsGr != null ? String(Math.round(stock.rankEpsGr)) : '-'),      clr(stock.epsGrowth)],
-    ['Rev Gr %',     stock.revGrowth != null ? fpd(stock.revGrowth) : (stock.rankRevGr != null ? String(Math.round(stock.rankRevGr)) : '-'),      clr(stock.revGrowth)],
+    ['P/E Trailing', stock.peTrail != null ? fv(stock.peTrail, 1) : quintileDisplay(stock.peTrailingQuintile).text,      stock.peTrail != null ? '' : `text-[${quintileDisplay(stock.peTrailingQuintile).color}]`],
+    ['P/E Fwd',      stock.peFwd != null ? fv(stock.peFwd, 1) : quintileDisplay(stock.peForwardQuintile).text,        stock.peFwd != null ? '' : `text-[${quintileDisplay(stock.peForwardQuintile).color}]`],
+    ['P/B',          stock.pb != null ? fv(stock.pb, 2) : quintileDisplay(stock.pbQuintile).text,           stock.pb != null ? '' : `text-[${quintileDisplay(stock.pbQuintile).color}]`],
+    ['EPS Gr %',     stock.epsGrowth != null ? fpd(stock.epsGrowth) : quintileDisplay(stock.epsGrowthQuintile).text,      stock.epsGrowth != null ? '' : `text-[${quintileDisplay(stock.epsGrowthQuintile).color}]`],
+    ['Rev Gr %',     stock.revGrowth != null ? fpd(stock.revGrowth) : quintileDisplay(stock.revGrowthQuintile).text,      stock.revGrowth != null ? '' : `text-[${quintileDisplay(stock.revGrowthQuintile).color}]`],
     ['Mom 1W %',     fpd(stock.mom1w),          clr(stock.mom1w)],
     ['Mom 1M %',     fpd(stock.mom1m),          clr(stock.mom1m)],
     ['Mom 6M %',     fpd(stock.mom6m),          clr(stock.mom6m)],
@@ -1075,8 +1090,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
-      rankEpsGr: mcw(list, 'rankEpsGr'),
-      rankRevGr: mcw(list, 'rankRevGr'),
+      epsGrowthQuintile: (() => { const r = mcw(list, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+      revGrowthQuintile: (() => { const r = mcw(list, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -1090,8 +1105,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
     valueScore: mcw(stocksEur, 'valueScore'),
     growthScore: mcw(stocksEur, 'growthScore'),
     combinedRank: mcw(stocksEur, 'combinedRank'),
-    rankEpsGr: mcw(stocksEur, 'rankEpsGr'),
-    rankRevGr: mcw(stocksEur, 'rankRevGr'),
+    epsGrowthQuintile: (() => { const r = mcw(stocksEur, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+    revGrowthQuintile: (() => { const r = mcw(stocksEur, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
@@ -1144,8 +1159,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
-                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : (s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '-')}</td>
-                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{s.revGrowth != null ? fpDec(s.revGrowth) : (s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '-')}</td>
+                      <td className="font-mono font-600" style={s.epsGrowth != null ? {} : { color: quintileDisplay(s.epsGrowthQuintile).color }}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : quintileDisplay(s.epsGrowthQuintile).text}</td>
+                      <td className="font-mono font-600" style={s.revGrowth != null ? {} : { color: quintileDisplay(s.revGrowthQuintile).color }}>{s.revGrowth != null ? fpDec(s.revGrowth) : quintileDisplay(s.revGrowthQuintile).text}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
                       <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fv(s.valueScore, 0)}</td>
                       <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fv(s.growthScore, 0)}</td>
@@ -1230,8 +1245,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
-      rankEpsGr: mcw(list, 'rankEpsGr'),
-      rankRevGr: mcw(list, 'rankRevGr'),
+      epsGrowthQuintile: (() => { const r = mcw(list, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+      revGrowthQuintile: (() => { const r = mcw(list, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -1245,8 +1260,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
     valueScore: mcw(stocksUS, 'valueScore'),
     growthScore: mcw(stocksUS, 'growthScore'),
     combinedRank: mcw(stocksUS, 'combinedRank'),
-    rankEpsGr: mcw(stocksUS, 'rankEpsGr'),
-    rankRevGr: mcw(stocksUS, 'rankRevGr'),
+    epsGrowthQuintile: (() => { const r = mcw(stocksUS, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+    revGrowthQuintile: (() => { const r = mcw(stocksUS, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
@@ -1299,8 +1314,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fv(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clr(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
-                      <td className="font-mono font-600" style={clr(s.epsGrowth)}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : (s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '-')}</td>
-                      <td className="font-mono font-600" style={clr(s.revGrowth)}>{s.revGrowth != null ? fpDec(s.revGrowth) : (s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '-')}</td>
+                      <td className="font-mono font-600" style={s.epsGrowth != null ? {} : { color: quintileDisplay(s.epsGrowthQuintile).color }}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : quintileDisplay(s.epsGrowthQuintile).text}</td>
+                      <td className="font-mono font-600" style={s.revGrowth != null ? {} : { color: quintileDisplay(s.revGrowthQuintile).color }}>{s.revGrowth != null ? fpDec(s.revGrowth) : quintileDisplay(s.revGrowthQuintile).text}</td>
                       <td className="font-mono font-700" style={clr(s.mom12m)}>{fpDec(s.mom12m)}</td>
                       <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fv(s.valueScore, 0)}</td>
                       <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fv(s.growthScore, 0)}</td>
@@ -2118,7 +2133,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
       revGrowth: mcw(list, 'revGrowth'), mom12m: mcwReturn(list, 'mom12m'),
       valueScore: mcw(list, 'valueScore'), growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
-      rankEpsGr: mcw(list, 'rankEpsGr'), rankRevGr: mcw(list, 'rankRevGr'),
+      epsGrowthQuintile: (() => { const r = mcw(list, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+      revGrowthQuintile: (() => { const r = mcw(list, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -2132,8 +2148,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
     valueScore: mcw(stocksAP, 'valueScore'),
     growthScore: mcw(stocksAP, 'growthScore'),
     combinedRank: mcw(stocksAP, 'combinedRank'),
-    rankEpsGr: mcw(stocksAP, 'rankEpsGr'),
-    rankRevGr: mcw(stocksAP, 'rankRevGr'),
+    epsGrowthQuintile: (() => { const r = mcw(stocksAP, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+    revGrowthQuintile: (() => { const r = mcw(stocksAP, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
@@ -2173,8 +2189,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
                       <td className="font-mono text-muted">{s.count}</td>
                       <td className="font-mono">{fvs(s.mktCap, 0)}</td>
                       <td className="font-mono font-600" style={clrS(s.change1d)}>{fpPct(s.change1d != null ? s.change1d*100 : null)}</td>
-                      <td className="font-mono font-600" style={clrS(s.epsGrowth)}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : (s.rankEpsGr != null ? String(Math.round(s.rankEpsGr)) : '-')}</td>
-                      <td className="font-mono font-600" style={clrS(s.revGrowth)}>{s.revGrowth != null ? fpDec(s.revGrowth) : (s.rankRevGr != null ? String(Math.round(s.rankRevGr)) : '-')}</td>
+                      <td className="font-mono font-600" style={s.epsGrowth != null ? clrS(s.epsGrowth) : { color: quintileDisplay(s.epsGrowthQuintile).color }}>{s.epsGrowth != null ? fpDec(s.epsGrowth) : quintileDisplay(s.epsGrowthQuintile).text}</td>
+                      <td className="font-mono font-600" style={s.revGrowth != null ? clrS(s.revGrowth) : { color: quintileDisplay(s.revGrowthQuintile).color }}>{s.revGrowth != null ? fpDec(s.revGrowth) : quintileDisplay(s.revGrowthQuintile).text}</td>
                       <td className="font-mono font-700" style={clrS(s.mom12m)}>{fpDec(s.mom12m)}</td>
                       <td className="font-mono font-600" style={clrScore(s.valueScore)}>{fvs(s.valueScore, 0)}</td>
                       <td className="font-mono font-600" style={clrScore(s.growthScore)}>{fvs(s.growthScore, 0)}</td>
