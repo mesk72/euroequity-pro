@@ -38,6 +38,25 @@ function scoreClr(v?: number | null): string {
   return 'var(--red)'
 }
 
+// Quintile (Top/2nd/Mid/4th/Bottom) al posto del rank esatto quando il
+// dato grezzo non e' disponibile — stessa palette colori del resto del
+// sito, per coerenza visiva.
+const QUINTILE_LABELS: Record<string, { short: string; color: string }> = {
+  'Top Quintile':    { short: 'Top 20%',    color: '#22c55e' },
+  '2nd Quintile':    { short: '60-80%',     color: '#84cc16' },
+  'Middle':          { short: 'Mid',        color: '#f97316' },
+  '4th Quintile':    { short: '20-40%',     color: '#f97316' },
+  'Bottom Quintile': { short: 'Bottom 20%', color: '#ef4444' },
+}
+function quintileText(label?: string | null): string {
+  if (!label) return '—'
+  return QUINTILE_LABELS[label]?.short ?? '—'
+}
+function quintileColor(label?: string | null): string {
+  if (!label) return 'var(--text3)'
+  return QUINTILE_LABELS[label]?.color ?? 'var(--text3)'
+}
+
 // Simple SVG price chart
 function PriceChart({ history }: { history: any[] }) {
   const prices = history
@@ -154,14 +173,14 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
     ['Price',   (stock.exchange === 'SWX' ? 'CHF ' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp ' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK ' : stock.exchange === 'OB' ? 'NOK ' : stock.exchange === 'CPSE' ? 'DKK ' : stock.exchange === 'US' ? 'USD ' : 'EUR ') + fv(stock.price, 2), ''],
     ['1D Change %',  fp(chg, 2),               chg >= 0 ? 'var(--green)' : 'var(--red)'],
     ['Mkt Cap $B',   fv(stock.mktCap, 2),      ''],
-    ['PE LTM Rank',  fn((stock as any).rankPeLtm),  scoreClr((stock as any).rankPeLtm)],
-    ['PE NTM Rank',  fn((stock as any).rankPeNtm),  scoreClr((stock as any).rankPeNtm)],
-    ['PB Rank',      fn((stock as any).rankPb),      scoreClr((stock as any).rankPb)],
+    ['PE LTM Rank',  (stock as any).rankPeLtm != null ? fn((stock as any).rankPeLtm) : quintileText((stock as any).peTrailingQuintile),  (stock as any).rankPeLtm != null ? scoreClr((stock as any).rankPeLtm) : quintileColor((stock as any).peTrailingQuintile)],
+    ['PE NTM Rank',  (stock as any).rankPeNtm != null ? fn((stock as any).rankPeNtm) : quintileText((stock as any).peForwardQuintile),  (stock as any).rankPeNtm != null ? scoreClr((stock as any).rankPeNtm) : quintileColor((stock as any).peForwardQuintile)],
+    ['PB Rank',      (stock as any).rankPb != null ? fn((stock as any).rankPb) : quintileText((stock as any).pbQuintile),      (stock as any).rankPb != null ? scoreClr((stock as any).rankPb) : quintileColor((stock as any).pbQuintile)],
   ]
 
   const rightMetrics: [string, string, string][] = [
-    ['EPS Gr Rank',    fn((stock as any).rankEpsGr),  scoreClr((stock as any).rankEpsGr)],
-    ['Rev Gr Rank',    fn((stock as any).rankRevGr),  scoreClr((stock as any).rankRevGr)],
+    ['EPS Gr Rank',    (stock as any).rankEpsGr != null ? fn((stock as any).rankEpsGr) : quintileText((stock as any).epsGrowthQuintile),  (stock as any).rankEpsGr != null ? scoreClr((stock as any).rankEpsGr) : quintileColor((stock as any).epsGrowthQuintile)],
+    ['Rev Gr Rank',    (stock as any).rankRevGr != null ? fn((stock as any).rankRevGr) : quintileText((stock as any).revGrowthQuintile),  (stock as any).rankRevGr != null ? scoreClr((stock as any).rankRevGr) : quintileColor((stock as any).revGrowthQuintile)],
     ['Mom 1 Week %',   fpPct(stock.mom1w),      clr(stock.mom1w)],
     ['Mom 1 Month %',  fpPct(stock.mom1m),      clr(stock.mom1m)],
     ['Mom 6 Months %', fpPct(stock.mom6m),      clr(stock.mom6m)],
