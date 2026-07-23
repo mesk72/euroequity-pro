@@ -107,34 +107,40 @@ const PUBLIC_FIELDS = new Set([
 const SCORE_MOMENTUM_FIELDS = new Set([
   'valueScore', 'growthScore', 'combinedRank',
   'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m',
-  'revGrowthTier', // fascia qualitativa (Alto/Medio/Basso), non il dato grezzo
+  'revGrowthTier', 'epsGrowthTier', // fasce qualitative (High/Average/Low),
+  // stessa logica per entrambe — coerenza: se una mostra un rank, lo
+  // mostrano tutte, nessuna resta vuota mentre l'altra ha un'etichetta.
 ])
 
-function revGrowthTierFrom(rankRevGr: number | null | undefined): string | null {
-  if (rankRevGr == null) return null
-  if (rankRevGr >= 70) return 'High'
-  if (rankRevGr >= 30) return 'Average'
+function tierFrom(rank: number | null | undefined): string | null {
+  if (rank == null) return null
+  if (rank >= 70) return 'High'
+  if (rank >= 30) return 'Average'
   return 'Low'
 }
 
 function redactForGuest<T extends Record<string, any>>(obj: T): T {
   const out: any = {}
-  const tier = revGrowthTierFrom(obj.rankRevGr)
+  const revTier = tierFrom(obj.rankRevGr)
+  const epsTier = tierFrom(obj.rankEpsGr)
   for (const key of Object.keys(obj)) {
     out[key] = PUBLIC_FIELDS.has(key) ? obj[key] : null
   }
-  out.revGrowthTier = tier
+  out.revGrowthTier = revTier
+  out.epsGrowthTier = epsTier
   return out
 }
 
 function redactRawData<T extends Record<string, any>>(obj: T): T {
   const allowed = new Set(Array.from(PUBLIC_FIELDS).concat(Array.from(SCORE_MOMENTUM_FIELDS)))
   const out: any = {}
-  const tier = revGrowthTierFrom(obj.rankRevGr)
+  const revTier = tierFrom(obj.rankRevGr)
+  const epsTier = tierFrom(obj.rankEpsGr)
   for (const key of Object.keys(obj)) {
     out[key] = allowed.has(key) ? obj[key] : null
   }
-  out.revGrowthTier = tier
+  out.revGrowthTier = revTier
+  out.epsGrowthTier = epsTier
   return out
 }
 
