@@ -1,16 +1,12 @@
-import os, requests
+import os, requests, datetime
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
-headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY, "Prefer":"count=exact"}
+headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-r = requests.get(f"{SUPABASE_URL}/rest/v1/news_cache", headers=headers_r, params={"select":"ticker","limit":"1"})
-print("Righe totali in news_cache:", r.headers.get("content-range"))
-
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/news_cache", headers={"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY},
-    params={"select":"ticker,exchange,fetched_at","order":"fetched_at.desc","limit":"5"})
-print("Ultime 5 righe:", r2.json())
-
-# Controllo specifico: AAPL ha notizie?
-r3 = requests.get(f"{SUPABASE_URL}/rest/v1/news_cache", headers={"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY},
-    params={"select":"ticker,exchange,title","ticker":"eq.AAPL"})
-print("Notizie AAPL:", r3.json())
+r = requests.get(f"{SUPABASE_URL}/rest/v1/news_cache", headers=headers_r,
+    params={"select":"ticker,title,pub_date,fetched_at","ticker":"eq.AAPL"})
+print("Ora attuale UTC:", datetime.datetime.utcnow().isoformat())
+print("Cutoff 24h fa:", (datetime.datetime.utcnow() - datetime.timedelta(hours=24)).isoformat())
+print()
+for row in r.json():
+    print(row)
