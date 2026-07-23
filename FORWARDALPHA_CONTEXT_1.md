@@ -2936,3 +2936,15 @@ Andrea ha specificato due formati diversi per le etichette quintile, a seconda d
 - `src/app/stock/[id]/page.tsx` (pagina dedicata con URL proprio)
 
 Se in futuro si aggiunge un sesto punto che mostra questi campi, chiedere ad Andrea quale formato usare in base allo spazio disponibile in quel contesto specifico, seguendo questa stessa logica (tabelle/colonne strette = corto, pagine di dettaglio con piu' spazio = lungo).
+
+---
+
+## CORREZIONE AL PATTERN "5 COMPONENTI" — in realta' StockTable ha ANCHE una vista mobile separata (23 luglio 2026)
+
+Il vero componente sotto `Screener` (in `src/app/page.tsx`) e' `StockTable` (riga ~340), che a sua volta ha DUE rendering completamente separati al suo interno:
+- **Desktop**: usa `cellFmt(s, key)` per ogni colonna — quello corretto per primo.
+- **Mobile** (`if (isMobile) return (...)`, controllato con `window.innerWidth < 768`): un blocco JSX inline COMPLETAMENTE SEPARATO, che NON usa `cellFmt` — stesso pattern del "tooltip PEv/PEf/EPS/Rev" gia' visto altrove, con `(s as any).rankPeLtm` letto direttamente.
+
+**Regola aggiornata**: quando si cerca "dove appare questo campo", non basta cercare il nome del componente — bisogna controllare ANCHE se quel componente ha un ramo `if (isMobile)` o simili con markup duplicato, dato che il fix sul ramo desktop non tocca affatto quello mobile. Cercare esplicitamente `isMobile` dentro ogni componente prima di dichiarare un fix completo.
+
+`StockTable` e' usato sia da `Screener` sia probabilmente da altri punti (verificare con `<StockTable` se serve in futuro).
