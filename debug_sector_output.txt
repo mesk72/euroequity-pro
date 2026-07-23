@@ -1,2 +1,7 @@
-US con Best Score: 0-0/5
-AAPL: [{'ticker': 'AAPL', 'value_score': 22, 'growth_score': 80.98, 'combined_rank': None}]
+Dati scaricati: 300
+  val_sums len=282, gr_sums len=211
+rank_updates: 300
+Esempio: [{'ticker': 'APG', 'exchange': 'US', 'value_score': 31, 'growth_score': 61}, {'ticker': 'TWST', 'exchange': 'US', 'value_score': 15, 'growth_score': 83}, {'ticker': 'PENN', 'exchange': 'US', 'value_score': 40, 'growth_score': 84}]
+
+all_scores (con entrambi i punteggi non-null): 211
+Esempio all_scores[0]: {'ticker': 'APG', 'exchange': 'US', 'value_score': 31, 'growth_score': 61}
