@@ -384,41 +384,29 @@ export async function GET(req: NextRequest) {
     }
 
     if (ticker && exchange) {
-      const [stockRes, fundRes, priceRes, histRes] = await Promise.all([
+      const [stockRes, fundRes, histRes] = await Promise.all([
         supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker,in_universe').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf').eq('ticker', ticker).eq('exchange', exchange).limit(1),
-        // Prezzo reale piu' recente da prices_eod — fundamentals.price e' un
-        // campo statico aggiornato solo dagli script weekly, non riflette
-        // l'aggiornamento giornaliero. Era la causa del prezzo mostrato
-        // fermo di giorni rispetto al dato vero gia' presente nel database.
-        supabase.from('prices_eod').select('date,adj_close').eq('ticker', ticker).eq('exchange', exchange).order('date', { ascending: false }).limit(1),
-        // Storico ~400 giorni per calcolare il momentum reale (1d/1w/1m/6m/12m)
-        // dal prezzo vero, invece che da fundamentals.mom* — stesso problema
-        // del prezzo: quei campi restano fermi finche' il run settimanale/
-        // notturno non li ricalcola con successo.
+        // Storico per il grafico prezzi — NON usato per il prezzo/variazione
+        // mostrati (quelli vengono SEMPRE da fundamentals.price/change1d,
+        // stessa identica fonte di Screener e ricerca — nessuna query
+        // separata, garantisce lo stesso numero ovunque per tutti gli
+        // 8000 titoli, come richiesto esplicitamente da Andrea 23/7/2026).
         supabase.from('prices_eod').select('date,adj_close').eq('ticker', ticker).eq('exchange', exchange).order('date', { ascending: false }).limit(400),
       ])
       const s: any = stockRes.data?.[0] || {}
       const f: any = fundRes.data?.[0] || {}
-      const p: any = priceRes.data?.[0] || {}
       if (!s.ticker) return jsonNoCache({ stocks: [] })
       const mapped = mapStock(s, f)
-      if (p.adj_close != null) {
-        mapped.price = p.adj_close
-        mapped.lastPriceDate = p.date
-      }
       const hist: any[] = histRes.data || []
-      if (hist.length > 1) {
-        const latest = hist[0]
-        const prevDay = hist[1]
-        const c1d = prevDay && prevDay.adj_close ? (latest.adj_close / prevDay.adj_close - 1) * 100 : null
-        if (c1d != null) mapped.change1d = c1d
+      // change1d resta SEMPRE quello di fundamentals (via mapStock sopra) —
+      // stessa fonte di Screener/ricerca. hist qui serve solo per il
+      // grafico prezzi, non deve mai sovrascrivere il valore mostrato.
         // mom1w/mom1m/mom6m/mom12m NON vengono piu' ricalcolati qui — quel blocco
         // duplicato sovrascriveva il valore corretto (decimale) letto da
         // fundamentals con un valore gia' moltiplicato per 100, causando la
         // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
         // fonte per il momentum, gia' corretta e verificata.
-      }
       if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
         if (!top500.has(`${mapped.ticker}.${mapped.exchange}`)) {
@@ -452,23 +440,6 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
       let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
-
-      // Stesso fix del ramo bulk: prezzo fresco da prices_eod, mai quello
-      // statico di fundamentals — un QUARTO ramo (ricerca) aveva lo
-      // stesso identico problema, mai corretto prima (23/7/2026).
-      try {
-        const searchExList = Array.from(new Set(stocks.map((s: any) => s.exchange)))
-        const freshPrices = await fetchLatestPrices(searchExList)
-        for (const s of stocks) {
-          const key = `${s.ticker}.${s.exchange}`
-          const fresh = freshPrices[key]
-          if (fresh) {
-            s.price = fresh.price
-            s.change1d = fresh.change1d
-            s.lastPriceDate = fresh.date
-          }
-        }
-      } catch {}
 
       if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
@@ -510,25 +481,6 @@ export async function GET(req: NextRequest) {
       // "North America"/"Asia Pacific" combinati (gonfiati).
       stocks = applyUniverseFilter(fundData, stocksData)
     }
-
-    // FIX CRITICO: fetchLatestPrices esisteva ma non veniva mai chiamata
-    // — lo Screener/Sector Heatmap mostravano sempre fundamentals.price
-    // (statico, aggiornato solo dai run settimanali), MAI il prezzo
-    // fresco da prices_eod, causa reale del "due prezzi diversi" tra
-    // pagina titolo (sempre corretta, query diretta) e Screener
-    // (23/7/2026, es. 9984.TSE: 5751 vero vs 6370 statico mostrato).
-    try {
-      const freshPrices = await fetchLatestPrices(exList)
-      for (const s of stocks) {
-        const key = `${s.ticker}.${s.exchange}`
-        const fresh = freshPrices[key]
-        if (fresh) {
-          s.price = fresh.price
-          s.change1d = fresh.change1d
-          s.lastPriceDate = fresh.date
-        }
-      }
-    } catch {}
 
     // Sottoinsieme dei 500 per il proprietario escluso — decide solo
     // QUALI righe includere, nessun valore viene mai ricalcolato.
