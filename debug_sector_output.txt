@@ -1,3 +1,8 @@
-Righe totali in news_cache: 0-0/37010
-Ultime 5 righe: [{'ticker': '3110', 'exchange': 'TSE', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '6651', 'exchange': 'SEHK', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '6651', 'exchange': 'SEHK', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '6651', 'exchange': 'SEHK', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '3110', 'exchange': 'TSE', 'fetched_at': '2026-07-23T04:30:32.907933'}]
-Notizie AAPL: [{'ticker': 'AAPL', 'exchange': 'US', 'title': "AAPL Stock Alert: Apple Just Unseated Nvidia as World's Most Valuable Company - Barchart.com"}, {'ticker': 'AAPL', 'exchange': 'US', 'title': 'AAPL Stock Tops Nasdaq’s Modest Gains: Analyst Says Siri Finally Shows ‘AI Chops’ In iOS 27 Beta - TradingView'}, {'ticker': 'AAPL', 'exchange': 'US', 'title': 'Apple Inc. (AAPL) Is A Top Stock In D. E. Shaw’s Holdings - Yahoo Finance'}, {'ticker': 'AAPL', 'exchange': 'US', 'title': 'Apple Stock: Moat Keeps Doing The Heavy Lifting (NASDAQ:AAPL) - Seeking Alpha'}, {'ticker': 'AAPL', 'exchange': 'US', 'title': "What's Going on With Apple Stock Wednesday? - Benzinga"}]
+Ora attuale UTC: 2026-07-23T07:36:59.724363
+Cutoff 24h fa: 2026-07-22T07:36:59.724391
+
+{'ticker': 'AAPL', 'title': "AAPL Stock Alert: Apple Just Unseated Nvidia as World's Most Valuable Company - Barchart.com", 'pub_date': 'Fri, 17 Jul 2026 19:06:49 GMT', 'fetched_at': '2026-07-22T16:05:05.965025'}
+{'ticker': 'AAPL', 'title': 'AAPL Stock Tops Nasdaq’s Modest Gains: Analyst Says Siri Finally Shows ‘AI Chops’ In iOS 27 Beta - TradingView', 'pub_date': 'Thu, 16 Jul 2026 03:32:00 GMT', 'fetched_at': '2026-07-22T16:05:05.965025'}
+{'ticker': 'AAPL', 'title': 'Apple Inc. (AAPL) Is A Top Stock In D. E. Shaw’s Holdings - Yahoo Finance', 'pub_date': 'Sun, 12 Jul 2026 07:00:00 GMT', 'fetched_at': '2026-07-22T16:05:05.965025'}
+{'ticker': 'AAPL', 'title': 'Apple Stock: Moat Keeps Doing The Heavy Lifting (NASDAQ:AAPL) - Seeking Alpha', 'pub_date': 'Tue, 21 Jul 2026 13:34:15 GMT', 'fetched_at': '2026-07-22T16:05:05.965025'}
+{'ticker': 'AAPL', 'title': "What's Going on With Apple Stock Wednesday? - Benzinga", 'pub_date': 'Wed, 22 Jul 2026 13:20:47 GMT', 'fetched_at': '2026-07-22T16:05:05.965025'}
