@@ -114,6 +114,12 @@ const SCORE_MOMENTUM_FIELDS = new Set([
   'revGrowthQuintile', 'epsGrowthQuintile', 'peTrailingQuintile', 'peForwardQuintile', 'pbQuintile',
   'sectorEpsGrowthQuintile', 'sectorRevGrowthQuintile',
   'continentEpsGrowthQuintile', 'continentRevGrowthQuintile',
+  // Reverse Earnings Model — output del modello (Ke, crescita implicita),
+  // non un dato grezzo in ingresso come PE/PB. Dimenticato quando e'
+  // stato costruito il sistema di protezione, causa reale per cui la
+  // sezione spariva dalla pagina titolo per chiunque non fosse
+  // proprietario (23/7/2026).
+  'ke', 'impliedGrowth10y',
 ])
 
 function quintileFrom(rank: number | null | undefined): string | null {
