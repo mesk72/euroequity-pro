@@ -3,7 +3,7 @@ name: Fetch Beta US (Yahoo Finance)
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Daily US Update"]
+    workflows: ["Daily US Yahoo Finance"]
     types:
       - completed
 
