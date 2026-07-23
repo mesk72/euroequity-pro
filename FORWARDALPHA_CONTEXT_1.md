@@ -2948,3 +2948,26 @@ Il vero componente sotto `Screener` (in `src/app/page.tsx`) e' `StockTable` (rig
 **Regola aggiornata**: quando si cerca "dove appare questo campo", non basta cercare il nome del componente — bisogna controllare ANCHE se quel componente ha un ramo `if (isMobile)` o simili con markup duplicato, dato che il fix sul ramo desktop non tocca affatto quello mobile. Cercare esplicitamente `isMobile` dentro ogni componente prima di dichiarare un fix completo.
 
 `StockTable` e' usato sia da `Screener` sia probabilmente da altri punti (verificare con `<StockTable` se serve in futuro).
+
+---
+
+## COSTO VERCEL — causa reale trovata coi dati veri (23 luglio 2026)
+
+Andrea ha ricevuto un avviso Vercel: $15,01 su $20 di credito mensile Pro consumati, a 6 giorni dalla fine del ciclo. Prima di controllare i dati veri, sono stato spinto a credere (e ho quasi agito su questa base sbagliata) che fosse il cron delle notizie (ogni 20 minuti) a consumare il credito. Andrea ha giustamente preteso di vedere il pannello Usage reale invece di fidarsi delle mie stime.
+
+**Dati veri dal pannello Usage di Vercel**:
+- Build CPU Minutes: $12,14 (80% del totale) — causa VERA
+- Observability Events: $1,34
+- Fluid Provisioned Memory: $0,57
+- Fluid Active CPU: $0,39
+- Fast Origin Transfer: $0,14
+- Web Analytics Events: $0,12
+- **Function Invocations: solo $0,12** — conferma che il cron NON e' la causa
+
+**La vera causa**: decine di push consecutivi durante la sessione maratona 22-23 luglio, ognuno dei quali ha innescato un build completo su Vercel. Non il cron, non il traffico, non le funzioni — i deploy ripetuti.
+
+**Regola per il futuro, per Claude**: quando si corregge codice in una sessione con molti bug a catena, RAGGRUPPARE piu' correzioni insieme prima di pushare, invece di un deploy per ogni singolo fix. Ogni push = un build completo = CPU minutes consumati, che e' risultato essere la voce di costo Vercel piu' pesante in assoluto, non il traffico o le funzioni.
+
+**Regola generale**: quando Andrea chiede di intervenire su un costo/consumo, non ragionare per ipotesi generali (anche se sembrano plausibili) — chiedere sempre il pannello Usage reale prima di agire, dato che le cause intuitive possono essere sbagliate (come e' successo qui).
+
+Il cron notizie e' rimasto a `*/20 0-11,13-23 * * *` + `0,30 12 * * *` in vercel.json, INVARIATO — confermato non essere il problema, nessuna modifica necessaria li'.
