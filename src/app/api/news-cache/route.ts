@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   let query = supabase
     .from('news_cache')
     .select('*')
-    .gte('pub_date', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    .gte('fetched_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
     .order('best_score', { ascending: false, nullsFirst: false })
     .limit(limit)
 
