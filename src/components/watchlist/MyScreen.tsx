@@ -26,11 +26,11 @@ const rankClr = (v: number | null | undefined) => {
   return (v as number) >= 70 ? '#22c55e' : (v as number) <= 30 ? '#e84560' : '#f59e0b'
 }
 const QLBL: Record<string, { t: string; c: string }> = {
-  'Top Quintile':    { t: 'First Quintile',    c: '#22c55e' },
-  '2nd Quintile':    { t: 'Second Quintile',     c: '#84cc16' },
-  'Middle':          { t: 'Third Quintile',        c: '#f59e0b' },
-  '4th Quintile':    { t: 'Fourth Quintile',     c: '#f59e0b' },
-  'Bottom Quintile': { t: 'Fifth Quintile', c: '#e84560' },
+  'Top Quintile':    { t: '1° Quintile',    c: '#22c55e' },
+  '2nd Quintile':    { t: '2° Quintile',     c: '#84cc16' },
+  'Middle':          { t: '3° Quintile',        c: '#f59e0b' },
+  '4th Quintile':    { t: '4° Quintile',     c: '#f59e0b' },
+  'Bottom Quintile': { t: '5° Quintile', c: '#e84560' },
 }
 const qText = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].t : '-'
 const qClr = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].c : 'var(--text3)'
