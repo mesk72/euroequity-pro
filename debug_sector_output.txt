@@ -1,8 +1,10 @@
-Ultimi 5 prezzi reali per 9984.TSE:
+Valore attuale in fundamentals: [{'ticker': '9984', 'price': 6370.0, 'change1d': 0.106479}]
+
+Ultimi prezzi:
   {'date': '2026-07-21', 'adj_close': 5751.0}
   {'date': '2026-07-17', 'adj_close': 5424.0}
   {'date': '2026-07-16', 'adj_close': 5961.0}
   {'date': '2026-07-15', 'adj_close': 6360.0}
   {'date': '2026-07-14', 'adj_close': 6574.0}
 
-Campo fundamentals.price (statico, potrebbe essere una terza fonte): [{'ticker': '9984', 'price': 6370.0, 'change1d': 0.106479}]
+Variazione reale calcolata (2026-07-17 -> 2026-07-21): 6.03%
