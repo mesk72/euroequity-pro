@@ -3,17 +3,18 @@ SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-r = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
-    params={"select":"ticker,price,change1d","ticker":"eq.9984","exchange":"eq.TSE"})
-print("Valore attuale in fundamentals:", r.json())
+r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
+    params={"select":"ticker","exchange":"eq.TSE","in_universe":"eq.true","limit":"15"})
+sample = [s["ticker"] for s in r.json()]
 
-# Calcolo reale dal prezzo storico
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-    params={"select":"date,adj_close","ticker":"eq.9984","exchange":"eq.TSE","order":"date.desc","limit":"5"})
-prices = r2.json()
-print("\nUltimi prezzi:")
-for p in prices:
-    print(" ", p)
-if len(prices) >= 2:
-    real_change = prices[0]["adj_close"] / prices[1]["adj_close"] - 1
-    print(f"\nVariazione reale calcolata ({prices[1]['date']} -> {prices[0]['date']}): {real_change*100:.2f}%")
+for tk in sample:
+    r2 = requests.get(f"{SUPABASE_URL}/rest/v1/fundamentals", headers=headers_r,
+        params={"select":"price,change1d","ticker":f"eq.{tk}","exchange":"eq.TSE"})
+    d = r2.json()
+    r3 = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"date,adj_close","ticker":f"eq.{tk}","exchange":"eq.TSE","order":"date.desc","limit":"1"})
+    p = r3.json()
+    fund_price = d[0]["price"] if d else None
+    real_price = p[0]["adj_close"] if p else None
+    match = "OK" if fund_price and real_price and abs(fund_price - real_price) < 0.01 else "MISMATCH"
+    print(f"{tk}: fundamentals.price={fund_price}, prices_eod reale={real_price} [{match}]")
