@@ -167,7 +167,7 @@ export default function StockDetailPage({ stock, onClose, onAddPortfolio }: Prop
     setTimeout(() => setAdded(false), 2000)
   }
 
-  const chg = stock.change1d || 0
+  const chg = (stock.change1d || 0) * 100
 
   const leftMetrics: [string, string, string][] = [
     ['Price',   (stock.exchange === 'SWX' ? 'CHF ' : stock.exchange === 'LSE' || stock.exchange === 'AIM' ? 'GBp ' : stock.exchange === 'OM' || stock.exchange === 'NGM' ? 'SEK ' : stock.exchange === 'OB' ? 'NOK ' : stock.exchange === 'CPSE' ? 'DKK ' : stock.exchange === 'US' ? 'USD ' : 'EUR ') + fv(stock.price, 2), ''],
