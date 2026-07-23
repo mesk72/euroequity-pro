@@ -170,37 +170,46 @@ async function fetchLatestPrices(exchangeList: string[]) {
   // / change1d — campi statici aggiornati solo dai run settimanali, causa
   // reale del "prezzo fermo" segnalato su JPM e su tutti gli screener.
   //
-  // FIX: la versione precedente ordinava per data attraverso TUTTI i
-  // ticker insieme e limitava a 2 righe per ticker durante la paginazione
-  // — con molti titoli nello stesso exchange, la pagina (1000 righe)
-  // poteva tagliare a meta' un giorno, associando ad alcuni titoli un
-  // prezzo di un giorno diverso da quello vero (causa reale del prezzo
-  // doppio/diverso tra Screener e pagina titolo, 23/7/2026). Ora si
-  // processa un GIORNO alla volta, completo, prima di passare al
-  // precedente — nessun taglio possibile a meta' giorno.
-  const byTicker: Record<string, { date: string; adj_close: number }[]> = {}
+  // FIX v2: la versione "un giorno alla volta" era corretta ma troppo
+  // lenta (fino a 10 chiamate sequenziali per mercato, causa reale del
+  // sito lentissimo/pagine che non si aprivano, 23/7/2026). Ora: UNA
+  // query per mercato, ordinata per TICKER prima e DATA dopo — se la
+  // paginazione taglia, taglia tra un ticker e il successivo, mai a
+  // meta' delle righe di un singolo ticker (impossibile con soli 7
+  // giorni di dati per ticker, ben sotto il limite di pagina). Stessa
+  // correttezza della versione precedente, molto piu' veloce. Tutti i
+  // mercati richiesti in parallelo, non piu' in sequenza.
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - 7)
+  const cutoffStr = cutoff.toISOString().slice(0, 10)
 
-  for (const exchange of exchangeList) {
-    for (let daysAgo = 0; daysAgo < 10; daysAgo++) {
-      const d = new Date()
-      d.setDate(d.getDate() - daysAgo)
-      const dateStr = d.toISOString().slice(0, 10)
-
+  const perExchange = await Promise.all(exchangeList.map(async (exchange) => {
+    const byTicker: Record<string, { date: string; adj_close: number }[]> = {}
+    const PAGE = 1000
+    let from = 0
+    while (true) {
       const { data, error } = await supabase
         .from('prices_eod')
         .select('ticker,date,adj_close')
         .eq('exchange', exchange)
-        .eq('date', dateStr)
-      if (error) continue
-      if (data && data.length > 0) {
-        for (const row of data) {
-          const key = `${row.ticker}.${exchange}`
-          if (!byTicker[key]) byTicker[key] = []
-          if (byTicker[key].length < 2) byTicker[key].push({ date: row.date, adj_close: row.adj_close })
-        }
+        .gte('date', cutoffStr)
+        .order('ticker', { ascending: true })
+        .order('date', { ascending: false })
+        .range(from, from + PAGE - 1)
+      if (error || !data || data.length === 0) break
+      for (const row of data) {
+        const key = `${row.ticker}.${exchange}`
+        if (!byTicker[key]) byTicker[key] = []
+        if (byTicker[key].length < 2) byTicker[key].push({ date: row.date, adj_close: row.adj_close })
       }
+      if (data.length < PAGE) break
+      from += PAGE
     }
-  }
+    return byTicker
+  }))
+
+  const byTicker: Record<string, { date: string; adj_close: number }[]> = {}
+  for (const partial of perExchange) Object.assign(byTicker, partial)
 
   const result: Record<string, { price: number; date: string; change1d: number | null }> = {}
   for (const key of Object.keys(byTicker)) {
