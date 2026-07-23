@@ -1,4 +1,2 @@
-Dati TSX scaricati: 506
-Liste base costruite OK
-mom6_adj_g=422, mom12_adj_g=422
-TUTTO OK, nessuna eccezione
+AAPL: [{'ticker': 'AAPL', 'value_score': 22, 'growth_score': 84, 'combined_rank': 54}]
+Quanti con Best Score in US+TSX: 0-0/3046
