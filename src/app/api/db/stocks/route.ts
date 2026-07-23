@@ -112,6 +112,7 @@ const SCORE_MOMENTUM_FIELDS = new Set([
   'valueScore', 'growthScore', 'combinedRank',
   'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m',
   'revGrowthQuintile', 'epsGrowthQuintile', 'peTrailingQuintile', 'peForwardQuintile', 'pbQuintile',
+  'sectorEpsGrowthQuintile', 'sectorRevGrowthQuintile',
 ])
 
 function quintileFrom(rank: number | null | undefined): string | null {
@@ -472,6 +473,44 @@ export async function GET(req: NextRequest) {
     if (!isOwner && !isInstitutionalViewer) {
       const top500 = await getTop500Keys()
       stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
+    }
+
+    // Quintile di SETTORE per EPS/Revenue growth, calcolato QUI con i
+    // dati grezzi completi (sempre disponibili internamente al server,
+    // anche se mai esposti ai non-proprietari) — media ponderata per
+    // market cap dei rank dei singoli titoli, poi convertita in quintile
+    // e allegata a OGNI titolo del settore. Cosi' l'aggregato di settore
+    // resta corretto e sempre visibile anche per chi non vede i rank dei
+    // singoli titoli, senza rivelare i pesi della formula per singolo
+    // titolo (un aggregato su decine/centinaia di titoli non permette la
+    // stessa regressione di un dato per singolo titolo).
+    {
+      const bySector: Record<string, any[]> = {}
+      for (const s of stocks) {
+        const sec = s.sector || 'Unknown'
+        if (!bySector[sec]) bySector[sec] = []
+        bySector[sec].push(s)
+      }
+      const sectorQuintile: Record<string, { eps: string | null; rev: string | null }> = {}
+      for (const [sec, list] of Object.entries(bySector)) {
+        const wavg = (field: string) => {
+          let num = 0, den = 0
+          for (const s of list) {
+            if (s[field] == null || s.mktCap == null) continue
+            num += s[field] * s.mktCap
+            den += s.mktCap
+          }
+          return den > 0 ? num / den : null
+        }
+        const toQ = (r: number | null) => r == null ? null :
+          r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile'
+        sectorQuintile[sec] = { eps: toQ(wavg('rankEpsGr')), rev: toQ(wavg('rankRevGr')) }
+      }
+      for (const s of stocks) {
+        const sec = s.sector || 'Unknown'
+        s.sectorEpsGrowthQuintile = sectorQuintile[sec]?.eps ?? null
+        s.sectorRevGrowthQuintile = sectorQuintile[sec]?.rev ?? null
+      }
     }
 
     if (isOwner) {
