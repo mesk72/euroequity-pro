@@ -107,9 +107,10 @@ const PUBLIC_FIELDS = new Set([
 const SCORE_MOMENTUM_FIELDS = new Set([
   'valueScore', 'growthScore', 'combinedRank',
   'change1d', 'mom1w', 'mom1m', 'mom6m', 'mom12m',
-  'revGrowthTier', 'epsGrowthTier', // fasce qualitative (High/Average/Low),
-  // stessa logica per entrambe — coerenza: se una mostra un rank, lo
-  // mostrano tutte, nessuna resta vuota mentre l'altra ha un'etichetta.
+  // Fasce qualitative (High/Average/Low) per OGNI singolo fattore che
+  // alimenta Value/Growth Score — tutte insieme, stessa logica, cosi'
+  // nessuna resta vuota mentre le altre mostrano un'etichetta.
+  'revGrowthTier', 'epsGrowthTier', 'peTrailingTier', 'peForwardTier', 'pbTier',
 ])
 
 function tierFrom(rank: number | null | undefined): string | null {
@@ -119,28 +120,32 @@ function tierFrom(rank: number | null | undefined): string | null {
   return 'Low'
 }
 
+// Applica le fasce qualitative a TUTTI i fattori insieme, in un solo
+// posto — evita di dimenticarne uno quando se ne aggiunge un altro.
+function applyTiers(out: any, src: any) {
+  out.revGrowthTier   = tierFrom(src.rankRevGr)
+  out.epsGrowthTier   = tierFrom(src.rankEpsGr)
+  out.peTrailingTier  = tierFrom(src.rankPeLtm)
+  out.peForwardTier   = tierFrom(src.rankPeNtm)
+  out.pbTier          = tierFrom(src.rankPb)
+}
+
 function redactForGuest<T extends Record<string, any>>(obj: T): T {
   const out: any = {}
-  const revTier = tierFrom(obj.rankRevGr)
-  const epsTier = tierFrom(obj.rankEpsGr)
   for (const key of Object.keys(obj)) {
     out[key] = PUBLIC_FIELDS.has(key) ? obj[key] : null
   }
-  out.revGrowthTier = revTier
-  out.epsGrowthTier = epsTier
+  applyTiers(out, obj)
   return out
 }
 
 function redactRawData<T extends Record<string, any>>(obj: T): T {
   const allowed = new Set(Array.from(PUBLIC_FIELDS).concat(Array.from(SCORE_MOMENTUM_FIELDS)))
   const out: any = {}
-  const revTier = tierFrom(obj.rankRevGr)
-  const epsTier = tierFrom(obj.rankEpsGr)
   for (const key of Object.keys(obj)) {
     out[key] = allowed.has(key) ? obj[key] : null
   }
-  out.revGrowthTier = revTier
-  out.epsGrowthTier = epsTier
+  applyTiers(out, obj)
   return out
 }
 
