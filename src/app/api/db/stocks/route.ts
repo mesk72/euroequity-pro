@@ -387,11 +387,11 @@ export async function GET(req: NextRequest) {
       const [stockRes, fundRes, histRes] = await Promise.all([
         supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker,in_universe').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf').eq('ticker', ticker).eq('exchange', exchange).limit(1),
-        // Storico per il grafico prezzi — NON usato per il prezzo/variazione
-        // mostrati (quelli vengono SEMPRE da fundamentals.price/change1d,
-        // stessa identica fonte di Screener e ricerca — nessuna query
-        // separata, garantisce lo stesso numero ovunque per tutti gli
-        // 8000 titoli, come richiesto esplicitamente da Andrea 23/7/2026).
+        // Storico per il grafico E per il prezzo/variazione reali — query
+        // diretta su UN solo titolo, sempre veloce (millisecondi). Restaurata
+        // dopo che rimuoverla aveva rotto qualcosa che PRIMA funzionava
+        // correttamente (23/7/2026) — fundamentals.price/change1d non e'
+        // affidabile per tutti gli 8000 titoli, resta indietro per alcuni.
         supabase.from('prices_eod').select('date,adj_close').eq('ticker', ticker).eq('exchange', exchange).order('date', { ascending: false }).limit(400),
       ])
       const s: any = stockRes.data?.[0] || {}
@@ -399,14 +399,17 @@ export async function GET(req: NextRequest) {
       if (!s.ticker) return jsonNoCache({ stocks: [] })
       const mapped = mapStock(s, f)
       const hist: any[] = histRes.data || []
-      // change1d resta SEMPRE quello di fundamentals (via mapStock sopra) —
-      // stessa fonte di Screener/ricerca. hist qui serve solo per il
-      // grafico prezzi, non deve mai sovrascrivere il valore mostrato.
-        // mom1w/mom1m/mom6m/mom12m NON vengono piu' ricalcolati qui — quel blocco
-        // duplicato sovrascriveva il valore corretto (decimale) letto da
-        // fundamentals con un valore gia' moltiplicato per 100, causando la
-        // doppia moltiplicazione mostrata sul sito. mapStock() sopra e' l'unica
-        // fonte per il momentum, gia' corretta e verificata.
+      if (hist.length > 1) {
+        const latest = hist[0]
+        const prevDay = hist[1]
+        if (latest.adj_close != null) {
+          mapped.price = latest.adj_close
+          mapped.lastPriceDate = latest.date
+        }
+        if (prevDay && prevDay.adj_close) {
+          mapped.change1d = latest.adj_close / prevDay.adj_close - 1
+        }
+      }
       if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
         if (!top500.has(`${mapped.ticker}.${mapped.exchange}`)) {
@@ -440,6 +443,21 @@ export async function GET(req: NextRequest) {
       const fundMap: Record<string, any> = {}
       for (const f of (fundData || [])) fundMap[`${f.ticker}.${f.exchange}`] = f
       let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+
+      // Stessa fonte del ramo bulk — prezzo reale, mai il campo statico.
+      try {
+        const searchExList = Array.from(new Set(stocks.map((s: any) => s.exchange)))
+        const freshPrices = await fetchLatestPrices(searchExList)
+        for (const s of stocks) {
+          const key = `${s.ticker}.${s.exchange}`
+          const fresh = freshPrices[key]
+          if (fresh) {
+            s.price = fresh.price
+            s.change1d = fresh.change1d
+            s.lastPriceDate = fresh.date
+          }
+        }
+      } catch {}
 
       if (!isOwner && !isInstitutionalViewer) {
         const top500 = await getTop500Keys()
@@ -481,6 +499,25 @@ export async function GET(req: NextRequest) {
       // "North America"/"Asia Pacific" combinati (gonfiati).
       stocks = applyUniverseFilter(fundData, stocksData)
     }
+
+    // Prezzo/variazione reali da prices_eod, mai dal campo statico
+    // fundamentals.price/change1d — non affidabile per tutti gli 8000
+    // titoli (alcuni restano indietro, es. 9984.TSE mostrava 10.65%
+    // invece del vero 6.03%, 23/7/2026). Una query per mercato, veloce
+    // (ordinata per ticker poi data, nessun taglio a meta' titolo tra le
+    // pagine), tutti i mercati richiesti in parallelo.
+    try {
+      const freshPrices = await fetchLatestPrices(exList)
+      for (const s of stocks) {
+        const key = `${s.ticker}.${s.exchange}`
+        const fresh = freshPrices[key]
+        if (fresh) {
+          s.price = fresh.price
+          s.change1d = fresh.change1d
+          s.lastPriceDate = fresh.date
+        }
+      }
+    } catch {}
 
     // Sottoinsieme dei 500 per il proprietario escluso — decide solo
     // QUALI righe includere, nessun valore viene mai ricalcolato.
