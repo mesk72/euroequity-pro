@@ -37,6 +37,11 @@ SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 LEEWAY_KEY   = os.environ.get("LEEWAY_KEY", "")
 LEEWAY_BASE  = "https://api.leeway.tech/api/v1/public"
 TODAY        = datetime.now().strftime("%Y-%m-%d")
+# Margine di 2 giorni per il download Yahoo — 'end' e' ESCLUSIVO in
+# yfinance, e se lo script gira poco prima della mezzanotte UTC, TODAY
+# potrebbe risultare "ieri" rispetto al vero giorno di mercato, tagliando
+# fuori l'ultimo giorno disponibile (bug reale riscontrato il 23/7/2026).
+END_FOR_DOWNLOAD = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
 TODAY_DT     = datetime.now()
 
 headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
@@ -140,7 +145,7 @@ for exchange, tickers in by_exchange.items():
 
         try:
             data_yf = yf.download(
-                tickers=" ".join(ytickers), start=start_dt, end=TODAY,
+                tickers=" ".join(ytickers), start=start_dt, end=END_FOR_DOWNLOAD,
                 interval="1d", auto_adjust=True, progress=False, threads=True,
             )
             if data_yf.empty: fail_yf += len(ytickers); continue
