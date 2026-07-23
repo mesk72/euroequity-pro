@@ -1090,8 +1090,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
-      epsGrowthQuintile: (() => { const r = mcw(list, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
-      revGrowthQuintile: (() => { const r = mcw(list, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+      epsGrowthQuintile: (list[0] as any)?.sectorEpsGrowthQuintile ?? null,
+      revGrowthQuintile: (list[0] as any)?.sectorRevGrowthQuintile ?? null,
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -1105,8 +1105,8 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
     valueScore: mcw(stocksEur, 'valueScore'),
     growthScore: mcw(stocksEur, 'growthScore'),
     combinedRank: mcw(stocksEur, 'combinedRank'),
-    epsGrowthQuintile: (() => { const r = mcw(stocksEur, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
-    revGrowthQuintile: (() => { const r = mcw(stocksEur, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+    epsGrowthQuintile: (stocksEur[0] as any)?.continentEpsGrowthQuintile ?? null,
+    revGrowthQuintile: (stocksEur[0] as any)?.continentRevGrowthQuintile ?? null,
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
@@ -1245,8 +1245,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
       valueScore: mcw(list, 'valueScore'),
       growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
-      epsGrowthQuintile: (() => { const r = mcw(list, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
-      revGrowthQuintile: (() => { const r = mcw(list, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+      epsGrowthQuintile: (list[0] as any)?.sectorEpsGrowthQuintile ?? null,
+      revGrowthQuintile: (list[0] as any)?.sectorRevGrowthQuintile ?? null,
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -1260,8 +1260,8 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
     valueScore: mcw(stocksUS, 'valueScore'),
     growthScore: mcw(stocksUS, 'growthScore'),
     combinedRank: mcw(stocksUS, 'combinedRank'),
-    epsGrowthQuintile: (() => { const r = mcw(stocksUS, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
-    revGrowthQuintile: (() => { const r = mcw(stocksUS, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+    epsGrowthQuintile: (stocksUS[0] as any)?.continentEpsGrowthQuintile ?? null,
+    revGrowthQuintile: (stocksUS[0] as any)?.continentRevGrowthQuintile ?? null,
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
@@ -2133,8 +2133,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
       revGrowth: mcw(list, 'revGrowth'), mom12m: mcwReturn(list, 'mom12m'),
       valueScore: mcw(list, 'valueScore'), growthScore: mcw(list, 'growthScore'),
       combinedRank: mcw(list, 'combinedRank'),
-      epsGrowthQuintile: (() => { const r = mcw(list, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
-      revGrowthQuintile: (() => { const r = mcw(list, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+      epsGrowthQuintile: (list[0] as any)?.sectorEpsGrowthQuintile ?? null,
+      revGrowthQuintile: (list[0] as any)?.sectorRevGrowthQuintile ?? null,
     }))
     .sort((a, b) => b.mktCap - a.mktCap)
 
@@ -2148,8 +2148,8 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
     valueScore: mcw(stocksAP, 'valueScore'),
     growthScore: mcw(stocksAP, 'growthScore'),
     combinedRank: mcw(stocksAP, 'combinedRank'),
-    epsGrowthQuintile: (() => { const r = mcw(stocksAP, 'rankEpsGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
-    revGrowthQuintile: (() => { const r = mcw(stocksAP, 'rankRevGr'); return r == null ? null : r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile' })(),
+    epsGrowthQuintile: (stocksAP[0] as any)?.continentEpsGrowthQuintile ?? null,
+    revGrowthQuintile: (stocksAP[0] as any)?.continentRevGrowthQuintile ?? null,
   }
 
   const fpPct = (v: number | null) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '-'
