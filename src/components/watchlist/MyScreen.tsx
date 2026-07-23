@@ -34,6 +34,14 @@ const QLBL: Record<string, { t: string; c: string }> = {
 }
 const qText = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].t : '-'
 const qClr = (q: string | null | undefined) => q && QLBL[q] ? QLBL[q].c : 'var(--text3)'
+const quintFromAvg = (r: number | null): string | null => {
+  if (r == null) return null
+  if (r >= 80) return 'Top Quintile'
+  if (r >= 60) return '2nd Quintile'
+  if (r >= 40) return 'Middle'
+  if (r >= 20) return '4th Quintile'
+  return 'Bottom Quintile'
+}
 
 const SECTOR_COLORS: Record<string, string> = {
   'Technology': '#3b82f6', 'Financials': '#f59e0b', 'Health Care': '#10b981',
@@ -454,13 +462,13 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
               <div className="flex gap-2 text-[10px] font-mono flex-wrap">
                 <span className="text-muted">1D: <span style={clrStyle(avg('change1d'))}>{avg('change1d') != null ? fpd((avg('change1d') as number) / 100) : '-'}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">PEv: <span style={{color: rankClr(avg('rankPeLtm'))}}>{fn(avg('rankPeLtm'))}</span></span>
+                <span className="text-muted">PEv: <span style={{color: qClr(quintFromAvg(avg('rankPeLtm')))}}>{qText(quintFromAvg(avg('rankPeLtm')))}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">PEf: <span style={{color: rankClr(avg('rankPeNtm'))}}>{fn(avg('rankPeNtm'))}</span></span>
+                <span className="text-muted">PEf: <span style={{color: qClr(quintFromAvg(avg('rankPeNtm')))}}>{qText(quintFromAvg(avg('rankPeNtm')))}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">EPS: <span style={{color: rankClr(avg('rankEpsGr'))}}>{fn(avg('rankEpsGr'))}</span></span>
+                <span className="text-muted">EPS: <span style={{color: qClr(quintFromAvg(avg('rankEpsGr')))}}>{qText(quintFromAvg(avg('rankEpsGr')))}</span></span>
                 <span className="text-[#444]">|</span>
-                <span className="text-muted">Rev: <span style={{color: rankClr(avg('rankRevGr'))}}>{fn(avg('rankRevGr'))}</span></span>
+                <span className="text-muted">Rev: <span style={{color: qClr(quintFromAvg(avg('rankRevGr')))}}>{qText(quintFromAvg(avg('rankRevGr')))}</span></span>
               </div>
               <div className="flex gap-2 text-[10px] font-mono mt-0.5 flex-wrap">
                 <span className="text-muted">Val: <span style={{color:'#3b82f6'}}>{fn(avg('valueScore'))}</span></span>
@@ -566,11 +574,11 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                     {avg('change1d') != null ? fpd((avg('change1d') as number) / 100) : '-'}
                   </td>
                   <td className="font-mono text-right text-[12px] font-700">{avg('mktCap') != null ? fv(avg('mktCap'), 1) : '-'}</td>
-                  <td className="font-mono text-center text-[12px] font-700" style={{color: rankClr(avg('rankPeLtm'))}}>{fn(avg('rankPeLtm'))}</td>
-                  <td className="font-mono text-center text-[12px] font-700" style={{color: rankClr(avg('rankPeNtm'))}}>{fn(avg('rankPeNtm'))}</td>
-                  <td className="font-mono text-center text-[12px] font-700" style={{color: rankClr(avg('rankPb'))}}>{fn(avg('rankPb'))}</td>
-                  <td className="font-mono text-center text-[12px] font-700" style={{color: rankClr(avg('rankEpsGr'))}}>{fn(avg('rankEpsGr'))}</td>
-                  <td className="font-mono text-center text-[12px] font-700" style={{color: rankClr(avg('rankRevGr'))}}>{fn(avg('rankRevGr'))}</td>
+                  <td className="font-mono text-center text-[12px] font-700" style={{color: qClr(quintFromAvg(avg('rankPeLtm')))}}>{qText(quintFromAvg(avg('rankPeLtm')))}</td>
+                  <td className="font-mono text-center text-[12px] font-700" style={{color: qClr(quintFromAvg(avg('rankPeNtm')))}}>{qText(quintFromAvg(avg('rankPeNtm')))}</td>
+                  <td className="font-mono text-center text-[12px] font-700" style={{color: qClr(quintFromAvg(avg('rankPb')))}}>{qText(quintFromAvg(avg('rankPb')))}</td>
+                  <td className="font-mono text-center text-[12px] font-700" style={{color: qClr(quintFromAvg(avg('rankEpsGr')))}}>{qText(quintFromAvg(avg('rankEpsGr')))}</td>
+                  <td className="font-mono text-center text-[12px] font-700" style={{color: qClr(quintFromAvg(avg('rankRevGr')))}}>{qText(quintFromAvg(avg('rankRevGr')))}</td>
                   <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('mom1w'))}>{fpd(avg('mom1w'))}</td>
                   <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('mom1m'))}>{fpd(avg('mom1m'))}</td>
                   <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('mom6m'))}>{fpd(avg('mom6m'))}</td>
