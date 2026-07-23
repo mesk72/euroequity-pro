@@ -5,10 +5,17 @@ on:
     - cron: '*/20 * * * *'   # ogni 20 minuti, rotazione intelligente per orario mercati
   workflow_dispatch:
 
+concurrency:
+  group: fetch-news-cache
+  cancel-in-progress: false   # mette in coda invece di cancellare — la
+  # finestra pesante (Asia+Europa+Americhe insieme, 12-13 ora italiana)
+  # puo' richiedere piu' dei 20 minuti tra un trigger e l'altro, non deve
+  # essere interrotta a meta' da un nuovo trigger che parte nel frattempo
+
 jobs:
   fetch-news:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40   # era 15, troppo corto per la finestra pesante
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -25,7 +32,11 @@ jobs:
         run: |
           git config user.name "debug-bot"
           git config user.email "debug-bot@users.noreply.github.com"
-          git add fetch_news_cache_last_output.txt news_rotation_state.json
-          git commit -m "log news cache output + rotation state" || echo "nothing to commit"
-          git pull --rebase
-          git push
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            git add fetch_news_cache_last_output.txt news_rotation_state.json 2>/dev/null || true
+            git commit -m "log news cache output + rotation state" || echo "nothing to commit"
+            if git push origin main; then break; fi
+            sleep 5
+          done
