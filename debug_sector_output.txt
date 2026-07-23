@@ -1,8 +1,3 @@
-Universo totale: 7889
-Nuovo top 500 calcolato: 500
-Primi 3: [{'ticker': 'NVDA', 'exchange': 'US', 'mkt_cap': 4769748.03}, {'ticker': 'AAPL', 'exchange': 'US', 'mkt_cap': 4562774.01}, {'ticker': 'GOOGL', 'exchange': 'US', 'mkt_cap': 4460079.02}]
-AAPL presente nel nuovo calcolo: True
-  batch 0: HTTP 201
-  batch 200: HTTP 201
-  batch 400: HTTP 201
-Righe finali nella tabella: 0-0/500
+Righe totali in news_cache: 0-0/37010
+Ultime 5 righe: [{'ticker': '3110', 'exchange': 'TSE', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '6651', 'exchange': 'SEHK', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '6651', 'exchange': 'SEHK', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '6651', 'exchange': 'SEHK', 'fetched_at': '2026-07-23T04:30:32.907933'}, {'ticker': '3110', 'exchange': 'TSE', 'fetched_at': '2026-07-23T04:30:32.907933'}]
+Notizie AAPL: [{'ticker': 'AAPL', 'exchange': 'US', 'title': "AAPL Stock Alert: Apple Just Unseated Nvidia as World's Most Valuable Company - Barchart.com"}, {'ticker': 'AAPL', 'exchange': 'US', 'title': 'AAPL Stock Tops Nasdaq’s Modest Gains: Analyst Says Siri Finally Shows ‘AI Chops’ In iOS 27 Beta - TradingView'}, {'ticker': 'AAPL', 'exchange': 'US', 'title': 'Apple Inc. (AAPL) Is A Top Stock In D. E. Shaw’s Holdings - Yahoo Finance'}, {'ticker': 'AAPL', 'exchange': 'US', 'title': 'Apple Stock: Moat Keeps Doing The Heavy Lifting (NASDAQ:AAPL) - Seeking Alpha'}, {'ticker': 'AAPL', 'exchange': 'US', 'title': "What's Going on With Apple Stock Wednesday? - Benzinga"}]
