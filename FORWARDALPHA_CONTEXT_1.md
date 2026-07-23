@@ -2871,3 +2871,52 @@ Andrea ha esplicitamente richiesto di mostrare i RANK VERI (numero, es. 15/20/50
 Stato attuale: rankPeLtm, rankPeNtm, rankPb, rankEpsGr, rankRevGr sono ora campi VISIBILI (in SCORE_MOMENTUM_FIELDS) per chiunque sia loggato (utente 500 titoli e institutional viewer), non solo per il proprietario. I dati grezzi originali (peTrail, peFwd, pb, epsGrowth, revGrowth come percentuali/multipli assoluti) restano nascosti - solo i RANK percentili sono visibili.
 
 Frontend aggiornato: quando il dato grezzo e' null, mostra il rank arrotondato invece del vecchio fallback a fascia testuale. Le funzioni tierFrom/applyTiers restano nel codice ma non sono piu' usate per popolare le colonne principali (potrebbero servire altrove in futuro, non rimosse per ora).
+
+---
+
+## RIEPILOGO SESSIONE MARATONA 22-23 LUGLIO 2026 (notte + mattina)
+
+### IL PATTERN PIU' IMPORTANTE DA RICORDARE: cinque componenti duplicati per lo stesso dato
+
+Quando si mostra un campo (es. i rank dei fattori Value/Growth) nel frontend, ESISTONO CINQUE punti diversi nel codice che lo renderizzano indipendentemente, NON uno:
+1. `function Screener` in `src/app/page.tsx` (riga ~709) — IL VERO componente usato per tutte le tabelle (Best Value/Growth/Ideas, tutti i mercati). Usa `cellFmt(s, key)` con uno switch/case per colonna.
+2. `function StockDetail` in `src/app/page.tsx` (riga ~592) — CODICE MORTO, mai istanziato da nessuna parte, NON perdere tempo a modificarlo.
+3. `StockDetailPage` in `src/components/dashboard/StockDetailPage.tsx` — popup di dettaglio titolo, quello vero.
+4. `src/app/stock/[id]/page.tsx` — pagina dedicata con URL proprio per un titolo.
+5. `src/components/watchlist/MyScreen.tsx` — pagina wallet, ha sia vista mobile sia tabella, sia riga singolo titolo sia riga aggregata (con funzione `avg()`).
+
+**Regola per il futuro**: ogni volta che si modifica come viene mostrato un campo, cercare in TUTTO il repository con `search/code` (non solo grep nei file gia' noti) prima di dichiarare "fatto" — usare termini come il nome esatto della colonna o del campo per essere sicuri di trovare tutti e 5 i punti.
+
+### Sistema quintili (sostituisce rank esatti e dati grezzi)
+
+Per Value/Growth Score, i 5 fattori sottostanti (PE trailing, PE forward, PB, EPS growth, Revenue growth) hanno i loro RANK (percentili 0-100) ora visibili a tutti gli utenti loggati (non solo proprietario), ma i DATI GREZZI ASSOLUTI (PE effettivo, PB effettivo, percentuali crescita effettive) restano nascosti — protezione della formula.
+
+**IMPORTANTE**: Andrea ha deciso di mostrare i RANK VERI (numero), non le fasce qualitative che avevo costruito inizialmente — poi per la riga AGGREGATA di settore ha chiesto lo stesso principio (media ponderata vera), e per omogeneita' finale ha chiesto etichette uniformi: quando il numero esatto non e' disponibile (utente normale), si mostra **First Quintile / Second Quintile / Third Quintile / Fourth Quintile / Fifth Quintile** (80-100/60-80/40-60/20-40/0-20), MAI un trattino vuoto, con gli stessi colori del resto del sito (verde/verde chiaro/arancione/arancione/rosso).
+
+Nomi dei campi lato server (`src/app/api/db/stocks/route.ts`): `peTrailingQuintile`, `peForwardQuintile`, `pbQuintile`, `epsGrowthQuintile`, `revGrowthQuintile` — calcolati da `applyTiers()` a partire da `rankPeLtm/rankPeNtm/rankPb/rankEpsGr/rankRevGr` (questi ultimi ORA visibili come numero in `SCORE_MOMENTUM_FIELDS`, non piu' nascosti).
+
+Per l'AGGREGATO DI SETTORE (riga riepilogo nella Sector Heatmap): calcolato SERVER-SIDE in un blocco dedicato in route.ts (media ponderata per market cap dei rank dei singoli titoli, con accesso completo ai dati anche per i non-proprietari, poi convertito in quintile) — campi `sectorEpsGrowthQuintile`/`sectorRevGrowthQuintile`, allegati a OGNI titolo del suo settore. Fatto SOLO per EPS/Revenue growth finora, non per gli altri 3 fattori nell'aggregato.
+
+Interfaccia `Stock` in `src/lib/ranking.ts` — deve includere ESPLICITAMENTE ogni nuovo campo aggiunto (altrimenti build fallisce con "Property does not exist on type"). Controllare sempre questo file quando si aggiungono nuovi campi al payload.
+
+### Livello "institutional viewer"
+
+Tabella `institutional_viewers` (email, note) in Supabase, RLS disabilitato. Chi e' in questa lista vede tutti gli 8000 titoli (bypassa il limite dei 500) ma non vede mai i dati grezzi (stesso trattamento di un utente normale su quel fronte). Andrea gestisce l'accesso lui stesso via SQL Editor (INSERT/DELETE), nessuna UI admin costruita per questo.
+
+### Bug strutturali trovati e corretti stanotte
+
+**`in_universe` su fundamentals**: non esiste li', vive solo in `stocks` — un filtro diretto nella query falliva silenziosamente svuotando tutto. Causa del Best Score sempre None per gli USA per ore. Va sempre filtrato in Python/JS dopo aver letto `stocks`, mai come parametro diretto su una query a `fundamentals`.
+
+**Tabella `top500_universe`**: calcolata UNA TANTUM quando creata — va ricalcolata ogni volta che i market cap cambiano significativamente (dopo i daily). Non e' automatica, richiede rilancio manuale dello script di popolamento.
+
+**Date/fuso orario per Yahoo**: `end` in `yf.download()` e' ESCLUSIVO — se lo script gira vicino alla mezzanotte UTC, TODAY calcolato puo' risultare "ieri", tagliando fuori l'ultimo giorno di mercato disponibile. Fix: `END_FOR_DOWNLOAD` con margine di 2 giorni, usato SOLO per il download, non per `TODAY` (che serve altrove per il momentum).
+
+**Timeout GitHub Actions per fetch_news_cache.yml**: era 15 minuti, insufficiente per la finestra pesante (Asia+Europa+Americhe insieme, 12-13 ora italiana) che puo' richiedere 30-40 minuti — causava run "cancelled" silenziosi. Aumentato a 40 minuti, aggiunta `concurrency: cancel-in-progress: false` per mettere in coda invece di interrompere.
+
+**Trigger Reverse Earnings Model**: `fetch_beta_us.yml` aspettava il completamento di un workflow chiamato "Daily US Update" — nome ORMAI INESISTENTE dopo la migrazione a Yahoo (ora si chiama "Daily US Yahoo Finance"). La catena Beta+Risk-free->Reverse Earnings Model non si attivava mai. Corretto puntando al nome giusto.
+
+**Filtro notizie wallet**: `pub_date` in `news_cache` e' testo RFC822 ("Wed, 22 Jul...", non ISO), un confronto `.gte()` su quella colonna fa confronto ALFABETICO non temporale. Corretto usando `fetched_at` (vero timestamp ISO) per il filtro delle ultime 24 ore.
+
+### File Python con logica gia' pronta ma mai collegata correttamente
+
+`fetch_beta_us.py` scarica GIA' sia Beta (Yahoo, 5 anni mensile) sia il risk-free rate (Treasury 10Y direttamente da treasury.gov, fonte ufficiale) — il problema era solo il trigger rotto, non la logica.
