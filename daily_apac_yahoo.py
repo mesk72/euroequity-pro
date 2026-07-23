@@ -241,14 +241,15 @@ ok_momentum = ok
 print("\n[5/5] Ricalcolo rank APAC...")
 all_data = []
 offset = 0
+universe_keys = {(s['ticker'], s['exchange']) for s in all_stocks}
 while True:
     r = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
         params={"select": "ticker,exchange,pe_trailing,pe_forward,pb,eps_growth,rev_growth,mom6m,mom12m,mom1w,mom1m",
-                "exchange": "in.(TSE,SEHK,ASX)", "in_universe": "eq.true",
+                "exchange": "in.(TSE,SEHK,ASX)",
                 "offset": str(offset), "limit": "1000"})
     data = r.json()
     if not isinstance(data, list) or not data: break
-    all_data.extend(data); offset += 1000
+    all_data.extend([d for d in data if (d["ticker"], d["exchange"]) in universe_keys]); offset += 1000
     if len(data) < 1000: break
 print(f"  Fundamentals: {len(all_data)}")
 
