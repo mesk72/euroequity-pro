@@ -369,8 +369,13 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
 
   const NO_SORT = new Set(['rankPeLtm','rankPeNtm','rankPb','rankEpsGr','rankRevGr'])
   const LOCKED_GUEST = new Set(['valueScore','growthScore','combinedRank','mom1w','mom1m','mom6m','mom12m'])
+  // Nelle viste Best Ideas/Value/Growth, ordinare per Value/Growth/Best
+  // Score e' riservato al solo proprietario — anche per chi e' loggato
+  // o institutional viewer (23/7/2026, richiesta esplicita).
+  const SCORE_KEYS = new Set(['valueScore','growthScore','combinedRank'])
   const toggle = (key: SortKey) => {
     if (NO_SORT.has(key)) return
+    if (restrictScoreSort && SCORE_KEYS.has(key)) return
     if (!userId && LOCKED_GUEST.has(key)) {
       alert('Register for free to sort by Value, Growth and Best Score.')
       return
@@ -465,7 +470,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
                 style={{
                   minWidth: c.width,
                   userSelect: 'none',
-                  cursor: (NO_SORT.has(c.key) || (!userId && LOCKED_GUEST.has(c.key))) ? 'default' : 'pointer',
+                  cursor: (NO_SORT.has(c.key) || (!userId && LOCKED_GUEST.has(c.key)) || (restrictScoreSort && SCORE_KEYS.has(c.key))) ? 'default' : 'pointer',
                   ...(ci === 0 ? {
                     position: 'sticky',
                     left: 0,
@@ -706,7 +711,7 @@ function StockDetail({ stock, onClose, onAddPortfolio, portfolioNames }: {
 }
 
 // - SCREENER -
-function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, userId = null, initValMin = 0, initGrowMin = 0, initCombinedMin = 0, showAll = false, maxRows: maxRowsProp }: {
+function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', onSelectStock, userId = null, initValMin = 0, initGrowMin = 0, initCombinedMin = 0, showAll = false, maxRows: maxRowsProp, restrictScoreSort = false }: {
   initExchange?: string
   initSector?:   string
   initEpsMom?:   string
@@ -717,6 +722,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   initCombinedMin?: number
   showAll?: boolean
   maxRows?: number
+  restrictScoreSort?: boolean
 }) {
   const [exchange,  setExchange]  = useState(initExchange)
   const [stocks,    setStocks]    = useState<Stock[]>([])
@@ -2389,6 +2395,7 @@ function AppContent() {
     }
   }
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
+  const isOwner = user?.email === 'andreameschini19@gmail.com'
   const [showAuth,    setShowAuth]    = useState(false)
   const [authMode,    setAuthMode]    = useState<'login'|'register'>('login')
   useEffect(() => {
@@ -2741,27 +2748,27 @@ function AppContent() {
           )}
           {(page === 'screener' || page === 'MIL' || page === 'PA' || page === 'XETRA' || page === 'LSE' || page === 'OM' || page === 'OB' || page === 'SWX' || page === 'MC' || page === 'AS' || page === 'HE' || page === 'BR' || page === 'GR' || page === 'CPSE' || page === 'VI' || page === 'LS' || page === 'IR') && <Screener key={`${page}-${scrSector}`} initExchange={page === 'screener' ? scrExchange : page} initSector={page === 'screener' ? scrSector : 'All'} initEpsMom={scrEpsMom} onSelectStock={setDetailStock} userId={user?.id || null} />}
           {page === 'bestvalue'  && (user
-            ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
+            ? <Screener key="bestvalue"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value" />
           )}
           {page === 'bestideas'  && (user
-            ? <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
+            ? <Screener key="bestideas"  initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas" />
           )}
           {page === 'bestgrowth' && (user
-            ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
+            ? <Screener key="bestgrowth" initExchange="EZ" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth" />
           )}
           {page === 'bestvalue_us' && (user
-            ? <Screener key="bestvalue_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} initCombinedMin={0} />
+            ? <Screener key="bestvalue_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} initCombinedMin={0} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value US" />
           )}
           {page === 'bestideas_us' && (user
-            ? <Screener key="bestideas_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} />
+            ? <Screener key="bestideas_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas US" />
           )}
           {page === 'bestgrowth_us' && (user
-            ? <Screener key="bestgrowth_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} />
+            ? <Screener key="bestgrowth_us" initExchange="US,TSX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} initCombinedMin={0} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth US" />
           )}
           {page === 'northamerica' && (
@@ -2788,15 +2795,15 @@ function AppContent() {
           {page === 'KRX' && <Screener key="KRX" initExchange="KRX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={400} />}
           {page === 'SGX' && <Screener key="SGX" initExchange="SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} maxRows={100} />}
           {page === 'bestvalue_ap' && (user
-            ? <Screener key="bestvalue_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} />
+            ? <Screener key="bestvalue_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={80} initGrowMin={30} showAll={true} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Value Asia Pacific" />
           )}
           {page === 'bestideas_ap' && (user
-            ? <Screener key="bestideas_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} />
+            ? <Screener key="bestideas_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={0} initCombinedMin={80} showAll={true} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Ideas Asia Pacific" />
           )}
           {page === 'bestgrowth_ap' && (user
-            ? <Screener key="bestgrowth_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} />
+            ? <Screener key="bestgrowth_ap" initExchange="TSE,SEHK,ASX,KRX,SGX" initSector="All" initEpsMom="" onSelectStock={setDetailStock} userId={user?.id || null} initValMin={0} initGrowMin={80} showAll={true} restrictScoreSort={!isOwner} />
             : <LoginGate onLogin={() => setShowAuth(true)} title="Best Growth Asia Pacific" />
           )}
           {page === 'usscreen' && <Screener key={'usscreen-'+scrSectorUS} initExchange='US,TSX' initSector={scrSectorUS} initEpsMom='' onSelectStock={setDetailStock} userId={user?.id || null} />}
