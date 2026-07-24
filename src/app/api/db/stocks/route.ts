@@ -479,9 +479,14 @@ export async function GET(req: NextRequest) {
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf'
 
-    const [stocksData, fundData] = await Promise.all([
+    const [stocksData, fundData, freshPricesResult] = await Promise.all([
       fetchAllByExchange('stocks', stocksSelect, exList, true),
       fetchAll('fundamentals', fundSelect, exList),
+      // Non dipende da stocksData/fundData (usa solo exList, gia' noto) —
+      // eseguito IN PARALLELO invece che dopo, per non sommare i tempi
+      // (causa reale dei 20 secondi di caricamento, 23/7/2026). Stesso
+      // identico calcolo di prima, solo avviato prima.
+      fetchLatestPrices(exList).catch(() => ({} as Record<string, { price: number; date: string; change1d: number | null }>)),
     ])
 
     let stocks: any[]
@@ -503,11 +508,9 @@ export async function GET(req: NextRequest) {
     // Prezzo/variazione reali da prices_eod, mai dal campo statico
     // fundamentals.price/change1d — non affidabile per tutti gli 8000
     // titoli (alcuni restano indietro, es. 9984.TSE mostrava 10.65%
-    // invece del vero 6.03%, 23/7/2026). Una query per mercato, veloce
-    // (ordinata per ticker poi data, nessun taglio a meta' titolo tra le
-    // pagine), tutti i mercati richiesti in parallelo.
-    try {
-      const freshPrices = await fetchLatestPrices(exList)
+    // invece del vero 6.03%, 23/7/2026). Gia' calcolato in parallelo sopra.
+    {
+      const freshPrices = freshPricesResult
       for (const s of stocks) {
         const key = `${s.ticker}.${s.exchange}`
         const fresh = freshPrices[key]
@@ -517,7 +520,7 @@ export async function GET(req: NextRequest) {
           s.lastPriceDate = fresh.date
         }
       }
-    } catch {}
+    }
 
     // Sottoinsieme dei 500 per il proprietario escluso — decide solo
     // QUALI righe includere, nessun valore viene mai ricalcolato.
