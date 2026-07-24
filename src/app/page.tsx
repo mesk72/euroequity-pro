@@ -753,7 +753,9 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (names.length > 0) setPortfolioNames(names)
   }, [])
 
+  const loadRequestId = useRef(0)
   useEffect(() => {
+    const myRequestId = ++loadRequestId.current
     const load = () => {
     setStocks([]); setSelected(null); setLoading(true)
     const ALL_GLOBAL_EXCHANGES = 'US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX'
@@ -803,6 +805,13 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       data.forEach((s: any) => {
         if (NO_RANK_EX.has(s.exchange)) { s.combinedRank = null }
       })
+
+      // Scarta risposte obsolete — se nel frattempo l'utente ha cambiato
+      // mercato, una richiesta precedente piu' lenta (es. US, grande
+      // mercato) potrebbe rispondere DOPO quella piu' recente (es. Italia,
+      // piccola e veloce), sovrascrivendo la selezione corretta con dati
+      // sbagliati. Solo la richiesta piu' recente puo' aggiornare lo stato.
+      if (myRequestId !== loadRequestId.current) return
 
       setStocks(data)
       setLoading(false)
