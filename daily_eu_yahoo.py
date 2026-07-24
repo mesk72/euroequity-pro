@@ -136,13 +136,22 @@ price_buf = []
 
 # Prima controlla ultima data per ogni titolo
 last_dates = {}
+# Una query per MERCATO (non per singolo titolo, che con migliaia di
+# titoli faceva scadere il timeout prima del vero download - causa
+# reale del prezzo fermo di giorni, 23-24/7/2026). Stima la data piu'
+# recente per ciascun mercato distinto nell'universo, poi la usa per
+# tutti i suoi titoli - l'upsert successivo sovrascrive senza danni se
+# qualche titolo avesse per caso uno storico diverso.
+distinct_exchanges = sorted(set(s["exchange"] for s in all_stocks))
+global_last_by_exchange = {}
+for ex in distinct_exchanges:
+    rg = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+        params={"select": "date", "exchange": "eq." + ex, "order": "date.desc", "limit": "1"})
+    row = rg.json()
+    global_last_by_exchange[ex] = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
+    print(f"  Data piu' recente stimata per {ex}: {global_last_by_exchange[ex]}")
 for stock in all_stocks:
-    rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-        params={"select": "date", "ticker": "eq." + stock["ticker"],
-                "exchange": "eq." + stock["exchange"],
-                "order": "date.desc", "limit": "1"})
-    row = rp.json()
-    last_dates[(stock["ticker"], stock["exchange"])] = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
+    last_dates[(stock["ticker"], stock["exchange"])] = global_last_by_exchange.get(stock["exchange"], "2020-01-01")
 
 # Scarica per exchange in chunk da 150 titoli
 import random
