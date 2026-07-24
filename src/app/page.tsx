@@ -337,13 +337,14 @@ function cellFmt(s: Stock, key: SortKey): { val: string; cls: string; style?: Re
   }
 }
 
-function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, fromPage = "" }: {
+function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, fromPage = "", restrictScoreSort = false }: {
   stocks: Stock[]
   onSelect: (s: Stock) => void
   loading?: boolean
   maxRows?: number
   userId?: string | null
   fromPage?: string
+  restrictScoreSort?: boolean
 }) {
   const router = useRouter()
   const [sortKey, setSortKey] = useState<SortKey>('mktCap')
@@ -1015,7 +1016,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
       {/* Table */}
       <div className="bg-surface border border-border rounded overflow-hidden">
-        <StockTable stocks={filtered} fromPage={initExchange === "US" ? "northamerica" : "screener"} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={showAll ? 9999 : (maxRowsProp || 100)} userId={userId} />
+        <StockTable stocks={filtered} fromPage={initExchange === "US" ? "northamerica" : "screener"} onSelect={onSelectStock || (() => {})} loading={loading} maxRows={showAll ? 9999 : (maxRowsProp || 100)} userId={userId} restrictScoreSort={restrictScoreSort} />
       </div>
     </div>
   )
