@@ -725,7 +725,16 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   maxRows?: number
   restrictScoreSort?: boolean
 }) {
-  const [exchange,  setExchange]  = useState(initExchange)
+  const scrRouter = useRouter()
+  const scrPathname = usePathname()
+  const scrSearchParams = useSearchParams()
+  // La selezione del mercato dentro lo Screener (Italia, All Europe, ecc.)
+  // era SOLO stato interno React, mai riflessa nell'URL — quando si
+  // tornava indietro da un titolo, l'URL salvato non sapeva quale mercato
+  // fosse stato scelto, mostrando il default invece della vera selezione
+  // (23/7/2026, "All Europe" -> ASML -> indietro mostrava un mix casuale).
+  const urlExchange = scrSearchParams.get('scr_ex')
+  const [exchange,  setExchange]  = useState(urlExchange || initExchange)
   const [stocks,    setStocks]    = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(false)
   const [selected,  setSelected]  = useState<Stock | null>(null)
@@ -754,6 +763,21 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   }, [])
 
   const loadRequestId = useRef(0)
+
+  // Sincronizza la selezione con l'URL (router.replace — non aggiunge
+  // voci alla cronologia del browser, non ricarica la pagina). Cosi'
+  // "torna indietro" da un titolo sa sempre esattamente quale mercato
+  // era selezionato, invece di mostrare il default.
+  useEffect(() => {
+    const params = new URLSearchParams(scrSearchParams.toString())
+    if (exchange && exchange !== initExchange) {
+      params.set('scr_ex', exchange)
+    } else {
+      params.delete('scr_ex')
+    }
+    const qs = params.toString()
+    scrRouter.replace(qs ? `${scrPathname}?${qs}` : scrPathname, { scroll: false })
+  }, [exchange])
   useEffect(() => {
     const myRequestId = ++loadRequestId.current
     const load = () => {
