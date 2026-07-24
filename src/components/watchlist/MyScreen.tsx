@@ -405,7 +405,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-600 text-sm">{fv(s.price)}</span>
                   <span className="font-mono text-xs" style={clrStyle(s.change1d)}>
-                    {s.change1d != null ? fpd(s.change1d / 100) : '-'}
+                    {s.change1d != null ? fpd(s.change1d) : '-'}
                   </span>
                   <button onClick={(e) => remove(e, s.id)} className="text-muted hover:text-red-400">
                     <Trash2 size={13} />
@@ -460,7 +460,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                 <span className="text-[9px] text-muted">{stocks.length} stocks</span>
               </div>
               <div className="flex gap-2 text-[10px] font-mono flex-wrap">
-                <span className="text-muted">1D: <span style={clrStyle(avg('change1d'))}>{avg('change1d') != null ? fpd((avg('change1d') as number) / 100) : '-'}</span></span>
+                <span className="text-muted">1D: <span style={clrStyle(avg('change1d'))}>{avg('change1d') != null ? fpd(avg('change1d') as number) : '-'}</span></span>
                 <span className="text-[#444]">|</span>
                 <span className="text-muted">PEv: <span style={{color: qClr(quintFromAvg(avg('rankPeLtm')))}}>{qText(quintFromAvg(avg('rankPeLtm')))}</span></span>
                 <span className="text-[#444]">|</span>
@@ -531,7 +531,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   </td>
                   <td className="font-mono text-right text-[12px]">{fv(s.price)}</td>
                   <td className="font-mono text-right text-[12px]" style={clrStyle(s.change1d)}>
-                    {s.change1d != null ? fpd(s.change1d / 100) : '-'}
+                    {s.change1d != null ? fpd(s.change1d) : '-'}
                   </td>
                   <td className="font-mono text-right text-[12px]">{s.mktCap != null ? fv(s.mktCap, 1) : '-'}</td>
                   <td className="font-mono text-center text-[12px] font-600" style={{color: s.rankPeLtm != null ? rankClr(s.rankPeLtm) : qClr((s as any).peTrailingQuintile)}}>{s.rankPeLtm != null ? fn(s.rankPeLtm) : qText((s as any).peTrailingQuintile)}</td>
@@ -571,7 +571,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   <td></td><td></td>
                   <td></td>
                   <td className="font-mono text-right text-[12px] font-700" style={clrStyle(avg('change1d'))}>
-                    {avg('change1d') != null ? fpd((avg('change1d') as number) / 100) : '-'}
+                    {avg('change1d') != null ? fpd(avg('change1d') as number) : '-'}
                   </td>
                   <td className="font-mono text-right text-[12px] font-700">{avg('mktCap') != null ? fv(avg('mktCap'), 1) : '-'}</td>
                   <td className="font-mono text-center text-[12px] font-700" style={{color: qClr(quintFromAvg(avg('rankPeLtm')))}}>{qText(quintFromAvg(avg('rankPeLtm')))}</td>
