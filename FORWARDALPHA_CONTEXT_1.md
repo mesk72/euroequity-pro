@@ -2971,3 +2971,25 @@ Andrea ha ricevuto un avviso Vercel: $15,01 su $20 di credito mensile Pro consum
 **Regola generale**: quando Andrea chiede di intervenire su un costo/consumo, non ragionare per ipotesi generali (anche se sembrano plausibili) — chiedere sempre il pannello Usage reale prima di agire, dato che le cause intuitive possono essere sbagliate (come e' successo qui).
 
 Il cron notizie e' rimasto a `*/20 0-11,13-23 * * *` + `0,30 12 * * *` in vercel.json, INVARIATO — confermato non essere il problema, nessuna modifica necessaria li'.
+
+---
+
+## REGOLA FONDAMENTALE: change1d e' SEMPRE decimale alla fonte, MAI moltiplicato per 100 nel dato grezzo (23-24/7/2026)
+
+Dopo aver trovato lo stesso identico tipo di bug (scala ×100/÷100) in MOLTI punti diversi del sito in questa sessione, ecco la regola definitiva da seguire SEMPRE, per non ripetere la stessa caccia:
+
+**Alla FONTE (database, daily script, endpoint server)**: `change1d` e tutti i campi momentum (mom1w/mom1m/mom6m/mom12m) sono SEMPRE decimali puri (es. 0.06 per 6%, MAI 6.0). Nessuna eccezione. Se un daily script scrive `chg1d = round((... - 1) * 100, 4)`, quello e' SBAGLIATO e va tolto il `* 100`.
+
+**Nel FRONTEND, al momento di mostrare il numero**: la moltiplicazione per 100 avviene SOLO li', UNA VOLTA, o dentro la funzione di formattazione (se la funzione la fa gia' internamente) O esplicitamente nel chiamante — MAI ENTRAMBE, altrimenti il risultato e' 10000 volte troppo grande (doppia moltiplicazione) o mostra praticamente zero (divisione extra che annulla la moltiplicazione interna della funzione).
+
+**Prima di usare una funzione di formattazione percentuale (fp/fpd/fpPct/ecc.), controllare SEMPRE la sua implementazione per sapere se moltiplica gia' per 100 internamente**, prima di decidere se moltiplicare (o dividere) il valore prima di passarglielo.
+
+### Punti dove questo bug e' stato trovato e corretto stanotte (lista esaustiva per riferimento futuro)
+
+1. `daily_us_yahoo.py`, `daily_eu_yahoo.py`, `daily_apac_yahoo.py` — chg1d moltiplicato per 100 alla fonte, tolto.
+2. `src/components/dashboard/StockDetailPage.tsx` — mancava la moltiplicazione ×100 in display, aggiunta.
+3. `src/app/stock/[id]/page.tsx` — stesso, mancava ×100 in display, aggiunta.
+4. `src/components/watchlist/MyScreen.tsx` — quattro punti (singolo titolo mobile/tabella, media wallet mobile/tabella) dividevano per 100 PRIMA di una funzione fpd() che gia' moltiplica per 100 internamente, risultato praticamente zero. Divisione rimossa in tutti e quattro.
+5. `src/app/page.tsx` (Screener/Sector Heatmap) — questo file aveva GIA' la moltiplicazione corretta ovunque quando controllato, nessun fix necessario li'.
+
+**Se in futuro un altro punto mostra percentuali palesemente sbagliate (troppo piccole = manca ×100 o c'e' una divisione di troppo; troppo grandi = doppia moltiplicazione), controllare PRIMA la funzione di formattazione usata in quel punto specifico, poi il valore passato, seguendo questa stessa checklist — non serve piu' scoprire il pattern da zero.**
