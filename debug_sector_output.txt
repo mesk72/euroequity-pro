@@ -1,5 +1,2 @@
-RPC status: 500
-RPC righe restituite (campione): {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
-RPC totale righe: N/A
-
-Tabella sector_aggregates status: 200 []
+RPC status: 400 tempo: 0.68s
+Errore: {'code': '42702', 'details': 'It could refer to either a PL/pgSQL variable or a table column.', 'hint': None, 'message': 'column reference "ticker" is ambiguous'}
