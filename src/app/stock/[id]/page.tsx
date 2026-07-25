@@ -203,12 +203,17 @@ function StockPageInner() {
     if (!from) from = searchParams.get('from')
     if (from) {
       const decoded = from.startsWith('/') ? from : decodeURIComponent(from)
+      try { sessionStorage.removeItem('stockBackTo') } catch {}
       // Per /news usa history.back() — evita freeze da Router Cache di Next.js
       if (decoded === '/news') {
         window.history.back()
       } else {
-        router.push(decoded)
-        router.refresh()  // forza il router a non servire una versione in cache
+        // FIX (diagnosi con Kimi, 25/7/2026): router.refresh() dopo
+        // router.push() poteva causare un doppio caricamento o
+        // comportamento imprevedibile, contribuendo al "torna a una
+        // pagina sbagliata" segnalato — rimosso, non necessario dato
+        // che l'URL di origine ora e' sempre corretto e aggiornato.
+        router.push(decoded, { scroll: false })
       }
     } else {
       window.history.back()
