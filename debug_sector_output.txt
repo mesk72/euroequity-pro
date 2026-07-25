@@ -1,2 +1,2 @@
-RPC status: 400 tempo: 0.68s
-Errore: {'code': '42702', 'details': 'It could refer to either a PL/pgSQL variable or a table column.', 'hint': None, 'message': 'column reference "ticker" is ambiguous'}
+RPC status: 500 tempo: 8.65s
+Errore: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
