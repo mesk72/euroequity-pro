@@ -1,1 +1,5 @@
-AAPL: [{'date': '2026-07-22'}]
+RPC status: 500
+RPC righe restituite (campione): {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
+RPC totale righe: N/A
+
+Tabella sector_aggregates status: 200 []
