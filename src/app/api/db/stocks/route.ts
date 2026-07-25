@@ -340,34 +340,41 @@ export async function GET(req: NextRequest) {
     return jsonNoCache({ error: 'Too many requests. Please slow down.' }, { status: 429 })
   }
 
-  // Verifica proprietario — solo Andrea vede l'universo completo, senza
-  // nessun ricalcolo di nulla. Chiunque altro vede un sottoinsieme.
-  let isOwner = false
-  let isInstitutionalViewer = false
-  let isLoggedIn = false
-  const authHeader = req.headers.get('authorization') || ''
-  if (authHeader.startsWith('Bearer ')) {
-    try {
-      const { data: { user } } = await supabase.auth.getUser(authHeader.slice(7))
-      if (user?.email) isLoggedIn = true
-      if (user?.email === 'andreameschini19@gmail.com') isOwner = true
-      // Livello "institutional viewer" — vede TUTTI gli 8.000 titoli
-      // (nessun limite ai 500), ma non vede MAI i dati grezzi, in nessuna
-      // vista — gestito da una lista email dedicata (institutional_viewers),
-      // che Andrea puo' aggiornare direttamente senza toccare codice.
-      if (!isOwner && user?.email) {
-        const { data: viewerRow } = await supabase
-          .from('institutional_viewers').select('email').eq('email', user.email).maybeSingle()
-        if (viewerRow) isInstitutionalViewer = true
-      }
-    } catch {}
+  // Verifica proprietario — estratta in funzione riusabile cosi' puo'
+  // girare IN PARALLELO col recupero dati (diagnosi Kimi 25/7/2026,
+  // problema 2: la verifica utente in sequenza PRIMA di tutto il resto
+  // era una causa concreta della lentezza sulla pagina titolo).
+  async function verifyUser(authHeader: string): Promise<{ isOwner: boolean; isInstitutionalViewer: boolean; isLoggedIn: boolean }> {
+    let isOwner = false, isInstitutionalViewer = false, isLoggedIn = false
+    if (authHeader.startsWith('Bearer ')) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser(authHeader.slice(7))
+        if (user?.email) isLoggedIn = true
+        if (user?.email === 'andreameschini19@gmail.com') isOwner = true
+        if (!isOwner && user?.email) {
+          const { data: viewerRow } = await supabase
+            .from('institutional_viewers').select('email').eq('email', user.email).maybeSingle()
+          if (viewerRow) isInstitutionalViewer = true
+        }
+      } catch {}
+    }
+    return { isOwner, isInstitutionalViewer, isLoggedIn }
   }
 
+  const authHeader = req.headers.get('authorization') || ''
   const exchange = req.nextUrl.searchParams.get('exchange') || ''
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
   const search = req.nextUrl.searchParams.get('search') || ''
   const ticker = req.nextUrl.searchParams.get('ticker') || ''
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
+
+  // Per il ramo singolo titolo, la verifica utente viene fatta DENTRO il
+  // Promise.all con le query dati (vedi sotto) — qui la saltiamo per non
+  // farla due volte. Per tutti gli altri rami, la facciamo subito.
+  let isOwner = false, isInstitutionalViewer = false, isLoggedIn = false
+  if (!(ticker && exchange)) {
+    ;({ isOwner, isInstitutionalViewer, isLoggedIn } = await verifyUser(authHeader))
+  }
 
   try {
     let exList: string[] = []
@@ -384,7 +391,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (ticker && exchange) {
-      const [stockRes, fundRes, histRes] = await Promise.all([
+      const [stockRes, fundRes, histRes, userVerify] = await Promise.all([
         supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker,in_universe').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf').eq('ticker', ticker).eq('exchange', exchange).limit(1),
         // Storico per il grafico E per il prezzo/variazione reali — query
@@ -393,7 +400,14 @@ export async function GET(req: NextRequest) {
         // correttamente (23/7/2026) — fundamentals.price/change1d non e'
         // affidabile per tutti gli 8000 titoli, resta indietro per alcuni.
         supabase.from('prices_eod').select('date,adj_close').eq('ticker', ticker).eq('exchange', exchange).order('date', { ascending: false }).limit(400),
+        // Verifica utente IN PARALLELO con i dati (diagnosi Kimi, problema
+        // 2) — prima era sequenziale PRIMA di tutto il resto, aggiungendo
+        // tempo morto ad ogni apertura di pagina titolo.
+        verifyUser(authHeader),
       ])
+      isOwner = userVerify.isOwner
+      isInstitutionalViewer = userVerify.isInstitutionalViewer
+      isLoggedIn = userVerify.isLoggedIn
       const s: any = stockRes.data?.[0] || {}
       const f: any = fundRes.data?.[0] || {}
       if (!s.ticker) return jsonNoCache({ stocks: [] })
