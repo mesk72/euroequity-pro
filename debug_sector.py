@@ -1,16 +1,16 @@
-import os, requests
+import os, requests, time
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY, "Content-Type": "application/json"}
 
-# Test la funzione RPC
+start = time.time()
 r = requests.post(f"{SUPABASE_URL}/rest/v1/rpc/get_latest_two_prices", headers=headers_r,
-    json={"exchange_list": ["US"]})
-print("RPC status:", r.status_code)
+    json={"exchange_list": ["US"]}, timeout=30)
+elapsed = time.time() - start
+print("RPC status:", r.status_code, f"tempo: {elapsed:.2f}s")
 data = r.json()
-print("RPC righe restituite (campione):", data[:3] if isinstance(data, list) else data)
-print("RPC totale righe:", len(data) if isinstance(data, list) else "N/A")
-
-# Test la tabella sector_aggregates
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/sector_aggregates", headers={"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}, params={"select":"*","limit":"1"})
-print("\nTabella sector_aggregates status:", r2.status_code, r2.text[:200])
+if isinstance(data, list):
+    print("Righe restituite:", len(data))
+    print("Campione:", data[:3])
+else:
+    print("Errore:", data)
