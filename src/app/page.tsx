@@ -764,10 +764,13 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
   const loadRequestId = useRef(0)
 
-  // Sincronizza la selezione con l'URL (router.replace — non aggiunge
-  // voci alla cronologia del browser, non ricarica la pagina). Cosi'
-  // "torna indietro" da un titolo sa sempre esattamente quale mercato
-  // era selezionato, invece di mostrare il default.
+  // Sincronizza la selezione con l'URL. FIX (diagnosi con Kimi, 25/7/2026):
+  // router.replace() da solo e' ASINCRONO — se l'utente clicca su un
+  // titolo subito dopo aver cambiato mercato, window.location.search
+  // potrebbe non essere ancora aggiornato quando goToStock lo legge,
+  // salvando l'indirizzo VECCHIO. history.replaceState() aggiorna
+  // l'URL del browser SUBITO (sincrono), eliminando la race condition;
+  // router.replace() resta solo per notificare Next.js.
   useEffect(() => {
     const params = new URLSearchParams(scrSearchParams.toString())
     if (exchange && exchange !== initExchange) {
@@ -776,7 +779,11 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       params.delete('scr_ex')
     }
     const qs = params.toString()
-    scrRouter.replace(qs ? `${scrPathname}?${qs}` : scrPathname, { scroll: false })
+    const newUrl = qs ? `${scrPathname}?${qs}` : scrPathname
+    if (typeof window !== 'undefined' && window.location.pathname + window.location.search !== newUrl) {
+      window.history.replaceState(window.history.state, '', newUrl)
+    }
+    scrRouter.replace(newUrl, { scroll: false })
   }, [exchange])
   useEffect(() => {
     const myRequestId = ++loadRequestId.current
