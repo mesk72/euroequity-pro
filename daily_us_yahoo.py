@@ -10,6 +10,7 @@
 # ============================================================
 
 import os, math, time, time as time_module, requests
+import pandas as pd
 try:
     from dateutil.relativedelta import relativedelta
 except ImportError:
@@ -198,7 +199,32 @@ for exchange, tickers in by_exchange.items():
                 interval="1d", auto_adjust=True, progress=False, threads=True,
             )
             if data_yf.empty: fail_yf += len(ytickers); continue
-            closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]}) if len(ytickers)==1 else data_yf["Close"]
+
+            # Estrazione robusta — yfinance puo' restituire strutture diverse
+            # a seconda di quanti ticker del chunk hanno effettivamente
+            # risposto (delisted/sospesi/simbolo cambiato fanno "degenerare"
+            # il formato). La versione precedente (data_yf["Close"] diretto,
+            # senza controlli) faceva fallire l'INTERO chunk da 150 titoli
+            # per colpa di un solo ticker "avvelenato" — causa reale
+            # del prezzo US fermo per giorni nonostante il job completasse
+            # con successo (25/7/2026, diagnosticato con l'aiuto di Kimi).
+            if len(ytickers) == 1:
+                closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]})
+            elif isinstance(data_yf.columns, pd.MultiIndex):
+                if "Close" in data_yf.columns.get_level_values(0):
+                    closes = data_yf["Close"]
+                elif "Close" in data_yf.columns.get_level_values(1):
+                    closes = data_yf.xs("Close", axis=1, level=1)
+                else:
+                    closes = None
+            elif "Close" in data_yf.columns:
+                closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]})
+            else:
+                closes = None
+
+            if closes is None or not hasattr(closes, "columns"):
+                raise ValueError("formato dati Yahoo non riconosciuto per questo chunk")
+
             for yt in ytickers:
                 if yt not in closes.columns: fail_yf += 1; continue
                 tk, ex = ticker_map[yt]
@@ -209,8 +235,27 @@ for exchange, tickers in by_exchange.items():
                     price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
                 ok_yf += 1
         except Exception as e:
-            print(f"  Errore chunk {exchange} {i}: {e}")
-            fail_yf += len(ytickers)
+            # Invece di scartare l'intero chunk (fino a 150 titoli persi
+            # per colpa di uno solo), riprova titolo per titolo — piu'
+            # lento ma non perde dati validi per un vicino problematico.
+            print(f"  Chunk {exchange} {i} fallito ({e}), riprovo singolarmente...")
+            for yt in ytickers:
+                try:
+                    single = yf.download(yt, start=start_dt, end=END_FOR_DOWNLOAD,
+                        interval="1d", auto_adjust=True, progress=False)
+                    if single.empty or "Close" not in single.columns:
+                        fail_yf += 1; continue
+                    tk, ex = ticker_map[yt]
+                    last = last_dates.get((tk, ex), "2020-01-01")
+                    for date_idx, price in single["Close"].dropna().items():
+                        date_str = date_idx.strftime("%Y-%m-%d")
+                        if date_str <= last: continue
+                        price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
+                    ok_yf += 1
+                except Exception as e2:
+                    print(f"    Fallito anche singolarmente: {yt} ({e2})")
+                    fail_yf += 1
+
 
         if len(price_buf) >= 500:
             requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
