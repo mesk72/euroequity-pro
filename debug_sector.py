@@ -1,8 +1,4 @@
-import os, requests
-SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
-SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
-headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-for tk, ex in [("AAPL","US"), ("MSFT","US"), ("NVDA","US"), ("DMLP","US")]:
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-        params={"select":"date","ticker":f"eq.{tk}","exchange":f"eq.{ex}","order":"date.desc","limit":"1"})
-    print(f"{tk}:", r.json())
+import yfinance as yf
+data = yf.download(tickers="AAPL MSFT NVDA", start="2026-07-20", end="2026-07-27", interval="1d", auto_adjust=True, progress=False, threads=True)
+print(data)
+print("\nColonne:", data.columns.tolist() if hasattr(data.columns, 'tolist') else data.columns)
