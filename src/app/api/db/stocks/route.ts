@@ -165,63 +165,22 @@ function redactRawData<T extends Record<string, any>>(obj: T): T {
 }
 
 async function fetchLatestPrices(exchangeList: string[]) {
-  // Legge gli ultimi giorni di prezzi per calcolare prezzo corrente e
-  // variazione reale da prices_eod, invece di affidarsi a fundamentals.price
-  // / change1d — campi statici aggiornati solo dai run settimanali, causa
-  // reale del "prezzo fermo" segnalato su JPM e su tutti gli screener.
-  //
-  // FIX v2: la versione "un giorno alla volta" era corretta ma troppo
-  // lenta (fino a 10 chiamate sequenziali per mercato, causa reale del
-  // sito lentissimo/pagine che non si aprivano, 23/7/2026). Ora: UNA
-  // query per mercato, ordinata per TICKER prima e DATA dopo — se la
-  // paginazione taglia, taglia tra un ticker e il successivo, mai a
-  // meta' delle righe di un singolo ticker (impossibile con soli 7
-  // giorni di dati per ticker, ben sotto il limite di pagina). Stessa
-  // correttezza della versione precedente, molto piu' veloce. Tutti i
-  // mercati richiesti in parallelo, non piu' in sequenza.
-  const cutoff = new Date()
-  cutoff.setDate(cutoff.getDate() - 7)
-  const cutoffStr = cutoff.toISOString().slice(0, 10)
-
-  const perExchange = await Promise.all(exchangeList.map(async (exchange) => {
-    const byTicker: Record<string, { date: string; adj_close: number }[]> = {}
-    const PAGE = 1000
-    let from = 0
-    while (true) {
-      const { data, error } = await supabase
-        .from('prices_eod')
-        .select('ticker,date,adj_close')
-        .eq('exchange', exchange)
-        .gte('date', cutoffStr)
-        .order('ticker', { ascending: true })
-        .order('date', { ascending: false })
-        .range(from, from + PAGE - 1)
-      if (error || !data || data.length === 0) break
-      for (const row of data) {
-        const key = `${row.ticker}.${exchange}`
-        if (!byTicker[key]) byTicker[key] = []
-        if (byTicker[key].length < 2) byTicker[key].push({ date: row.date, adj_close: row.adj_close })
-      }
-      if (data.length < PAGE) break
-      from += PAGE
-    }
-    return byTicker
-  }))
-
-  const byTicker: Record<string, { date: string; adj_close: number }[]> = {}
-  for (const partial of perExchange) Object.assign(byTicker, partial)
-
+  // Legge da latest_prices — tabella PRE-CALCOLATA dai daily script,
+  // aggiornata una volta al giorno. Nessun calcolo pesante in tempo
+  // reale: sostituisce tutti i tentativi precedenti (query dirette,
+  // RPC con window function/DISTINCT ON) che erano corretti ma troppo
+  // lenti su tutto l'universo (causa reale dei 20 secondi di
+  // caricamento, 25/7/2026 — diagnosi Kimi, stesso principio gia'
+  // usato per top500_universe e sector_aggregates).
   const result: Record<string, { price: number; date: string; change1d: number | null }> = {}
-  for (const key of Object.keys(byTicker)) {
-    const rows = byTicker[key]
-    if (!rows.length) continue
-    const latest = rows[0]
-    const prev = rows[1]
-    result[key] = {
-      price: latest.adj_close,
-      date: latest.date,
-      change1d: prev && prev.adj_close ? (latest.adj_close / prev.adj_close - 1) : null,
-    }
+  const { data, error } = await supabase
+    .from('latest_prices')
+    .select('ticker,exchange,price,price_date,change1d')
+    .in('exchange', exchangeList)
+  if (error || !data) return result
+  for (const row of data) {
+    const key = `${row.ticker}.${row.exchange}`
+    result[key] = { price: row.price, date: row.price_date, change1d: row.change1d }
   }
   return result
 }
