@@ -1,15 +1,9 @@
 import os, requests
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
-headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY, "Prefer":"count=exact"}
+headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-r = requests.get(f"{SUPABASE_URL}/rest/v1/latest_prices", headers=headers_r, params={"select":"ticker","limit":"1"})
-print("Righe totali in latest_prices:", r.headers.get("content-range"))
-
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/latest_prices", headers={"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY},
-    params={"select":"*","ticker":"eq.AAPL","exchange":"eq.US"})
-print("AAPL in latest_prices:", r2.json())
-
-r3 = requests.get(f"{SUPABASE_URL}/rest/v1/latest_prices", headers={"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY},
-    params={"select":"*","ticker":"eq.9984","exchange":"eq.TSE"})
-print("9984 SoftBank in latest_prices:", r3.json())
+for tk, ex in [("AAPL","US"), ("MSFT","US"), ("NVDA","US"), ("7203","TSE"), ("9984","TSE")]:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"date","ticker":f"eq.{tk}","exchange":f"eq.{ex}","order":"date.desc","limit":"1"})
+    print(f"{tk}.{ex}:", r.json())
