@@ -1,4 +1,4 @@
-import os, requests, yfinance as yf, pandas as pd, time
+import os, requests, time
 from datetime import datetime, timedelta
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
@@ -7,15 +7,24 @@ headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
 r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
     params={"select":"ticker","exchange":"eq.US","in_universe":"eq.true","limit":"150","order":"ticker"})
-test_tickers = [s["ticker"] for s in r.json()]
-print(f"Campione: {len(test_tickers)} titoli")
+chunk = [s["ticker"] for s in r.json()]
 
-END_FOR_DOWNLOAD = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
-start_dt = "2026-07-22"
-
+from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
 t0 = time.time()
-data_yf = yf.download(tickers=" ".join(test_tickers), start=start_dt, end=END_FOR_DOWNLOAD,
-                       interval="1d", auto_adjust=True, progress=False, threads=True)
+total_rows = 0
+offset_p = 0
+pages = 0
+while True:
+    rp = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+        params={"select": "ticker,date,adj_close", "exchange": "eq.US",
+                "ticker": f"in.({','.join(chunk)})", "date": f"gte.{from_400d}",
+                "order": "ticker,date.desc", "limit": "1000", "offset": str(offset_p)})
+    batch = rp.json()
+    pages += 1
+    if not isinstance(batch, list) or not batch: break
+    total_rows += len(batch)
+    offset_p += 1000
+    if len(batch) < 1000: break
+
 elapsed = time.time() - t0
-print(f"TEMPO DOWNLOAD: {elapsed:.1f} secondi per {len(test_tickers)} titoli")
-print(f"shape: {data_yf.shape}, empty: {data_yf.empty}")
+print(f"TEMPO FASE 3 per 150 titoli: {elapsed:.1f}s, {pages} pagine, {total_rows} righe totali")
