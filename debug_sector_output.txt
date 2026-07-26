@@ -1,1 +1,3 @@
-Campione: 150 titoli reali
+Campione: 150 titoli
+TEMPO DOWNLOAD: 5.5 secondi per 150 titoli
+shape: (3, 750), empty: False
