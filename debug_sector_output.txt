@@ -1,3 +1,1 @@
-Campione: 150 titoli
-TEMPO DOWNLOAD: 5.5 secondi per 150 titoli
-shape: (3, 750), empty: False
+TEMPO FASE 3 per 150 titoli: 9.9s, 40 pagine, 39249 righe totali
