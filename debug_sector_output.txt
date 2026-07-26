@@ -1,5 +1,33 @@
-AAPL.US: [{'date': '2026-07-22'}]
-MSFT.US: [{'date': '2026-07-22'}]
-NVDA.US: [{'date': '2026-07-21'}]
-7203.TSE: [{'date': '2026-07-21'}]
-9984.TSE: [{'date': '2026-07-21'}]
+Oggi: 2026-07-26, end download: 2026-07-28
+AAPL: ultima data nel DB = 2026-07-22
+MSFT: ultima data nel DB = 2026-07-22
+NVDA: ultima data nel DB = 2026-07-21
+
+start_dt: 2026-07-22
+Scaricato, empty=False, shape=(3, 15)
+Tipo colonne: <class 'pandas.MultiIndex'>
+Livello 0: ['Close', 'High', 'Low', 'Open', 'Volume']
+
+closes e' None? False
+closes.columns: ['AAPL', 'MSFT', 'NVDA']
+
+AAPL ultimi valori:
+Date
+2026-07-22    325.890015
+2026-07-23    321.660004
+2026-07-24    333.019989
+Name: AAPL, dtype: float64
+
+MSFT ultimi valori:
+Date
+2026-07-22    390.339996
+2026-07-23    381.579987
+2026-07-24    381.700012
+Name: MSFT, dtype: float64
+
+NVDA ultimi valori:
+Date
+2026-07-22    212.059998
+2026-07-23    208.759995
+2026-07-24    206.839996
+Name: NVDA, dtype: float64
