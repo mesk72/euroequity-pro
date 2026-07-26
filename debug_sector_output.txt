@@ -1,1 +1,4 @@
-TEMPO FASE 3 per 150 titoli: 9.9s, 40 pagine, 39249 righe totali
+AAPL: [{'date': '2026-07-22'}]
+MSFT: [{'date': '2026-07-22'}]
+NVDA: [{'date': '2026-07-21'}]
+DMLP: [{'date': '2026-07-22'}]
