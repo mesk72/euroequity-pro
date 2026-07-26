@@ -160,14 +160,29 @@ last_dates = {}
 # recente per ciascun mercato distinto nell'universo, poi la usa per
 # tutti i suoi titoli - l'upsert successivo sovrascrive senza danni se
 # qualche titolo avesse per caso uno storico diverso.
+#
+# FIX CRITICO (26/7/2026): la versione precedente usava DIRETTAMENTE
+# questa data come start_dt per OGNI titolo del mercato — se la
+# MAGGIOR PARTE dei titoli era gia' aggiornata ma ALCUNI erano rimasti
+# indietro (es. per un problema di un run precedente), lo script
+# SALTAVA COMPLETAMENTE il download dei giorni mancanti proprio per
+# quei titoli, dato che presumeva (sbagliando) che tutti fossero alla
+# pari. Ora si arretra SEMPRE di un margine di sicurezza di 10 giorni
+# dalla data piu' recente vista nel mercato, cosi' anche i titoli in
+# ritardo vengono ricoperti — le righe gia' presenti nel database
+# vengono scartate piu' sotto (if date_str <= last: continue), quindi
+# scaricare "troppo" non causa duplicati ne' danni, solo qualche
+# richiesta in piu' verso Yahoo.
 distinct_exchanges = sorted(set(s["exchange"] for s in all_stocks))
 global_last_by_exchange = {}
 for ex in distinct_exchanges:
     rg = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
         params={"select": "date", "exchange": "eq." + ex, "order": "date.desc", "limit": "1"})
     row = rg.json()
-    global_last_by_exchange[ex] = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
-    print(f"  Data piu' recente stimata per {ex}: {global_last_by_exchange[ex]}")
+    most_recent = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
+    safety_dt = (datetime.strptime(most_recent, "%Y-%m-%d") - timedelta(days=10)).strftime("%Y-%m-%d")
+    global_last_by_exchange[ex] = safety_dt
+    print(f"  Data piu' recente nel mercato {ex}: {most_recent} — uso {safety_dt} come base (margine di sicurezza)")
 for stock in all_stocks:
     last_dates[(stock["ticker"], stock["exchange"])] = global_last_by_exchange.get(stock["exchange"], "2020-01-01")
 
