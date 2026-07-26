@@ -1,3 +1,5 @@
-Righe totali in latest_prices: 0-0/5793
-AAPL in latest_prices: [{'ticker': 'AAPL', 'exchange': 'US', 'price': 325.89, 'prev_price': 327.74, 'price_date': '2026-07-22', 'change1d': -0.005645, 'updated_at': '2026-07-26T02:47:09.580361+00:00'}]
-9984 SoftBank in latest_prices: [{'ticker': '9984', 'exchange': 'TSE', 'price': 5751.0, 'prev_price': 5424.0, 'price_date': '2026-07-21', 'change1d': 0.060288, 'updated_at': '2026-07-26T02:46:25.565566+00:00'}]
+AAPL.US: [{'date': '2026-07-22'}]
+MSFT.US: [{'date': '2026-07-22'}]
+NVDA.US: [{'date': '2026-07-21'}]
+7203.TSE: [{'date': '2026-07-21'}]
+9984.TSE: [{'date': '2026-07-21'}]
