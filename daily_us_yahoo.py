@@ -331,13 +331,34 @@ for stock in all_stocks:
         "mom1w": mom_new_weeks(4), "mom1m": mom_new_months(1),
         "mom6m": mom_new_months(6), "mom12m": mom_new_months(12),
         "change1d": chg1d, "price": last_px,
+        "_last_date": last_date.strftime("%Y-%m-%d"),
     })
     ok += 1
 
 for i in range(0, len(mom_updates), 100):
-    requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=mom_updates[i:i+100])
+    clean_batch = [{k: v for k, v in m.items() if k != "_last_date"} for m in mom_updates[i:i+100]]
+    requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=clean_batch)
 print(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
+
+# Mantiene aggiornata latest_prices (tabella pre-calcolata, letta dal
+# sito senza calcoli pesanti in tempo reale - causa risolta del sito
+# lentissimo, 25/7/2026). Riusa gli stessi dati gia' calcolati sopra,
+# con la data VERA dell'ultimo prezzo (non "oggi", che sarebbe sbagliato
+# se il prezzo fosse in ritardo di uno o piu' giorni).
+latest_price_updates = []
+for m in mom_updates:
+    price = m.get("price")
+    chg = m.get("change1d")
+    prev_price = (price / (1 + chg)) if (price is not None and chg is not None and (1 + chg) != 0) else None
+    latest_price_updates.append({
+        "ticker": m["ticker"], "exchange": m["exchange"],
+        "price": price, "prev_price": prev_price,
+        "price_date": m.get("_last_date"), "change1d": chg,
+    })
+for i in range(0, len(latest_price_updates), 500):
+    requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange", headers=headers_up, json=latest_price_updates[i:i+500])
+print(f"  latest_prices aggiornata: {len(latest_price_updates)} titoli")
 
 # ── 5. RANK US+CA ────────────────────────────────────────────
 print("\n[5/5] Ricalcolo rank US+CA...")
