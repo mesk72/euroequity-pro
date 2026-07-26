@@ -1,2 +1,26 @@
-RPC status: 500 tempo: 8.65s
-Errore: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
+MIL: 117 titoli scritti
+XETRA: 197 titoli scritti
+PA: 217 titoli scritti
+AS: 98 titoli scritti
+MC: 100 titoli scritti
+BR: 99 titoli scritti
+LS: 35 titoli scritti
+VI: 53 titoli scritti
+HE: 100 titoli scritti
+IR: 15 titoli scritti
+GR: 100 titoli scritti
+LSE: 422 titoli scritti
+SWX: 161 titoli scritti
+OM: 204 titoli scritti
+OB: 99 titoli scritti
+CPSE: 101 titoli scritti
+NGM: 0 titoli scritti
+TSE: 999 titoli scritti
+SEHK: 497 titoli scritti
+TSX: 372 titoli scritti
+ASX: 350 titoli scritti
+KRX: 355 titoli scritti
+SGX: 100 titoli scritti
+US: 1002 titoli scritti
+
+TOTALE: 5793 titoli scritti in latest_prices
