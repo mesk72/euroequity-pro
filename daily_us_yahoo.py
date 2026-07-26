@@ -273,12 +273,23 @@ for exchange, tickers in by_exchange.items():
 
 
         if len(price_buf) >= 500:
-            requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+            # FIX CRITICO (26/7/2026): mancava ?on_conflict=ticker,exchange,date
+            # — senza questo, un conflitto di chiave duplicata (riga gia'
+            # esistente) fa fallire l'INTERO batch di 500 righe SENZA nessun
+            # errore visibile (la risposta non veniva mai controllata). Causa
+            # reale del prezzo fermo nonostante lo script completasse sempre
+            # con successo — il download funzionava, la scrittura falliva
+            # silenziosamente. Ora controlla anche la risposta.
+            rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf)
+            if rw.status_code not in (200, 201, 204):
+                print(f"  ERRORE SCRITTURA prezzi: HTTP {rw.status_code} - {rw.text[:300]}")
             price_buf = []
         time.sleep(random.uniform(3.0, 7.0))
 
 if price_buf:
-    requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+    rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf)
+    if rw.status_code not in (200, 201, 204):
+        print(f"  ERRORE SCRITTURA prezzi (finale): HTTP {rw.status_code} - {rw.text[:300]}")
 print("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
 ok_prices = ok_yf; fail_prices = fail_yf
 
