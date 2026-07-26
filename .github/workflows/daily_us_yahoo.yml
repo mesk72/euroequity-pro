@@ -17,9 +17,10 @@ jobs:
       - name: Run US daily Yahoo
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python daily_us_yahoo.py | tee daily_us_yahoo_last_output.txt
+        run: |
+          set -o pipefail
+          python daily_us_yahoo.py 2>&1 | tee daily_us_yahoo_last_output.txt
       - name: Commit log
-        continue-on-error: true
         if: always()
         run: |
           git config user.name "debug-bot"
