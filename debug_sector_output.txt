@@ -1,26 +1,3 @@
-MIL: 117 titoli scritti
-XETRA: 197 titoli scritti
-PA: 217 titoli scritti
-AS: 98 titoli scritti
-MC: 100 titoli scritti
-BR: 99 titoli scritti
-LS: 35 titoli scritti
-VI: 53 titoli scritti
-HE: 100 titoli scritti
-IR: 15 titoli scritti
-GR: 100 titoli scritti
-LSE: 422 titoli scritti
-SWX: 161 titoli scritti
-OM: 204 titoli scritti
-OB: 99 titoli scritti
-CPSE: 101 titoli scritti
-NGM: 0 titoli scritti
-TSE: 999 titoli scritti
-SEHK: 497 titoli scritti
-TSX: 372 titoli scritti
-ASX: 350 titoli scritti
-KRX: 355 titoli scritti
-SGX: 100 titoli scritti
-US: 1002 titoli scritti
-
-TOTALE: 5793 titoli scritti in latest_prices
+Righe totali in latest_prices: 0-0/5793
+AAPL in latest_prices: [{'ticker': 'AAPL', 'exchange': 'US', 'price': 325.89, 'prev_price': 327.74, 'price_date': '2026-07-22', 'change1d': -0.005645, 'updated_at': '2026-07-26T02:47:09.580361+00:00'}]
+9984 SoftBank in latest_prices: [{'ticker': '9984', 'exchange': 'TSE', 'price': 5751.0, 'prev_price': 5424.0, 'price_date': '2026-07-21', 'change1d': 0.060288, 'updated_at': '2026-07-26T02:46:25.565566+00:00'}]
