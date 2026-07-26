@@ -148,8 +148,10 @@ for ex in distinct_exchanges:
     rg = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
         params={"select": "date", "exchange": "eq." + ex, "order": "date.desc", "limit": "1"})
     row = rg.json()
-    global_last_by_exchange[ex] = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
-    print(f"  Data piu' recente stimata per {ex}: {global_last_by_exchange[ex]}")
+    most_recent = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
+    safety_dt = (datetime.strptime(most_recent, "%Y-%m-%d") - timedelta(days=10)).strftime("%Y-%m-%d")
+    global_last_by_exchange[ex] = safety_dt
+    print(f"  Data piu' recente nel mercato {ex}: {most_recent} — uso {safety_dt} come base (margine di sicurezza)")
 for stock in all_stocks:
     last_dates[(stock["ticker"], stock["exchange"])] = global_last_by_exchange.get(stock["exchange"], "2020-01-01")
 
