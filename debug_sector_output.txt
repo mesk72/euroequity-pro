@@ -1,2 +1,4 @@
-Status: 200, tempo: 0.63s
-Risposta: [{"date":"2026-07-24"}]
+AAPL: [{'date': '2026-07-24'}]
+MSFT: [{'date': '2026-07-24'}]
+NVDA: [{'date': '2026-07-24'}]
+DMLP: [{'date': '2026-07-24'}]
