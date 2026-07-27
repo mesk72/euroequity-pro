@@ -49,6 +49,17 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 
+_log_buffer = []
+def log(msg):
+    print(msg)
+    _log_buffer.append(str(msg))
+    try:
+        requests.post(SUPABASE_URL + "/rest/v1/script_logs", headers=headers_up,
+            json={"script_name": "daily_apac_yahoo", "log_text": "\n".join(_log_buffer)},
+            timeout=10)
+    except Exception:
+        pass
+
 def leeway_ticker(ticker, exchange):
     if exchange == "TSE":
         return ticker + ".TSE"         # es. 7203.TSE
@@ -59,12 +70,12 @@ def leeway_ticker(ticker, exchange):
     return ticker
 
 start_time = time_module.time()
-print("=" * 60)
-print(f"FORWARDALPHA DAILY APAC LOAD — {TODAY}")
-print("=" * 60)
+log("=" * 60)
+log(f"FORWARDALPHA DAILY APAC LOAD — {TODAY}")
+log("=" * 60)
 
 # ── 1. CARICA UNIVERSO APAC ──────────────────────────────────
-print("\n[1/5] Caricamento universo APAC...")
+log("\n[1/5] Caricamento universo APAC...")
 all_stocks = []
 offset = 0
 while True:
@@ -79,14 +90,14 @@ while True:
     all_stocks.extend(data)
     offset += 1000
     if len(data) < 1000: break
-print(f"  Universo APAC: {len(all_stocks)} titoli")
+log(f"  Universo APAC: {len(all_stocks)} titoli")
 
 by_exchange = defaultdict(list)
 for s in all_stocks:
     by_exchange[s["exchange"]].append(s["ticker"])
 
 # ── 2. SCARICA PREZZI EOD DA YAHOO FINANCE ──────────────────
-print("\n[2/5] Download prezzi EOD da Yahoo Finance...")
+log("\n[2/5] Download prezzi EOD da Yahoo Finance...")
 
 YAHOO_SUFFIX = {
     "TSE":  "",    # Yahoo: 7203.T, 9984.T
@@ -129,7 +140,7 @@ for ex in distinct_exchanges:
     most_recent = row[0]["date"] if isinstance(row, list) and row else "2020-01-01"
     safety_dt = (datetime.strptime(most_recent, "%Y-%m-%d") - timedelta(days=10)).strftime("%Y-%m-%d")
     global_last_by_exchange[ex] = safety_dt
-    print(f"  Data piu' recente nel mercato {ex}: {most_recent} — uso {safety_dt} come base (margine di sicurezza)")
+    log(f"  Data piu' recente nel mercato {ex}: {most_recent} — uso {safety_dt} come base (margine di sicurezza)")
 for stock in all_stocks:
     last_dates[(stock["ticker"], stock["exchange"])] = global_last_by_exchange.get(stock["exchange"], "2020-01-01")
 
@@ -172,7 +183,7 @@ for exchange, tickers in by_exchange.items():
                     price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
                 ok_yf += 1
         except Exception as e:
-            print(f"  Errore chunk {exchange} {i}: {e}")
+            log(f"  Errore chunk {exchange} {i}: {e}")
             fail_yf += len(ytickers)
 
         if len(price_buf) >= 500:
@@ -182,11 +193,11 @@ for exchange, tickers in by_exchange.items():
 
 if price_buf:
     requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
-print("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
+log("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
 ok_prices = ok_yf; fail_prices = fail_yf
 
 # ── 3. LEGGI PREZZI DA prices_eod ────────────────────────────
-print("\n[3/5] Lettura prezzi da prices_eod...")
+log("\n[3/5] Lettura prezzi da prices_eod...")
 CHUNK = 20
 all_ph = defaultdict(list)
 for exchange, tickers in by_exchange.items():
@@ -212,10 +223,10 @@ for exchange, tickers in by_exchange.items():
             offset_p += 1000
             if len(batch) < 1000: break
         time.sleep(0.02)
-print(f"  Prezzi caricati: {len(all_ph)} titoli")
+log(f"  Prezzi caricati: {len(all_ph)} titoli")
 
 # ── 4. MOMENTUM ──────────────────────────────────────────────
-print("\n[4/5] Calcolo momentum...")
+log("\n[4/5] Calcolo momentum...")
 ok = fail = 0
 mom_updates = []
 for stock in all_stocks:
@@ -253,7 +264,7 @@ for stock in all_stocks:
 for i in range(0, len(mom_updates), 100):
     clean_batch = [{k: v for k, v in m.items() if k != "_last_date"} for m in mom_updates[i:i+100]]
     requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=clean_batch)
-print(f"  Momentum ok={ok} fail={fail}")
+log(f"  Momentum ok={ok} fail={fail}")
 ok_momentum = ok
 
 latest_price_updates = []
@@ -268,10 +279,10 @@ for m in mom_updates:
     })
 for i in range(0, len(latest_price_updates), 500):
     requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange", headers=headers_up, json=latest_price_updates[i:i+500])
-print(f"  latest_prices aggiornata: {len(latest_price_updates)} titoli")
+log(f"  latest_prices aggiornata: {len(latest_price_updates)} titoli")
 
 # ── 5. RANK APAC ─────────────────────────────────────────────
-print("\n[5/5] Ricalcolo rank APAC...")
+log("\n[5/5] Ricalcolo rank APAC...")
 all_data = []
 offset = 0
 universe_keys = {(s['ticker'], s['exchange']) for s in all_stocks}
@@ -284,7 +295,7 @@ while True:
     if not isinstance(data, list) or not data: break
     all_data.extend([d for d in data if (d["ticker"], d["exchange"]) in universe_keys]); offset += 1000
     if len(data) < 1000: break
-print(f"  Fundamentals: {len(all_data)}")
+log(f"  Fundamentals: {len(all_data)}")
 
 # Mom maps da mom_updates (prezzi appena scaricati) NON dal DB vecchio
 mom1w_map  = {(d["ticker"], d["exchange"]): d.get("mom1w")  for d in mom_updates}
@@ -351,13 +362,13 @@ for country, exchanges in RANK_GROUPS.items():
     if group:
         res = calc_ranks(group)
         rank_updates.extend(res)
-        print(f"  {country}: {len(res)} rankati")
+        log(f"  {country}: {len(res)} rankati")
 
 ok = 0
 for i in range(0, len(rank_updates), 100):
     r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=rank_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(rank_updates[i:i+100])
-print(f"  Rank APAC: {ok}/{len(rank_updates)}")
+log(f"  Rank APAC: {ok}/{len(rank_updates)}")
 
 # Combined rank AP = TSE+SEHK+ASX
 all_scores = [d for d in rank_updates if d.get("value_score") is not None and d.get("growth_score") is not None]
@@ -369,11 +380,11 @@ ok = 0
 for i in range(0, len(combined_updates), 100):
     r = requests.post(SUPABASE_URL + "/rest/v1/fundamentals?on_conflict=ticker,exchange", headers=headers_up, json=combined_updates[i:i+100])
     if r.status_code in (200, 201, 204): ok += len(combined_updates[i:i+100])
-print(f"  Combined rank AP: {ok}/{len(combined_updates)}")
+log(f"  Combined rank AP: {ok}/{len(combined_updates)}")
 ok_rank = ok
 
 # ── INDICI APAC ───────────────────────────────────────────────
-print("\n  Aggiornamento indici APAC...")
+log("\n  Aggiornamento indici APAC...")
 APAC_INDICES = [
     ("N225.INDX",  "TSE",  "N225",  "Nikkei 225"),
     ("HSI.INDX",   "SEHK", "HSI",   "Hang Seng"),
@@ -385,13 +396,13 @@ for db_ticker, exchange, lt, name in APAC_INDICES:
     url = LEEWAY_BASE + "/historicalquotes/" + lt + "?apitoken=" + LEEWAY_KEY + "&from=" + FROM_12M + "&to=" + TODAY
     try:
         r = requests.get(url, timeout=15)
-        if r.status_code != 200: print(f"  ERR {name}: HTTP {r.status_code}"); continue
+        if r.status_code != 200: log(f"  ERR {name}: HTTP {r.status_code}"); continue
         data_raw = r.json()
         if not isinstance(data_raw, list) or not data_raw:
-            print(f"  ERR {name}: no data"); continue
+            log(f"  ERR {name}: no data"); continue
         data_sorted = sorted(data_raw, key=lambda x: x["date"])
         valid = [d for d in data_sorted if d.get("close") is not None and float(d["close"]) > 0]
-        if not valid: print(f"  ERR {name}: nessun close valido"); continue
+        if not valid: log(f"  ERR {name}: nessun close valido"); continue
         rows = [{"ticker": db_ticker, "exchange": exchange, "date": d["date"],
                  "close": float(d["close"])} for d in valid]
         if rows:
@@ -402,11 +413,11 @@ for db_ticker, exchange, lt, name in APAC_INDICES:
         requests.patch(SUPABASE_URL + "/rest/v1/indices", headers=headers_up,
             params={"ticker": "eq." + db_ticker},
             json={"price": last, "change1d": change1d, "date": valid[-1]["date"]})
-        print(f"  {name}: {last:,.2f} ({change1d:+.2f}%)")
+        log(f"  {name}: {last:,.2f} ({change1d:+.2f}%)")
         ok_idx += 1
-    except Exception as e: print(f"  ERR {name}: {e}")
+    except Exception as e: log(f"  ERR {name}: {e}")
     time.sleep(0.2)
-print(f"  Indici APAC: {ok_idx}/{len(APAC_INDICES)}")
+log(f"  Indici APAC: {ok_idx}/{len(APAC_INDICES)}")
 
 end_time = time_module.time()
 log_entry = {"run_date": TODAY, "market": "APAC", "prices_updated": ok_prices,
@@ -414,7 +425,7 @@ log_entry = {"run_date": TODAY, "market": "APAC", "prices_updated": ok_prices,
              "momentum_updated": ok_momentum, "rank_updated": ok_rank,
              "duration_seconds": int(end_time - start_time)}
 requests.post(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_up, json=[log_entry])
-print(f"\nLog: leeway={ok_prices} fail={fail_prices} momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
-print("\n" + "=" * 60)
-print("DAILY APAC LOAD COMPLETATO")
-print("=" * 60)
+log(f"\nLog: leeway={ok_prices} fail={fail_prices} momentum={ok_momentum} rank={ok_rank} durata={int(end_time-start_time)}s")
+log("\n" + "=" * 60)
+log("DAILY APAC LOAD COMPLETATO")
+log("=" * 60)
