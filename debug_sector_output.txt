@@ -1,4 +1,6 @@
-7203.TSE: [{'date': '2026-07-21'}]
-9984.TSE: [{'date': '2026-07-21'}]
-0700.SEHK: []
-BHP.ASX: [{'date': '2026-07-21'}]
+Ultime 5 righe TSE (qualsiasi ticker):
+  {'ticker': '4578', 'date': '2026-07-27', 'adj_close': 11325.0}
+  {'ticker': '4587', 'date': '2026-07-27', 'adj_close': 955.8}
+  {'ticker': '4613', 'date': '2026-07-27', 'adj_close': 2739.0}
+  {'ticker': '4680', 'date': '2026-07-27', 'adj_close': 1234.0}
+  {'ticker': '4686', 'date': '2026-07-27', 'adj_close': 3960.0}
