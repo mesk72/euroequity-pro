@@ -1,2 +1,4 @@
-7203 TSE: [{'ticker': '7203', 'exchange': 'TSE', 'yahoo_ticker': '7203.T'}]
-9984 TSE: [{'ticker': '9984', 'exchange': 'TSE', 'yahoo_ticker': '9984.T'}]
+7203.TSE: [{'date': '2026-07-21'}]
+9984.TSE: [{'date': '2026-07-21'}]
+0700.SEHK: []
+BHP.ASX: [{'date': '2026-07-21'}]
