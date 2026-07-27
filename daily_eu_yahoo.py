@@ -225,14 +225,26 @@ for exchange, tickers in by_exchange.items():
             fail_yf += len(ytickers)
 
         if len(price_buf) >= 500:
-            requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+            dedup = {}
+            for row in price_buf:
+                dedup[(row["ticker"], row["exchange"], row["date"])] = row
+            price_buf_clean = list(dedup.values())
+            rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf_clean)
+            if rw.status_code not in (200, 201, 204):
+                print(f"  ERRORE SCRITTURA prezzi: HTTP {rw.status_code} - {rw.text[:300]}")
             price_buf = []
 
         # Pausa random tra chunk
         time.sleep(random.uniform(3.0, 7.0))
 
 if price_buf:
-    requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+    dedup = {}
+    for row in price_buf:
+        dedup[(row["ticker"], row["exchange"], row["date"])] = row
+    price_buf_clean = list(dedup.values())
+    rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf_clean)
+    if rw.status_code not in (200, 201, 204):
+        print(f"  ERRORE SCRITTURA prezzi (finale): HTTP {rw.status_code} - {rw.text[:300]}")
 print("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
 ok_prices = ok_yf; fail_prices = fail_yf
 
