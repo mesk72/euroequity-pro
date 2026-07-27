@@ -1,2 +1,2 @@
-Status: 500, tempo: 8.51s
-Risposta: {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+Status: 200, tempo: 0.63s
+Risposta: [{"date":"2026-07-24"}]
