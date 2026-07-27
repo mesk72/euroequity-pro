@@ -1,4 +1,42 @@
-7203.TSE: [{'date': '2026-07-21'}]
-9984.TSE: [{'date': '2026-07-21'}]
-0700.SEHK: []
-BHP.ASX: [{'date': '2026-07-21'}]
+2026-07-27T12:57:53.767505+00:00
+============================================================
+FORWARDALPHA DAILY APAC LOAD — 2026-07-27
+============================================================
+
+[1/5] Caricamento universo APAC...
+  Universo APAC: 1850 titoli
+
+[2/5] Download prezzi EOD da Yahoo Finance...
+  Data piu' recente nel mercato ASX: 2026-07-21 — uso 2026-07-11 come base (margine di sicurezza)
+  Data piu' recente nel mercato SEHK: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
+  Data piu' recente nel mercato TSE: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"21000","details":null,"hint":"Ensure that no rows proposed for insertion within the same command have duplicate constrained values.","message":"ON CONFLICT DO UPDATE command cannot affect row a second time"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"21000","details":null,"hint":"Ensure that no rows proposed for insertion within the same command have duplicate constrained values.","message":"ON CONFLICT DO UPDATE command cannot affect row a second time"}
+  Prezzi Yahoo: ok=1850 fail=0
+
+[3/5] Lettura prezzi da prices_eod...
+  Prezzi caricati: 1337 titoli
+
+[4/5] Calcolo momentum...
+  Momentum ok=1847 fail=3
+  latest_prices aggiornata: 1847 titoli
+
+[5/5] Ricalcolo rank APAC...
+  Fundamentals: 1339
+  JPN: 712 rankati
+  HKG: 486 rankati
+  AUS: 141 rankati
+  Rank APAC: 1339/1339
+  Combined rank AP: 1151/1151
+
+  Aggiornamento indici APAC...
+  ERR Nikkei 225: HTTP 401
+  ERR Hang Seng: HTTP 401
+  ERR ASX 200: HTTP 401
+  Indici APAC: 0/3
+
+Log: leeway=1850 fail=0 momentum=1847 rank=1151 durata=248s
+
+============================================================
+DAILY APAC LOAD COMPLETATO
+============================================================
