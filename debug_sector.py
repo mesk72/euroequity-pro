@@ -1,11 +1,11 @@
-import os, requests
+import os, requests, time
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-r = requests.get(f"{SUPABASE_URL}/rest/v1/script_logs", headers=headers_r,
-    params={"select":"log_text,created_at","script_name":"eq.daily_us_yahoo","order":"created_at.desc","limit":"1"})
-data = r.json()
-if data:
-    print(data[0]["log_text"])
-else:
-    print("Nessun log trovato ancora")
+
+t0 = time.time()
+r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+    params={"select": "date", "exchange": "eq.US", "order": "date.desc", "limit": "1"}, timeout=30)
+elapsed = time.time() - t0
+print(f"Status: {r.status_code}, tempo: {elapsed:.2f}s")
+print("Risposta:", r.text[:300])
