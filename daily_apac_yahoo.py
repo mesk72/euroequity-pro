@@ -223,14 +223,27 @@ for exchange, tickers in by_exchange.items():
                     fail_yf += 1
 
         if len(price_buf) >= 500:
-            rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf)
+            # Dedup PRIMA di scrivere - se lo stesso (ticker,exchange,date)
+            # appare due volte nello stesso blocco, l'upsert fallisce con
+            # "ON CONFLICT DO UPDATE command cannot affect row a second
+            # time" e l'INTERO blocco va perso (26/7/2026, causa reale di
+            # APAC ancora fermo nonostante gli altri fix).
+            dedup = {}
+            for row in price_buf:
+                dedup[(row["ticker"], row["exchange"], row["date"])] = row
+            price_buf_clean = list(dedup.values())
+            rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf_clean)
             if rw.status_code not in (200, 201, 204):
                 log(f"  ERRORE SCRITTURA prezzi: HTTP {rw.status_code} - {rw.text[:300]}")
             price_buf = []
         time.sleep(random.uniform(3.0, 7.0))
 
 if price_buf:
-    rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf)
+    dedup = {}
+    for row in price_buf:
+        dedup[(row["ticker"], row["exchange"], row["date"])] = row
+    price_buf_clean = list(dedup.values())
+    rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf_clean)
     if rw.status_code not in (200, 201, 204):
         log(f"  ERRORE SCRITTURA prezzi (finale): HTTP {rw.status_code} - {rw.text[:300]}")
 log("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
