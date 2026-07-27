@@ -1,4 +1,11 @@
-import yfinance as yf
-data = yf.download(tickers="AAPL MSFT NVDA", start="2026-07-20", end="2026-07-27", interval="1d", auto_adjust=True, progress=False, threads=True)
-print(data)
-print("\nColonne:", data.columns.tolist() if hasattr(data.columns, 'tolist') else data.columns)
+import os, requests
+SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
+SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
+r = requests.get(f"{SUPABASE_URL}/rest/v1/script_logs", headers=headers_r,
+    params={"select":"log_text,created_at","script_name":"eq.daily_us_yahoo","order":"created_at.desc","limit":"1"})
+data = r.json()
+if data:
+    print(data[0]["log_text"])
+else:
+    print("Nessun log trovato ancora")
