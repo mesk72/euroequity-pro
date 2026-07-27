@@ -2,11 +2,7 @@ import os, requests
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-r = requests.get(f"{SUPABASE_URL}/rest/v1/script_logs", headers=headers_r,
-    params={"select":"log_text,created_at","script_name":"eq.daily_apac_yahoo","order":"created_at.desc","limit":"1"})
-data = r.json()
-if data:
-    print(data[0]["created_at"])
-    print(data[0]["log_text"])
-else:
-    print("Nessun log APAC trovato")
+for tk, ex in [("7203","TSE"), ("9984","TSE"), ("0700","SEHK"), ("BHP","ASX")]:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"date","ticker":f"eq.{tk}","exchange":f"eq.{ex}","order":"date.desc","limit":"1"})
+    print(f"{tk}.{ex}:", r.json())
