@@ -1,4 +1,74 @@
-AAPL: [{'date': '2026-07-22'}]
-MSFT: [{'date': '2026-07-22'}]
-NVDA: [{'date': '2026-07-21'}]
-DMLP: [{'date': '2026-07-22'}]
+============================================================
+FORWARDALPHA DAILY US+CA LOAD — 2026-07-27
+============================================================
+
+[1/5] Caricamento universo US+CA...
+  Universo US+CA: 3402 titoli
+    US: 3002
+    TSX: 400
+
+[2/5] Download prezzi EOD da Yahoo Finance...
+  Data piu' recente nel mercato TSX: 2026-07-21 — uso 2026-07-11 come base (margine di sicurezza)
+  Data piu' recente nel mercato US: 2020-01-01 — uso 2019-12-22 come base (margine di sicurezza)
+  ERRORE SCRITTURA prezzi: HTTP 520 - <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!
+  ERRORE SCRITTURA prezzi: HTTP 520 - <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 520 - <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!
+  ERRORE SCRITTURA prezzi: HTTP 502 - "gateway error: Error: Network connection lost."
+  ERRORE SCRITTURA prezzi: HTTP 502 - "gateway error: Error: Network connection lost."
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  ERRORE SCRITTURA prezzi: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement timeout"}
+  Prezzi Yahoo: ok=3402 fail=0
+
+[3/5] Lettura prezzi da prices_eod...
+  Prezzi caricati: 3374 titoli
+
+[4/5] Calcolo momentum...
+  Momentum ok=3372 fail=30
+  latest_prices aggiornata: 3372 titoli
+
+[5/5] Ricalcolo rank US+CA...
+  Fundamentals: 3402
+  USA: 3002 rankati
+  CAN: 400 rankati
+  Rank US+CA: 3402/3402
+  DEBUG: rank_updates totali=3402, all_scores (con entrambi i punteggi)=3046
+  DEBUG: esempio combined_updates[0] = {'ticker': 'ACHV', 'exchange': 'US', 'combined_rank': 6}
+  Combined rank NA (US+TSX): 3046/3046
+
+  Aggiornamento indici Nord America...
+  ERR S&P 500: HTTP 401
+  ERR Nasdaq: HTTP 401
+  ERR Dow Jones: HTTP 401
+  ERR TSX: HTTP 401
+  Indici NA: 0/4
+
+Log: leeway=3402 fail=0 momentum=3372 rank=3046 durata=1727s
+
+============================================================
+DAILY US+CA LOAD COMPLETATO
+============================================================
