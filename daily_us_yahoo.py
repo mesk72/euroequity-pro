@@ -11,6 +11,7 @@
 
 import os, math, time, time as time_module, requests
 import pandas as pd
+import yfinance as yf
 try:
     from dateutil.relativedelta import relativedelta
 except ImportError:
