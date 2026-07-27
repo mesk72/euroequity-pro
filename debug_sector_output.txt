@@ -1,6 +1,39 @@
-2026-07-27T09:08:51.243588+00:00 - ============================================================
-FORWARDALPHA DAILY US+CA LOAD — 2026-07
-2026-07-27T09:08:51.081525+00:00 - ============================================================
-FORWARDALPHA DAILY US+CA LOAD — 2026-07
-2026-07-27T09:08:50.893316+00:00 - ============================================================
-FORWARDALPHA DAILY US+CA LOAD — 2026-07
+============================================================
+FORWARDALPHA DAILY APAC LOAD — 2026-07-27
+============================================================
+
+[1/5] Caricamento universo APAC...
+  Universo APAC: 1850 titoli
+
+[2/5] Download prezzi EOD da Yahoo Finance...
+  Data piu' recente nel mercato ASX: 2026-07-21 — uso 2026-07-11 come base (margine di sicurezza)
+  Data piu' recente nel mercato SEHK: 2026-07-21 — uso 2026-07-11 come base (margine di sicurezza)
+  Data piu' recente nel mercato TSE: 2026-07-21 — uso 2026-07-11 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=1850 fail=0
+
+[3/5] Lettura prezzi da prices_eod...
+  Prezzi caricati: 1336 titoli
+
+[4/5] Calcolo momentum...
+  Momentum ok=1845 fail=5
+  latest_prices aggiornata: 1845 titoli
+
+[5/5] Ricalcolo rank APAC...
+  Fundamentals: 1339
+  JPN: 712 rankati
+  HKG: 486 rankati
+  AUS: 141 rankati
+  Rank APAC: 1339/1339
+  Combined rank AP: 1151/1151
+
+  Aggiornamento indici APAC...
+  ERR Nikkei 225: HTTP 401
+  ERR Hang Seng: HTTP 401
+  ERR ASX 200: HTTP 401
+  Indici APAC: 0/3
+
+Log: leeway=1850 fail=0 momentum=1845 rank=1151 durata=371s
+
+============================================================
+DAILY APAC LOAD COMPLETATO
+============================================================
