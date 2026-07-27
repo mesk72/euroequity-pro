@@ -5,6 +5,7 @@
 # ============================================================
 
 import os, math, time, time as time_module, requests
+import pandas as pd
 import yfinance as yf
 try:
     from dateutil.relativedelta import relativedelta
@@ -172,7 +173,27 @@ for exchange, tickers in by_exchange.items():
                 interval="1d", auto_adjust=True, progress=False, threads=True,
             )
             if data_yf.empty: fail_yf += len(ytickers); continue
-            closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]}) if len(ytickers)==1 else data_yf["Close"]
+
+            # Stesso fix robusto applicato a US (26/7/2026) — un solo
+            # ticker con formato dati anomalo poteva far perdere l'intero
+            # gruppo di 150 titoli senza nessun errore visibile.
+            if len(ytickers) == 1:
+                closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]})
+            elif isinstance(data_yf.columns, pd.MultiIndex):
+                if "Close" in data_yf.columns.get_level_values(0):
+                    closes = data_yf["Close"]
+                elif "Close" in data_yf.columns.get_level_values(1):
+                    closes = data_yf.xs("Close", axis=1, level=1)
+                else:
+                    closes = None
+            elif "Close" in data_yf.columns:
+                closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]})
+            else:
+                closes = None
+
+            if closes is None or not hasattr(closes, "columns"):
+                raise ValueError("formato dati Yahoo non riconosciuto per questo chunk")
+
             for yt in ytickers:
                 if yt not in closes.columns: fail_yf += 1; continue
                 tk, ex = ticker_map[yt]
@@ -183,16 +204,35 @@ for exchange, tickers in by_exchange.items():
                     price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
                 ok_yf += 1
         except Exception as e:
-            log(f"  Errore chunk {exchange} {i}: {e}")
-            fail_yf += len(ytickers)
+            log(f"  Chunk {exchange} {i} fallito ({e}), riprovo singolarmente...")
+            for yt in ytickers:
+                try:
+                    single = yf.download(yt, start=start_dt, end=END_FOR_DOWNLOAD,
+                        interval="1d", auto_adjust=True, progress=False)
+                    if single.empty or "Close" not in single.columns:
+                        fail_yf += 1; continue
+                    tk, ex = ticker_map[yt]
+                    last = last_dates.get((tk, ex), "2020-01-01")
+                    for date_idx, price in single["Close"].dropna().items():
+                        date_str = date_idx.strftime("%Y-%m-%d")
+                        if date_str <= last: continue
+                        price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
+                    ok_yf += 1
+                except Exception as e2:
+                    log(f"    Fallito anche singolarmente: {yt} ({e2})")
+                    fail_yf += 1
 
         if len(price_buf) >= 500:
-            requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+            rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf)
+            if rw.status_code not in (200, 201, 204):
+                log(f"  ERRORE SCRITTURA prezzi: HTTP {rw.status_code} - {rw.text[:300]}")
             price_buf = []
         time.sleep(random.uniform(3.0, 7.0))
 
 if price_buf:
-    requests.post(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_up, json=price_buf)
+    rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date", headers=headers_up, json=price_buf)
+    if rw.status_code not in (200, 201, 204):
+        log(f"  ERRORE SCRITTURA prezzi (finale): HTTP {rw.status_code} - {rw.text[:300]}")
 log("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
 ok_prices = ok_yf; fail_prices = fail_yf
 
