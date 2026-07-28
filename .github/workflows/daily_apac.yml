@@ -1,8 +1,10 @@
 name: Daily APAC Update
 
 on:
-  schedule:
-    - cron: '0 16 * * 1-5'
+  # DISABILITATO 28/7/2026 — basato su Leeway, dismesso mesi fa. Falliva
+  # silenziosamente ogni giorno (run sempre "cancelled"), lasciando KRX/SGX
+  # senza aggiornamenti senza che nessun errore fosse visibile. Questi due
+  # mercati sono ora inclusi in daily_apac_yahoo.py/.yml.
   workflow_dispatch:
 
 concurrency:
