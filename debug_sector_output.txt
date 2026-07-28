@@ -1,9 +1,5 @@
-=== US ===
-AAPL: [{'date': '2026-07-27'}]
-MSFT: [{'date': '2026-07-27'}]
-NVDA: [{'date': '2026-07-27'}]
-
-=== EU ===
-SAP: [{'date': '2026-07-24'}]
-MC: [{'date': '2026-07-24'}]
-ASML: [{'date': '2026-07-24'}]
+Price            Close        High         Low        Open   Volume
+Ticker          SAP.DE      SAP.DE      SAP.DE      SAP.DE   SAP.DE
+Date                                                               
+2026-07-24  140.199997  141.320007  130.860001  130.880005  4092805
+2026-07-27         NaN         NaN         NaN         NaN  4516755
