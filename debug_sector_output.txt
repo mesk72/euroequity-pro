@@ -1,67 +1,7 @@
-=== LOG COMPLETO ===
-============================================================
-FORWARDALPHA DAILY APAC LOAD — 2026-07-28
-============================================================
-
-[1/5] Caricamento universo APAC...
-  Universo APAC: 1850 titoli
-
-[2/5] Download prezzi EOD da Yahoo Finance...
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Data piu' recente nel mercato SEHK: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Data piu' recente nel mercato TSE: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=1850 fail=0
-
-[3/5] Lettura prezzi da prices_eod...
-  Prezzi caricati: 1337 titoli
-
-[4/5] Calcolo momentum...
-  Momentum ok=1847 fail=3
-  latest_prices aggiornata: 1847 titoli
-
-[5/5] Ricalcolo rank APAC...
-  Fundamentals: 1339
-  JPN: 712 rankati
-  HKG: 486 rankati
-  AUS: 141 rankati
-  Rank APAC: 1339/1339
-  Combined rank AP: 1151/1151
-
-  Aggiornamento indici APAC...
-  ERR Nikkei 225: HTTP 401
-  ERR Hang Seng: HTTP 401
-  ERR ASX 200: HTTP 401
-  Indici APAC: 0/3
-
-Log: leeway=1850 fail=0 momentum=1847 rank=1151 durata=313s
-
-============================================================
-DAILY APAC LOAD COMPLETATO
-============================================================
-
-=== CAMPIONE PREZZI (20 titoli casuali + i 3 storicamente problematici) ===
-  1.SEHK: 2026-07-28
-  10.SEHK: 2026-07-28
-  100.SEHK: 2026-07-28
-  101.SEHK: 2026-07-28
-  1021.SEHK: 2026-07-28
-  1024.SEHK: 2026-07-28
-  1030.SEHK: 2026-07-28
-  1033.SEHK: 2026-07-28
-  1038.SEHK: 2026-07-28
-  1044.SEHK: 2026-07-28
-  1053.SEHK: 2026-07-28
-  1057.SEHK: 2026-07-28
-  1060.SEHK: 2026-07-28
-  1066.SEHK: 2026-07-28
-  107.SEHK: 2026-07-28
-  1070.SEHK: 2026-07-28
-  1072.SEHK: 2026-07-28
-  108.SEHK: 2026-07-28
-  1088.SEHK: 2026-07-28
-  1093.SEHK: 2026-07-28
-  7203.TSE: 2026-07-21 <-- storicamente problematico
-  9984.TSE: 2026-07-21 <-- storicamente problematico
-  BHP.ASX: 2026-07-21 <-- storicamente problematico
-
-Riepilogo date: {'2026-07-28': 20, '2026-07-21': 3}
+['TSE']: 0-0/1000
+['SEHK']: 0-0/500
+['ASX']: 0-0/350
+['KRX']: 0-0/400
+['SGX']: 0-0/100
+['TSE', 'SEHK', 'ASX']: 0-0/1850
+['TSE', 'SEHK', 'ASX', 'KRX', 'SGX']: 0-0/2350
