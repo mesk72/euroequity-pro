@@ -1,102 +1,17 @@
-=== daily_eu_yahoo ===
-recente nel mercato MC: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Data piu' recente nel mercato MIL: 2026-07-24 — uso 2026-07-14 come base (margine di sicurezza)
-  Data piu' recente nel mercato OB: 2026-07-24 — uso 2026-07-14 come base (margine di sicurezza)
-  Data piu' recente nel mercato OM: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Data piu' recente nel mercato PA: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Data piu' recente nel mercato SGX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Data piu' recente nel mercato SWX: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Data piu' recente nel mercato VI: 2026-07-24 — uso 2026-07-14 come base (margine di sicurezza)
-  Data piu' recente nel mercato XETRA: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2635 fail=2
+Totale TSE: 1000
+7203 e' all'indice 615 (chunk 4)
+9984 e' all'indice 996 (chunk 6)
 
-[3/5] Lettura prezzi da prices_eod...
-  Prezzi caricati: 2577 titoli
+Chunk contiene 7203? True
+Dimensione chunk: 150
 
-[4/5] Calcolo momentum...
-  Momentum ok=2574 fail=63
-  latest_prices aggiornata: 2574 titoli
-
-  Aggiornamento FX...
-  FX salvati
-
-[5/5] Ricalcolo rank EU...
-  Fundamentals: 2637
-  ITA: 117 rankati
-  DEU: 211 rankati
-  FRA: 217 rankati
-  GBR: 423 rankati
-  SWE: 206 rankati
-  NOR: 100 rankati
-  CHE: 161 rankati
-  NLD: 98 rankati
-  BEL: 100 rankati
-  FIN: 100 rankati
-  ESP: 100 rankati
-  DNK: 101 rankati
-  Rank EU: 2534/2534
-  Combined rank EU: 1983/1983
-
-  Aggiornamento indici EU...
-  ERR DAX: HTTP 401
-  ERR CAC 40: HTTP 401
-  ERR AEX: HTTP 401
-  ERR IBEX 35: HTTP 401
-  ERR BEL 20: HTTP 401
-  ERR SMI: HTTP 401
-  ERR OMX Stockholm: HTTP 401
-  ERR OMX Copenhagen: HTTP 401
-  ERR ATX: HTTP 401
-  ERR Euro Stoxx 50: HTTP 401
-  ERR STOXX 600: HTTP 401
-  ERR OMX Helsinki: HTTP 401
-  ERR PSI 20: HTTP 401
-  Indici EU: 0/13
-
-Log: leeway=2635 fail=2 momentum=2574 rank=1983 durata=534s
-
-============================================================
-DAILY EU LOAD COMPLETATO
-============================================================
-
-=== daily_apac_yahoo ===
-============================================================
-FORWARDALPHA DAILY APAC LOAD — 2026-07-28
-============================================================
-
-[1/5] Caricamento universo APAC...
-  Universo APAC: 1850 titoli
-
-[2/5] Download prezzi EOD da Yahoo Finance...
-  Data piu' recente nel mercato ASX: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Data piu' recente nel mercato SEHK: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Data piu' recente nel mercato TSE: 2026-07-27 — uso 2026-07-17 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=1850 fail=0
-
-[3/5] Lettura prezzi da prices_eod...
-  Prezzi caricati: 1337 titoli
-
-[4/5] Calcolo momentum...
-  Momentum ok=1847 fail=3
-  latest_prices aggiornata: 1847 titoli
-
-[5/5] Ricalcolo rank APAC...
-  Fundamentals: 1339
-  JPN: 712 rankati
-  HKG: 486 rankati
-  AUS: 141 rankati
-  Rank APAC: 1339/1339
-  Combined rank AP: 1151/1151
-
-  Aggiornamento indici APAC...
-  ERR Nikkei 225: HTTP 401
-  ERR Hang Seng: HTTP 401
-  ERR ASX 200: HTTP 401
-  Indici APAC: 0/3
-
-Log: leeway=1850 fail=0 momentum=1847 rank=1151 durata=277s
-
-============================================================
-DAILY APAC LOAD COMPLETATO
-============================================================
-
+Scaricato: empty=False, shape=(5, 750)
+Tipo colonne: <class 'pandas.MultiIndex'>
+'7203.T' in closes.columns? True
+Date
+2026-07-22    2939.0
+2026-07-23    2950.0
+2026-07-24    2897.0
+2026-07-27    2965.5
+2026-07-28    2998.0
+Name: 7203.T, dtype: float64
