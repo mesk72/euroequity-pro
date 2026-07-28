@@ -3,7 +3,7 @@ SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-for tk in ["7203", "9984"]:
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
-        params={"select":"*","ticker":f"eq.{tk}","exchange":"eq.TSE"})
-    print(f"{tk}:", r.json())
+for ex in ["US", "MIL", "XETRA", "PA"]:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
+        params={"select":"date","exchange":f"eq.{ex}","order":"date.desc","limit":"1"})
+    print(f"{ex}:", r.json())
