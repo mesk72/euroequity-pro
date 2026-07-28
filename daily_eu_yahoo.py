@@ -211,11 +211,24 @@ for exchange, tickers in by_exchange.items():
                 fail_yf += len(ytickers)
                 continue
 
-            # Estrai Adj Close (con auto_adjust=True si chiama Close)
+            # Estrazione robusta (fix Kimi, gia' applicato a US) — un solo
+            # ticker con formato anomalo poteva far perdere l'intero chunk.
             if len(ytickers) == 1:
                 closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]})
+            elif isinstance(data_yf.columns, pd.MultiIndex):
+                if "Close" in data_yf.columns.get_level_values(0):
+                    closes = data_yf["Close"]
+                elif "Close" in data_yf.columns.get_level_values(1):
+                    closes = data_yf.xs("Close", axis=1, level=1)
+                else:
+                    closes = None
+            elif "Close" in data_yf.columns:
+                closes = data_yf[["Close"]].rename(columns={"Close": ytickers[0]})
             else:
-                closes = data_yf["Close"] if "Close" in data_yf.columns else data_yf
+                closes = None
+
+            if closes is None or not hasattr(closes, "columns"):
+                raise ValueError("formato dati Yahoo non riconosciuto per questo chunk")
 
             for yt in ytickers:
                 if yt not in closes.columns:
@@ -232,8 +245,24 @@ for exchange, tickers in by_exchange.items():
                 ok_yf += 1
 
         except Exception as e:
-            log(f"  Errore chunk {exchange} {i}: {e}")
-            fail_yf += len(ytickers)
+            log(f"  Chunk {exchange} {i} fallito ({e}), riprovo singolarmente...")
+            for yt in ytickers:
+                try:
+                    single = yf.download(yt, start=start_dt, end=END_FOR_DOWNLOAD,
+                        interval="1d", auto_adjust=True, progress=False)
+                    if single.empty or "Close" not in single.columns:
+                        fail_yf += 1; continue
+                    tk, ex = ticker_map[yt]
+                    last = last_dates.get((tk, ex), "2020-01-01")
+                    for date_idx, price in single["Close"].dropna().items():
+                        date_str = date_idx.strftime("%Y-%m-%d")
+                        if date_str <= last: continue
+                        price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
+                    ok_yf += 1
+                except Exception as e2:
+                    log(f"    Fallito anche singolarmente: {yt} ({e2})")
+                    fail_yf += 1
+
 
         if len(price_buf) >= 500:
             dedup = {}
