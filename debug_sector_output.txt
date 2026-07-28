@@ -1,7 +1,54 @@
-['TSE']: 0-0/1000
-['SEHK']: 0-0/500
-['ASX']: 0-0/350
-['KRX']: 0-0/400
-['SGX']: 0-0/100
-['TSE', 'SEHK', 'ASX']: 0-0/1850
-['TSE', 'SEHK', 'ASX', 'KRX', 'SGX']: 0-0/2350
+=== LOG ===
+============================================================
+FORWARDALPHA DAILY APAC LOAD — 2026-07-28
+============================================================
+
+[1/5] Caricamento universo APAC...
+  Universo APAC: 2350 titoli
+
+[2/5] Download prezzi EOD da Yahoo Finance...
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Data piu' recente nel mercato KRX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Data piu' recente nel mercato SEHK: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Data piu' recente nel mercato SGX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Data piu' recente nel mercato TSE: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+
+[3/5] Lettura prezzi da prices_eod...
+  Prezzi caricati: 1623 titoli
+
+[4/5] Calcolo momentum...
+  Momentum ok=2348 fail=2
+  latest_prices aggiornata: 2348 titoli
+
+[5/5] Ricalcolo rank APAC...
+  Fundamentals: 1542
+  JPN: 883 rankati
+  HKG: 487 rankati
+  AUS: 172 rankati
+  Rank APAC: 1542/1542
+  Combined rank AP: 1320/1320
+
+  Aggiornamento indici APAC...
+  ERR Nikkei 225: HTTP 401
+  ERR Hang Seng: HTTP 401
+  ERR ASX 200: HTTP 401
+  Indici APAC: 0/3
+
+Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=545s
+
+============================================================
+DAILY APAC LOAD COMPLETATO
+============================================================
+
+=== Campione KRX/SGX ===
+  544.SGX: [{'date': '2026-07-28'}]
+  558.SGX: [{'date': '2026-07-28'}]
+  5E2.SGX: [{'date': '2026-07-28'}]
+  8C8U.SGX: [{'date': '2026-07-28'}]
+  8YZ.SGX: [{'date': '2026-07-28'}]
+  9A4U.SGX: [{'date': '2026-07-28'}]
+  9CI.SGX: [{'date': '2026-07-28'}]
+  A000080.KRX: [{'date': '2026-07-28'}]
+  A000100.KRX: [{'date': '2026-07-28'}]
+  A000120.KRX: [{'date': '2026-07-28'}]
