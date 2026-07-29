@@ -1,12 +1,11 @@
-Totale ASX in_universe=true: 172
-WES presente in lista? True
-WES e' in posizione 24, chunk #1: ['SEK', 'SMR', 'UOS', 'EDV', 'WES', 'WOW', 'EHL', 'AAC', 'ELS', 'ELV', 'LYC', 'AOV', 'QAN', 'HMC', 'CCP', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN']
+Pagina 1 (offset=0): 1000 righe, ticker: ['AAC', 'AOV', 'CCP', 'EDV']
+Pagina 2 (offset=1000): 1000 righe, ticker: ['EDV', 'EHL', 'ELS', 'ELV', 'EVN']
+Pagina 3 (offset=2000): 1000 righe, ticker: ['EVN', 'FFM', 'HMC', 'JMS']
+Pagina 4 (offset=3000): 1000 righe, ticker: ['JMS', 'KAR', 'LIN', 'LYC', 'QAN']
+Pagina 5 (offset=4000): 1000 righe, ticker: ['QAN', 'SEK', 'SMR', 'UOS']
+Pagina 6 (offset=5000): 600 righe, ticker: ['UOS', 'WES', 'WOW']
+  -> ultima pagina (batch<1000)
 
-URL params: {'select': 'ticker,date,adj_close', 'exchange': 'eq.ASX', 'ticker': 'in.(SEK,SMR,UOS,EDV,WES,WOW,EHL,AAC,ELS,ELV,LYC,AOV,QAN,HMC,CCP,EVN,FFM,JMS,KAR,LIN)', 'date': 'gte.2025-06-24', 'order': 'ticker,date.desc', 'limit': '1000', 'offset': '0'}
-
-Status: 200
-Righe totali tornate: 1000
-Ticker presenti nella risposta: ['AAC', 'AOV', 'CCP', 'EDV']
-Ticker MANCANTI dalla risposta: ['EHL', 'ELS', 'ELV', 'EVN', 'FFM', 'HMC', 'JMS', 'KAR', 'LIN', 'LYC', 'QAN', 'SEK', 'SMR', 'UOS', 'WES', 'WOW']
-Righe per WES specificamente: 0
-[]
+Totale righe raccolte: 5600
+Ticker trovati in totale: ['AAC', 'AOV', 'CCP', 'EDV', 'EHL', 'ELS', 'ELV', 'EVN', 'FFM', 'HMC', 'JMS', 'KAR', 'LIN', 'LYC', 'QAN', 'SEK', 'SMR', 'UOS', 'WES', 'WOW']
+Ticker MAI trovati: []
