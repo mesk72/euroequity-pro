@@ -1,7 +1,13 @@
 name: Daily US Yahoo Finance
 
 on:
-  workflow_dispatch:  # DISABILITATO — non gira automaticamente
+  workflow_dispatch:
+  schedule:
+    - cron: '30 0 * * *'  # 02:30 CEST
+
+concurrency:
+  group: daily-us-yahoo
+  cancel-in-progress: false
 
 jobs:
   update-us-yahoo:
