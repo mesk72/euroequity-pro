@@ -1,24 +1,27 @@
-import os, requests, yfinance as yf
+import os, requests
+from collections import Counter
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-# 1) Cosa dice Yahoo ADESSO per WES.AX
-print("=== YAHOO (yfinance) WES.AX ultimi 10 giorni ===")
-try:
-    df = yf.download("WES.AX", period="10d", interval="1d", auto_adjust=True, progress=False)
-    print(df.tail(10))
-except Exception as e:
-    print("ERRORE yfinance:", e)
+exchanges = ["ASX","TSE","SEHK","KRX","SGX"]
+stale_all = {}
+for ex in exchanges:
+    r = requests.get(f"{SUPABASE_URL}/rest/v1/latest_prices", headers=headers_r,
+        params={"select":"ticker,price_date","exchange":f"eq.{ex}","limit":"3000"})
+    rows = r.json()
+    if not rows:
+        print(f"{ex}: nessun dato in latest_prices")
+        continue
+    dates = Counter(row["price_date"] for row in rows)
+    top_date = dates.most_common(1)[0][0]
+    stale = [row["ticker"] for row in rows if row["price_date"] != top_date]
+    print(f"{ex}: {len(rows)} titoli, data prevalente={top_date}, distribuzione date={dict(dates)}")
+    if stale:
+        print(f"  -> {len(stale)} indietro: {stale[:20]}")
+        stale_all[ex] = stale
 
-# 2) Cosa c'e' nel nostro DB per WES su ASX, ultimi giorni
-print("\n=== DB prices_eod WES/ASX ultimi 10 record ===")
-r = requests.get(f"{SUPABASE_URL}/rest/v1/prices_eod", headers=headers_r,
-    params={"select":"date,adj_close","ticker":"eq.WES","exchange":"eq.ASX","order":"date.desc","limit":"10"})
-print(r.json())
-
-# 3) Controlla se WES appare in un secondo ticker/exchange diverso per errore
-print("\n=== stocks table: eventuali record WES ===")
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/stocks", headers=headers_r,
-    params={"select":"ticker,exchange,company_name,yahoo_ticker,in_universe","ticker":"eq.WES"})
-print(r2.json())
+import json
+with open("stale_list.json","w") as f:
+    json.dump(stale_all, f)
+print("\nSTALE_ALL:", stale_all)
