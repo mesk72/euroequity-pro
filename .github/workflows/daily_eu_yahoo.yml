@@ -1,7 +1,13 @@
 name: Daily EU Yahoo Finance
 
 on:
-  workflow_dispatch:  # DISABILITATO — non gira automaticamente
+  workflow_dispatch:
+  schedule:
+    - cron: '30 0 * * *'  # 02:30 CEST - backup nativo GitHub, indipendente da Vercel
+
+concurrency:
+  group: daily-eu-yahoo
+  cancel-in-progress: false  # se parte un secondo trigger mentre uno gira, aspetta invece di sovrapporsi
 
 jobs:
   update-eu-yahoo:
