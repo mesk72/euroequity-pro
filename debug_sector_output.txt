@@ -1,11 +1,70 @@
-ASX: 350 titoli, data prevalente=2026-07-21, distribuzione date={'2026-07-29': 172, '2026-07-21': 178}
-  -> 172 indietro: ['NIC', 'NGI', 'RDX', 'SEK', 'SMR', 'UOS', 'WES', 'WOW', 'AOV', 'ALL', 'CQR', 'A4N', 'MMI', 'MI6', 'L1G', 'LTR', 'MP1', 'MXT', 'NEU', 'NXT']
-TSE: 1000 titoli, data prevalente=2026-07-29, distribuzione date={'2026-07-29': 882, '2026-06-12': 1, '2026-07-21': 115, '2026-07-28': 2}
-  -> 118 indietro: ['4974', '6961', '6976', '6995', '7003', '7014', '7148', '7157', '7167', '7172', '7177', '7261', '7322', '7327', '7380', '7384', '7456', '7476', '7513', '7564']
-SEHK: 498 titoli, data prevalente=2026-07-29, distribuzione date={'2026-07-29': 478, '2026-07-28': 7, '2026-07-21': 13}
-  -> 20 indietro: ['1551', '2362', '754', '6979', '6993', '7666', '83', '857', '867', '902', '941', '956', '9900', '9903', '991', '9911', '2596', '247', '2558', '1788']
-KRX: 356 titoli, data prevalente=2026-07-29, distribuzione date={'2026-07-29': 353, '2026-07-21': 1, '2026-07-14': 1, '2026-07-28': 1}
-  -> 3 indietro: ['A057050', 'A012510', 'A183300']
-SGX: 100 titoli, data prevalente=2026-07-29, distribuzione date={'2026-07-29': 100}
 
-STALE_ALL: {'ASX': ['NIC', 'NGI', 'RDX', 'SEK', 'SMR', 'UOS', 'WES', 'WOW', 'AOV', 'ALL', 'CQR', 'A4N', 'MMI', 'MI6', 'L1G', 'LTR', 'MP1', 'MXT', 'NEU', 'NXT', 'NCK', 'WIA', 'ALX', 'ALK', 'OBL', 'ORI', 'AAC', 'LYC', 'QAN', 'ARB', 'CBO', 'DTR', 'EDV', 'EHL', 'ELS', 'CKF', 'CAT', 'CPU', 'CWY', 'AEF', 'ELV', 'LSF', 'HBRD', 'ORG', 'GLS', 'LGF', 'HUB', 'ILU', 'OPH', 'LFS', 'RFF', 'RF1', 'VETH', 'SLC', 'SHA', 'TVN', 'SGH', 'UNI', 'WBC', 'PLS', 'REG', 'A1M', 'BWP', '360', 'GWA', 'WC8', 'HMC', 'CCP', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN', 'ABB', 'CDP', 'CIP', 'COF', 'CQE', 'DTL', 'AFI', 'AMI', 'ALI', 'ABG', 'ARF', 'ASK', 'DGT', 'DXS', 'GMG', 'HDN', 'RGN', 'SCG', 'DXI', 'CMW', 'INA', 'BGA', 'DYL', 'JDO', 'LOV', 'MIR', 'MLX', 'NAN', 'OBM', '4DX', 'NHF', 'PDN', 'PNI', 'QBE', 'RIC', 'RMS', 'RSG', 'TPG', 'TWE', 'LRV', 'MFF', 'MTS', 'VNT', 'SRV', 'SUN', 'STO', 'TCG', 'TUA', 'WPR', 'TPW', 'VYS', 'VSL', 'WGN', 'WDS', 'WHC', 'WHF', 'WTC', 'ZIM', 'WLE', 'WA1', 'EUR', 'C79', 'BMN', 'AMP', 'G6M', 'IPG', 'BGL', 'CXO', 'AYA', 'SBM', 'CCL', 'EOS', 'IMR', 'APE', 'FGG', 'GGP', 'IDX', 'INR', 'PNV', 'PWH', 'SDR', 'PNR', 'PPM', 'RXL', 'SHV', 'SLX', 'WEB', 'BEN', 'AZJ', 'CLW', 'DRO', 'RRL', 'SIG', 'SOL', 'TCL', 'VAU', 'CIN', 'TAH', 'WBT'], 'TSE': ['4974', '6961', '6976', '6995', '7003', '7014', '7148', '7157', '7167', '7172', '7177', '7261', '7322', '7327', '7380', '7384', '7456', '7476', '7513', '7564', '7581', '7599', '7701', '7734', '7806', '7832', '7846', '7911', '7917', '7936', '7966', '7972', '7984', '7994', '8031', '8032', '8037', '8066', '8097', '8098', '8129', '8133', '8153', '8179', '8214', '8267', '8283', '8345', '8346', '8358', '8360', '8362', '8366', '8381', '8393', '8508', '8511', '8522', '8524', '8572', '8584', '8585', '8697', '8714', '8729', '8802', '8803', '8850', '8876', '8892', '8952', '8954', '8955', '8956', '8957', '8966', '9005', '9008', '9031', '9037', '9042', '9045', '9048', '9065', '9068', '9075', '9101', '9110', '9119', '9142', '9267', '9304', '9412', '9413', '9432', '9449', '9468', '9501', '9505', '9506', '9509', '9533', '9551', '9616', '9682', '9715', '9722', '9746', '9759', '9830', '9869', '9934', '9948', '9960', '9974', '9989', '6952', '6954'], 'SEHK': ['1551', '2362', '754', '6979', '6993', '7666', '83', '857', '867', '902', '941', '956', '9900', '9903', '991', '9911', '2596', '247', '2558', '1788'], 'KRX': ['A057050', 'A012510', 'A183300']}
+===== 2026-07-29T09:45:56.515818+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+  ERR ASX 200: HTTP 401
+Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
+
+===== 2026-07-29T09:45:56.289631+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+  ERR ASX 200: HTTP 401
+Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
+
+===== 2026-07-29T09:45:56.077253+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+  ERR ASX 200: HTTP 401
+Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
+
+===== 2026-07-29T09:45:55.862477+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+  ERR ASX 200: HTTP 401
+Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
+
+===== 2026-07-29T09:45:55.382204+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+  ERR ASX 200: HTTP 401
+
+===== 2026-07-29T09:45:55.161502+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+  ERR ASX 200: HTTP 401
+
+===== 2026-07-29T09:45:54.415418+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+
+===== 2026-07-29T09:45:53.654307+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+
+===== 2026-07-29T09:45:52.862716+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
+
+===== 2026-07-29T09:45:52.640962+00:00 =====
+  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
+  Prezzi Yahoo: ok=2350 fail=0
+  Prezzi caricati: 1623 titoli
+  Momentum ok=2348 fail=2
