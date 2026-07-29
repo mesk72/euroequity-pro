@@ -1,7 +1,13 @@
 name: Daily APAC Yahoo Finance
 
 on:
-  workflow_dispatch:  # DISABILITATO — non gira automaticamente
+  workflow_dispatch:
+  schedule:
+    - cron: '0 16 * * *'  # 18:00 CEST - backup nativo GitHub, indipendente da Vercel
+
+concurrency:
+  group: daily-apac-yahoo
+  cancel-in-progress: false
 
 jobs:
   update-apac-yahoo:
