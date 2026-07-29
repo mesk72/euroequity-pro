@@ -1,5 +1,11 @@
-AAC: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
-AOV: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
-CCP: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
-EDV: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
-WES: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
+Pagina 1 (offset=0): 1000 righe, ticker presenti: ['AAC', 'AOV', 'CCP', 'EDV']
+Pagina 2 (offset=1000): 1000 righe, ticker presenti: ['EDV', 'EHL', 'ELS', 'ELV', 'EVN']
+Pagina 3 (offset=2000): 1000 righe, ticker presenti: ['EVN', 'FFM', 'HMC', 'JMS']
+Pagina 4 (offset=3000): 1000 righe, ticker presenti: ['JMS', 'KAR', 'LIN', 'LYC', 'QAN']
+Pagina 5 (offset=4000): 1000 righe, ticker presenti: ['QAN', 'SEK', 'SMR', 'UOS']
+Pagina 6 (offset=5000): 600 righe, ticker presenti: ['UOS', 'WES', 'WOW']
+  -> ultima pagina (batch<1000)
+
+Ticker totali raccolti: ['AAC', 'AOV', 'CCP', 'EDV', 'EHL', 'ELS', 'ELV', 'EVN', 'FFM', 'HMC', 'JMS', 'KAR', 'LIN', 'LYC', 'QAN', 'SEK', 'SMR', 'UOS', 'WES', 'WOW']
+Ticker del chunk MANCANTI: []
+WES presente: True, righe: 280
