@@ -1,21 +1,2 @@
-EUROPA: 2137  (MIL=117, XETRA=211, PA=217, AS=98, MC=100, BR=100, LS=35, VI=53, HE=100, IR=15, GR=100, LSE=423, SWX=161, OM=206, OB=100, CPSE=101)
-US: 3002  (US=3002)
-TSX: 400  (TSX=400)
-TSE: 1000  (TSE=1000)
-SEHK: 500  (SEHK=500)
-ASX: 350  (ASX=350)
-KRX: 400  (KRX=400)
-SGX: 100  (SGX=100)
-
-TOTALE UNIVERSO REALE (in_universe=true, tabella stocks): 7889
-
-=== righe in latest_prices vs universo, per vedere quante mancano DEL TUTTO ===
-  XETRA: universo=211, in latest_prices=198, mancanti=13
-  LSE: universo=423, in latest_prices=422, mancanti=1
-  OM: universo=206, in latest_prices=204, mancanti=2
-  US: universo=3002, in latest_prices=3001, mancanti=1
-  TSX: universo=400, in latest_prices=374, mancanti=26
-  SEHK: universo=500, in latest_prices=498, mancanti=2
-  KRX: universo=400, in latest_prices=356, mancanti=44
-
-Totale righe in latest_prices: 7800  vs  universo reale: 7889  ->  mancanti del tutto: 89
+Tentativo 1: HTTP 200, 3.73s, 500 titoli restituiti, 577535 bytes
+Tentativo 2: HTTP 200, 2.17s, 500 titoli restituiti, 577535 bytes
