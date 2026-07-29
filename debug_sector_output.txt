@@ -1,2 +1,8 @@
-Valore salvato in fundamentals (usato da screener e pagina titolo):
-[{'mom1w': -0.0245, 'mom1m': -0.0564, 'mom6m': -0.0121, 'mom12m': 0.7096}]
+  Prezzi Yahoo: ok=2635 fail=2
+  Rank EU: 2534/2534
+  Combined rank EU: 1983/1983
+
+ASML.AS: [{'date': '2026-07-29'}]
+ROG.SWX: []
+SAP.XETRA: [{'date': '2026-07-29'}]
+MC.PA: [{'date': '2026-07-29'}]
