@@ -1,9 +1,11 @@
-XETRA: 13 assenti -> 0 riempiti, 13 non trovati nemmeno in prices_eod: ['BFV', 'EUK3', 'HG1', 'LEC', 'MBH3', 'MNV6', 'NLM', 'PHH2', 'SIM0', 'SPB', 'SSH', 'T2G', 'WBAH']
-LSE: 1 assenti -> 0 riempiti, 1 non trovati nemmeno in prices_eod: ['AT.']
-OM: 2 assenti -> 0 riempiti, 2 non trovati nemmeno in prices_eod: ['ROKO B', 'TANGEN B']
-US: 642 assenti -> 641 riempiti, 1 non trovati nemmeno in prices_eod: ['ZQXVW9']
-TSX: 26 assenti -> 0 riempiti, 26 non trovati nemmeno in prices_eod: ['ACO.X', 'AP.UN', 'APR.UN', 'BEI.UN', 'CAR.UN', 'CHP.UN', 'CRR.UN', 'CRT.UN', 'DIR.UN', 'FCR.UN', 'GO.U', 'GRT.UN', 'HOM.UN', 'IIP.UN', 'KMP.UN', 'MI.UN', 'MRG.UN', 'NXR.UN', 'PLZ.UN', 'PMZ.UN']
-SEHK: 2 assenti -> 0 riempiti, 2 non trovati nemmeno in prices_eod: ['778', '823']
-KRX: 44 assenti -> 0 riempiti, 44 non trovati nemmeno in prices_eod: ['A000250', 'A007390', 'A031980', 'A032820', 'A036930', 'A039200', 'A041830', 'A043260', 'A050890', 'A058610', 'A060370', 'A064760', 'A067310', 'A078600', 'A080220', 'A082920', 'A083450', 'A083650', 'A084370', 'A086450']
+=== TSX .UN: come viene mappato il ticker per Yahoo? ===
+stocks: [{'ticker': 'CAR.UN', 'exchange': 'TSX', 'yahoo_ticker': 'CAR.UN.TO'}]
+  CAR-UN.TO: DATI OK
+  CAR.UN.TO: vuoto
+  CAR-UN.V: vuoto
 
-TOTALE: 641 riempiti, 89 non trovati nemmeno nella fonte grezza (da investigare separatamente)
+=== KRX A0xxxxx: come viene mappato? ===
+stocks: [{'ticker': 'A000250', 'exchange': 'KRX', 'yahoo_ticker': 'A000250.KS'}]
+  000250.KS: DATI OK
+  A000250.KS: vuoto
+  000250.KQ: DATI OK
