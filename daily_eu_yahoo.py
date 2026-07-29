@@ -370,9 +370,21 @@ for m in mom_updates:
         "price": price, "prev_price": prev_price,
         "price_date": m.get("_last_date"), "change1d": chg,
     })
-for i in range(0, len(latest_price_updates), 500):
-    requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange", headers=headers_up, json=latest_price_updates[i:i+500])
-log("  latest_prices aggiornata: " + str(len(latest_price_updates)) + " titoli")
+# FIX 29/7/2026: stesso bug gia' risolto per prices_eod il 26/7 (duplicati
+# nello stesso batch fanno fallire l'INTERO batch di 500, in silenzio -
+# causa reale scoperta su APAC di latest_prices indietro di giorni pur
+# con prices_eod sempre corretto), applicato qui preventivamente.
+dedup_lp = {}
+for row in latest_price_updates:
+    dedup_lp[(row["ticker"], row["exchange"])] = row
+latest_price_updates_clean = list(dedup_lp.values())
+lp_fail = 0
+for i in range(0, len(latest_price_updates_clean), 500):
+    rlp = requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange", headers=headers_up, json=latest_price_updates_clean[i:i+500])
+    if rlp.status_code not in (200, 201, 204):
+        lp_fail += len(latest_price_updates_clean[i:i+500])
+        log(f"  ERRORE SCRITTURA latest_prices: HTTP {rlp.status_code} - {rlp.text[:300]}")
+log("  latest_prices aggiornata: " + str(len(latest_price_updates_clean)) + " titoli (falliti: " + str(lp_fail) + ")")
 
 # ── 5. FX ────────────────────────────────────────────────────
 log("\n  Aggiornamento FX...")
