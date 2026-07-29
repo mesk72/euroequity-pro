@@ -10,18 +10,12 @@ for ex in exchanges:
     r = requests.get(f"{SUPABASE_URL}/rest/v1/latest_prices", headers=headers_r,
         params={"select":"ticker,price_date","exchange":f"eq.{ex}","limit":"3000"})
     rows = r.json()
-    if not rows:
-        print(f"{ex}: nessun dato in latest_prices")
-        continue
+    if not rows: continue
+    max_date = max(row["price_date"] for row in rows)
+    stale = [row["ticker"] for row in rows if row["price_date"] != max_date]
     dates = Counter(row["price_date"] for row in rows)
-    top_date = dates.most_common(1)[0][0]
-    stale = [row["ticker"] for row in rows if row["price_date"] != top_date]
-    print(f"{ex}: {len(rows)} titoli, data prevalente={top_date}, distribuzione date={dict(dates)}")
+    print(f"{ex}: {len(rows)} titoli, data PIU' RECENTE={max_date}, distribuzione={dict(dates)}")
     if stale:
-        print(f"  -> {len(stale)} indietro: {stale[:20]}")
+        print(f"  -> {len(stale)} REALMENTE indietro rispetto a {max_date}: {stale[:25]}")
         stale_all[ex] = stale
-
-import json
-with open("stale_list.json","w") as f:
-    json.dump(stale_all, f)
-print("\nSTALE_ALL:", stale_all)
+print("\nTOTALE REALMENTE INDIETRO:", {k: len(v) for k, v in stale_all.items()})
