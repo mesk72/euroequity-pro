@@ -1,6 +1,8 @@
-US: ultima data=[{'date': '2026-07-28'}], righe totali in prices_eod=0
-TSX: ultima data=[{'date': '2026-07-28'}], righe totali in prices_eod=450646
-US: universo in_universe=true -> 3002
-TSX: universo in_universe=true -> 400
-US: righe in latest_prices -> 3000
-TSX: righe in latest_prices -> 373
+EU: 2118 righe, prevalente=2026-07-29, distribuzione={'2026-07-29': 1950, '2026-07-28': 164, '2026-07-27': 2, '2026-07-24': 1, '2026-07-23': 1}
+  -> 168 fermi: [('YRM', 'MIL', '2026-07-28'), ('PSAN', 'XETRA', '2026-07-28'), ('SHF', 'XETRA', '2026-07-28'), ('RHK', 'XETRA', '2026-07-28'), ('O5G', 'XETRA', '2026-07-28'), ('TGHN', 'XETRA', '2026-07-28'), ('EBK', 'XETRA', '2026-07-28'), ('HLE', 'XETRA', '2026-07-28'), ('MVV1', 'XETRA', '2026-07-28'), ('KSB', 'XETRA', '2026-07-28'), ('NBG6', 'XETRA', '2026-07-28'), ('ORIA', 'PA', '2026-07-28'), ('MLCFM', 'PA', '2026-07-28'), ('EIFF', 'PA', '2026-07-28'), ('ARTO', 'PA', '2026-07-28')]
+US: 3000 righe, prevalente=2026-07-28, distribuzione={'2026-07-28': 2987, '2026-07-21': 4, '2026-07-13': 3, '2026-07-14': 1, '2026-07-16': 1}
+  -> 13 fermi: [('NUVL', 'US', '2026-07-21'), ('XOMA', 'US', '2026-07-21'), ('NSA', 'US', '2026-07-21'), ('OLPX', 'US', '2026-07-13'), ('ESPR', 'US', '2026-07-13'), ('EEX', 'US', '2026-07-14'), ('GTLS', 'US', '2026-07-16'), ('BLD', 'US', '2026-07-02'), ('AVNS', 'US', '2026-07-24'), ('WSR', 'US', '2026-07-13'), ('CNGO', 'US', '2026-07-17'), ('CPRX', 'US', '2026-07-21'), ('TMHC', 'US', '2026-07-23')]
+TSX: 373 righe, prevalente=2026-07-28, distribuzione={'2026-07-28': 372, '2026-07-07': 1}
+  -> 1 fermi: [('ISC', 'TSX', '2026-07-07')]
+KRX: 356 righe, prevalente=2026-07-29, distribuzione={'2026-07-29': 353, '2026-07-21': 1, '2026-07-14': 1, '2026-07-28': 1}
+  -> 3 fermi: [('A057050', 'KRX', '2026-07-21'), ('A012510', 'KRX', '2026-07-14'), ('A183300', 'KRX', '2026-07-28')]
