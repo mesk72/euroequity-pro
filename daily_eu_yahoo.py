@@ -300,14 +300,28 @@ for exchange, tickers in by_exchange.items():
         # Limita a ultimi 400 giorni — sufficiente per momentum 12 mesi
         from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
         while True:
-            rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-                params={"select": "ticker,date,adj_close",
-                        "exchange": "eq." + exchange,
-                        "ticker": "in.(" + ",".join(chunk) + ")",
-                        "date": "gte." + from_400d,
-                        "order": "ticker,date.desc",
-                        "limit": "1000", "offset": str(offset_p)})
-            batch = rp.json()
+            # FIX 29/7/2026: stesso fix applicato ad APAC — nessun timeout
+            # ne' retry poteva troncare silenziosamente la lettura sotto
+            # carico prolungato (centinaia di richieste sequenziali).
+            rp = None
+            for attempt in range(3):
+                try:
+                    rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+                        params={"select": "ticker,date,adj_close",
+                                "exchange": "eq." + exchange,
+                                "ticker": "in.(" + ",".join(chunk) + ")",
+                                "date": "gte." + from_400d,
+                                "order": "ticker,date.desc",
+                                "limit": "1000", "offset": str(offset_p)},
+                        timeout=20)
+                    break
+                except Exception:
+                    time.sleep(1.0 + attempt)
+            if rp is None: break
+            try:
+                batch = rp.json()
+            except Exception:
+                break
             if not isinstance(batch, list) or not batch: break
             for d in batch:
                 if d["adj_close"] is not None:
