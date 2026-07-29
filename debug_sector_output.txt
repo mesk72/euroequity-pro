@@ -1,28 +1,5 @@
-
-===== ASML.AS — 1285 record totali, ultimo: 2026-07-29 =====
-Data odierna (ultimo prezzo): 2026-07-29  prezzo=1363.2
---- Metodo GRAFICO (indice fisso 127gg trading) ---
-  Data riferimento: 2026-01-28  prezzo=1190.1676
-  mom6m = 14.54%
---- Metodo SCREENER (calendario -6 mesi) ---
-  Data target: 2026-01-29 (6 mesi calendario prima)
-  Data riferimento trovata: 2026-01-30  prezzo=1211.2924
-  mom6m = 12.54%
---- SCARTO ---
-  Differenza date di riferimento: -2 giorni di calendario
-  Differenza mom6m: 2.00 punti percentuali
-  Giorni di trading REALI tra la data corretta (-6 mesi) e oggi: 125 (il grafico assume fisso 127)
-
-===== MC.PA — 1285 record totali, ultimo: 2026-07-29 =====
-Data odierna (ultimo prezzo): 2026-07-29  prezzo=473.3
---- Metodo GRAFICO (indice fisso 127gg trading) ---
-  Data riferimento: 2026-01-28  prezzo=534.0911
-  mom6m = -11.38%
---- Metodo SCREENER (calendario -6 mesi) ---
-  Data target: 2026-01-29 (6 mesi calendario prima)
-  Data riferimento trovata: 2026-01-30  prezzo=538.1253
-  mom6m = -12.05%
---- SCARTO ---
-  Differenza date di riferimento: -2 giorni di calendario
-  Differenza mom6m: 0.66 punti percentuali
-  Giorni di trading REALI tra la data corretta (-6 mesi) e oggi: 125 (il grafico assume fisso 127)
+institutional_viewers: HTTP 200 (anon key, senza auth) -> ESPOSTA
+latest_prices: HTTP 200 (anon key, senza auth) -> ESPOSTA
+script_logs: HTTP 200 (anon key, senza auth) -> ESPOSTA
+sector_aggregates: HTTP 200 (anon key, senza auth) -> ESPOSTA
+top500_universe: HTTP 200 (anon key, senza auth) -> ESPOSTA
