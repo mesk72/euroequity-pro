@@ -17,4 +17,8 @@ jobs:
       - name: Run EU daily Yahoo
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          GH_RUN_ID: ${{ github.run_id }}
+          GH_WORKFLOW: daily_eu_yahoo.yml
         run: python daily_eu_yahoo.py
