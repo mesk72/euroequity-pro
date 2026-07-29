@@ -1,70 +1,20 @@
+=== YAHOO (yfinance) WES.AX ultimi 10 giorni ===
+Price           Close       High        Low       Open   Volume
+Ticker         WES.AX     WES.AX     WES.AX     WES.AX   WES.AX
+Date                                                           
+2026-07-16  91.980003  92.080002  90.589996  91.500000  1280318
+2026-07-17  92.800003  93.000000  92.040001  92.779999  1439299
+2026-07-20  92.959999  93.250000  92.440002  92.699997   922907
+2026-07-21  91.839996  92.370003  91.320000  92.110001  1346796
+2026-07-22  89.900002  91.690002  89.800003  91.260002  1531348
+2026-07-23  88.110001  90.089996  87.169998  87.800003  3276624
+2026-07-24  87.250000  88.500000  86.949997  88.099998  1429516
+2026-07-27  87.400002  87.699997  86.010002  87.199997  1182586
+2026-07-28  89.220001  89.220001  87.470001  87.529999   895702
+2026-07-29  90.610001  91.699997  90.010002  90.500000  1445790
 
-===== 2026-07-29T09:45:56.515818+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-  ERR ASX 200: HTTP 401
-Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
+=== DB prices_eod WES/ASX ultimi 10 record ===
+[{'date': '2026-07-29', 'adj_close': 90.61}, {'date': '2026-07-28', 'adj_close': 89.22}, {'date': '2026-07-27', 'adj_close': 87.4}, {'date': '2026-07-24', 'adj_close': 87.25}, {'date': '2026-07-23', 'adj_close': 88.11}, {'date': '2026-07-22', 'adj_close': 89.9}, {'date': '2026-07-21', 'adj_close': 91.84}, {'date': '2026-07-20', 'adj_close': 92.96}, {'date': '2026-07-17', 'adj_close': 92.8}, {'date': '2026-07-16', 'adj_close': 91.98}]
 
-===== 2026-07-29T09:45:56.289631+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-  ERR ASX 200: HTTP 401
-Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
-
-===== 2026-07-29T09:45:56.077253+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-  ERR ASX 200: HTTP 401
-Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
-
-===== 2026-07-29T09:45:55.862477+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-  ERR ASX 200: HTTP 401
-Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=391s
-
-===== 2026-07-29T09:45:55.382204+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-  ERR ASX 200: HTTP 401
-
-===== 2026-07-29T09:45:55.161502+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-  ERR ASX 200: HTTP 401
-
-===== 2026-07-29T09:45:54.415418+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-
-===== 2026-07-29T09:45:53.654307+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-
-===== 2026-07-29T09:45:52.862716+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
-
-===== 2026-07-29T09:45:52.640962+00:00 =====
-  Data piu' recente nel mercato ASX: 2026-07-28 — uso 2026-07-18 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-  Prezzi caricati: 1623 titoli
-  Momentum ok=2348 fail=2
+=== stocks table: eventuali record WES ===
+{'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
