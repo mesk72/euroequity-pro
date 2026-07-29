@@ -70,26 +70,51 @@ export async function GET(req: NextRequest) {
     }))
 
     // Calcola TUTTI i momentum da prices_eod — fonte unica
-    // FIX: usa giorni di TRADING (indici fissi), non giorni di calendario,
-    // per allinearsi esattamente alla convenzione ForwardAlpha standard
-    // gia' usata per il valore salvato in fundamentals (1w=5, 1m=21, 6m=127, 12m=253 trading days).
-    const closes = all.map((d: any) => d.adj_close) as number[]
-    const lastPrice = closes[closes.length - 1]
+    // FIX 29/7/2026: usa lookback per DATA DI CALENDARIO, esattamente come
+    // mom_new_weeks()/mom_new_months() negli script daily_*_yahoo.py — non
+    // piu' un indice fisso di giorni di trading. Un indice fisso (es. 127gg
+    // per 6 mesi) assume implicitamente che ogni finestra di calendario
+    // contenga sempre lo stesso numero di sedute di borsa, il che e' falso
+    // (festivita' variabili per mercato/anno: es. verificato 125 sedute
+    // reali nella finestra a 6 mesi corrente, non 127) e produce uno scarto
+    // sistematico crescente con la lunghezza della finestra rispetto al
+    // valore mostrato nello screener/tabella. Con il lookback per data,
+    // grafico e screener leggono la STESSA data di riferimento e quindi
+    // restituiscono sempre lo stesso numero.
+    const lastPrice = all[all.length - 1].adj_close as number
+    const lastDate = new Date(all[all.length - 1].date + 'T00:00:00Z')
 
-    const momBack = (tradingDaysBack: number): number | null => {
-      const idx = closes.length - 1 - tradingDaysBack
-      if (idx < 0) return null
-      const p = closes[idx]
+    // Replica dateutil.relativedelta: sottrae mesi clampando al ultimo
+    // giorno valido del mese target (es. 31 gen - 1 mese = 31 dic; non overflow).
+    const subtractMonths = (d: Date, months: number): Date => {
+      const targetMonthIdx = d.getUTCMonth() - months
+      const targetYear = d.getUTCFullYear() + Math.floor(targetMonthIdx / 12)
+      const normMonth = ((targetMonthIdx % 12) + 12) % 12
+      const lastDayOfTargetMonth = new Date(Date.UTC(targetYear, normMonth + 1, 0)).getUTCDate()
+      const clampedDay = Math.min(d.getUTCDate(), lastDayOfTargetMonth)
+      return new Date(Date.UTC(targetYear, normMonth, clampedDay))
+    }
+
+    const momByCalendar = (opts: { daysBack?: number; monthsBack?: number }): number | null => {
+      const target = opts.monthsBack != null
+        ? subtractMonths(lastDate, opts.monthsBack)
+        : new Date(lastDate.getTime() - (opts.daysBack || 0) * 86400000)
+      const targetPlus1Str = new Date(target.getTime() + 86400000).toISOString().slice(0, 10)
+      // 'all' e' ordinato per data ascendente: il primo record >= target+1
+      // e' esattamente il min(candidates) usato in Python.
+      const ref = all.find((d: any) => d.date >= targetPlus1Str)
+      if (!ref) return null
+      const p = ref.adj_close
       return p && p > 0 ? (lastPrice / p - 1) * 100 : null
     }
 
     const momentum = {
-      mom1w: momBack(5),
-      mom1m: momBack(21),
-      mom6m: momBack(127),
-      mom12m: momBack(253),
-      mom3y: momBack(756),
-      mom5y: momBack(1260),
+      mom1w: momByCalendar({ daysBack: 7 }),
+      mom1m: momByCalendar({ monthsBack: 1 }),
+      mom6m: momByCalendar({ monthsBack: 6 }),
+      mom12m: momByCalendar({ monthsBack: 12 }),
+      mom3y: momByCalendar({ monthsBack: 36 }),
+      mom5y: momByCalendar({ monthsBack: 60 }),
     }
 
     return NextResponse.json({ history, momentum })
