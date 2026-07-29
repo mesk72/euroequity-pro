@@ -1,2 +1,6 @@
-Status: 200
-Body: {"triggered":true,"timestamp":"2026-07-29T20:51:51.980Z"}
+stocks (ilike company_name=roche): {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
+stocks (ilike company=roche): [{'ticker': 'ROP', 'exchange': 'SWX', 'in_universe': True}, {'ticker': 'A006650', 'exchange': 'KRX', 'in_universe': True}, {'ticker': '009915016', 'exchange': 'BR', 'in_universe': False}, {'ticker': 'RBO', 'exchange': 'PA', 'in_universe': False}, {'ticker': '338', 'exchange': 'SEHK', 'in_universe': True}]
+ticker=ROG: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
+ticker=RO: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
+ticker=RHHBY: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
+ticker=RHHVF: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
