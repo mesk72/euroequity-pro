@@ -17,6 +17,28 @@ from collections import defaultdict
 import yfinance as yf
 import pandas as pd
 
+# ── LOCK ANTI-DOPPIA-ESECUZIONE ──────────────────────────────
+# FIX 29/7/2026: stesso lock gia' aggiunto a daily_apac_yahoo.py.
+_gh_token = os.environ.get("GH_TOKEN", "")
+_gh_repo = os.environ.get("GH_REPO", "")
+_gh_run_id = os.environ.get("GH_RUN_ID", "")
+_gh_workflow = os.environ.get("GH_WORKFLOW", "")
+if _gh_token and _gh_repo and _gh_workflow:
+    try:
+        _r = requests.get(
+            f"https://api.github.com/repos/{_gh_repo}/actions/workflows/{_gh_workflow}/runs",
+            headers={"Authorization": f"token {_gh_token}", "Accept": "application/vnd.github+json"},
+            params={"status": "in_progress", "per_page": "10"}, timeout=15)
+        _runs = _r.json().get("workflow_runs", [])
+        _others = [x for x in _runs if str(x.get("id")) != str(_gh_run_id)]
+        if _others:
+            print(f"LOCK: un'altra esecuzione di {_gh_workflow} e' gia' in corso (run {_others[0]['id']}) - esco per evitare duplicati.")
+            raise SystemExit(0)
+    except SystemExit:
+        raise
+    except Exception as _e:
+        print(f"LOCK: controllo fallito ({_e}), procedo comunque.")
+
 def pct_rank(values, v):
     if v is None: return None
     try:
