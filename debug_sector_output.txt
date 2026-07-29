@@ -1,11 +1,6 @@
-=== Verifica diretta prices_eod per titoli noti ===
-ASML.AS: [{'date': '2026-07-29', 'adj_close': 1363.2}]
-SAP.XETRA: [{'date': '2026-07-29', 'adj_close': 159.66}]
-MC.PA: [{'date': '2026-07-29', 'adj_close': 473.3}]
-AAPL.US: [{'date': '2026-07-28', 'adj_close': 340.08}]
-MSFT.US: [{'date': '2026-07-28', 'adj_close': 393.35}]
-SHOP.TSX: []
-
-=== Distribuzione date in latest_prices (cache) ===
-EU: totale 2118 righe, distribuzione date: {'2026-07-29': 1950, '2026-07-28': 164, '2026-07-27': 2, '2026-07-24': 1, '2026-07-23': 1}
-NA: totale 1373 righe, distribuzione date: {'2026-07-28': 1363, '2026-07-21': 3, '2026-07-13': 2, '2026-07-14': 1, '2026-07-16': 1}
+US: ultima data=[{'date': '2026-07-28'}], righe totali in prices_eod=0
+TSX: ultima data=[{'date': '2026-07-28'}], righe totali in prices_eod=450646
+US: universo in_universe=true -> 3002
+TSX: universo in_universe=true -> 400
+US: righe in latest_prices -> 3000
+TSX: righe in latest_prices -> 373
