@@ -257,10 +257,14 @@ ok_prices = ok_yf; fail_prices = fail_yf
 log("\n[3/5] Lettura prezzi da prices_eod...")
 CHUNK = 20
 all_ph = defaultdict(list)
+chunk_fail_log = []  # DIAGNOSTICA 29/7/2026: quali chunk restano vuoti e perche'
 for exchange, tickers in by_exchange.items():
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i+CHUNK]
         offset_p = 0
+        got_any = False
+        last_status = None
+        last_text = ""
         # Limita a ultimi 400 giorni — sufficiente per momentum 12 mesi
         from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
         while True:
@@ -271,16 +275,35 @@ for exchange, tickers in by_exchange.items():
                         "date": "gte." + from_400d,
                         "order": "ticker,date.desc",
                         "limit": "1000", "offset": str(offset_p)})
-            batch = rp.json()
-            if not isinstance(batch, list) or not batch: break
+            last_status = rp.status_code
+            try:
+                batch = rp.json()
+            except Exception as e:
+                last_text = f"JSON decode error: {e} — body: {rp.text[:200]}"
+                break
+            if not isinstance(batch, list):
+                last_text = f"risposta non e' una lista: {str(batch)[:200]}"
+                break
+            if not batch:
+                break
+            got_any = True
             for d in batch:
                 if d["adj_close"] is not None:
                     all_ph[(d["ticker"], exchange)].append(
                         {"date": d["date"], "close": d["adj_close"]})
             offset_p += 1000
             if len(batch) < 1000: break
+        if not got_any:
+            chunk_fail_log.append(
+                f"{exchange} chunk#{i//CHUNK} ({chunk[0]}..{chunk[-1]}, {len(chunk)} titoli) "
+                f"HTTP={last_status} {last_text}"
+            )
         time.sleep(0.02)
 log(f"  Prezzi caricati: {len(all_ph)} titoli")
+if chunk_fail_log:
+    log(f"  DIAGNOSTICA: {len(chunk_fail_log)} chunk senza dati su {sum(len(v) for v in by_exchange.values())//CHUNK+1} totali:")
+    for line in chunk_fail_log[:15]:
+        log(f"    {line}")
 
 # ── 4. MOMENTUM ──────────────────────────────────────────────
 log("\n[4/5] Calcolo momentum...")
