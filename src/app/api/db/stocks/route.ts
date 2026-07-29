@@ -186,26 +186,34 @@ async function fetchLatestPrices(exchangeList: string[]) {
 }
 
 async function fetchAllByExchange(table: string, select: string, exchangeList: string[], universeOnly = false) {
-  // Legge un exchange alla volta per evitare il limite di 1000 righe miste
-  const all: any[] = []
+  // FIX 29/7/2026: fetchAll() (usata per fundamentals) era gia' stata
+  // parallelizzata il 23/7 per la lentezza di Global/continenti, ma questa
+  // funzione gemella (usata per 'stocks') era rimasta SEQUENZIALE — un
+  // round trip alla volta per OGNI exchange, e dentro ogni exchange una
+  // pagina alla volta. Il Promise.all esterno che lancia stocks/
+  // fundamentals/latest_prices insieme resta comunque limitato dal piu'
+  // lento dei tre: con Global (19 exchange) o Sectors (11 exchange EU)
+  // questa era rimasta il vero collo di bottiglia, anche a fundamentals
+  // gia' parallela. Si legge ancora un exchange alla volta (per evitare
+  // il limite di 1000 righe miste tra exchange diversi), ma ORA tutte le
+  // pagine di TUTTI gli exchange partono insieme invece che in sequenza.
+  const PAGE = 1000
+  const MAX_PAGES_PER_EXCHANGE = 4 // fino a 4000 titoli per singolo exchange — ampio margine (il piu' grande, US, ne ha ~2000)
+  const requests: Promise<{ data: any[] | null; error: any }>[] = []
   for (const exchange of exchangeList) {
-    const PAGE = 1000
-    let from = 0
-    while (true) {
-      let query = supabase
-        .from(table)
-        .select(select)
-        .eq('exchange', exchange)
+    for (let page = 0; page < MAX_PAGES_PER_EXCHANGE; page++) {
+      let query = supabase.from(table).select(select).eq('exchange', exchange)
       if (universeOnly) query = query.eq('in_universe', true)
-      const { data, error } = await query
-        .order('ticker', { ascending: true })
-        .range(from, from + PAGE - 1)
-        .limit(PAGE)
-      if (error || !data || data.length === 0) break
-      all.push(...data)
-      if (data.length < PAGE) break
-      from += PAGE
+      requests.push(
+        query.order('ticker', { ascending: true }).range(page * PAGE, page * PAGE + PAGE - 1).limit(PAGE) as any
+      )
     }
+  }
+  const results = await Promise.all(requests)
+  const all: any[] = []
+  for (const { data, error } of results) {
+    if (error || !data) continue
+    all.push(...data)
   }
   return all
 }
