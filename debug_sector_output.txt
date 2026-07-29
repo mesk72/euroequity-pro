@@ -1,10 +1,21 @@
-EUROPA: 2121 titoli totali, 73 fermi (3.4%), data attesa=2026-07-29
-NORD AMERICA (US): 3001 titoli totali, 49 fermi (1.6%), data attesa=2026-07-29
-NORD AMERICA (TSX): 374 titoli totali, 10 fermi (2.7%), data attesa=2026-07-29
-APAC - Giappone (TSE): 1000 titoli totali, 118 fermi (11.8%), data attesa=2026-07-29
-APAC - Hong Kong (SEHK): 498 titoli totali, 7 fermi (1.4%), data attesa=2026-07-29
-APAC - Australia (ASX): 350 titoli totali, 1 fermi (0.3%), data attesa=2026-07-29
-APAC - Corea (KRX): 356 titoli totali, 3 fermi (0.8%), data attesa=2026-07-29
-APAC - Singapore (SGX): 100 titoli totali, 0 fermi (0.0%), data attesa=2026-07-29
+EUROPA: 2137  (MIL=117, XETRA=211, PA=217, AS=98, MC=100, BR=100, LS=35, VI=53, HE=100, IR=15, GR=100, LSE=423, SWX=161, OM=206, OB=100, CPSE=101)
+US: 3002  (US=3002)
+TSX: 400  (TSX=400)
+TSE: 1000  (TSE=1000)
+SEHK: 500  (SEHK=500)
+ASX: 350  (ASX=350)
+KRX: 400  (KRX=400)
+SGX: 100  (SGX=100)
 
-TOTALE COMPLESSIVO: 7800 titoli, 261 fermi (3.3%)
+TOTALE UNIVERSO REALE (in_universe=true, tabella stocks): 7889
+
+=== righe in latest_prices vs universo, per vedere quante mancano DEL TUTTO ===
+  XETRA: universo=211, in latest_prices=198, mancanti=13
+  LSE: universo=423, in latest_prices=422, mancanti=1
+  OM: universo=206, in latest_prices=204, mancanti=2
+  US: universo=3002, in latest_prices=3001, mancanti=1
+  TSX: universo=400, in latest_prices=374, mancanti=26
+  SEHK: universo=500, in latest_prices=498, mancanti=2
+  KRX: universo=400, in latest_prices=356, mancanti=44
+
+Totale righe in latest_prices: 7800  vs  universo reale: 7889  ->  mancanti del tutto: 89
