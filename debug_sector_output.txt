@@ -1,12 +1,33 @@
+Con dato 29/7 disponibile su YAHOO ma NON nel nostro DB: 0
 
-=== 4974.TSE ===
-DB: [{'date': '2026-06-12', 'adj_close': 1144.0}]
-Yahoo (4974.T): VUOTO
-
-=== 6961.TSE ===
-DB: [{'date': '2026-07-28', 'adj_close': 11950.0}, {'date': '2026-07-27', 'adj_close': 13030.0}, {'date': '2026-07-24', 'adj_close': 13150.0}]
-Yahoo (6961.T): {'6961.T': {Timestamp('2026-07-27 00:00:00'): 13030.0, Timestamp('2026-07-28 00:00:00'): 11950.0, Timestamp('2026-07-29 00:00:00'): nan}}
-
-=== 8098.TSE ===
-DB: [{'date': '2026-07-28', 'adj_close': 4015.0}, {'date': '2026-07-27', 'adj_close': 4050.0}, {'date': '2026-07-24', 'adj_close': 4030.0}]
-Yahoo (8098.T): {'8098.T': {Timestamp('2026-07-27 00:00:00'): 4050.0, Timestamp('2026-07-28 00:00:00'): 4015.0, Timestamp('2026-07-29 00:00:00'): nan}}
+Senza dato 29/7 nemmeno su Yahoo (genuino ritardo Yahoo): 30
+  ('4974', 'nessun dato in 5gg')
+  ('6961', 'ultimo disponibile: 2026-07-28')
+  ('6976', 'ultimo disponibile: 2026-07-28')
+  ('6995', 'ultimo disponibile: 2026-07-28')
+  ('7003', 'ultimo disponibile: 2026-07-28')
+  ('7014', 'ultimo disponibile: 2026-07-28')
+  ('7148', 'ultimo disponibile: 2026-07-28')
+  ('7157', 'ultimo disponibile: 2026-07-28')
+  ('7167', 'ultimo disponibile: 2026-07-28')
+  ('7172', 'ultimo disponibile: 2026-07-28')
+  ('7177', 'ultimo disponibile: 2026-07-28')
+  ('7261', 'ultimo disponibile: 2026-07-28')
+  ('7322', 'ultimo disponibile: 2026-07-28')
+  ('7327', 'ultimo disponibile: 2026-07-28')
+  ('7380', 'ultimo disponibile: 2026-07-28')
+  ('7384', 'ultimo disponibile: 2026-07-28')
+  ('7456', 'ultimo disponibile: 2026-07-28')
+  ('8098', 'ultimo disponibile: 2026-07-28')
+  ('8129', 'ultimo disponibile: 2026-07-28')
+  ('8133', 'ultimo disponibile: 2026-07-28')
+  ('8153', 'ultimo disponibile: 2026-07-28')
+  ('8179', 'ultimo disponibile: 2026-07-28')
+  ('8214', 'ultimo disponibile: 2026-07-28')
+  ('8267', 'ultimo disponibile: 2026-07-28')
+  ('8283', 'ultimo disponibile: 2026-07-28')
+  ('8345', 'ultimo disponibile: 2026-07-28')
+  ('7734', 'ultimo disponibile: 2026-07-28')
+  ('7806', 'ultimo disponibile: 2026-07-28')
+  ('8346', 'ultimo disponibile: 2026-07-28')
+  ('7832', 'ultimo disponibile: 2026-07-28')
