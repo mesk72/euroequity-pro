@@ -1,11 +1,10 @@
-Pagina 1 (offset=0): 1000 righe, ticker presenti: ['AAC', 'AOV', 'CCP', 'EDV']
-Pagina 2 (offset=1000): 1000 righe, ticker presenti: ['EDV', 'EHL', 'ELS', 'ELV', 'EVN']
-Pagina 3 (offset=2000): 1000 righe, ticker presenti: ['EVN', 'FFM', 'HMC', 'JMS']
-Pagina 4 (offset=3000): 1000 righe, ticker presenti: ['JMS', 'KAR', 'LIN', 'LYC', 'QAN']
-Pagina 5 (offset=4000): 1000 righe, ticker presenti: ['QAN', 'SEK', 'SMR', 'UOS']
-Pagina 6 (offset=5000): 600 righe, ticker presenti: ['UOS', 'WES', 'WOW']
-  -> ultima pagina (batch<1000)
+ASX universo: 350 titoli
 
-Ticker totali raccolti: ['AAC', 'AOV', 'CCP', 'EDV', 'EHL', 'ELS', 'ELV', 'EVN', 'FFM', 'HMC', 'JMS', 'KAR', 'LIN', 'LYC', 'QAN', 'SEK', 'SMR', 'UOS', 'WES', 'WOW']
-Ticker del chunk MANCANTI: []
-WES presente: True, righe: 280
+WES e' nel chunk#10: ['UOS', 'EDV', 'WES', 'WOW', 'EHL', 'AAC', 'ELS', 'ELV', 'LYC', 'AOV', 'QAN', 'HMC', 'CCP', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN', 'LRV', 'MFF']
+  Pagina 1 (offset=0): 1000 righe totali, 0 di WES
+  Pagina 2 (offset=1000): 1000 righe totali, 0 di WES
+  Pagina 3 (offset=2000): 1000 righe totali, 0 di WES
+  Pagina 4 (offset=3000): 1000 righe totali, 0 di WES
+  Pagina 5 (offset=4000): 1000 righe totali, 0 di WES
+  Pagina 6 (offset=5000): 600 righe totali, 280 di WES (piu' recente: 2026-07-29)
+WES trovato nella lettura completa del chunk: True
