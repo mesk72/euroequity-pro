@@ -1,7 +1,1 @@
-XETRA: 13 assenti -> ['BFV', 'EUK3', 'HG1', 'LEC', 'MBH3', 'MNV6', 'NLM', 'PHH2', 'SIM0', 'SPB', 'SSH', 'T2G', 'WBAH']
-LSE: 1 assenti -> ['AT.']
-OM: 2 assenti -> ['ROKO B', 'TANGEN B']
-US: 642 assenti -> ['F', 'FA', 'FANG', 'FBAK', 'FBP', 'FCBC', 'FCCN', 'FDUS', 'FDXF', 'FETH', 'FFMR', 'FFPP', 'FG', 'FHN', 'FIG', 'FINN', 'FINS', 'FISV', 'FIVN', 'FLG', 'FLGT', 'FLUT', 'FMCB', 'FMNB', 'FN', 'FNB', 'FNF', 'FNGS', 'FOR', 'FOXA', 'FOXF', 'FPS', 'FRBA', 'FRBT', 'FRMI', 'FROG', 'FRPH', 'FRVO', 'FSK', 'FULT', 'FUTU', 'FWRG', 'GAM', 'GAMI', 'GBTC', 'GCMG', 'GDDY', 'GDS', 'GDV', 'GDYN']
-TSX: 26 assenti -> ['ACO.X', 'AP.UN', 'APR.UN', 'BEI.UN', 'CAR.UN', 'CHP.UN', 'CRR.UN', 'CRT.UN', 'DIR.UN', 'FCR.UN', 'GO.U', 'GRT.UN', 'HOM.UN', 'IIP.UN', 'KMP.UN', 'MI.UN', 'MRG.UN', 'NXR.UN', 'PLZ.UN', 'PMZ.UN', 'PRV.UN', 'REI.UN', 'SGR.UN', 'SRU.UN', 'U.UN', 'VITL.UN']
-SEHK: 2 assenti -> ['778', '823']
-KRX: 44 assenti -> ['A000250', 'A007390', 'A031980', 'A032820', 'A036930', 'A039200', 'A041830', 'A043260', 'A050890', 'A058610', 'A060370', 'A064760', 'A067310', 'A078600', 'A080220', 'A082920', 'A083450', 'A083650', 'A084370', 'A086450', 'A086520', 'A087010', 'A088980', 'A090710', 'A095340', 'A095610', 'A099320', 'A100790', 'A101490', 'A102710', 'A112040', 'A131290', 'A131970', 'A140410', 'A189300', 'A214370', 'A218410', 'A237690', 'A358570', 'A388720', 'A415640', 'A445680', 'A457190', 'A950160']
+F (Ford) in prices_eod: [{'date': '2026-07-29', 'adj_close': 15.28}, {'date': '2026-07-28', 'adj_close': 14.96}, {'date': '2026-07-27', 'adj_close': 14.68}]
