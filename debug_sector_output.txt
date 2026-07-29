@@ -1,11 +1,9 @@
-Pagina 1 (offset=0): 1000 righe, ticker: ['AAC', 'AOV', 'CCP', 'EDV']
-Pagina 2 (offset=1000): 1000 righe, ticker: ['EDV', 'EHL', 'ELS', 'ELV', 'EVN']
-Pagina 3 (offset=2000): 1000 righe, ticker: ['EVN', 'FFM', 'HMC', 'JMS']
-Pagina 4 (offset=3000): 1000 righe, ticker: ['JMS', 'KAR', 'LIN', 'LYC', 'QAN']
-Pagina 5 (offset=4000): 1000 righe, ticker: ['QAN', 'SEK', 'SMR', 'UOS']
-Pagina 6 (offset=5000): 600 righe, ticker: ['UOS', 'WES', 'WOW']
-  -> ultima pagina (batch<1000)
+Totale ASX in_universe: 172
+Posizione di WES nella lista: 24
+Chunk contenente WES (posizioni 20-40): ['SEK', 'SMR', 'UOS', 'EDV', 'WES', 'WOW', 'EHL', 'AAC', 'ELS', 'ELV', 'LYC', 'AOV', 'QAN', 'HMC', 'CCP', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN']
 
-Totale righe raccolte: 5600
-Ticker trovati in totale: ['AAC', 'AOV', 'CCP', 'EDV', 'EHL', 'ELS', 'ELV', 'EVN', 'FFM', 'HMC', 'JMS', 'KAR', 'LIN', 'LYC', 'QAN', 'SEK', 'SMR', 'UOS', 'WES', 'WOW']
-Ticker MAI trovati: []
+HTTP status: 200
+Righe totali restituite: 1000
+Ticker DISTINTI restituiti: ['AAC', 'AOV', 'CCP', 'EDV']
+Ticker del chunk MANCANTI dalla risposta: ['SEK', 'SMR', 'UOS', 'WES', 'WOW', 'EHL', 'ELS', 'ELV', 'LYC', 'QAN', 'HMC', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN']
+Ultima data per ticker nel batch: {'AAC': '2026-07-29', 'AOV': '2026-07-29', 'CCP': '2026-07-29', 'EDV': '2026-07-29'}
