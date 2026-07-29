@@ -2428,12 +2428,22 @@ function AppContent() {
   const page = (searchParams.get('page') as Page) ?? 'home'
 
   // Cambia schermata aggiornando solo l'URL
+  // FIX 29/7/2026: stesso pattern gia' applicato al sotto-filtro "exchange"
+  // dello Screener (diagnosi Kimi, 25/7/2026) — router.replace() di Next.js
+  // e' ASINCRONO, quindi se l'utente clicca su un titolo subito dopo aver
+  // cambiato tab/mercato (es. passa a Giappone/TSE e clicca SoftBank),
+  // window.location.search letto da goToStock() puo' ancora riflettere la
+  // pagina PRECEDENTE (es. Nord America), salvando l'indirizzo sbagliato
+  // per il tasto "Back". history.replaceState() aggiorna l'URL del browser
+  // SUBITO (sincrono), eliminando la race condition per OGNI screener/tab
+  // — prima il fix copriva solo il sotto-filtro interno allo Screener, non
+  // il cambio di pagina principale che governa TUTTI gli screener.
   const navigateTo = (newPage: Page) => {
-    if (newPage === 'home') {
-      appRouter.replace('/', { scroll: false })
-    } else {
-      appRouter.replace(`/?page=${newPage}`, { scroll: false })
+    const newUrl = newPage === 'home' ? '/' : `/?page=${newPage}`
+    if (typeof window !== 'undefined' && window.location.pathname + window.location.search !== newUrl) {
+      window.history.replaceState(window.history.state, '', newUrl)
     }
+    appRouter.replace(newUrl, { scroll: false })
   }
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
   const isOwner = user?.email === 'andreameschini19@gmail.com'
