@@ -1,9 +1,5 @@
-Totale ASX in_universe: 172
-Posizione di WES nella lista: 24
-Chunk contenente WES (posizioni 20-40): ['SEK', 'SMR', 'UOS', 'EDV', 'WES', 'WOW', 'EHL', 'AAC', 'ELS', 'ELV', 'LYC', 'AOV', 'QAN', 'HMC', 'CCP', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN']
-
-HTTP status: 200
-Righe totali restituite: 1000
-Ticker DISTINTI restituiti: ['AAC', 'AOV', 'CCP', 'EDV']
-Ticker del chunk MANCANTI dalla risposta: ['SEK', 'SMR', 'UOS', 'WES', 'WOW', 'EHL', 'ELS', 'ELV', 'LYC', 'QAN', 'HMC', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN']
-Ultima data per ticker nel batch: {'AAC': '2026-07-29', 'AOV': '2026-07-29', 'CCP': '2026-07-29', 'EDV': '2026-07-29'}
+AAC: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
+AOV: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
+CCP: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
+EDV: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
+WES: 1000 righe totali, 1000 date distinte, duplicati: 0 date con piu' righe
