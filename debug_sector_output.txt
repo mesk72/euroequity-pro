@@ -1,13 +1,11 @@
-=== daily_log per il 28/7 ===
-{'id': 158, 'run_date': '2026-07-28', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 2348, 'rank_updated': 1320, 'duration_seconds': 545, 'created_at': '2026-07-28T20:28:43.609816+00:00'}
-{'id': 155, 'run_date': '2026-07-28', 'market': 'APAC', 'prices_updated': 1850, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 1847, 'rank_updated': 1151, 'duration_seconds': 277, 'created_at': '2026-07-28T06:14:11.218844+00:00'}
-{'id': 157, 'run_date': '2026-07-28', 'market': 'APAC', 'prices_updated': 1850, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 1847, 'rank_updated': 1151, 'duration_seconds': 313, 'created_at': '2026-07-28T20:03:55.949347+00:00'}
-{'id': 154, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 453, 'created_at': '2026-07-28T05:18:11.530532+00:00'}
-{'id': 151, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 464, 'created_at': '2026-07-28T04:58:17.558036+00:00'}
-{'id': 156, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 534, 'created_at': '2026-07-28T06:18:24.08296+00:00'}
-{'id': 153, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 444, 'created_at': '2026-07-28T05:09:49.216789+00:00'}
-{'id': 152, 'run_date': '2026-07-28', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 3373, 'rank_updated': 3046, 'duration_seconds': 475, 'created_at': '2026-07-28T04:58:29.623336+00:00'}
+=== Verifica diretta prices_eod per titoli noti ===
+ASML.AS: [{'date': '2026-07-29', 'adj_close': 1363.2}]
+SAP.XETRA: [{'date': '2026-07-29', 'adj_close': 159.66}]
+MC.PA: [{'date': '2026-07-29', 'adj_close': 473.3}]
+AAPL.US: [{'date': '2026-07-28', 'adj_close': 340.08}]
+MSFT.US: [{'date': '2026-07-28', 'adj_close': 393.35}]
+SHOP.TSX: []
 
-=== conteggio effettivo titoli in_universe per exchange, con prezzo al 28/7 ===
-EU: universo totale in_universe=true -> 2137
-NA: universo totale in_universe=true -> 3402
+=== Distribuzione date in latest_prices (cache) ===
+EU: totale 2118 righe, distribuzione date: {'2026-07-29': 1950, '2026-07-28': 164, '2026-07-27': 2, '2026-07-24': 1, '2026-07-23': 1}
+NA: totale 1373 righe, distribuzione date: {'2026-07-28': 1363, '2026-07-21': 3, '2026-07-13': 2, '2026-07-14': 1, '2026-07-16': 1}
