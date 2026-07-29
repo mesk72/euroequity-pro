@@ -362,12 +362,18 @@ for stock in all_stocks:
     last_date = datetime.strptime(data[0]['date'], "%Y-%m-%d")
     chg1d = round(data[0]['close'] / data[1]['close'] - 1, 6)
 
-    def mom_new_weeks(trading_days_back):
-        # 1 settimana = 4 giorni di trading indietro (non 5, non calendario)
-        if len(data) <= trading_days_back: return None
-        ref_price = data[trading_days_back]['close']
-        if ref_price and ref_price != 0:
-            return round(last_px / ref_price - 1, 6)
+    def mom_new_weeks(days_back):
+        # FIX 29/7/2026: 1 settimana = 7 giorni di CALENDARIO indietro
+        # (come mom_new_months), non giorni di trading fissi - verificato
+        # contro Yahoo con GOOGL, la formula precedente dava risultati
+        # sistematicamente diversi dal valore reale.
+        target = last_date.date() - timedelta(days=days_back)
+        target_plus1 = target + timedelta(days=1)
+        candidates = [p for p in data if p['date'] >= target_plus1.isoformat()]
+        if not candidates: return None
+        ref = min(candidates, key=lambda p: p['date'])
+        if ref['close'] and ref['close'] != 0:
+            return round(last_px / ref['close'] - 1, 6)
         return None
 
     def mom_new_months(months):
@@ -384,7 +390,7 @@ for stock in all_stocks:
 
     mom_updates.append({
         "ticker": ticker, "exchange": exchange,
-        "mom1w": mom_new_weeks(4), "mom1m": mom_new_months(1),
+        "mom1w": mom_new_weeks(7), "mom1m": mom_new_months(1),
         "mom6m": mom_new_months(6), "mom12m": mom_new_months(12),
         "change1d": chg1d, "price": last_px,
         "_last_date": last_date.strftime("%Y-%m-%d"),
