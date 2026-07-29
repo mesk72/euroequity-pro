@@ -1,6 +1,2 @@
-Oggi: 2026-07-28, Close=nan
-
-1 settimana: target=2026-07-21, usa 2026-07-21 (Close=347.15) -> perf=nan%
-1 mese: target=2026-06-28, usa 2026-06-26 (Close=337.39) -> perf=nan%
-6 mesi: target=2026-01-28, usa 2026-01-28 (Close=336.01) -> perf=nan%
-12 mesi: target=2025-07-28, usa 2025-07-28 (Close=192.58) -> perf=nan%
+Valore salvato in fundamentals (usato da screener e pagina titolo):
+[{'mom1w': -0.0245, 'mom1m': -0.0564, 'mom6m': -0.0121, 'mom12m': 0.7096}]
