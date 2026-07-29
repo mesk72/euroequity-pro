@@ -1,42 +1,12 @@
-created_at: 2026-07-29T14:46:03.493868+00:00
-============================================================
-FORWARDALPHA DAILY APAC LOAD — 2026-07-29
-============================================================
+Totale ASX in_universe=true: 172
+WES presente in lista? True
+WES e' in posizione 24, chunk #1: ['SEK', 'SMR', 'UOS', 'EDV', 'WES', 'WOW', 'EHL', 'AAC', 'ELS', 'ELV', 'LYC', 'AOV', 'QAN', 'HMC', 'CCP', 'EVN', 'FFM', 'JMS', 'KAR', 'LIN']
 
-[1/5] Caricamento universo APAC...
-  Universo APAC: 2350 titoli
+URL params: {'select': 'ticker,date,adj_close', 'exchange': 'eq.ASX', 'ticker': 'in.(SEK,SMR,UOS,EDV,WES,WOW,EHL,AAC,ELS,ELV,LYC,AOV,QAN,HMC,CCP,EVN,FFM,JMS,KAR,LIN)', 'date': 'gte.2025-06-24', 'order': 'ticker,date.desc', 'limit': '1000', 'offset': '0'}
 
-[2/5] Download prezzi EOD da Yahoo Finance...
-  Data piu' recente nel mercato ASX: 2026-07-29 — uso 2026-07-19 come base (margine di sicurezza)
-  Data piu' recente nel mercato KRX: 2026-07-29 — uso 2026-07-19 come base (margine di sicurezza)
-  Data piu' recente nel mercato SEHK: 2026-07-29 — uso 2026-07-19 come base (margine di sicurezza)
-  Data piu' recente nel mercato SGX: 2026-07-29 — uso 2026-07-19 come base (margine di sicurezza)
-  Data piu' recente nel mercato TSE: 2026-07-29 — uso 2026-07-19 come base (margine di sicurezza)
-  Prezzi Yahoo: ok=2350 fail=0
-
-[3/5] Lettura prezzi da prices_eod...
-  Prezzi caricati: 1623 titoli
-
-[4/5] Calcolo momentum...
-  Momentum ok=2348 fail=2
-  latest_prices aggiornata: 1623 titoli (falliti: 0)
-
-[5/5] Ricalcolo rank APAC...
-  Fundamentals: 1542
-  JPN: 883 rankati
-  HKG: 487 rankati
-  AUS: 172 rankati
-  Rank APAC: 1542/1542
-  Combined rank AP: 1320/1320
-
-  Aggiornamento indici APAC...
-  ERR Nikkei 225: HTTP 401
-  ERR Hang Seng: HTTP 401
-  ERR ASX 200: HTTP 401
-  Indici APAC: 0/3
-
-Log: leeway=2350 fail=0 momentum=2348 rank=1320 durata=505s
-
-============================================================
-DAILY APAC LOAD COMPLETATO
-============================================================
+Status: 200
+Righe totali tornate: 1000
+Ticker presenti nella risposta: ['AAC', 'AOV', 'CCP', 'EDV']
+Ticker MANCANTI dalla risposta: ['EHL', 'ELS', 'ELV', 'EVN', 'FFM', 'HMC', 'JMS', 'KAR', 'LIN', 'LYC', 'QAN', 'SEK', 'SMR', 'UOS', 'WES', 'WOW']
+Righe per WES specificamente: 0
+[]
