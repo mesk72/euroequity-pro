@@ -1,30 +1,10 @@
-Totale fermi: 73, data prevalente=2026-07-29
+EUROPA: 2121 titoli totali, 73 fermi (3.4%), data attesa=2026-07-29
+NORD AMERICA (US): 3001 titoli totali, 49 fermi (1.6%), data attesa=2026-07-29
+NORD AMERICA (TSX): 374 titoli totali, 10 fermi (2.7%), data attesa=2026-07-29
+APAC - Giappone (TSE): 1000 titoli totali, 118 fermi (11.8%), data attesa=2026-07-29
+APAC - Hong Kong (SEHK): 498 titoli totali, 7 fermi (1.4%), data attesa=2026-07-29
+APAC - Australia (ASX): 350 titoli totali, 1 fermi (0.3%), data attesa=2026-07-29
+APAC - Corea (KRX): 356 titoli totali, 3 fermi (0.8%), data attesa=2026-07-29
+APAC - Singapore (SGX): 100 titoli totali, 0 fermi (0.0%), data attesa=2026-07-29
 
-Confermato ritardo Yahoo (yahoo non ha piu' di noi): 23/25
-  ('YRM', 'MIL', '2026-07-28', '2026-07-28')
-  ('EIFF', 'PA', '2026-07-28', '2026-07-28')
-  ('ARTO', 'PA', '2026-07-28', '2026-07-28')
-  ('MLMTP', 'PA', '2026-07-28', '2026-07-28')
-  ('MLPLC', 'PA', '2026-07-28', '2026-07-28')
-  ('MALT', 'PA', '2026-07-28', '2026-07-28')
-  ('BEVER', 'AS', '2026-07-28', '2026-07-28')
-  ('ECT', 'AS', '2026-07-28', '2026-07-28')
-  ('PORF', 'AS', '2026-07-28', '2026-07-28')
-  ('QEV', 'AS', '2026-07-28', '2026-07-28')
-  ('HWK', 'AS', '2026-07-28', '2026-07-28')
-  ('CTAC', 'AS', '2026-07-28', '2026-07-28')
-  ('ARM', 'MC', '2026-07-28', '2026-07-28')
-  ('YGMP', 'MC', '2026-07-28', '2026-07-28')
-  ('GGC', 'MC', '2026-07-28', '2026-07-28')
-  ('YSIL', 'MC', '2026-07-28', '2026-07-28')
-  ('YZBL', 'MC', '2026-07-28', '2026-07-28')
-  ('YATO', 'MC', '2026-07-28', '2026-07-28')
-  ('YFID', 'MC', '2026-07-28', '2026-07-28')
-  ('YCPS', 'MC', '2026-07-28', '2026-07-28')
-  ('YEPSA', 'MC', '2026-07-28', '2026-07-28')
-  ('YVIV', 'MC', '2026-07-28', '2026-07-28')
-  ('IEP', 'BR', '2026-07-28', '2026-07-28')
-
-BUG REALE (yahoo ha dati piu' recenti di noi, o yahoo vuoto): 2/25
-  ('1COV', 'XETRA', 'yahoo vuoto')
-  ('COFB', 'BR', 'yahoo vuoto')
+TOTALE COMPLESSIVO: 7800 titoli, 261 fermi (3.3%)
