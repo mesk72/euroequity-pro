@@ -1,35 +1,13 @@
+=== daily_log per il 28/7 ===
+{'id': 158, 'run_date': '2026-07-28', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 2348, 'rank_updated': 1320, 'duration_seconds': 545, 'created_at': '2026-07-28T20:28:43.609816+00:00'}
+{'id': 155, 'run_date': '2026-07-28', 'market': 'APAC', 'prices_updated': 1850, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 1847, 'rank_updated': 1151, 'duration_seconds': 277, 'created_at': '2026-07-28T06:14:11.218844+00:00'}
+{'id': 157, 'run_date': '2026-07-28', 'market': 'APAC', 'prices_updated': 1850, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 1847, 'rank_updated': 1151, 'duration_seconds': 313, 'created_at': '2026-07-28T20:03:55.949347+00:00'}
+{'id': 154, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 453, 'created_at': '2026-07-28T05:18:11.530532+00:00'}
+{'id': 151, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 464, 'created_at': '2026-07-28T04:58:17.558036+00:00'}
+{'id': 156, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 534, 'created_at': '2026-07-28T06:18:24.08296+00:00'}
+{'id': 153, 'run_date': '2026-07-28', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'last_price_date': '2026-07-28', 'momentum_updated': 2574, 'rank_updated': 1983, 'duration_seconds': 444, 'created_at': '2026-07-28T05:09:49.216789+00:00'}
+{'id': 152, 'run_date': '2026-07-28', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'last_price_date': '2026-07-28', 'momentum_updated': 3373, 'rank_updated': 3046, 'duration_seconds': 475, 'created_at': '2026-07-28T04:58:29.623336+00:00'}
 
-=== 1551 -> 1551.HK ===
-DB: [{'date': '2026-07-28', 'adj_close': 1.53}, {'date': '2026-07-27', 'adj_close': 1.53}, {'date': '2026-07-24', 'adj_close': 1.53}]
-Yahoo: {'1551.HK': {Timestamp('2026-07-24 00:00:00'): 1.5299999713897705, Timestamp('2026-07-27 00:00:00'): 1.5299999713897705, Timestamp('2026-07-28 00:00:00'): 1.5299999713897705}}
-stocks: [{'ticker': '1551', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '1551.HK'}]
-
-=== 2362 -> 2362.HK ===
-DB: [{'date': '2026-07-28', 'adj_close': 0.636}, {'date': '2026-07-27', 'adj_close': 0.636}, {'date': '2026-07-24', 'adj_close': 0.636}]
-Yahoo: {'2362.HK': {Timestamp('2026-07-24 00:00:00'): 0.6359999775886536, Timestamp('2026-07-27 00:00:00'): 0.6359999775886536, Timestamp('2026-07-28 00:00:00'): 0.6359999775886536}}
-stocks: [{'ticker': '2362', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '2362.HK'}]
-
-=== 754 -> 0754.HK ===
-DB: [{'date': '2026-07-28', 'adj_close': 2.64}, {'date': '2026-07-27', 'adj_close': 2.64}, {'date': '2026-07-24', 'adj_close': 2.64}]
-Yahoo: {'0754.HK': {Timestamp('2026-07-24 00:00:00'): 2.640000104904175, Timestamp('2026-07-27 00:00:00'): 2.640000104904175, Timestamp('2026-07-28 00:00:00'): 2.640000104904175}}
-stocks: [{'ticker': '754', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '0754.HK'}]
-
-=== 2596 -> 2596.HK ===
-DB: [{'date': '2026-07-28', 'adj_close': 2.65}, {'date': '2026-07-27', 'adj_close': 2.65}, {'date': '2026-07-24', 'adj_close': 2.64}]
-Yahoo: {'2596.HK': {Timestamp('2026-07-24 00:00:00'): 2.640000104904175, Timestamp('2026-07-27 00:00:00'): 2.6500000953674316, Timestamp('2026-07-28 00:00:00'): 2.6500000953674316}}
-stocks: [{'ticker': '2596', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '2596.HK'}]
-
-=== 247 -> 0247.HK ===
-DB: [{'date': '2026-07-28', 'adj_close': 19.35}, {'date': '2026-07-27', 'adj_close': 19.35}, {'date': '2026-07-24', 'adj_close': 19.35}]
-Yahoo: {'0247.HK': {Timestamp('2026-07-24 00:00:00'): 19.350000381469727, Timestamp('2026-07-27 00:00:00'): 19.350000381469727, Timestamp('2026-07-28 00:00:00'): 19.350000381469727}}
-stocks: [{'ticker': '247', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '0247.HK'}]
-
-=== 2558 -> 2558.HK ===
-DB: [{'date': '2026-07-28', 'adj_close': 1.1}, {'date': '2026-07-27', 'adj_close': 1.12}, {'date': '2026-07-24', 'adj_close': 1.12}]
-Yahoo: {'2558.HK': {Timestamp('2026-07-24 00:00:00'): 1.1200000047683716, Timestamp('2026-07-27 00:00:00'): 1.1200000047683716, Timestamp('2026-07-28 00:00:00'): 1.100000023841858}}
-stocks: [{'ticker': '2558', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '2558.HK'}]
-
-=== 1788 -> 1788.HK ===
-DB: [{'date': '2026-07-28', 'adj_close': 2.08}, {'date': '2026-07-27', 'adj_close': 2.08}, {'date': '2026-07-24', 'adj_close': 2.08}]
-Yahoo: {'1788.HK': {Timestamp('2026-07-24 00:00:00'): 2.0799999237060547, Timestamp('2026-07-27 00:00:00'): 2.0799999237060547, Timestamp('2026-07-28 00:00:00'): 2.0799999237060547}}
-stocks: [{'ticker': '1788', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '1788.HK'}]
+=== conteggio effettivo titoli in_universe per exchange, con prezzo al 28/7 ===
+EU: universo totale in_universe=true -> 2137
+NA: universo totale in_universe=true -> 3402
