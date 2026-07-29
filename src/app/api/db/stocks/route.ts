@@ -333,13 +333,15 @@ export async function GET(req: NextRequest) {
   const exchanges = req.nextUrl.searchParams.get('exchanges') || ''
   const search = req.nextUrl.searchParams.get('search') || ''
   const ticker = req.nextUrl.searchParams.get('ticker') || ''
+  const tickersParam = req.nextUrl.searchParams.get('tickers') || '' // "TICKER.EXCHANGE,TICKER2.EXCHANGE2,..." — usato da MyScreen per caricare l'intera watchlist in una sola chiamata
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '0')
 
-  // Per il ramo singolo titolo, la verifica utente viene fatta DENTRO il
-  // Promise.all con le query dati (vedi sotto) — qui la saltiamo per non
-  // farla due volte. Per tutti gli altri rami, la facciamo subito.
+  // Per il ramo singolo titolo e per il ramo batch (tickers), la verifica
+  // utente viene fatta DENTRO il Promise.all con le query dati (vedi
+  // sotto) — qui la saltiamo per non farla due volte. Per tutti gli altri
+  // rami, la facciamo subito.
   let isOwner = false, isInstitutionalViewer = false, isLoggedIn = false
-  if (!(ticker && exchange)) {
+  if (!(ticker && exchange) && !tickersParam) {
     ;({ isOwner, isInstitutionalViewer, isLoggedIn } = await verifyUser(authHeader))
   }
 
@@ -406,6 +408,70 @@ export async function GET(req: NextRequest) {
         finalMapped = redactRawData(mapped)
       }
       return jsonNoCache({ stocks: [finalMapped], source: 'supabase' })
+    }
+
+    if (tickersParam) {
+      // FIX 29/7/2026: MyScreen (watchlist) chiamava questo endpoint UNA
+      // VOLTA PER OGNI titolo in watchlist (in parallelo tra loro, ma
+      // comunque N round trip HTTP separati — e ognuno rifaceva la
+      // verifica utente con supabase.auth.getUser(), una chiamata di rete
+      // a Supabase Auth ripetuta N volte per lo STESSO identico token).
+      // Con una watchlist di decine di titoli diventava lento. Ora un
+      // solo round trip per l'intera watchlist, una sola verifica utente.
+      const pairs = tickersParam.split(',').map(p => {
+        const idx = p.lastIndexOf('.')
+        return idx > 0 ? { ticker: p.slice(0, idx), exchange: p.slice(idx + 1) } : null
+      }).filter((p): p is { ticker: string; exchange: string } => !!p)
+      if (!pairs.length) return jsonNoCache({ stocks: [] })
+      const tickerList = Array.from(new Set(pairs.map(p => p.ticker)))
+      const exList2 = Array.from(new Set(pairs.map(p => p.exchange)))
+      const pairKeys = new Set(pairs.map(p => `${p.ticker}.${p.exchange}`))
+
+      const [stockRes, fundRes, userVerify] = await Promise.all([
+        supabase.from('stocks').select('ticker,exchange,isin,company,sector,country,flag,website,price,last_price_date,primary_exchange,description,yahoo_ticker,in_universe').in('ticker', tickerList).in('exchange', exList2),
+        supabase.from('fundamentals').select('ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf').in('ticker', tickerList).in('exchange', exList2),
+        verifyUser(authHeader),
+      ])
+      isOwner = userVerify.isOwner
+      isInstitutionalViewer = userVerify.isInstitutionalViewer
+      isLoggedIn = userVerify.isLoggedIn
+
+      // .in()/.in() e' un incrocio (non coppie esatte): scarta le righe
+      // che non corrispondono a una coppia ticker+exchange realmente
+      // richiesta (es. stesso ticker su un altro mercato).
+      const stocksData = (stockRes.data || []).filter((s: any) => pairKeys.has(`${s.ticker}.${s.exchange}`))
+      const fundDataAll = (fundRes.data || []).filter((f: any) => pairKeys.has(`${f.ticker}.${f.exchange}`))
+      const fundMap: Record<string, any> = {}
+      for (const f of fundDataAll) fundMap[`${f.ticker}.${f.exchange}`] = f
+
+      let stocks = stocksData.map((s: any) => mapStock(s, fundMap[`${s.ticker}.${s.exchange}`] || {}))
+
+      // Prezzo reale da prices_eod via latest_prices — stessa fonte del ramo bulk.
+      try {
+        const freshPrices = await fetchLatestPrices(exList2)
+        for (const s of stocks) {
+          const key = `${s.ticker}.${s.exchange}`
+          const fresh = freshPrices[key]
+          if (fresh) {
+            s.price = fresh.price
+            s.change1d = fresh.change1d
+            s.lastPriceDate = fresh.date
+          }
+        }
+      } catch {}
+
+      if (!isOwner && !isInstitutionalViewer) {
+        const top500 = await getTop500Keys()
+        stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
+      }
+      if (isOwner) {
+        // nessuna restrizione
+      } else if (!isLoggedIn) {
+        stocks = stocks.map((s: any) => redactForGuest(s))
+      } else {
+        stocks = stocks.map((s: any) => redactRawData(s))
+      }
+      return jsonNoCache({ stocks, source: 'supabase' })
     }
 
     if (search) {
