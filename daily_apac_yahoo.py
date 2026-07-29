@@ -651,6 +651,45 @@ for ex, tickers in by_exchange.items():
             repair_fail += 1
         time.sleep(0.05)
 log(f"  latest_prices riparata: {repaired} titoli corretti, {repair_fail} falliti")
+# ── FASE B: TITOLI MAI SCRITTI in latest_prices ──────────────
+# FIX 29/7/2026 (Kimi + Claude): la Fase A sopra confronta la price_date
+# di un record ESISTENTE — se il titolo non ha MAI avuto una riga in
+# latest_prices, la Fase A non lo vede affatto (invisibile al repair).
+# Trovato cosi': US aveva 642 titoli mai scritti (es. Ford, GoDaddy,
+# Fiserv) pur con dati perfettamente corretti in prices_eod. Questa fase
+# trova chi e' in_universe ma assente del tutto da latest_prices, e lo
+# scrive leggendo da prices_eod.
+log("\n[Riparazione B] Titoli mai scritti in latest_prices...")
+missing_filled = missing_notfound = 0
+for ex, tickers in by_exchange.items():
+    have_here = set(tk for (tk, exx) in lp_current.keys() if exx == ex)
+    missing_here = [tk for tk in tickers if tk not in have_here]
+    batch_missing = []
+    for tk in missing_here:
+        try:
+            rpx = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+                params={"select": "date,adj_close", "ticker": "eq." + tk, "exchange": "eq." + ex,
+                        "order": "date.desc", "limit": "2"})
+            rows_px = rpx.json()
+            if not isinstance(rows_px, list) or len(rows_px) < 1:
+                missing_notfound += 1
+                continue
+            last_row = rows_px[0]
+            prev_row = rows_px[1] if len(rows_px) > 1 else None
+            chg = round(last_row["adj_close"] / prev_row["adj_close"] - 1, 6) if (prev_row and prev_row.get("adj_close")) else None
+            prev_price = (last_row["adj_close"] / (1 + chg)) if (chg is not None and (1 + chg) != 0) else None
+            batch_missing.append({"ticker": tk, "exchange": ex, "price": last_row["adj_close"],
+                "prev_price": prev_price, "price_date": last_row["date"], "change1d": chg})
+        except Exception:
+            missing_notfound += 1
+        time.sleep(0.03)
+    for i in range(0, len(batch_missing), 500):
+        rup2 = requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange",
+            headers=headers_up, json=batch_missing[i:i+500])
+        if rup2.status_code in (200, 201, 204):
+            missing_filled += len(batch_missing[i:i+500])
+log(f"  Titoli mai scritti riempiti: {missing_filled}, non trovati nemmeno in prices_eod: {missing_notfound}")
+
 
 end_time = time_module.time()
 log_entry = {"run_date": TODAY, "market": "APAC", "prices_updated": ok_prices,
