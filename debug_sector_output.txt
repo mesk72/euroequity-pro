@@ -1,33 +1,35 @@
-Con dato 29/7 disponibile su YAHOO ma NON nel nostro DB: 0
 
-Senza dato 29/7 nemmeno su Yahoo (genuino ritardo Yahoo): 30
-  ('4974', 'nessun dato in 5gg')
-  ('6961', 'ultimo disponibile: 2026-07-28')
-  ('6976', 'ultimo disponibile: 2026-07-28')
-  ('6995', 'ultimo disponibile: 2026-07-28')
-  ('7003', 'ultimo disponibile: 2026-07-28')
-  ('7014', 'ultimo disponibile: 2026-07-28')
-  ('7148', 'ultimo disponibile: 2026-07-28')
-  ('7157', 'ultimo disponibile: 2026-07-28')
-  ('7167', 'ultimo disponibile: 2026-07-28')
-  ('7172', 'ultimo disponibile: 2026-07-28')
-  ('7177', 'ultimo disponibile: 2026-07-28')
-  ('7261', 'ultimo disponibile: 2026-07-28')
-  ('7322', 'ultimo disponibile: 2026-07-28')
-  ('7327', 'ultimo disponibile: 2026-07-28')
-  ('7380', 'ultimo disponibile: 2026-07-28')
-  ('7384', 'ultimo disponibile: 2026-07-28')
-  ('7456', 'ultimo disponibile: 2026-07-28')
-  ('8098', 'ultimo disponibile: 2026-07-28')
-  ('8129', 'ultimo disponibile: 2026-07-28')
-  ('8133', 'ultimo disponibile: 2026-07-28')
-  ('8153', 'ultimo disponibile: 2026-07-28')
-  ('8179', 'ultimo disponibile: 2026-07-28')
-  ('8214', 'ultimo disponibile: 2026-07-28')
-  ('8267', 'ultimo disponibile: 2026-07-28')
-  ('8283', 'ultimo disponibile: 2026-07-28')
-  ('8345', 'ultimo disponibile: 2026-07-28')
-  ('7734', 'ultimo disponibile: 2026-07-28')
-  ('7806', 'ultimo disponibile: 2026-07-28')
-  ('8346', 'ultimo disponibile: 2026-07-28')
-  ('7832', 'ultimo disponibile: 2026-07-28')
+=== 1551 -> 1551.HK ===
+DB: [{'date': '2026-07-28', 'adj_close': 1.53}, {'date': '2026-07-27', 'adj_close': 1.53}, {'date': '2026-07-24', 'adj_close': 1.53}]
+Yahoo: {'1551.HK': {Timestamp('2026-07-24 00:00:00'): 1.5299999713897705, Timestamp('2026-07-27 00:00:00'): 1.5299999713897705, Timestamp('2026-07-28 00:00:00'): 1.5299999713897705}}
+stocks: [{'ticker': '1551', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '1551.HK'}]
+
+=== 2362 -> 2362.HK ===
+DB: [{'date': '2026-07-28', 'adj_close': 0.636}, {'date': '2026-07-27', 'adj_close': 0.636}, {'date': '2026-07-24', 'adj_close': 0.636}]
+Yahoo: {'2362.HK': {Timestamp('2026-07-24 00:00:00'): 0.6359999775886536, Timestamp('2026-07-27 00:00:00'): 0.6359999775886536, Timestamp('2026-07-28 00:00:00'): 0.6359999775886536}}
+stocks: [{'ticker': '2362', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '2362.HK'}]
+
+=== 754 -> 0754.HK ===
+DB: [{'date': '2026-07-28', 'adj_close': 2.64}, {'date': '2026-07-27', 'adj_close': 2.64}, {'date': '2026-07-24', 'adj_close': 2.64}]
+Yahoo: {'0754.HK': {Timestamp('2026-07-24 00:00:00'): 2.640000104904175, Timestamp('2026-07-27 00:00:00'): 2.640000104904175, Timestamp('2026-07-28 00:00:00'): 2.640000104904175}}
+stocks: [{'ticker': '754', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '0754.HK'}]
+
+=== 2596 -> 2596.HK ===
+DB: [{'date': '2026-07-28', 'adj_close': 2.65}, {'date': '2026-07-27', 'adj_close': 2.65}, {'date': '2026-07-24', 'adj_close': 2.64}]
+Yahoo: {'2596.HK': {Timestamp('2026-07-24 00:00:00'): 2.640000104904175, Timestamp('2026-07-27 00:00:00'): 2.6500000953674316, Timestamp('2026-07-28 00:00:00'): 2.6500000953674316}}
+stocks: [{'ticker': '2596', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '2596.HK'}]
+
+=== 247 -> 0247.HK ===
+DB: [{'date': '2026-07-28', 'adj_close': 19.35}, {'date': '2026-07-27', 'adj_close': 19.35}, {'date': '2026-07-24', 'adj_close': 19.35}]
+Yahoo: {'0247.HK': {Timestamp('2026-07-24 00:00:00'): 19.350000381469727, Timestamp('2026-07-27 00:00:00'): 19.350000381469727, Timestamp('2026-07-28 00:00:00'): 19.350000381469727}}
+stocks: [{'ticker': '247', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '0247.HK'}]
+
+=== 2558 -> 2558.HK ===
+DB: [{'date': '2026-07-28', 'adj_close': 1.1}, {'date': '2026-07-27', 'adj_close': 1.12}, {'date': '2026-07-24', 'adj_close': 1.12}]
+Yahoo: {'2558.HK': {Timestamp('2026-07-24 00:00:00'): 1.1200000047683716, Timestamp('2026-07-27 00:00:00'): 1.1200000047683716, Timestamp('2026-07-28 00:00:00'): 1.100000023841858}}
+stocks: [{'ticker': '2558', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '2558.HK'}]
+
+=== 1788 -> 1788.HK ===
+DB: [{'date': '2026-07-28', 'adj_close': 2.08}, {'date': '2026-07-27', 'adj_close': 2.08}, {'date': '2026-07-24', 'adj_close': 2.08}]
+Yahoo: {'1788.HK': {Timestamp('2026-07-24 00:00:00'): 2.0799999237060547, Timestamp('2026-07-27 00:00:00'): 2.0799999237060547, Timestamp('2026-07-28 00:00:00'): 2.0799999237060547}}
+stocks: [{'ticker': '1788', 'exchange': 'SEHK', 'in_universe': True, 'yahoo_ticker': '1788.HK'}]
