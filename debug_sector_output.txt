@@ -1,6 +1,2 @@
-stocks (ilike company_name=roche): {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
-stocks (ilike company=roche): [{'ticker': 'ROP', 'exchange': 'SWX', 'in_universe': True}, {'ticker': 'A006650', 'exchange': 'KRX', 'in_universe': True}, {'ticker': '009915016', 'exchange': 'BR', 'in_universe': False}, {'ticker': 'RBO', 'exchange': 'PA', 'in_universe': False}, {'ticker': '338', 'exchange': 'SEHK', 'in_universe': True}]
-ticker=ROG: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
-ticker=RO: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
-ticker=RHHBY: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
-ticker=RHHVF: {'code': '42703', 'details': None, 'hint': None, 'message': 'column stocks.company_name does not exist'}
+stocks: [{'ticker': 'ROP', 'exchange': 'SWX', 'company': 'Roche Holding AG', 'sector': 'Healthcare', 'country': 'CHE'}]
+prices_eod: [{'date': '2026-07-29', 'adj_close': 361.7}, {'date': '2026-07-28', 'adj_close': 367.9}, {'date': '2026-07-27', 'adj_close': 360.1}]
