@@ -579,6 +579,58 @@ for db_ticker, exchange, lt, name in EU_INDICES:
     time.sleep(0.2)
 log("  Indici EU: " + str(ok_idx) + "/" + str(len(EU_INDICES)))
 
+# ── RIPARAZIONE FINALE latest_prices ─────────────────────────
+# FIX 29/7/2026: stesso repair pass gia' aggiunto a daily_apac_yahoo.py -
+# confronta la price_date di ogni titolo con quella prevalente del suo
+# mercato, e per chi resta indietro rilegge SOLO quel titolo da
+# prices_eod (query singola, affidabile anche se il batch grande aveva
+# avuto un problema) e riscrive la sua riga in latest_prices.
+log("\n[Riparazione] Verifica e riparazione latest_prices...")
+from collections import Counter as _Counter
+lp_current = {}
+for ex in by_exchange.keys():
+    offset_lp = 0
+    while True:
+        rlpq = requests.get(SUPABASE_URL + "/rest/v1/latest_prices", headers=headers_r,
+            params={"select": "ticker,exchange,price_date", "exchange": "eq." + ex,
+                     "limit": "1000", "offset": str(offset_lp)})
+        try:
+            batch_lp = rlpq.json()
+        except Exception:
+            break
+        if not isinstance(batch_lp, list) or not batch_lp: break
+        for row in batch_lp:
+            lp_current[(row["ticker"], row["exchange"])] = row.get("price_date")
+        offset_lp += 1000
+        if len(batch_lp) < 1000: break
+
+repaired = repair_fail = 0
+for ex, tickers in by_exchange.items():
+    dates_here = [lp_current.get((tk, ex)) for tk in tickers if lp_current.get((tk, ex))]
+    if not dates_here: continue
+    prevalent_date = _Counter(dates_here).most_common(1)[0][0]
+    stragglers = [tk for tk in tickers if lp_current.get((tk, ex)) != prevalent_date]
+    for tk in stragglers:
+        try:
+            rpx = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+                params={"select": "date,adj_close", "ticker": "eq." + tk, "exchange": "eq." + ex,
+                        "order": "date.desc", "limit": "2"})
+            rows_px = rpx.json()
+            if not isinstance(rows_px, list) or len(rows_px) < 1: continue
+            last_row = rows_px[0]
+            prev_row = rows_px[1] if len(rows_px) > 1 else None
+            chg = round(last_row["adj_close"] / prev_row["adj_close"] - 1, 6) if (prev_row and prev_row.get("adj_close")) else None
+            prev_price = (last_row["adj_close"] / (1 + chg)) if (chg is not None and (1 + chg) != 0) else None
+            rup = requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange",
+                headers=headers_up, json=[{"ticker": tk, "exchange": ex, "price": last_row["adj_close"],
+                "prev_price": prev_price, "price_date": last_row["date"], "change1d": chg}])
+            if rup.status_code in (200, 201, 204): repaired += 1
+            else: repair_fail += 1
+        except Exception:
+            repair_fail += 1
+        time.sleep(0.05)
+log("  latest_prices riparata: " + str(repaired) + " titoli corretti, " + str(repair_fail) + " falliti")
+
 end_time = time_module.time()
 log_entry = {"run_date": TODAY, "market": "EU", "prices_updated": ok_prices,
              "prices_failed": fail_prices, "last_price_date": TODAY,
