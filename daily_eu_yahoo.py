@@ -15,6 +15,7 @@ except ImportError:
 from datetime import datetime, timedelta
 from collections import defaultdict
 import yfinance as yf
+import pandas as pd
 
 def pct_rank(values, v):
     if v is None: return None
