@@ -268,42 +268,44 @@ for exchange, tickers in by_exchange.items():
         # Limita a ultimi 400 giorni — sufficiente per momentum 12 mesi
         from_400d = (datetime.now() - timedelta(days=400)).strftime("%Y-%m-%d")
         while True:
-            # FIX 29/7/2026: nessun timeout ne' retry su questa chiamata —
-            # sotto centinaia di richieste sequenziali (l'intero universo
-            # APAC, ~120 chunk x fino a 6-7 pagine ciascuno) un singolo
-            # errore transitorio (rate limit, connessione caduta) troncava
-            # silenziosamente la lettura per quel ticker in poi, senza mai
-            # comparire nei log — causa reale di WES e altri 170+ titoli
-            # ASX con prices_eod corretto ma latest_prices/momentum indietro
-            # di giorni (verificato: la stessa identica query, isolata,
-            # recupera WES correttamente — il problema e' solo sotto carico
-            # prolungato).
-            rp = None
+            batch = None
+            last_text = ""
             for attempt in range(3):
+                rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+                    params={"select": "ticker,date,adj_close",
+                            "exchange": "eq." + exchange,
+                            "ticker": "in.(" + ",".join(chunk) + ")",
+                            "date": "gte." + from_400d,
+                            "order": "ticker,date.desc",
+                            "limit": "1000", "offset": str(offset_p)})
+                last_status = rp.status_code
                 try:
-                    rp = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-                        params={"select": "ticker,date,adj_close",
-                                "exchange": "eq." + exchange,
-                                "ticker": "in.(" + ",".join(chunk) + ")",
-                                "date": "gte." + from_400d,
-                                "order": "ticker,date.desc",
-                                "limit": "1000", "offset": str(offset_p)},
-                        timeout=20)
-                    break
+                    batch = rp.json()
                 except Exception as e:
-                    last_status = "EXC"
-                    last_text = f"tentativo {attempt+1}/3 fallito: {e}"
-                    time.sleep(1.0 + attempt)
-            if rp is None:
-                break
-            last_status = rp.status_code
-            try:
-                batch = rp.json()
-            except Exception as e:
-                last_text = f"JSON decode error: {e} — body: {rp.text[:200]}"
-                break
-            if not isinstance(batch, list):
+                    batch = None
+                    last_text = f"JSON decode error: {e} — body: {rp.text[:200]}"
+                if isinstance(batch, list):
+                    break
                 last_text = f"risposta non e' una lista: {str(batch)[:200]}"
+                time.sleep(0.5 * (attempt + 1))
+            if not isinstance(batch, list):
+                # FIX 29/7/2026: prima, se una pagina SUCCESSIVA alla prima
+                # falliva (es. errore transitorio/timeout su un chunk con
+                # piu' di 1000 righe totali su 400 giorni), il chunk restava
+                # "got_any=True" grazie alle pagine precedenti gia' andate a
+                # buon fine — la diagnostica per-chunk non vedeva nulla di
+                # anomalo, ma i titoli le cui righe cadevano nella pagina
+                # persa restavano silenziosamente senza dati recenti (causa
+                # reale, sospetta, di WES e altri titoli ASX/TSE/SEHK fermi
+                # pur con prices_eod corretto). Ora si ritenta fino a 3
+                # volte per pagina prima di arrendersi, e si logga
+                # esplicitamente quando una pagina viene persa DOPO che il
+                # chunk aveva gia' dati parziali.
+                chunk_fail_log.append(
+                    f"{exchange} chunk#{i//CHUNK} offset={offset_p} ({chunk[0]}..{chunk[-1]}, {len(chunk)} titoli) "
+                    f"HTTP={last_status} {last_text} — persa dopo 3 tentativi"
+                    + (" [PARZIALE: chunk aveva gia' dati da pagine precedenti]" if got_any else "")
+                )
                 break
             if not batch:
                 break
@@ -317,25 +319,13 @@ for exchange, tickers in by_exchange.items():
         if not got_any:
             chunk_fail_log.append(
                 f"{exchange} chunk#{i//CHUNK} ({chunk[0]}..{chunk[-1]}, {len(chunk)} titoli) "
-                f"HTTP={last_status} {last_text}"
+                f"totalmente vuoto"
             )
-        else:
-            # DIAGNOSTICA 29/7/2026 v2: il chunk ha risposto (got_any=True)
-            # ma potrebbe mancare SOLO ALCUNI ticker al suo interno — il
-            # controllo precedente vedeva solo il fallimento TOTALE del
-            # chunk (batch vuoto), non questo caso parziale, che a giudicare
-            # dal cluster alfabetico dei ticker bloccati (WBC,WBT,WC8,WDS,
-            # WEB,WES...) sembra il caso reale in corso.
-            missing_in_chunk = [t for t in chunk if (t, exchange) not in all_ph]
-            if missing_in_chunk:
-                chunk_fail_log.append(
-                    f"{exchange} chunk#{i//CHUNK} PARZIALE — mancanti {len(missing_in_chunk)}/{len(chunk)}: {missing_in_chunk}"
-                )
         time.sleep(0.02)
 log(f"  Prezzi caricati: {len(all_ph)} titoli")
 if chunk_fail_log:
-    log(f"  DIAGNOSTICA: {len(chunk_fail_log)} chunk senza dati su {sum(len(v) for v in by_exchange.values())//CHUNK+1} totali:")
-    for line in chunk_fail_log[:15]:
+    log(f"  DIAGNOSTICA: {len(chunk_fail_log)} problemi rilevati su {sum(len(v) for v in by_exchange.values())//CHUNK+1} chunk totali:")
+    for line in chunk_fail_log[:40]:
         log(f"    {line}")
 
 # ── 4. MOMENTUM ──────────────────────────────────────────────
