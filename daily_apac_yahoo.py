@@ -87,6 +87,15 @@ while True:
                 # silenziosamente da tempo (Leeway dismesso), lasciando
                 # 500 titoli senza aggiornamenti quotidiani senza che
                 # nessun errore fosse visibile (28/7/2026).
+                # FIX 29/7/2026: order esplicito - senza, Postgres non
+                # garantisce un ordine stabile tra esecuzioni diverse,
+                # quindi la composizione dei chunk da 150 titoli poteva
+                # cambiare ogni volta. Se un chunk incontra un problema
+                # (rate limit, blip di rete su un batch Yahoo), i titoli
+                # che ne risentono cambiavano run dopo run in modo
+                # imprevedibile (causa sospetta di BHP e altri titoli ASX
+                # bloccati in modo apparentemente casuale).
+                "order": "ticker.asc",
                 "offset": str(offset), "limit": "1000"})
     if not r.text or r.text == "[]": break
     try: data = r.json()
@@ -202,7 +211,20 @@ for exchange, tickers in by_exchange.items():
                 if yt not in closes.columns: fail_yf += 1; continue
                 tk, ex = ticker_map[yt]
                 last = last_dates.get((tk, ex), "2020-01-01")
-                for date_idx, price in closes[yt].dropna().items():
+                col_valid = closes[yt].dropna()
+                # DIAGNOSTICA 29/7/2026: nessuna eccezione veniva sollevata
+                # se un titolo, DENTRO un chunk bulk altrimenti riuscito,
+                # tornava con dati fermi a piu' di 2 giorni fa (es. BHP
+                # fermo mentre 149 titoli-fratelli nello stesso chunk
+                # arrivavano fino a oggi) — ok_yf veniva comunque
+                # incrementato, nessun log, nessun modo di accorgersene
+                # senza controllare manualmente titolo per titolo.
+                if len(col_valid) > 0:
+                    col_last = col_valid.index.max().strftime("%Y-%m-%d")
+                    days_behind = (datetime.strptime(TODAY, "%Y-%m-%d") - datetime.strptime(col_last, "%Y-%m-%d")).days
+                    if days_behind > 2:
+                        log(f"    ATTENZIONE {tk}.{ex}: dati Yahoo fermi al {col_last} ({days_behind}gg fa) dentro un chunk altrimenti riuscito")
+                for date_idx, price in col_valid.items():
                     date_str = date_idx.strftime("%Y-%m-%d")
                     if date_str <= last: continue
                     price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
