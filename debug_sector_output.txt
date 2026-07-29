@@ -1,16 +1,5 @@
-BHP e' nel chunk bulk #0, posizione 109 su 150 titoli
-Colonne livello 0: ['Close', 'High', 'Low', 'Open', 'Volume']
+Universo ASX: 350 titoli
+Trovati nella lettura a chunk: 350 titoli distinti
+Mancanti: 0 -> []
 
-BHP.AX in colonne: True
-
-Dati BHP.AX nel download BULK (chunk 150 titoli):
-Date
-2026-07-20    57.540001
-2026-07-21    58.290001
-2026-07-22    59.759998
-2026-07-23    60.630001
-2026-07-24    58.849998
-2026-07-27    60.099998
-2026-07-28    59.369999
-2026-07-29    60.180000
-Name: BHP.AX, dtype: float64
+=== Verifica diretta per singoli titoli mancanti ===
