@@ -213,6 +213,20 @@ function StockPageInner() {
         // comportamento imprevedibile, contribuendo al "torna a una
         // pagina sbagliata" segnalato — rimosso, non necessario dato
         // che l'URL di origine ora e' sempre corretto e aggiornato.
+        //
+        // FIX 29/7/2026: router.push() di Next.js e' ASINCRONO —
+        // window.location.search puo' restare quello della pagina titolo
+        // ancora per un istante dopo aver premuto "Back". Se in quella
+        // finestra l'utente apre SUBITO un altro titolo dallo stesso
+        // screener, goToStock() catturava come "origine" l'URL sbagliato
+        // (ancora la vecchia pagina titolo) invece dello screener — causa
+        // reale del "torna a Nord America" al secondo titolo aperto dallo
+        // stesso screener, per qualsiasi mercato (stesso principio gia'
+        // corretto in navigateTo() per il cambio tab). replaceState (non
+        // pushState) aggiorna l'URL SUBITO senza creare una voce di
+        // cronologia duplicata rispetto a quella che router.push() sta
+        // per creare.
+        window.history.replaceState(window.history.state, '', decoded)
         router.push(decoded, { scroll: false })
       }
     } else {
