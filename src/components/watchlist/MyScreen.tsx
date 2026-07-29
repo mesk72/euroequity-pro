@@ -198,29 +198,35 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
 
     if (!data || data.length === 0) { setAllStocks([]); setLoading(false); return }
 
-    // Carica ogni titolo singolarmente con ticker+exchange
-    // Questo bypassa i filtri top N e funziona per qualsiasi titolo
+    // FIX 29/7/2026: prima caricava ogni titolo della watchlist con una
+    // chiamata HTTP SEPARATA (in parallelo tra loro, ma ognuna rifaceva
+    // la verifica utente sul token — chiamata di rete a Supabase Auth
+    // ripetuta una volta per titolo). Con molti titoli in watchlist
+    // diventava lento. Ora una sola chiamata batch (endpoint tickers=),
+    // una sola verifica utente, stessi identici dati per ogni titolo.
     let authHeader: Record<string, string> = {}
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
     } catch {}
     const liveMap: Record<string, any> = {}
-    await Promise.all(data.map(async (w: any) => {
-      try {
-        const r = await fetch(`/api/db/stocks?ticker=${encodeURIComponent(w.ticker)}&exchange=${encodeURIComponent(w.exchange)}`, { headers: authHeader })
-        if (!r.ok) return
+    try {
+      const tickersParam = data.map((w: any) => `${w.ticker}.${w.exchange}`).join(',')
+      const r = await fetch(`/api/db/stocks?tickers=${encodeURIComponent(tickersParam)}`, { headers: authHeader })
+      if (r.ok) {
         const d = await r.json()
-        const s = (d.stocks || [])[0]
-        if (s) liveMap[`${s.ticker}.${s.exchange}`] = s
-        else if (d.restricted) {
-          liveMap[`${w.ticker}.${w.exchange}`] = {
-            ticker: d.ticker || w.ticker, exchange: w.exchange,
-            company: d.company || w.ticker, restricted: true,
-          }
+        for (const s of (d.stocks || [])) {
+          if (s) liveMap[`${s.ticker}.${s.exchange}`] = s
         }
-      } catch {}
-    }))
+      }
+    } catch {}
+    // Titoli restanti (non restituiti dal batch, es. fuori dai 500
+    // pubblici per un utente non istituzionale) — segnati come "restricted"
+    // cosi' la UI puo' mostrarli comunque come limitati anziche' vuoti.
+    for (const w of data) {
+      const key = `${w.ticker}.${w.exchange}`
+      if (!liveMap[key]) liveMap[key] = { ticker: w.ticker, exchange: w.exchange, company: w.ticker, restricted: true }
+    }
 
     const merged = data.map((w: any) => {
       const live = liveMap[`${w.ticker}.${w.exchange}`] || {}
