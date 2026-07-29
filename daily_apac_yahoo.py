@@ -334,9 +334,27 @@ for m in mom_updates:
         "price": price, "prev_price": prev_price,
         "price_date": m.get("_last_date"), "change1d": chg,
     })
-for i in range(0, len(latest_price_updates), 500):
-    requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange", headers=headers_up, json=latest_price_updates[i:i+500])
-log(f"  latest_prices aggiornata: {len(latest_price_updates)} titoli")
+# FIX 29/7/2026: stesso identico bug gia' risolto per prices_eod il
+# 26/7/2026 (vedi commento sopra), mai applicato qui - se lo stesso
+# (ticker,exchange) appare due volte nello stesso batch di 500, l'upsert
+# fallisce con "ON CONFLICT DO UPDATE command cannot affect row a second
+# time" e l'INTERO batch va perso, SENZA NESSUN LOG (il risultato della
+# POST non veniva nemmeno controllato). Causa reale per cui prices_eod
+# risultava sempre aggiornato ma latest_prices (letta dallo screener per
+# velocita') restava indietro di giorni per centinaia di titoli, su tutti
+# i mercati (ASX, TSE, SEHK...) — non un problema di dati Yahoo, i prezzi
+# grezzi erano sempre corretti, solo la cache non si aggiornava.
+dedup_lp = {}
+for row in latest_price_updates:
+    dedup_lp[(row["ticker"], row["exchange"])] = row
+latest_price_updates_clean = list(dedup_lp.values())
+lp_fail = 0
+for i in range(0, len(latest_price_updates_clean), 500):
+    rlp = requests.post(SUPABASE_URL + "/rest/v1/latest_prices?on_conflict=ticker,exchange", headers=headers_up, json=latest_price_updates_clean[i:i+500])
+    if rlp.status_code not in (200, 201, 204):
+        lp_fail += len(latest_price_updates_clean[i:i+500])
+        log(f"  ERRORE SCRITTURA latest_prices: HTTP {rlp.status_code} - {rlp.text[:300]}")
+log(f"  latest_prices aggiornata: {len(latest_price_updates_clean)} titoli (falliti: {lp_fail})")
 
 # ── 5. RANK APAC ─────────────────────────────────────────────
 log("\n[5/5] Ricalcolo rank APAC...")
