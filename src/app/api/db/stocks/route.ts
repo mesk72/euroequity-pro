@@ -186,57 +186,71 @@ async function fetchLatestPrices(exchangeList: string[]) {
 }
 
 async function fetchAllByExchange(table: string, select: string, exchangeList: string[], universeOnly = false) {
-  // FIX 29/7/2026: fetchAll() (usata per fundamentals) era gia' stata
-  // parallelizzata il 23/7 per la lentezza di Global/continenti, ma questa
-  // funzione gemella (usata per 'stocks') era rimasta SEQUENZIALE — un
-  // round trip alla volta per OGNI exchange, e dentro ogni exchange una
-  // pagina alla volta. Il Promise.all esterno che lancia stocks/
-  // fundamentals/latest_prices insieme resta comunque limitato dal piu'
-  // lento dei tre: con Global (19 exchange) o Sectors (11 exchange EU)
-  // questa era rimasta il vero collo di bottiglia, anche a fundamentals
-  // gia' parallela. Si legge ancora un exchange alla volta (per evitare
-  // il limite di 1000 righe miste tra exchange diversi), ma ORA tutte le
-  // pagine di TUTTI gli exchange partono insieme invece che in sequenza.
+  // FIX 30/7/2026: la parallelizzazione del 29/7 lanciava SEMPRE 4 pagine
+  // per OGNI exchange "per sicurezza" — per Global (23 mercati) sono 92
+  // richieste simultanee verso Supabase, anche se quasi tutti i mercati
+  // hanno poche centinaia di titoli e stanno in UNA pagina sola (solo US
+  // supera le 1000 righe). Sospetto reale per i 21s residui su Global
+  // dopo aver tolto il calcolo quintili: 92 connessioni parallele possono
+  // incontrare limiti di concorrenza lato Supabase. Ora si chiede prima
+  // UNA pagina per ogni exchange (23 richieste, non 92), e SOLO per chi
+  // torna una pagina piena (1000 righe, segno che ce n'e' altra) si
+  // chiedono le pagine successive, solo per quello specifico exchange.
   const PAGE = 1000
-  const MAX_PAGES_PER_EXCHANGE = 4 // fino a 4000 titoli per singolo exchange — ampio margine (il piu' grande, US, ne ha ~2000)
-  const requests: Promise<{ data: any[] | null; error: any }>[] = []
-  for (const exchange of exchangeList) {
-    for (let page = 0; page < MAX_PAGES_PER_EXCHANGE; page++) {
-      let query = supabase.from(table).select(select).eq('exchange', exchange)
-      if (universeOnly) query = query.eq('in_universe', true)
-      requests.push(
-        query.order('ticker', { ascending: true }).range(page * PAGE, page * PAGE + PAGE - 1).limit(PAGE) as any
-      )
-    }
+  const MAX_PAGES_PER_EXCHANGE = 4
+  const buildQuery = (exchange: string, page: number) => {
+    let query = supabase.from(table).select(select).eq('exchange', exchange)
+    if (universeOnly) query = query.eq('in_universe', true)
+    return query.order('ticker', { ascending: true }).range(page * PAGE, page * PAGE + PAGE - 1).limit(PAGE)
   }
-  const results = await Promise.all(requests)
+
+  const firstPageResults = await Promise.all(
+    exchangeList.map(exchange => buildQuery(exchange, 0).then(r => ({ exchange, ...r })))
+  )
+
   const all: any[] = []
-  for (const { data, error } of results) {
+  const needMore: string[] = []
+  for (const { exchange, data, error } of firstPageResults as any[]) {
     if (error || !data) continue
     all.push(...data)
+    if (data.length === PAGE) needMore.push(exchange)
+  }
+
+  if (needMore.length > 0) {
+    const extraRequests: Promise<any>[] = []
+    for (const exchange of needMore) {
+      for (let page = 1; page < MAX_PAGES_PER_EXCHANGE; page++) {
+        extraRequests.push(buildQuery(exchange, page))
+      }
+    }
+    const extraResults = await Promise.all(extraRequests)
+    for (const { data, error } of extraResults as any[]) {
+      if (error || !data) continue
+      all.push(...data)
+    }
   }
   return all
 }
 
 async function fetchAll(table: string, select: string, exchangeList: string[]) {
+  // FIX 30/7/2026: stesso principio di fetchAllByExchange — prima UNA
+  // pagina, poi le altre SOLO se la prima torna piena, invece di sparare
+  // sempre 12 pagine (fino a 4 delle quali inutili per un Global con
+  // ~7.889 righe di fundamentals, che ne servono 8).
   const PAGE = 1000
-  const MAX_PAGES = 12 // fino a 12.000 righe, ampio margine anche per "Global"
-  // Lancia tutte le pagine in PARALLELO invece che in sequenza: prima la
-  // paginazione sequenziale (una richiesta alla volta, aspettando ognuna)
-  // rendeva "Global" (23 mercati) e i continenti piu' popolati lentissimi
-  // o percepiti come bloccati, sommando la latenza di ogni singola pagina.
-  const pagePromises = Array.from({ length: MAX_PAGES }, (_, i) =>
-    supabase
-      .from(table)
-      .select(select)
-      .in('exchange', exchangeList)
-      .order('ticker', { ascending: true })
-      .range(i * PAGE, i * PAGE + PAGE - 1)
-      .limit(PAGE)
-  )
-  const results = await Promise.all(pagePromises)
+  const MAX_PAGES = 12
+  const buildQuery = (page: number) =>
+    supabase.from(table).select(select).in('exchange', exchangeList)
+      .order('ticker', { ascending: true }).range(page * PAGE, page * PAGE + PAGE - 1).limit(PAGE)
+
   let all: any[] = []
-  for (const { data, error } of results) {
+  const { data: firstData, error: firstErr } = await buildQuery(0)
+  if (!firstErr && firstData) all = all.concat(firstData)
+  if (!firstData || firstData.length < PAGE) return all
+
+  const remainingPages = Array.from({ length: MAX_PAGES - 1 }, (_, i) => buildQuery(i + 1))
+  const results = await Promise.all(remainingPages)
+  for (const { data, error } of results as any[]) {
     if (error || !data) continue
     all = all.concat(data)
   }
