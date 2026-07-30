@@ -257,11 +257,10 @@ function StockPageInner() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
     } catch {}
-    const tSA0 = Date.now()
     fetch(`/api/db/sector-averages?continent=${continent}&sector=${encodeURIComponent(stock.sector || '')}`, { headers: authHeader })
       .then(r => r.ok ? r.json() : null)
-      .then(d => { setSectorAvgData(d); setSectorAvgLoading(false); recordTiming('sector-averages', Date.now() - tSA0) })
-      .catch(() => { setSectorAvgLoading(false); recordTiming('sector-averages (errore)', Date.now() - tSA0) })
+      .then(d => { setSectorAvgData(d); setSectorAvgLoading(false) })
+      .catch(() => setSectorAvgLoading(false))
   }
 
   useEffect(() => {
@@ -272,7 +271,6 @@ function StockPageInner() {
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
       } catch {}
-      const tST0 = Date.now()
       fetch(`/api/db/stocks?ticker=${ticker}&exchange=${exchangeCode}`, { headers: authHeader })
         .then(r => r.ok ? r.json() : null)
         .then(d => {
@@ -288,14 +286,12 @@ function StockPageInner() {
             setStock(found || null)
           }
           setLoadingStock(false)
-          recordTiming('stocks', Date.now() - tST0)
         })
         .catch(() => {
           const allStocks = computeScores([...DEMO_STOCKS])
           const found = allStocks.find(s => s.ticker === ticker && s.exchange === exchangeCode)
           setStock(found || null)
           setLoadingStock(false)
-          recordTiming('stocks (errore)', Date.now() - tST0)
         })
     }
     load()
@@ -306,11 +302,6 @@ function StockPageInner() {
   }, [ticker, exchangeCode])
 
   const [chartDays, setChartDays] = useState(252)
-  // TIMING TEMPORANEO 30/7/2026 — banner visibile (no DevTools) per capire
-  // quale delle tre chiamate della pagina titolo e' lenta. Da rimuovere.
-  const [loadTimings, setLoadTimings] = useState<Record<string, number>>({})
-  const recordTiming = (label: string, ms: number) =>
-    setLoadTimings(prev => ({ ...prev, [label]: ms }))
   const [history, setHistory] = useState<any[]>([])
   const [momentum, setMomentum] = useState<any>(null)
   const [loadingChart, setLoading] = useState(true)
@@ -326,11 +317,10 @@ function StockPageInner() {
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
       } catch {}
-      const tH0 = Date.now()
       fetch(`/api/db/history?ticker=${ticker}&exchange=${exchangeCode}&days=${Math.max(chartDays + 50, 1800)}&t=${Date.now()}`, { cache: 'no-store', headers: authHeader })
         .then(r => r.ok ? r.json() : { history: [] })
-        .then(d => { setHistory(d.history || []); setMomentum(d.momentum || null); setLoading(false); recordTiming('history/grafico', Date.now() - tH0) })
-        .catch(() => { setLoading(false); recordTiming('history/grafico (errore)', Date.now() - tH0) })
+        .then(d => { setHistory(d.history || []); setMomentum(d.momentum || null); setLoading(false) })
+        .catch(() => setLoading(false))
     }
     load()
   }, [ticker, exchangeCode, chartDays])
@@ -426,12 +416,6 @@ function StockPageInner() {
           FORWARD<span style={{ color:'var(--text3)' }}>ALPHA</span>
         </div>
       </div>
-      {Object.keys(loadTimings).length > 0 && (
-        <div style={{ background:'#22c55e', color:'#000', fontSize:11, padding:'6px 12px',
-          fontFamily:'monospace', wordBreak:'break-all' }}>
-          {Object.entries(loadTimings).map(([k,v]) => `${k}: ${v}ms`).join('  |  ')}
-        </div>
-      )}
 
       <div style={{ maxWidth:1100, margin:'0 auto', padding:'24px 16px' }}>
         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
