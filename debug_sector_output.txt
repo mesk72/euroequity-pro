@@ -1,2 +1,3 @@
-Righe totali: 0-0/247
-Exchange presenti: ['AS', 'ASX', 'BR', 'CPSE', 'GR', 'HE', 'IR', 'KRX', 'LS', 'LSE', 'MC', 'MIL', 'OB', 'OM', 'PA', 'SEHK', 'SGX', 'SWX', 'TSE', 'TSX', 'US', 'VI', 'XETRA']
+Tentativo 1: 3.48s totali | X-Timing-Total-Ms=2824 | righe=500
+Tentativo 2: 2.09s totali | X-Timing-Total-Ms=1560 | righe=500
+Tentativo 3: 1.81s totali | X-Timing-Total-Ms=1477 | righe=500
