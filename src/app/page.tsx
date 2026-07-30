@@ -42,14 +42,22 @@ import WatchlistButton from '@/components/watchlist/WatchlistButton'
 // (StockTable, Screener, Dashboard, DashboardUS, DashboardAP) - ognuno la
 // richiama una volta con useGoToStock(), non serve passarla via prop.
 function useGoToStock() {
+  // FIX 30/7/2026 v2 (Kimi): legge window.location DIRETTAMENTE invece di
+  // useSearchParams()/usePathname() di React. router.replace() aggiorna
+  // window.location in modo sincrono (side effect diretto sul DOM del
+  // browser), ma il re-render di React che aggiorna il valore restituito
+  // da useSearchParams() puo' restare indietro di un ciclo — se l'utente
+  // cambia il filtro exchange e clicca un titolo molto in fretta,
+  // useSearchParams() poteva ancora riflettere il valore precedente anche
+  // se l'URL reale era gia' corretto. window.location.search e' sempre
+  // aggiornato nell'istante esatto in cui si legge.
   const ugsRouter = useRouter()
-  const ugsPathname = usePathname()
-  const ugsSearchParams = useSearchParams()
   return useCallback((ticker: string, exchange: string) => {
-    const qs = ugsSearchParams.toString()
-    const origin = ugsPathname + (qs ? `?${qs}` : '')
+    const origin = typeof window !== 'undefined'
+      ? window.location.pathname + window.location.search
+      : '/'
     ugsRouter.push(`/stock/${ticker}-${exchange}?from=${encodeURIComponent(origin)}`)
-  }, [ugsPathname, ugsSearchParams, ugsRouter])
+  }, [ugsRouter])
 }
 
 import MyScreen from '@/components/watchlist/MyScreen'
