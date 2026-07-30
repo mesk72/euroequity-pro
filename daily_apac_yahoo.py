@@ -692,6 +692,74 @@ log(f"  Titoli mai scritti riempiti: {missing_filled}, non trovati nemmeno in pr
 
 
 end_time = time_module.time()
+
+# ── QUINTILI DI SETTORE PRECALCOLATI ─────────────────────────
+# FIX 30/7/2026 (Kimi + Claude): il calcolo dei quintili di settore/
+# continente per la pagina Sectors girava ad ogni richiesta dell'API
+# scorrendo TUTTE le righe restituite (fino a ~7.889 per Global) — causa
+# principale dei 25s di caricamento. Qui si calcolano UNA VOLTA AL GIORNO
+# le somme parziali per (exchange, settore): sum(rank*mkt_cap) e
+# sum(mkt_cap) per EPS growth e Revenue growth. Sono sommabili: l'API puo'
+# ricostruire il quintile per QUALSIASI combinazione di mercati (Global,
+# EU, un singolo paese) sommando solo le righe pertinenti di questa
+# tabella (poche decine), invece di ricalcolare da zero su migliaia di
+# titoli grezzi.
+log("\n[Quintili] Calcolo somme parziali per settore...")
+sector_by_key = {}
+offset_s = 0
+while True:
+    rs_q = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=headers_r,
+        params={"select": "ticker,exchange,sector", "exchange": "in.(" + ",".join(by_exchange.keys()) + ")",
+                "in_universe": "eq.true", "limit": "1000", "offset": str(offset_s)})
+    batch_s = rs_q.json()
+    if not isinstance(batch_s, list) or not batch_s: break
+    for row in batch_s:
+        sector_by_key[(row["ticker"], row["exchange"])] = row.get("sector") or "Unknown"
+    offset_s += 1000
+    if len(batch_s) < 1000: break
+
+partials = {}  # (exchange, sector) -> {sum_eps_w, sum_eps_wt, sum_rev_w, sum_rev_wt, n}
+offset_f = 0
+while True:
+    rf_q = requests.get(SUPABASE_URL + "/rest/v1/fundamentals", headers=headers_r,
+        params={"select": "ticker,exchange,mkt_cap,rank_eps_gr,rank_rev_gr",
+                "exchange": "in.(" + ",".join(by_exchange.keys()) + ")",
+                "limit": "1000", "offset": str(offset_f)})
+    batch_f = rf_q.json()
+    if not isinstance(batch_f, list) or not batch_f: break
+    for row in batch_f:
+        key = (row["ticker"], row["exchange"])
+        sector = sector_by_key.get(key)
+        if not sector: continue
+        pkey = (row["exchange"], sector)
+        if pkey not in partials:
+            partials[pkey] = {"sum_eps_w": 0.0, "sum_eps_wt": 0.0, "sum_rev_w": 0.0, "sum_rev_wt": 0.0, "n": 0}
+        p = partials[pkey]
+        mc = row.get("mkt_cap")
+        if mc:
+            if row.get("rank_eps_gr") is not None:
+                p["sum_eps_w"] += row["rank_eps_gr"] * mc
+                p["sum_eps_wt"] += mc
+            if row.get("rank_rev_gr") is not None:
+                p["sum_rev_w"] += row["rank_rev_gr"] * mc
+                p["sum_rev_wt"] += mc
+        p["n"] += 1
+    offset_f += 1000
+    if len(batch_f) < 1000: break
+
+partial_rows = [{"exchange": ex, "sector": sec, "sum_eps_weighted": v["sum_eps_w"],
+    "sum_eps_weight": v["sum_eps_wt"], "sum_rev_weighted": v["sum_rev_w"],
+    "sum_rev_weight": v["sum_rev_wt"], "n_stocks": v["n"]} for (ex, sec), v in partials.items()]
+q_ok = 0
+for i in range(0, len(partial_rows), 500):
+    rq = requests.post(SUPABASE_URL + "/rest/v1/sector_quintile_partials?on_conflict=exchange,sector",
+        headers=headers_up, json=partial_rows[i:i+500])
+    if rq.status_code in (200, 201, 204):
+        q_ok += len(partial_rows[i:i+500])
+    else:
+        log(f"  ERRORE SCRITTURA sector_quintile_partials: HTTP {rq.status_code} - {rq.text[:200]}")
+log(f"  Quintili di settore: {q_ok} righe (exchange,settore) aggiornate")
+
 log_entry = {"run_date": TODAY, "market": "APAC", "prices_updated": ok_prices,
              "prices_failed": fail_prices, "last_price_date": TODAY,
              "momentum_updated": ok_momentum, "rank_updated": ok_rank,
