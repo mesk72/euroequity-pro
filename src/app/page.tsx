@@ -2568,6 +2568,14 @@ function AppContent() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
+      {/* DEBUG TEMPORANEO 30/7/2026 — banner visibile (no DevTools) per
+          isolare il bug del Back al secondo titolo. Da rimuovere dopo. */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999,
+        background: '#f97316', color: '#000', fontSize: 11, padding: '6px 12px',
+        fontFamily: 'monospace', wordBreak: 'break-all' }}>
+        page param: {page}  |  URL: {typeof window !== 'undefined' ? window.location.pathname + window.location.search : '(server)'}
+      </div>
+
 
       {/* - SIDEBAR - */}
       <aside className={`
