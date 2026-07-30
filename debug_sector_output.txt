@@ -1,4 +1,3 @@
-stocks (dati titolo) - AAPL: 1.44s | HTTP 200 | 2892 byte
-history (grafico) - AAPL: 0.46s | HTTP 200 | 106 byte
-stocks (dati titolo) - ASML: 0.70s | HTTP 200 | 2538 byte
-history (grafico) - ASML: 0.39s | HTTP 200 | 106 byte
+HTTP: 200
+Contenuto completo: {"history":[],"momentum":{"mom1w":null,"mom1m":null,"mom6m":null,"mom12m":null,"mom3y":null,"mom5y":null}}
+Headers: {'Age': '0', 'Cache-Control': 'public', 'Content-Encoding': 'gzip', 'Content-Type': 'application/json', 'Date': 'Thu, 30 Jul 2026 10:59:13 GMT', 'Server': 'Vercel', 'Strict-Transport-Security': 'max-age=63072000', 'Vary': 'RSC, Next-Router-State-Tree, Next-Router-Prefetch', 'X-Matched-Path': '/api/db/history', 'X-Vercel-Cache': 'MISS', 'X-Vercel-Id': 'sfo1::iad1::9nrr6-1785409153155-fa0a5a2d5a66', 'Transfer-Encoding': 'chunked'}
