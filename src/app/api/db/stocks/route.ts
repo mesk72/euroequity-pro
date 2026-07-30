@@ -584,49 +584,94 @@ export async function GET(req: NextRequest) {
 
     const tQuintile0 = Date.now()
 
-    // Quintile di SETTORE per EPS/Revenue growth, calcolato QUI con i
-    // dati grezzi completi (sempre disponibili internamente al server,
-    // anche se mai esposti ai non-proprietari) — media ponderata per
-    // market cap dei rank dei singoli titoli, poi convertita in quintile
-    // e allegata a OGNI titolo del settore. Cosi' l'aggregato di settore
-    // resta corretto e sempre visibile anche per chi non vede i rank dei
-    // singoli titoli, senza rivelare i pesi della formula per singolo
-    // titolo (un aggregato su decine/centinaia di titoli non permette la
-    // stessa regressione di un dato per singolo titolo).
+    // FIX 30/7/2026 (Kimi + Claude): il calcolo di settore/continente
+    // girava QUI ad ogni richiesta scorrendo tutte le righe (fino a
+    // ~7.889 per Global) — causa principale dei 25s su Global. Le somme
+    // parziali per (exchange, settore) sono ora precalcolate una volta al
+    // giorno dagli script daily_*.py (tabella sector_quintile_partials) e
+    // sono SOMMABILI: per qualsiasi combinazione di mercati richiesta
+    // basta sommare le poche righe pertinenti (decine, non migliaia).
     {
-      const bySector: Record<string, any[]> = {}
-      for (const s of stocks) {
-        const sec = s.sector || 'Unknown'
-        if (!bySector[sec]) bySector[sec] = []
-        bySector[sec].push(s)
-      }
-      const wavgOver = (list: any[], field: string) => {
-        let num = 0, den = 0
-        for (const s of list) {
-          if (s[field] == null || s.mktCap == null) continue
-          num += s[field] * s.mktCap
-          den += s.mktCap
-        }
-        return den > 0 ? num / den : null
-      }
       const toQ = (r: number | null) => r == null ? null :
         r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile'
 
-      const sectorQuintile: Record<string, { eps: string | null; rev: string | null }> = {}
-      for (const [sec, list] of Object.entries(bySector)) {
-        sectorQuintile[sec] = { eps: toQ(wavgOver(list, 'rankEpsGr')), rev: toQ(wavgOver(list, 'rankRevGr')) }
-      }
-      // Aggregato sull'INTERO continente (tutti i settori insieme) — stessa
-      // logica provata, usata per la riga "totale" della Sector Heatmap.
-      const continentEps = toQ(wavgOver(stocks, 'rankEpsGr'))
-      const continentRev = toQ(wavgOver(stocks, 'rankRevGr'))
+      let usedPrecomputed = false
+      try {
+        const { data: partials, error: partialsErr } = await supabase
+          .from('sector_quintile_partials')
+          .select('exchange,sector,sum_eps_weighted,sum_eps_weight,sum_rev_weighted,sum_rev_weight')
+          .in('exchange', exList)
 
-      for (const s of stocks) {
-        const sec = s.sector || 'Unknown'
-        s.sectorEpsGrowthQuintile = sectorQuintile[sec]?.eps ?? null
-        s.sectorRevGrowthQuintile = sectorQuintile[sec]?.rev ?? null
-        s.continentEpsGrowthQuintile = continentEps
-        s.continentRevGrowthQuintile = continentRev
+        if (!partialsErr && partials && partials.length > 0) {
+          const bySector: Record<string, { epsW: number; epsWt: number; revW: number; revWt: number }> = {}
+          let contEpsW = 0, contEpsWt = 0, contRevW = 0, contRevWt = 0
+          for (const p of partials) {
+            const sec = p.sector || 'Unknown'
+            if (!bySector[sec]) bySector[sec] = { epsW: 0, epsWt: 0, revW: 0, revWt: 0 }
+            bySector[sec].epsW += p.sum_eps_weighted || 0
+            bySector[sec].epsWt += p.sum_eps_weight || 0
+            bySector[sec].revW += p.sum_rev_weighted || 0
+            bySector[sec].revWt += p.sum_rev_weight || 0
+            contEpsW += p.sum_eps_weighted || 0
+            contEpsWt += p.sum_eps_weight || 0
+            contRevW += p.sum_rev_weighted || 0
+            contRevWt += p.sum_rev_weight || 0
+          }
+          const sectorQuintile: Record<string, { eps: string | null; rev: string | null }> = {}
+          for (const [sec, v] of Object.entries(bySector)) {
+            sectorQuintile[sec] = {
+              eps: toQ(v.epsWt > 0 ? v.epsW / v.epsWt : null),
+              rev: toQ(v.revWt > 0 ? v.revW / v.revWt : null),
+            }
+          }
+          const continentEps = toQ(contEpsWt > 0 ? contEpsW / contEpsWt : null)
+          const continentRev = toQ(contRevWt > 0 ? contRevW / contRevWt : null)
+          for (const s of stocks) {
+            const sec = s.sector || 'Unknown'
+            s.sectorEpsGrowthQuintile = sectorQuintile[sec]?.eps ?? null
+            s.sectorRevGrowthQuintile = sectorQuintile[sec]?.rev ?? null
+            s.continentEpsGrowthQuintile = continentEps
+            s.continentRevGrowthQuintile = continentRev
+          }
+          usedPrecomputed = true
+        }
+      } catch {
+        // ignora, cade nel fallback sotto
+      }
+
+      if (!usedPrecomputed) {
+        // FALLBACK (Kimi): tabella vuota/non ancora popolata/errore — stesso
+        // calcolo di prima, in JS sui dati grezzi, cosi' i quintili non
+        // spariscono mai. Loggato per accorgersi se scatta troppo spesso.
+        console.warn('[TIMING] sector_quintile_partials mancante o vuota, fallback su calcolo JS')
+        const bySector: Record<string, any[]> = {}
+        for (const s of stocks) {
+          const sec = s.sector || 'Unknown'
+          if (!bySector[sec]) bySector[sec] = []
+          bySector[sec].push(s)
+        }
+        const wavgOver = (list: any[], field: string) => {
+          let num = 0, den = 0
+          for (const s of list) {
+            if (s[field] == null || s.mktCap == null) continue
+            num += s[field] * s.mktCap
+            den += s.mktCap
+          }
+          return den > 0 ? num / den : null
+        }
+        const sectorQuintile: Record<string, { eps: string | null; rev: string | null }> = {}
+        for (const [sec, list] of Object.entries(bySector)) {
+          sectorQuintile[sec] = { eps: toQ(wavgOver(list, 'rankEpsGr')), rev: toQ(wavgOver(list, 'rankRevGr')) }
+        }
+        const continentEps = toQ(wavgOver(stocks, 'rankEpsGr'))
+        const continentRev = toQ(wavgOver(stocks, 'rankRevGr'))
+        for (const s of stocks) {
+          const sec = s.sector || 'Unknown'
+          s.sectorEpsGrowthQuintile = sectorQuintile[sec]?.eps ?? null
+          s.sectorRevGrowthQuintile = sectorQuintile[sec]?.rev ?? null
+          s.continentEpsGrowthQuintile = continentEps
+          s.continentRevGrowthQuintile = continentRev
+        }
       }
     }
     console.log(`[TIMING] quintili di settore: ${Date.now() - tQuintile0}ms`)
