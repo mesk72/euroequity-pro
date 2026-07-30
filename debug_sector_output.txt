@@ -1,4 +1,3 @@
-False | menzioni 'serviceWorker' nell'HTML iniziale
-sw.js: 404
-service-worker.js: 404
-manifest.json: 404 
+vecchio chunk (dovrebbe dare 404, nuovo build ha nome diverso): 404
+homepage HTTP: 200
+nome chunk homepage attuale: app/page-39502f67f5d1ee4c.js
