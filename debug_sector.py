@@ -1,8 +1,6 @@
-import os, requests
-SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
-SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
-headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-r = requests.get(f"{SUPABASE_URL}/rest/v1/daily_log", headers=headers_r,
-    params={"select":"run_date,market,prices_updated,prices_failed,duration_seconds,created_at","order":"created_at.desc","limit":"15"})
-for row in r.json():
-    print(row)
+import requests
+url = "https://forwardalpha.pro/api/db/stocks?exchanges=US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX"
+r = requests.get(url, timeout=60)
+print("HTTP:", r.status_code)
+print("X-Quintile-Source:", r.headers.get("X-Quintile-Source"))
+print("X-Timing-Total-Ms:", r.headers.get("X-Timing-Total-Ms"))
