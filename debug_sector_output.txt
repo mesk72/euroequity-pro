@@ -1,3 +1,1 @@
-vecchio chunk (dovrebbe dare 404, nuovo build ha nome diverso): 404
-homepage HTTP: 200
-nome chunk homepage attuale: app/page-39502f67f5d1ee4c.js
+chunk homepage: app/page-ad95ebeb0890c437.js
