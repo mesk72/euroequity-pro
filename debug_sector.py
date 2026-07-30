@@ -1,7 +1,8 @@
-import requests, time
-url = "https://forwardalpha.pro/api/db/stocks?exchanges=US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX"
-for i in range(2):
-    t0 = time.time()
-    r = requests.get(url, timeout=60)
-    elapsed = time.time() - t0
-    print(f"Tentativo {i+1}: {elapsed:.2f}s | X-Timing-Total-Ms={r.headers.get('X-Timing-Total-Ms')} | righe={r.headers.get('X-Timing-Rows')}")
+import requests, re
+r = requests.get("https://forwardalpha.pro/", timeout=30)
+print("HTTP homepage:", r.status_code)
+m = re.search(r'app/page-([a-f0-9]+)\.js', r.text)
+print("chunk homepage:", m.group(0) if m else "NON TROVATO - possibile problema")
+# controlla anche l'endpoint API risponda
+r2 = requests.get("https://forwardalpha.pro/api/db/stocks?exchanges=US", timeout=30)
+print("API stocks HTTP:", r2.status_code)
