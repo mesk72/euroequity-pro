@@ -1,6 +1,24 @@
-HTTP: 200 | lunghezza HTML: 9566
-x-vercel-cache: PRERENDER | age: 0
-Chunk JS trovati: 0
-Controllati 0 chunk. Codice vecchio trovato: False
-
-Con cachebust - x-vercel-cache: HIT | age: 0
+HTTP: 200 len: 9566
+--- primi 2000 caratteri ---
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/css/f9974c1eb8e1ecbe.css?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack-c84e7b3dbc67fa68.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF"/><script src="/_next/static/chunks/fd9d1056-79c5ad9da5262500.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/23-7b84cb6a56f23244.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/main-app-f73cdb3bce740b12.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/44530001-cd60f60d1b279d84.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/726-9d3daa73991c65f2.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/815-1c18945fe3ecc845.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/45-dfa548553a2e9387.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/945-4bb5260d7bd68dd5.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/app/page-51cf813554b305ca.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><script src="/_next/static/chunks/app/layout-ea4151f348ffcc8c.js?dpl=dpl_FeXinXVV5BUafZdouBC9X6jDVghF" async=""></script><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/><title>ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked</title><meta name="description" content="ForwardAlpha — Institutional-grade Value &amp; Growth scoring across 7,000+ global stocks: Europe, US, Canada, Japan, Hong Kong, Australia. Daily price refresh. Built by ex J.P. Morgan &amp
+--- cerco 'buildId' o '_next' ovunque nel testo ---
+'scale=1"/><link rel="stylesheet" href="/_next/static/css/f9974c1eb8e1ecbe.css?dpl=dpl'
+' as="script" fetchPriority="low" href="/_next/static/chunks/webpack-c84e7b3dbc67fa68.'
+'XVV5BUafZdouBC9X6jDVghF"/><script src="/_next/static/chunks/fd9d1056-79c5ad9da5262500'
+'jDVghF" async=""></script><script src="/_next/static/chunks/23-7b84cb6a56f23244.js?dp'
+'jDVghF" async=""></script><script src="/_next/static/chunks/main-app-f73cdb3bce740b12'
+'jDVghF" async=""></script><script src="/_next/static/chunks/44530001-cd60f60d1b279d84'
+'jDVghF" async=""></script><script src="/_next/static/chunks/726-9d3daa73991c65f2.js?d'
+'jDVghF" async=""></script><script src="/_next/static/chunks/815-1c18945fe3ecc845.js?d'
+'jDVghF" async=""></script><script src="/_next/static/chunks/45-dfa548553a2e9387.js?dp'
+'jDVghF" async=""></script><script src="/_next/static/chunks/945-4bb5260d7bd68dd5.js?d'
+'jDVghF" async=""></script><script src="/_next/static/chunks/app/page-51cf813554b305ca'
+'jDVghF" async=""></script><script src="/_next/static/chunks/app/layout-ea4151f348ffcc'
+'y=swap" rel="stylesheet"/><script src="/_next/static/chunks/polyfills-78c92fac7aa8fdd'
+'RING"></template><!--/$--><script src="/_next/static/chunks/webpack-c84e7b3dbc67fa68.'
+'DVghF" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0]);self.__n'
+'_f.push([2,null])</script><script>self.__next_f.push([1,"1:HL[\\"/_next/static/css/f99'
+'",\\"style\\"]\\n"])</script><script>self.__next_f.push([1,"2:I[5751,[],\\"\\"]\\n4:I[6513,'
+',\\"\\"]\\nc:[]\\n"])</script><script>self.__next_f.push([1,"0:[[[\\"$\\",\\"link\\",\\"0\\",{\\'
+'"rel\\":\\"stylesheet\\",\\"href\\":\\"/_next/static/css/f9974c1eb8e1ecbe.css?dpl=dpl'
+'":\\"$Wc\\"}]]\\n"])</script><script>self.__next_f.push([1,"a:[[\\"$\\",\\"meta\\",\\"0\\",{\\"'
