@@ -605,11 +605,11 @@ export async function GET(req: NextRequest) {
     // giorno dagli script daily_*.py (tabella sector_quintile_partials) e
     // sono SOMMABILI: per qualsiasi combinazione di mercati richiesta
     // basta sommare le poche righe pertinenti (decine, non migliaia).
+    let usedPrecomputed = false
     {
       const toQ = (r: number | null) => r == null ? null :
         r >= 80 ? 'Top Quintile' : r >= 60 ? '2nd Quintile' : r >= 40 ? 'Middle' : r >= 20 ? '4th Quintile' : 'Bottom Quintile'
 
-      let usedPrecomputed = false
       try {
         const { data: partials, error: partialsErr } = await supabase
           .from('sector_quintile_partials')
@@ -688,7 +688,7 @@ export async function GET(req: NextRequest) {
         }
       }
     }
-    console.log(`[TIMING] quintili di settore: ${Date.now() - tQuintile0}ms`)
+    console.log(`[TIMING] quintili di settore: ${Date.now() - tQuintile0}ms | fonte=${usedPrecomputed ? 'PRECALCOLATA' : 'FALLBACK-JS-LENTO'}`)
 
     const tRedact0 = Date.now()
     if (isOwner) {
