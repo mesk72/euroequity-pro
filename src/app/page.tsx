@@ -25,20 +25,31 @@ import WatchlistButton from '@/components/watchlist/WatchlistButton'
 // locale. Usa window.location.href (ricarica pagina) invece del router
 // client-side di Next.js — meno fluido ma elimina alla radice il problema
 // di cache del router che ha causato tre tentativi di fix falliti.
-function goToStock(ticker: string, exchange: string) {
-  // FIX 29/7/2026 (Kimi + Claude): eliminato sessionStorage. Prima l'origine
-  // veniva passata sia via sessionStorage sia via ?from nell'URL - due
-  // meccanismi paralleli per lo stesso dato, con replaceState() manuale a
-  // fare da collante tra i due. Fragile: bastava una race tra i due
-  // meccanismi (es. sessionStorage scritto da un secondo titolo mentre lo
-  // stato history del primo non era ancora completamente assestato) per
-  // mandare il "Back" nel posto sbagliato al secondo titolo aperto dallo
-  // stesso screener - bug riportato piu' volte, mai risolto del tutto con
-  // fix incrementali sul meccanismo misto. Ora l'origine vive SOLO nell'URL
-  // della pagina titolo (?from=...): ogni voce della cronologia del browser
-  // porta la propria origine, senza stato globale condiviso tra tab/pagine.
-  const origin = window.location.pathname + window.location.search
-  window.location.href = `/stock/${ticker}-${exchange}?from=${encodeURIComponent(origin)}`
+// FIX 30/7/2026 (Kimi): sostituita la navigazione HARD (window.location.href,
+// ricarica completa di HTML+CSS+JS ad ogni titolo aperto - causa sospetta
+// della lentezza percepita sulla pagina titolo nonostante i singoli fetch
+// dati siano veloci) con navigazione SOFT via router di Next.js. Elimina
+// anche l'INTERA classe di bug del Back: con navigazione hard, ogni
+// atterraggio richiede una nuova idratazione React da zero, ed e' proprio
+// nell'istante di quella idratazione che lo stato del filtro (scr_ex) e'
+// risultato ripetutamente disallineato dall'URL reale nonostante tre
+// tentativi di fix diversi. Con navigazione soft non c'e' idratazione ad
+// ogni click - il componente si ri-renderizza con le nuove props, niente
+// stato da poter disallineare.
+// Trasformata in hook (non piu' funzione a livello di modulo) perche'
+// serve accesso a router/pathname/searchParams di Next.js, disponibili
+// solo dentro componenti React. Usata da 5 componenti diversi
+// (StockTable, Screener, Dashboard, DashboardUS, DashboardAP) - ognuno la
+// richiama una volta con useGoToStock(), non serve passarla via prop.
+function useGoToStock() {
+  const ugsRouter = useRouter()
+  const ugsPathname = usePathname()
+  const ugsSearchParams = useSearchParams()
+  return useCallback((ticker: string, exchange: string) => {
+    const qs = ugsSearchParams.toString()
+    const origin = ugsPathname + (qs ? `?${qs}` : '')
+    ugsRouter.push(`/stock/${ticker}-${exchange}?from=${encodeURIComponent(origin)}`)
+  }, [ugsPathname, ugsSearchParams, ugsRouter])
 }
 
 import MyScreen from '@/components/watchlist/MyScreen'
@@ -367,6 +378,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
   restrictScoreSort?: boolean
 }) {
   const router = useRouter()
+  const goToStock = useGoToStock()
   const [sortKey, setSortKey] = useState<SortKey>('mktCap')
   const [sortAsc, setSortAsc] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -748,6 +760,7 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   const scrRouter = useRouter()
   const scrPathname = usePathname()
   const scrSearchParams = useSearchParams()
+  const goToStock = useGoToStock()
   // La selezione del mercato dentro lo Screener (Italia, All Europe, ecc.)
   // era SOLO stato interno React, mai riflessa nell'URL — quando si
   // tornava indietro da un titolo, l'URL salvato non sapeva quale mercato
@@ -765,6 +778,14 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // logica, sincrona via replaceState, che prima stava nel useEffect di
   // sync separato — ora è l'UNICO punto che scrive scr_ex).
   const setExchange = (code: string) => {
+    // FIX 30/7/2026 (Kimi): rimosso il replaceState manuale. Serviva solo
+    // perche' goToStock leggeva window.location direttamente e poteva
+    // catturare un URL non ancora aggiornato da router.replace()
+    // (asincrono). Ora goToStock legge searchParams di React via hook
+    // (useGoToStock) invece di window.location, quindi quella race non si
+    // puo' piu' verificare - il doppio replaceState+router.replace creava
+    // due scritture di history leggermente diverse, sospettato causa
+    // concreta del back rotto.
     const params = new URLSearchParams(scrSearchParams.toString())
     if (code && code !== initExchange) {
       params.set('scr_ex', code)
@@ -773,9 +794,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     }
     const qs = params.toString()
     const newUrl = qs ? `${scrPathname}?${qs}` : scrPathname
-    if (typeof window !== 'undefined') {
-      window.history.replaceState(window.history.state, '', newUrl)
-    }
     scrRouter.replace(newUrl, { scroll: false })
   }
   const [stocks,    setStocks]    = useState<Stock[]>([])
@@ -1426,6 +1444,7 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
   onGoScreener?: (filter: string) => void
 }) {
   const router = useRouter()
+  const goToStock = useGoToStock()
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -1715,6 +1734,7 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
   onGoScreener?: (filter: string) => void
 }) {
   const router = useRouter()
+  const goToStock = useGoToStock()
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -2009,6 +2029,7 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
   onSelectStock?: (s: Stock) => void
 }) {
   const router = useRouter()
+  const goToStock = useGoToStock()
   const [indices,   setIndices]   = useState<any[]>([])
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -2470,21 +2491,13 @@ function AppContent() {
   const page = (searchParams.get('page') as Page) ?? 'home'
 
   // Cambia schermata aggiornando solo l'URL
-  // FIX 29/7/2026: stesso pattern gia' applicato al sotto-filtro "exchange"
-  // dello Screener (diagnosi Kimi, 25/7/2026) — router.replace() di Next.js
-  // e' ASINCRONO, quindi se l'utente clicca su un titolo subito dopo aver
-  // cambiato tab/mercato (es. passa a Giappone/TSE e clicca SoftBank),
-  // window.location.search letto da goToStock() puo' ancora riflettere la
-  // pagina PRECEDENTE (es. Nord America), salvando l'indirizzo sbagliato
-  // per il tasto "Back". history.replaceState() aggiorna l'URL del browser
-  // SUBITO (sincrono), eliminando la race condition per OGNI screener/tab
-  // — prima il fix copriva solo il sotto-filtro interno allo Screener, non
-  // il cambio di pagina principale che governa TUTTI gli screener.
+  // FIX 30/7/2026 (Kimi): rimosso il replaceState manuale usato dal
+  // 29/7 per una race ormai non piu' possibile — goToStock non legge piu'
+  // window.location direttamente (ora usa l'hook useGoToStock, basato su
+  // searchParams di React), quindi router.replace() da solo e' sufficiente
+  // e coerente con lo stato interno del router di Next.js.
   const navigateTo = (newPage: Page) => {
     const newUrl = newPage === 'home' ? '/' : `/?page=${newPage}`
-    if (typeof window !== 'undefined' && window.location.pathname + window.location.search !== newUrl) {
-      window.history.replaceState(window.history.state, '', newUrl)
-    }
     appRouter.replace(newUrl, { scroll: false })
   }
   const [user,        setUser]        = useState<SupabaseUser | null>(null)
