@@ -2554,16 +2554,42 @@ function AppContent() {
     return () => sub.subscription.unsubscribe()
   }, [])
 
+  // FIX 30/7/2026 — CAUSA RADICE del "Back torna allo screener sbagliato",
+  // dopo cinque tentativi falliti su altri fronti.
+  //
+  // Questo effetto gira AL MONTAGGIO e chiamava navigateTo(p) per la
+  // pagina indicata nell'URL. Ma navigateTo costruisce l'URL come
+  // `/?page=${newPage}` — RISCRIVE l'indirizzo BUTTANDO VIA tutti gli
+  // altri parametri, incluso scr_ex (il filtro mercato dello Screener).
+  //
+  // Sequenza del bug:
+  //   1. utente su /?page=globalscreen&scr_ex=KRX
+  //   2. apre un titolo -> ?from=...scr_ex%3DKRX          (corretto)
+  //   3. Back -> router.replace('/?page=globalscreen&scr_ex=KRX')  (corretto)
+  //   4. AppContent si rimonta -> questo effetto parte
+  //   5. navigateTo('globalscreen') -> URL riscritto SENZA scr_ex
+  //   6. lo Screener non trova piu' scr_ex -> ricade sul default (Global)
+  //
+  // I cinque tentativi precedenti hanno tutti corretto chi LEGGE l'URL
+  // (stato React, idratazione, timing di lettura), mai chi lo RISCRIVE:
+  // per questo l'alert di debug mostrava sempre un "from" corretto al
+  // punto 3, e il parametro spariva solo dopo l'atterraggio.
+  //
+  // Le chiamate a navigateTo qui sono anche INUTILI oltre che dannose:
+  // `page` e' gia' derivato da searchParams.get('page') (vedi sopra),
+  // quindi navigavano alla pagina in cui l'utente si trovava gia'.
+  // Rimosse. Resta solo la sincronizzazione degli stati di settore, che
+  // e' l'unica cosa utile che questo effetto faceva davvero.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const p = params.get("page")
     const s = params.get("sector")
     if (p) {
-      if (p === "northamerica") { setScrSectorUS(s || "All"); setScrSectorAP("All"); navigateTo("northamerica") }
-      else if (p === "nascreen") { setScrSectorUS(s || "All"); setScrSectorAP("All"); navigateTo("nascreen") }
-      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setScrSectorAP("All"); navigateTo("screener") }
-      else if (p === "asiapacific") { setScrSectorAP(s || "All"); setScrSectorUS("All"); setScrSector("All"); navigateTo("asiapacific") }
-      else { setScrSectorUS("All"); setScrSectorAP("All"); setScrSector("All"); navigateTo(p as Page) }
+      if (p === "northamerica") { setScrSectorUS(s || "All"); setScrSectorAP("All") }
+      else if (p === "nascreen") { setScrSectorUS(s || "All"); setScrSectorAP("All") }
+      else if (p === "screener") { setScrExchange("EZ"); setScrSector(s || "All"); setScrSectorUS("All"); setScrSectorAP("All") }
+      else if (p === "asiapacific") { setScrSectorAP(s || "All"); setScrSectorUS("All"); setScrSector("All") }
+      else { setScrSectorUS("All"); setScrSectorAP("All"); setScrSector("All") }
     } else {
       setScrSectorUS("All"); setScrSectorAP("All")
     }
