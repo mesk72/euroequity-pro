@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import WatchlistButton from '@/components/watchlist/WatchlistButton'
 import { computeScores } from '@/lib/ranking'
@@ -195,42 +195,27 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
 
 function StockPageInner() {
   const params = useParams()
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  // FIX 29/7/2026 (Kimi + Claude): riscritto in modalita' stateless.
+  // Prima: sessionStorage + ?from nell'URL + replaceState() manuale + 
+  // router.push() (soft nav) - quattro meccanismi diversi a coordinare lo
+  // stesso singolo dato (dove tornare). Funzionava al primo titolo aperto
+  // da uno screener ma si rompeva al secondo, causa non isolata con
+  // certezza nonostante piu' fix incrementali sul meccanismo misto.
+  // Ora: l'unica fonte di verita' e' il parametro ?from della URL CORRENTE
+  // di questa specifica pagina titolo (scritto da goToStock al momento del
+  // click). Nessuno stato globale condiviso, nessuna race possibile tra
+  // meccanismi diversi. Back e' una navigazione HARD (window.location.href),
+  // stessa natura dell'andata (anche goToStock usa window.location.href) -
+  // niente piu' disallineamento tra router client-side di Next.js e URL
+  // reale del browser, che era la radice di tutta questa classe di bug.
   const handleBack = () => {
-    let from: string | null = null
-    try { from = sessionStorage.getItem('stockBackTo') } catch {}
-    if (!from) from = searchParams.get('from')
-    if (from) {
-      const decoded = from.startsWith('/') ? from : decodeURIComponent(from)
-      try { sessionStorage.removeItem('stockBackTo') } catch {}
-      // Per /news usa history.back() — evita freeze da Router Cache di Next.js
-      if (decoded === '/news') {
-        window.history.back()
-      } else {
-        // FIX (diagnosi con Kimi, 25/7/2026): router.refresh() dopo
-        // router.push() poteva causare un doppio caricamento o
-        // comportamento imprevedibile, contribuendo al "torna a una
-        // pagina sbagliata" segnalato — rimosso, non necessario dato
-        // che l'URL di origine ora e' sempre corretto e aggiornato.
-        //
-        // FIX 29/7/2026: router.push() di Next.js e' ASINCRONO —
-        // window.location.search puo' restare quello della pagina titolo
-        // ancora per un istante dopo aver premuto "Back". Se in quella
-        // finestra l'utente apre SUBITO un altro titolo dallo stesso
-        // screener, goToStock() catturava come "origine" l'URL sbagliato
-        // (ancora la vecchia pagina titolo) invece dello screener — causa
-        // reale del "torna a Nord America" al secondo titolo aperto dallo
-        // stesso screener, per qualsiasi mercato (stesso principio gia'
-        // corretto in navigateTo() per il cambio tab). replaceState (non
-        // pushState) aggiorna l'URL SUBITO senza creare una voce di
-        // cronologia duplicata rispetto a quella che router.push() sta
-        // per creare.
-        window.history.replaceState(window.history.state, '', decoded)
-        router.push(decoded, { scroll: false })
-      }
-    } else {
+    const urlParams = new URLSearchParams(window.location.search)
+    const from = urlParams.get('from')
+    const target = from ? decodeURIComponent(from) : '/'
+    if (target === '/news') {
       window.history.back()
+    } else {
+      window.location.href = target
     }
   }
   const id = (params?.id as string) || ''
