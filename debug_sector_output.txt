@@ -1,4 +1,4 @@
-HTTP: 200 | lunghezza: 118668
-Contiene 'stockBackTo' (codice VECCHIO): False
-Contiene 'stateless' (commento nuovo codice): False
-Contiene 'X-Timing' o 'Timing-Total' (nuovo timing): False
+False | menzioni 'serviceWorker' nell'HTML iniziale
+sw.js: 404
+service-worker.js: 404
+manifest.json: 404 
