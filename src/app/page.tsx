@@ -242,7 +242,17 @@ async function apiHistory(ticker: string, exchange: string, days: number) {
     ? `/api/db/history?ticker=${ticker}&exchange=${exchange}&days=${days}`
     : `/api/history?ticker=${ticker}&exchange=${exchange}&days=${days}`
   try {
-    const r = await fetch(endpoint)
+    // FIX 30/7/2026: /api/db/history richiede autenticazione dal 20/7/2026
+    // (per non esporre pubblicamente lo storico prezzi completo), ma questa
+    // funzione non ha mai inviato il token — il grafico e' rimasto vuoto
+    // per chiunque, proprietario compreso, da allora. Stesso pattern gia'
+    // usato altrove in questo file per recuperare il token della sessione.
+    let authHeader: Record<string, string> = {}
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+    } catch {}
+    const r = await fetch(endpoint, { headers: authHeader })
     if (!r.ok) return []
     const d = await r.json()
     return d.history || []
