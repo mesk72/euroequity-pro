@@ -217,7 +217,7 @@ async function fetchAllByExchange(table: string, select: string, exchangeList: s
   }
 
   if (needMore.length > 0) {
-    const extraRequests: Promise<any>[] = []
+    const extraRequests: any[] = []
     for (const exchange of needMore) {
       for (let page = 1; page < MAX_PAGES_PER_EXCHANGE; page++) {
         extraRequests.push(buildQuery(exchange, page))
