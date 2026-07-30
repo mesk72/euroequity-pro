@@ -1,15 +1,3 @@
-{'run_date': '2026-07-30', 'market': 'EU', 'prices_updated': 2624, 'prices_failed': 2, 'duration_seconds': 729, 'created_at': '2026-07-30T07:18:52.018045+00:00'}
-{'run_date': '2026-07-30', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 670, 'created_at': '2026-07-30T07:18:03.043317+00:00'}
-{'run_date': '2026-07-30', 'market': 'APAC', 'prices_updated': 2349, 'prices_failed': 0, 'duration_seconds': 558, 'created_at': '2026-07-30T07:16:08.372235+00:00'}
-{'run_date': '2026-07-30', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 717, 'created_at': '2026-07-30T03:51:25.55709+00:00'}
-{'run_date': '2026-07-30', 'market': 'EU', 'prices_updated': 2624, 'prices_failed': 2, 'duration_seconds': 520, 'created_at': '2026-07-30T03:50:28.890945+00:00'}
-{'run_date': '2026-07-30', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 861, 'created_at': '2026-07-30T00:44:48.22789+00:00'}
-{'run_date': '2026-07-30', 'market': 'EU', 'prices_updated': 2624, 'prices_failed': 2, 'duration_seconds': 582, 'created_at': '2026-07-30T00:40:11.956458+00:00'}
-{'run_date': '2026-07-29', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 949, 'created_at': '2026-07-29T21:05:18.846829+00:00'}
-{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 417, 'created_at': '2026-07-29T20:59:15.024435+00:00'}
-{'run_date': '2026-07-29', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'duration_seconds': 576, 'created_at': '2026-07-29T20:59:07.544791+00:00'}
-{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 607, 'created_at': '2026-07-29T15:54:35.362433+00:00'}
-{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 381, 'created_at': '2026-07-29T15:38:31.386329+00:00'}
-{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 354, 'created_at': '2026-07-29T15:15:53.913819+00:00'}
-{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 363, 'created_at': '2026-07-29T15:07:14.640327+00:00'}
-{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 505, 'created_at': '2026-07-29T14:46:02.642921+00:00'}
+HTTP: 200
+X-Quintile-Source: PRECALCOLATA
+X-Timing-Total-Ms: 2197
