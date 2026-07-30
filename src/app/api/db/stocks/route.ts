@@ -526,6 +526,7 @@ export async function GET(req: NextRequest) {
     const stocksSelect = 'ticker,exchange,isin,company,sector,country,flag,website,primary_exchange,yahoo_ticker'
     const fundSelect = 'ticker,exchange,price,change1d,mkt_cap,pe_trailing,pe_forward,pb,ev_ebitda,roe,div_yield,beta,eps_growth,rev_growth,value_score,growth_score,combined_rank,rank_pe_ltm,rank_pe_ntm,rank_pb,rank_eps_gr,rank_rev_gr,mom1w,mom1m,mom6m,mom12m,rank_mom6_adj,rank_mom12_adj,ke,implied_growth_10y,eps_fwd24,eps_fwd36,eps_growth_12_24m,eps_growth_24_36m,eps_cagr_2y,eps_ntm_dcf'
 
+    const t0 = Date.now()
     const [stocksData, fundData, freshPricesResult] = await Promise.all([
       fetchAllByExchange('stocks', stocksSelect, exList, true),
       fetchAll('fundamentals', fundSelect, exList),
@@ -535,7 +536,9 @@ export async function GET(req: NextRequest) {
       // identico calcolo di prima, solo avviato prima.
       fetchLatestPrices(exList).catch(() => ({} as Record<string, { price: number; date: string; change1d: number | null }>)),
     ])
+    console.log(`[TIMING] fetch (stocks+fundamentals+latest_prices parallel): ${Date.now() - t0}ms | stocks=${stocksData.length} fund=${fundData.length}`)
 
+    const tJoin0 = Date.now()
     let stocks: any[]
     if (isUSOnly) {
       const fundMap: Record<string, any> = {}
@@ -551,11 +554,13 @@ export async function GET(req: NextRequest) {
       // "North America"/"Asia Pacific" combinati (gonfiati).
       stocks = applyUniverseFilter(fundData, stocksData)
     }
+    console.log(`[TIMING] join stocks+fundamentals: ${Date.now() - tJoin0}ms | rows=${stocks.length}`)
 
     // Prezzo/variazione reali da prices_eod, mai dal campo statico
     // fundamentals.price/change1d — non affidabile per tutti gli 8000
     // titoli (alcuni restano indietro, es. 9984.TSE mostrava 10.65%
     // invece del vero 6.03%, 23/7/2026). Gia' calcolato in parallelo sopra.
+    const tPrice0 = Date.now()
     {
       const freshPrices = freshPricesResult
       for (const s of stocks) {
@@ -568,13 +573,16 @@ export async function GET(req: NextRequest) {
         }
       }
     }
+    console.log(`[TIMING] merge prezzi freschi: ${Date.now() - tPrice0}ms`)
 
-    // Sottoinsieme dei 500 per il proprietario escluso — decide solo
-    // QUALI righe includere, nessun valore viene mai ricalcolato.
+    const tTop500 = Date.now()
     if (!isOwner && !isInstitutionalViewer) {
       const top500 = await getTop500Keys()
       stocks = stocks.filter((s: any) => top500.has(`${s.ticker}.${s.exchange}`))
     }
+    console.log(`[TIMING] top500 filter: ${Date.now() - tTop500}ms | rows=${stocks.length} (owner=${isOwner})`)
+
+    const tQuintile0 = Date.now()
 
     // Quintile di SETTORE per EPS/Revenue growth, calcolato QUI con i
     // dati grezzi completi (sempre disponibili internamente al server,
@@ -621,7 +629,9 @@ export async function GET(req: NextRequest) {
         s.continentRevGrowthQuintile = continentRev
       }
     }
+    console.log(`[TIMING] quintili di settore: ${Date.now() - tQuintile0}ms`)
 
+    const tRedact0 = Date.now()
     if (isOwner) {
       // nessuna restrizione
     } else if (!isLoggedIn) {
@@ -629,11 +639,13 @@ export async function GET(req: NextRequest) {
     } else {
       stocks = stocks.map((s: any) => redactRawData(s))
     }
+    console.log(`[TIMING] redazione: ${Date.now() - tRedact0}ms`)
 
     if (isRowVolumeLimited(ip, stocks.length)) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
+    console.log(`[TIMING] TOTALE richiesta: ${Date.now() - t0}ms | righe finali=${stocks.length}`)
     return jsonNoCache({ stocks, source: 'supabase' })
 
   } catch (e) {
