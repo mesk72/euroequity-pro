@@ -918,7 +918,12 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (gSearch.length < 2) { setGSearchRes([]); return }
     gSearchTimer.current = setTimeout(async () => {
       try {
-        const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(gSearch)}&limit=10`)
+        let authHeader: Record<string, string> = {}
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+        } catch {}
+        const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(gSearch)}&limit=10`, { headers: authHeader })
         if (r.ok) {
           const d = await r.json()
           setGSearchRes(d.stocks || [])
@@ -1456,7 +1461,12 @@ function Dashboard({ onSectorClick, onSelectStock, onGoScreener }: {
     searchTimer.current = setTimeout(async () => {
       if (USE_DB) {
         try {
-          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`)
+          let authHeader: Record<string, string> = {}
+          try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+          } catch {}
+          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`, { headers: authHeader })
           if (r.ok) {
             const d = await r.json()
             setSearchRes(d.stocks || [])
@@ -1747,7 +1757,12 @@ function DashboardUS({ onSectorClick, onSelectStock, onGoScreener }: {
     searchTimer.current = setTimeout(async () => {
       if (USE_DB) {
         try {
-          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`)
+          let authHeader: Record<string, string> = {}
+          try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+          } catch {}
+          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`, { headers: authHeader })
           if (r.ok) {
             const d = await r.json()
             setSearchRes(d.stocks || [])
@@ -2016,7 +2031,12 @@ function DashboardAP({ onSectorClick, onSelectStock }: {
     searchTimer.current = setTimeout(async () => {
       if (USE_DB) {
         try {
-          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`)
+          let authHeader: Record<string, string> = {}
+          try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session?.access_token) authHeader = { Authorization: `Bearer ${session.access_token}` }
+          } catch {}
+          const r = await fetch(`/api/db/stocks?search=${encodeURIComponent(search)}&limit=10`, { headers: authHeader })
           if (r.ok) { const d = await r.json(); setSearchRes(d.stocks || []); return }
         } catch {}
       }
