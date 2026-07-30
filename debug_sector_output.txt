@@ -1,1 +1,1 @@
-HTTP: 200 | []
+HTTP: 200 | risposta: [{"exchange":"TSE"}]
