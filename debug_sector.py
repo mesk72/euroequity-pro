@@ -106,11 +106,17 @@ def raccogli_dati():
 
         assenti = sorted(tickers_universo - set(data_per_ticker))
         date_valide = [d for d in data_per_ticker.values() if d]
-        ultima_seduta = max(date_valide) if date_valide else None
+        # Riferimento = data PREVALENTE, non la piu' recente in assoluto.
+        # Con il massimo bastava un singolo titolo in anticipo (es. un ADR
+        # o un titolo con orario di pubblicazione diverso) per far
+        # risultare "in ritardo" tutto il resto del mercato che invece era
+        # perfettamente corretto: numeri gonfiati e allarmi falsi.
+        ultima_seduta = Counter(date_valide).most_common(1)[0][0] if date_valide else None
 
         aggiornati, in_ritardo = [], []
         for tk, d in data_per_ticker.items():
-            if d == ultima_seduta:
+            # chi ha una data uguale o piu' recente della prevalente e' a posto
+            if d and ultima_seduta and d >= ultima_seduta:
                 aggiornati.append(tk)
             else:
                 in_ritardo.append((tk, nome_per_ticker.get(tk, tk), d))
