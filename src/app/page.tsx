@@ -772,28 +772,41 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // La selezione del mercato dentro lo Screener (Italia, All Europe, ecc.)
   // era SOLO stato interno React, mai riflessa nell'URL — quando si
   // tornava indietro da un titolo, l'URL salvato non sapeva quale mercato
-  // fosse stato scelto, mostrando il default invece della vera selezione
-  // FIX 30/7/2026 (dopo due tentativi falliti di sincronizzare uno stato
-  // React con l'URL — prima con un useEffect di correzione post-idratazione,
-  // poi con un lazy initializer che legge window.location.search — il
-  // filtro Korea continuava a perdersi dopo il Back. Il problema di fondo
-  // non era il TIMING della sincronizzazione ma l'AVERE DUE FONTI DI
-  // VERITA' (stato React + URL) che devono restare d'accordo. Eliminato
-  // lo stato: 'exchange' ora si legge SEMPRE, ad ogni render, direttamente
-  // da scrSearchParams — nessuna copia locale che possa disallinearsi.
-  const exchange = scrSearchParams.get('scr_ex') || initExchange
-  // setExchange non è più uno stato: aggiorna l'URL direttamente (stessa
-  // logica, sincrona via replaceState, che prima stava nel useEffect di
-  // sync separato — ora è l'UNICO punto che scrive scr_ex).
+  // FIX 30/7/2026 v3 (Kimi, versione completa): stato locale come fonte di
+  // verita' per la logica interna (quale fetch fare), con un useEffect che
+  // ha SOLO un ruolo passivo di risincronizzazione se l'URL cambia dall'
+  // esterno (Back). Diverso dai tentativi #1 e #2 (falliti) in un punto
+  // decisivo: allora la navigazione andata/ritorno era ancora HARD in
+  // almeno una direzione (window.location.href), quindi ogni atterraggio
+  // richiedeva una nuova idratazione React da zero — ed e' proprio in
+  // quell'istante che la lettura dell'URL risultava inaffidabile (vedi
+  // commento storico sotto). Ora la navigazione e' SOFT in entrambe le
+  // direzioni (router.push in useGoToStock, router.replace nel Back della
+  // pagina titolo) - nessuna idratazione a meta', quindi ne' l'
+  // inizializzazione da window.location ne' l'effetto di sync sono piu'
+  // esposti a quella race.
+  const [exchange, setExchangeState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const fromUrl = new URLSearchParams(window.location.search).get('scr_ex')
+      if (fromUrl) return fromUrl
+    }
+    return initExchange
+  })
+  // Risincronizza lo stato locale se l'URL cambia dall'esterno (Back,
+  // digitazione manuale, cronologia) — ruolo passivo, non scrive mai lui
+  // stesso l'URL.
+  useEffect(() => {
+    const urlExchange = scrSearchParams.get('scr_ex') || initExchange
+    if (urlExchange !== exchange) {
+      setExchangeState(urlExchange)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scrSearchParams, initExchange])
   const setExchange = (code: string) => {
-    // FIX 30/7/2026 (Kimi): rimosso il replaceState manuale. Serviva solo
-    // perche' goToStock leggeva window.location direttamente e poteva
-    // catturare un URL non ancora aggiornato da router.replace()
-    // (asincrono). Ora goToStock legge searchParams di React via hook
-    // (useGoToStock) invece di window.location, quindi quella race non si
-    // puo' piu' verificare - il doppio replaceState+router.replace creava
-    // due scritture di history leggermente diverse, sospettato causa
-    // concreta del back rotto.
+    // Aggiorna SUBITO lo stato locale (UI/fetch reattivi immediatamente),
+    // poi l'URL in background — l'ordine e' invertito rispetto a prima
+    // (prima si scriveva solo l'URL e si leggeva sempre da li').
+    setExchangeState(code)
     const params = new URLSearchParams(scrSearchParams.toString())
     if (code && code !== initExchange) {
       params.set('scr_ex', code)
