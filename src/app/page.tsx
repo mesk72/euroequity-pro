@@ -745,11 +745,21 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // (23/7/2026, "All Europe" -> ASML -> indietro mostrava un mix casuale).
   const urlExchange = scrSearchParams.get('scr_ex')
   const [exchange,  setExchange]  = useState(urlExchange || initExchange)
-  // DEBUG TEMPORANEO 30/7/2026 — da rimuovere dopo
-  const [scrDebug, setScrDebug] = useState('')
+  // FIX 30/7/2026: dopo una navigazione hard (window.location.href, usata
+  // dal Back), lo useState qui sopra a volte legge scr_ex come assente
+  // nell'istante esatto del primo render/idratazione (probabile per come
+  // Vercel serve questa rotta in parte dalla cache statica) — 'exchange'
+  // restava quindi bloccato sulla lista intera anche quando l'URL reale,
+  // un istante dopo, mostrava correttamente scr_ex=KRX. Confermato con
+  // alert() diretti: il valore passato dal Back era sempre corretto, si
+  // perdeva SOLO dopo l'atterraggio. Questo effetto ricontrolla scr_ex
+  // DOPO che il client ha finito di idratare (quando window.location e'
+  // sicuramente quello vero), e corregge 'exchange' se serve.
   useEffect(() => {
-    setScrDebug(`exchange state: ${exchange}  |  urlExchange (letto da URL al mount): ${urlExchange}  |  initExchange (prop): ${initExchange.length > 40 ? initExchange.slice(0,40)+'...' : initExchange}  |  URL ora: ${typeof window !== 'undefined' ? window.location.search : ''}`)
-  })
+    const fresh = scrSearchParams.get('scr_ex')
+    if (fresh && fresh !== exchange) setExchange(fresh)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [stocks,    setStocks]    = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(false)
   const [selected,  setSelected]  = useState<Stock | null>(null)
@@ -791,13 +801,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (exchange && exchange !== initExchange) {
       params.set('scr_ex', exchange)
     } else {
-      // ALERT TEMPORANEO 30/7/2026 — se questo scatta su globalscreen con
-      // exchange gia' errato (es. la lista intera invece di KRX), il
-      // problema e' che 'exchange' era GIA' sbagliato al mount, non che
-      // questo effetto lo cancella lui stesso. Da rimuovere.
-      if (initExchange.length > 30) {
-        alert('SYNC EFFECT -> sto per RIMUOVERE scr_ex. exchange attuale: ' + exchange + ' | initExchange: ' + initExchange.slice(0, 30) + '...')
-      }
       params.delete('scr_ex')
     }
     const qs = params.toString()
@@ -929,13 +932,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
   return (
     <div className="space-y-3 p-3">
-      {scrDebug && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
-          background: '#0ea5e9', color: '#000', fontSize: 11, padding: '6px 12px',
-          fontFamily: 'monospace', wordBreak: 'break-all' }}>
-          {scrDebug}
-        </div>
-      )}
 
       {/* Ricerca globale — qualsiasi titolo, qualsiasi mercato */}
       <div className="relative">
@@ -2587,13 +2583,6 @@ function AppContent() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg">
-      {/* DEBUG TEMPORANEO 30/7/2026 — banner visibile (no DevTools) per
-          isolare il bug del Back al secondo titolo. Da rimuovere dopo. */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9999,
-        background: '#f97316', color: '#000', fontSize: 11, padding: '6px 12px',
-        fontFamily: 'monospace', wordBreak: 'break-all' }}>
-        page param: {page}  |  URL: {typeof window !== 'undefined' ? window.location.pathname + window.location.search : '(server)'}
-      </div>
 
 
       {/* - SIDEBAR - */}
