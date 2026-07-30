@@ -1,2 +1,3 @@
-Tentativo 1: 2.34s | X-Timing-Total-Ms=1897 | righe=500
-Tentativo 2: 1.97s | X-Timing-Total-Ms=1792 | righe=500
+HTTP homepage: 200
+chunk homepage: app/page-229e35db0cdd7ad6.js
+API stocks HTTP: 200
