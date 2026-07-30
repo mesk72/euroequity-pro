@@ -742,23 +742,32 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // era SOLO stato interno React, mai riflessa nell'URL — quando si
   // tornava indietro da un titolo, l'URL salvato non sapeva quale mercato
   // fosse stato scelto, mostrando il default invece della vera selezione
-  // (23/7/2026, "All Europe" -> ASML -> indietro mostrava un mix casuale).
-  // FIX 30/7/2026 (Kimi): invece di inizializzare da useSearchParams() (che
-  // durante l'idratazione dopo una navigazione hard puo' non riflettere
-  // ancora l'URL reale del browser — causa confermata con alert() diretti
-  // del filtro Korea perso al Back), lo stato legge window.location.search
-  // DIRETTAMENTE in un initializer "lazy" di useState, eseguito una sola
-  // volta al primo render client. Bypassa il problema di sincronizzazione
-  // con l'idratazione invece di correggerlo dopo (approccio precedente,
-  // sostituito da questo perche' piu' diretto). Fallback a initExchange
-  // (il prop reale di questo componente), non 'ALL' che non esiste qui.
-  const [exchange, setExchange] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const fromUrl = new URLSearchParams(window.location.search).get('scr_ex')
-      if (fromUrl) return fromUrl
+  // FIX 30/7/2026 (dopo due tentativi falliti di sincronizzare uno stato
+  // React con l'URL — prima con un useEffect di correzione post-idratazione,
+  // poi con un lazy initializer che legge window.location.search — il
+  // filtro Korea continuava a perdersi dopo il Back. Il problema di fondo
+  // non era il TIMING della sincronizzazione ma l'AVERE DUE FONTI DI
+  // VERITA' (stato React + URL) che devono restare d'accordo. Eliminato
+  // lo stato: 'exchange' ora si legge SEMPRE, ad ogni render, direttamente
+  // da scrSearchParams — nessuna copia locale che possa disallinearsi.
+  const exchange = scrSearchParams.get('scr_ex') || initExchange
+  // setExchange non è più uno stato: aggiorna l'URL direttamente (stessa
+  // logica, sincrona via replaceState, che prima stava nel useEffect di
+  // sync separato — ora è l'UNICO punto che scrive scr_ex).
+  const setExchange = (code: string) => {
+    const params = new URLSearchParams(scrSearchParams.toString())
+    if (code && code !== initExchange) {
+      params.set('scr_ex', code)
+    } else {
+      params.delete('scr_ex')
     }
-    return initExchange
-  })
+    const qs = params.toString()
+    const newUrl = qs ? `${scrPathname}?${qs}` : scrPathname
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(window.history.state, '', newUrl)
+    }
+    scrRouter.replace(newUrl, { scroll: false })
+  }
   const [stocks,    setStocks]    = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(false)
   const [selected,  setSelected]  = useState<Stock | null>(null)
@@ -788,27 +797,6 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
   const loadRequestId = useRef(0)
 
-  // Sincronizza la selezione con l'URL. FIX (diagnosi con Kimi, 25/7/2026):
-  // router.replace() da solo e' ASINCRONO — se l'utente clicca su un
-  // titolo subito dopo aver cambiato mercato, window.location.search
-  // potrebbe non essere ancora aggiornato quando goToStock lo legge,
-  // salvando l'indirizzo VECCHIO. history.replaceState() aggiorna
-  // l'URL del browser SUBITO (sincrono), eliminando la race condition;
-  // router.replace() resta solo per notificare Next.js.
-  useEffect(() => {
-    const params = new URLSearchParams(scrSearchParams.toString())
-    if (exchange && exchange !== initExchange) {
-      params.set('scr_ex', exchange)
-    } else {
-      params.delete('scr_ex')
-    }
-    const qs = params.toString()
-    const newUrl = qs ? `${scrPathname}?${qs}` : scrPathname
-    if (typeof window !== 'undefined' && window.location.pathname + window.location.search !== newUrl) {
-      window.history.replaceState(window.history.state, '', newUrl)
-    }
-    scrRouter.replace(newUrl, { scroll: false })
-  }, [exchange])
   useEffect(() => {
     const myRequestId = ++loadRequestId.current
     const load = () => {
