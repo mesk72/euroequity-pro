@@ -1,23 +1,15 @@
-EUROPA: 2126  (MIL=117, XETRA=210, PA=216, AS=98, MC=91, BR=100, LS=35, VI=53, HE=100, IR=15, GR=100, LSE=423, SWX=161, OM=206, OB=100, CPSE=101)
-US: 3002  (US=3002)
-TSX: 400  (TSX=400)
-TSE: 1000  (TSE=1000)
-SEHK: 500  (SEHK=500)
-ASX: 349  (ASX=349)
-KRX: 400  (KRX=400)
-SGX: 100  (SGX=100)
-
-TOTALE UNIVERSO REALE (in_universe=true, tabella stocks): 7877
-
-=== righe in latest_prices vs universo, per vedere quante mancano DEL TUTTO ===
-  XETRA: universo=210, in latest_prices=198, mancanti=12
-  PA: universo=216, in latest_prices=217, mancanti=-1
-  MC: universo=91, in latest_prices=100, mancanti=-9
-  LSE: universo=423, in latest_prices=422, mancanti=1
-  OM: universo=206, in latest_prices=204, mancanti=2
-  US: universo=3002, in latest_prices=3001, mancanti=1
-  TSX: universo=400, in latest_prices=397, mancanti=3
-  SEHK: universo=500, in latest_prices=498, mancanti=2
-  ASX: universo=349, in latest_prices=350, mancanti=-1
-
-Totale righe in latest_prices: 7867  vs  universo reale: 7877  ->  mancanti del tutto: 10
+{'run_date': '2026-07-30', 'market': 'EU', 'prices_updated': 2624, 'prices_failed': 2, 'duration_seconds': 729, 'created_at': '2026-07-30T07:18:52.018045+00:00'}
+{'run_date': '2026-07-30', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 670, 'created_at': '2026-07-30T07:18:03.043317+00:00'}
+{'run_date': '2026-07-30', 'market': 'APAC', 'prices_updated': 2349, 'prices_failed': 0, 'duration_seconds': 558, 'created_at': '2026-07-30T07:16:08.372235+00:00'}
+{'run_date': '2026-07-30', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 717, 'created_at': '2026-07-30T03:51:25.55709+00:00'}
+{'run_date': '2026-07-30', 'market': 'EU', 'prices_updated': 2624, 'prices_failed': 2, 'duration_seconds': 520, 'created_at': '2026-07-30T03:50:28.890945+00:00'}
+{'run_date': '2026-07-30', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 861, 'created_at': '2026-07-30T00:44:48.22789+00:00'}
+{'run_date': '2026-07-30', 'market': 'EU', 'prices_updated': 2624, 'prices_failed': 2, 'duration_seconds': 582, 'created_at': '2026-07-30T00:40:11.956458+00:00'}
+{'run_date': '2026-07-29', 'market': 'US+CA', 'prices_updated': 3402, 'prices_failed': 0, 'duration_seconds': 949, 'created_at': '2026-07-29T21:05:18.846829+00:00'}
+{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 417, 'created_at': '2026-07-29T20:59:15.024435+00:00'}
+{'run_date': '2026-07-29', 'market': 'EU', 'prices_updated': 2635, 'prices_failed': 2, 'duration_seconds': 576, 'created_at': '2026-07-29T20:59:07.544791+00:00'}
+{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 607, 'created_at': '2026-07-29T15:54:35.362433+00:00'}
+{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 381, 'created_at': '2026-07-29T15:38:31.386329+00:00'}
+{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 354, 'created_at': '2026-07-29T15:15:53.913819+00:00'}
+{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 363, 'created_at': '2026-07-29T15:07:14.640327+00:00'}
+{'run_date': '2026-07-29', 'market': 'APAC', 'prices_updated': 2350, 'prices_failed': 0, 'duration_seconds': 505, 'created_at': '2026-07-29T14:46:02.642921+00:00'}
