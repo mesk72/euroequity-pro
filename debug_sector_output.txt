@@ -1,3 +1,23 @@
-HTTP: 200
-Contenuto completo: {"history":[],"momentum":{"mom1w":null,"mom1m":null,"mom6m":null,"mom12m":null,"mom3y":null,"mom5y":null}}
-Headers: {'Age': '0', 'Cache-Control': 'public', 'Content-Encoding': 'gzip', 'Content-Type': 'application/json', 'Date': 'Thu, 30 Jul 2026 10:59:13 GMT', 'Server': 'Vercel', 'Strict-Transport-Security': 'max-age=63072000', 'Vary': 'RSC, Next-Router-State-Tree, Next-Router-Prefetch', 'X-Matched-Path': '/api/db/history', 'X-Vercel-Cache': 'MISS', 'X-Vercel-Id': 'sfo1::iad1::9nrr6-1785409153155-fa0a5a2d5a66', 'Transfer-Encoding': 'chunked'}
+EUROPA: 2126  (MIL=117, XETRA=210, PA=216, AS=98, MC=91, BR=100, LS=35, VI=53, HE=100, IR=15, GR=100, LSE=423, SWX=161, OM=206, OB=100, CPSE=101)
+US: 3002  (US=3002)
+TSX: 400  (TSX=400)
+TSE: 1000  (TSE=1000)
+SEHK: 500  (SEHK=500)
+ASX: 349  (ASX=349)
+KRX: 400  (KRX=400)
+SGX: 100  (SGX=100)
+
+TOTALE UNIVERSO REALE (in_universe=true, tabella stocks): 7877
+
+=== righe in latest_prices vs universo, per vedere quante mancano DEL TUTTO ===
+  XETRA: universo=210, in latest_prices=198, mancanti=12
+  PA: universo=216, in latest_prices=217, mancanti=-1
+  MC: universo=91, in latest_prices=100, mancanti=-9
+  LSE: universo=423, in latest_prices=422, mancanti=1
+  OM: universo=206, in latest_prices=204, mancanti=2
+  US: universo=3002, in latest_prices=3001, mancanti=1
+  TSX: universo=400, in latest_prices=397, mancanti=3
+  SEHK: universo=500, in latest_prices=498, mancanti=2
+  ASX: universo=349, in latest_prices=350, mancanti=-1
+
+Totale righe in latest_prices: 7867  vs  universo reale: 7877  ->  mancanti del tutto: 10
