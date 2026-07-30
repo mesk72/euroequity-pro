@@ -1,9 +1,7 @@
-import os, requests
-SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
-SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
-headers_r = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
-r = requests.get(f"{SUPABASE_URL}/rest/v1/sector_quintile_partials", headers=headers_r | {"Prefer":"count=exact"}, params={"select":"exchange","limit":"1"})
-print("Righe totali:", r.headers.get("content-range"))
-r2 = requests.get(f"{SUPABASE_URL}/rest/v1/sector_quintile_partials", headers=headers_r, params={"select":"exchange","limit":"1000"})
-exchanges = sorted(set(row["exchange"] for row in r2.json()))
-print("Exchange presenti:", exchanges)
+import requests, time
+url = "https://forwardalpha.pro/api/db/stocks?exchanges=US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX"
+for i in range(3):
+    t0 = time.time()
+    r = requests.get(url, timeout=60)
+    elapsed = time.time() - t0
+    print(f"Tentativo {i+1}: {elapsed:.2f}s totali | X-Timing-Total-Ms={r.headers.get('X-Timing-Total-Ms')} | righe={r.headers.get('X-Timing-Rows')}")
