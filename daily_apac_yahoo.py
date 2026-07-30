@@ -81,6 +81,22 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 
+# LOCK ANTI-DOPPIA-ESECUZIONE (solo per trigger automatici) - FIX 30/7/2026:
+# EU/US sono girati 3 volte in una notte (Vercel cron + cron nativo GitHub
+# aggiunto oggi + eventuali trigger manuali). 'concurrency' nel workflow
+# evita sovrapposizioni PARALLELE ma non esecuzioni sequenziali multiple
+# nello stesso giorno. Qui si salta SOLO se il trigger e' un cron
+# automatico (schedule) E oggi risulta gia' un'esecuzione completata per
+# questo mercato - i trigger manuali (workflow_dispatch, usati per
+# debug/riparazioni) restano SEMPRE permessi senza restrizioni.
+if os.environ.get("GITHUB_EVENT_NAME") == "schedule":
+    _lock_check = requests.get(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_r,
+        params={"select": "duration_seconds", "run_date": "eq." + TODAY, "market": "eq.APAC", "limit": "1"})
+    _lock_rows = _lock_check.json()
+    if isinstance(_lock_rows, list) and _lock_rows and _lock_rows[0].get("duration_seconds"):
+        print(f"LOCK: gia' un'esecuzione completata oggi per APAC (run_date={TODAY}). Esco per evitare doppio run automatico.")
+        exit(0)
+
 _log_buffer = []
 def log(msg):
     print(msg)
