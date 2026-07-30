@@ -1,2 +1,1 @@
-sector_aggregates esiste? 200
-Contenuto campione: []
+HTTP: 200 | []
