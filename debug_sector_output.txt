@@ -1,9 +1,9 @@
-OGGETTO: ForwardAlpha OK - 7451/7876 titoli aggiornati (94.6%)
+OGGETTO: ForwardAlpha OK - 7697/7876 titoli aggiornati (97.7%)
 
-COPERTURA: 7451/7876 aggiornati (94.6%) | 403 in ritardo | 22 assenti
+COPERTURA: 7697/7876 aggiornati (97.7%) | 157 in ritardo | 22 assenti
 
 MERCATO           UNIV     AGG     RIT     ASS  ULTIMA SEDUTA
-Europa            2126    1797     313      16  2026-07-30
+Europa            2126    2043      67      16  2026-07-30
 Stati Uniti       3001    2968      32       1  2026-07-29
 Canada             400     394       3       3  2026-07-29
 Giappone          1000     999       1       0  2026-07-30
@@ -23,4 +23,4 @@ ESECUZIONI ultime 24h: 11
 Quintili precalcolati: 247 righe (aggiornati 2026-07-30)
 
 SMTP non configurato: stampo il rapporto senza inviarlo.
-ForwardAlpha OK - 7451/7876 titoli aggiornati (94.6%)
+ForwardAlpha OK - 7697/7876 titoli aggiornati (97.7%)
