@@ -1,9 +1,6 @@
-Homepage HTTP: 200
-Trovati 0 chunk JS
-Stringa 'stockBackTo' (codice vecchio) NON trovata nei chunk controllati
+HTTP: 200 | lunghezza HTML: 9566
+x-vercel-cache: PRERENDER | age: 0
+Chunk JS trovati: 0
+Controllati 0 chunk. Codice vecchio trovato: False
 
-Header risposta homepage:
-  x-vercel-id: iad1::vkmvp-1785390094637-7372d9b62937
-  age: 293
-  x-vercel-cache: HIT
-  date: Thu, 30 Jul 2026 05:41:34 GMT
+Con cachebust - x-vercel-cache: HIT | age: 0
