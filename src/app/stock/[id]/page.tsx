@@ -220,9 +220,17 @@ function StockPageInner() {
   }, [])
 
   const handleBack = () => {
+    // FIX 30/7/2026: URLSearchParams.get() decodifica GIA' automaticamente
+    // — la decodeURIComponent() aggiunta qui sopra era una doppia
+    // decodifica ridondante (innocua per gli URL visti finora, ma un bug
+    // latente reale se l'origine avesse mai contenuto un carattere % gia'
+    // codificato, es. un ticker o nome societa' con caratteri speciali).
     const urlParams = new URLSearchParams(window.location.search)
     const from = urlParams.get('from')
-    const target = from ? decodeURIComponent(from) : '/'
+    const target = from || '/'
+    // ALERT TEMPORANEO 30/7/2026 — mostra il valore ESATTO usato nella
+    // navigazione reale, non una copia calcolata a parte. Da rimuovere.
+    alert('BACK -> target esatto: ' + target)
     if (target === '/news') {
       window.history.back()
     } else {
