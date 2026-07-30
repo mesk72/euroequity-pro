@@ -1,1 +1,2 @@
-HTTP: 200 | risposta: [{"exchange":"TSE"}]
+Righe totali: 0-0/247
+Exchange presenti: ['AS', 'ASX', 'BR', 'CPSE', 'GR', 'HE', 'IR', 'KRX', 'LS', 'LSE', 'MC', 'MIL', 'OB', 'OM', 'PA', 'SEHK', 'SGX', 'SWX', 'TSE', 'TSX', 'US', 'VI', 'XETRA']
