@@ -743,23 +743,22 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // tornava indietro da un titolo, l'URL salvato non sapeva quale mercato
   // fosse stato scelto, mostrando il default invece della vera selezione
   // (23/7/2026, "All Europe" -> ASML -> indietro mostrava un mix casuale).
-  const urlExchange = scrSearchParams.get('scr_ex')
-  const [exchange,  setExchange]  = useState(urlExchange || initExchange)
-  // FIX 30/7/2026: dopo una navigazione hard (window.location.href, usata
-  // dal Back), lo useState qui sopra a volte legge scr_ex come assente
-  // nell'istante esatto del primo render/idratazione (probabile per come
-  // Vercel serve questa rotta in parte dalla cache statica) — 'exchange'
-  // restava quindi bloccato sulla lista intera anche quando l'URL reale,
-  // un istante dopo, mostrava correttamente scr_ex=KRX. Confermato con
-  // alert() diretti: il valore passato dal Back era sempre corretto, si
-  // perdeva SOLO dopo l'atterraggio. Questo effetto ricontrolla scr_ex
-  // DOPO che il client ha finito di idratare (quando window.location e'
-  // sicuramente quello vero), e corregge 'exchange' se serve.
-  useEffect(() => {
-    const fresh = scrSearchParams.get('scr_ex')
-    if (fresh && fresh !== exchange) setExchange(fresh)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // FIX 30/7/2026 (Kimi): invece di inizializzare da useSearchParams() (che
+  // durante l'idratazione dopo una navigazione hard puo' non riflettere
+  // ancora l'URL reale del browser — causa confermata con alert() diretti
+  // del filtro Korea perso al Back), lo stato legge window.location.search
+  // DIRETTAMENTE in un initializer "lazy" di useState, eseguito una sola
+  // volta al primo render client. Bypassa il problema di sincronizzazione
+  // con l'idratazione invece di correggerlo dopo (approccio precedente,
+  // sostituito da questo perche' piu' diretto). Fallback a initExchange
+  // (il prop reale di questo componente), non 'ALL' che non esiste qui.
+  const [exchange, setExchange] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const fromUrl = new URLSearchParams(window.location.search).get('scr_ex')
+      if (fromUrl) return fromUrl
+    }
+    return initExchange
+  })
   const [stocks,    setStocks]    = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(false)
   const [selected,  setSelected]  = useState<Stock | null>(null)
