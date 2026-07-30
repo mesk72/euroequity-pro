@@ -1,1 +1,4 @@
-chunk homepage: app/page-ad95ebeb0890c437.js
+US soltanto (3002 titoli): 2.36s totali | X-Timing-Total-Ms=1904 | righe=281
+US+TSX (3402 titoli): 1.33s totali | X-Timing-Total-Ms=1170 | righe=304
+EU completa (2137 titoli): 1.90s totali | X-Timing-Total-Ms=1713 | righe=112
+Global (7889 titoli, 23 exchange): 2.49s totali | X-Timing-Total-Ms=2308 | righe=500
