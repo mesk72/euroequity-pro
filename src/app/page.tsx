@@ -791,6 +791,13 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
     if (exchange && exchange !== initExchange) {
       params.set('scr_ex', exchange)
     } else {
+      // ALERT TEMPORANEO 30/7/2026 — se questo scatta su globalscreen con
+      // exchange gia' errato (es. la lista intera invece di KRX), il
+      // problema e' che 'exchange' era GIA' sbagliato al mount, non che
+      // questo effetto lo cancella lui stesso. Da rimuovere.
+      if (initExchange.length > 30) {
+        alert('SYNC EFFECT -> sto per RIMUOVERE scr_ex. exchange attuale: ' + exchange + ' | initExchange: ' + initExchange.slice(0, 30) + '...')
+      }
       params.delete('scr_ex')
     }
     const qs = params.toString()
