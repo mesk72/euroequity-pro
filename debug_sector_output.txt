@@ -1,3 +1,26 @@
-API HTTP: 200
-Intestazioni di debug residue: NESSUNA
-Sito HTTP: 200
+OGGETTO: ForwardAlpha OK - 7451/7876 titoli aggiornati (94.6%)
+
+COPERTURA: 7451/7876 aggiornati (94.6%) | 403 in ritardo | 22 assenti
+
+MERCATO           UNIV     AGG     RIT     ASS  ULTIMA SEDUTA
+Europa            2126    1797     313      16  2026-07-30
+Stati Uniti       3001    2968      32       1  2026-07-29
+Canada             400     394       3       3  2026-07-29
+Giappone          1000     999       1       0  2026-07-30
+Hong Kong          500     491       7       2  2026-07-30
+Australia          349     349       0       0  2026-07-30
+Corea              400     355      45       0  2026-07-30
+Singapore          100      98       2       0  2026-07-30
+
+ESECUZIONI ultime 24h: 11
+  APAC   ok=2349 falliti=0 durata=476s
+  EU     ok=2624 falliti=2 durata=729s
+  US+CA  ok=3402 falliti=0 durata=670s
+  APAC   ok=2349 falliti=0 durata=558s
+  US+CA  ok=3402 falliti=0 durata=717s
+  EU     ok=2624 falliti=2 durata=520s
+
+Quintili precalcolati: 247 righe (aggiornati 2026-07-30)
+
+SMTP non configurato: stampo il rapporto senza inviarlo.
+ForwardAlpha OK - 7451/7876 titoli aggiornati (94.6%)
