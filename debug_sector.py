@@ -1,24 +1,26 @@
-import requests
-r = requests.get("https://forwardalpha.pro/", timeout=30)
-print("Homepage HTTP:", r.status_code)
-# cerca link a chunk JS
-import re
-js_links = re.findall(r'src="(/_next/static/[^"]+\.js)"', r.text)
-print(f"Trovati {len(js_links)} chunk JS")
-found_old_string = False
-for link in js_links[:15]:
-    full = "https://forwardalpha.pro" + link
+import requests, re
+r = requests.get("https://forwardalpha.pro/", timeout=30, headers={"Cache-Control": "no-cache"})
+print("HTTP:", r.status_code, "| lunghezza HTML:", len(r.text))
+print("x-vercel-cache:", r.headers.get("x-vercel-cache"), "| age:", r.headers.get("age"))
+
+# pattern piu' ampio per qualsiasi riferimento a file .js
+js_paths = set(re.findall(r'["\'](/_next/[^"\']+?\.js)["\']', r.text))
+print(f"Chunk JS trovati: {len(js_paths)}")
+
+found_old = False
+checked = 0
+for path in list(js_paths)[:25]:
+    full = "https://forwardalpha.pro" + path
     try:
         rj = requests.get(full, timeout=20)
+        checked += 1
         if "stockBackTo" in rj.text:
-            print(f"TROVATO 'stockBackTo' (CODICE VECCHIO) in: {link}")
-            found_old_string = True
-    except Exception as e:
-        print(f"errore su {link}: {e}")
-if not found_old_string:
-    print("Stringa 'stockBackTo' (codice vecchio) NON trovata nei chunk controllati")
+            found_old = True
+            print(f"  CODICE VECCHIO ('stockBackTo') trovato in {path}")
+    except Exception:
+        pass
+print(f"Controllati {checked} chunk. Codice vecchio trovato: {found_old}")
 
-# Controlla header deployment
-print("\nHeader risposta homepage:")
-for h in ["x-vercel-id", "age", "x-vercel-cache", "date"]:
-    print(f"  {h}: {r.headers.get(h)}")
+# forza bypass cache con query string
+r2 = requests.get("https://forwardalpha.pro/?_cachebust=123456", timeout=30)
+print("\nCon cachebust - x-vercel-cache:", r2.headers.get("x-vercel-cache"), "| age:", r2.headers.get("age"))
