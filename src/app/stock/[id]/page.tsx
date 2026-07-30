@@ -212,28 +212,24 @@ function StockPageInner() {
   // reale del browser, che era la radice di tutta questa classe di bug.
 
   const handleBack = () => {
-    // FIX 30/7/2026 (Kimi): router.back() usa la cronologia REALE del
-    // browser invece di ricostruire manualmente l'URL di destinazione —
-    // elimina la classe di bug (tre tentativi falliti prima di questo,
-    // tutti basati su ricostruire/sincronizzare l'URL a mano). Poiche'
-    // navigateTo/setExchange usano solo router.replace() (mai push,
-    // fix Kimi 30/7), la cronologia non si riempie di voci spurie: back()
-    // atterra sempre sull'unica voce "screener" aggiornata sul posto.
-    // Fallback su router.push(from) solo per accesso diretto (bookmark,
-    // link condiviso) dove non esiste una cronologia app da cui tornare.
+    // FIX 30/7/2026 v2 (Kimi): router.back() si affida al ripristino
+    // opaco della pagina precedente da parte di Next.js — sospettato che
+    // in certi casi il client-side router cache serva una versione stale
+    // o che i searchParams si resettino brevemente al default durante il
+    // ripristino, prima che l'URL reale venga riletto (comportamento
+    // documentato di App Router su route dinamiche con query complessi).
+    // Ora si naviga ESPLICITAMENTE all'URL noto (quello in "from"), non
+    // ci si affida piu' allo stack di history gestito da Next.js.
+    // replace() (non push) per non accumulare voci nello stack.
     const from = searchParams.get('from')
-    const target = from || '/'
+    const target = from ? decodeURIComponent(from) : '/'
     if (target === '/news') {
-      // Caso speciale preesistente: evita un freeze del Router Cache di
-      // Next.js su questa pagina specifica — non toccato, causa diversa.
+      // Caso speciale preesistente (non toccato, causa diversa): evita un
+      // freeze del Router Cache di Next.js su questa pagina specifica.
       window.history.back()
       return
     }
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      router.back()
-    } else {
-      router.push(target)
-    }
+    router.replace(target)
   }
   const id = (params?.id as string) || ''
   const [ticker, exchangeCode] = id.split('-')
