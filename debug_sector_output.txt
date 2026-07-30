@@ -1,3 +1,2 @@
-HTTP homepage: 200
 chunk homepage: app/page-229e35db0cdd7ad6.js
-API stocks HTTP: 200
+x-vercel-cache: PRERENDER | age: 0
