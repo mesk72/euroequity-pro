@@ -208,16 +208,6 @@ function StockPageInner() {
   // stessa natura dell'andata (anche goToStock usa window.location.href) -
   // niente piu' disallineamento tra router client-side di Next.js e URL
   // reale del browser, che era la radice di tutta questa classe di bug.
-  // DEBUG TEMPORANEO 30/7/2026 — banner visibile sulla pagina (no DevTools
-  // necessario) per isolare il bug del Back al secondo titolo. Da rimuovere
-  // una volta capito il problema.
-  const [debugBanner, setDebugBanner] = useState('')
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const from = urlParams.get('from')
-    const target = from ? decodeURIComponent(from) : '/'
-    setDebugBanner(`URL pagina: ${window.location.pathname}${window.location.search}  |  from letto: ${from}  |  destinazione Back: ${target}`)
-  }, [])
 
   const handleBack = () => {
     // FIX 30/7/2026: URLSearchParams.get() decodifica GIA' automaticamente
@@ -228,9 +218,6 @@ function StockPageInner() {
     const urlParams = new URLSearchParams(window.location.search)
     const from = urlParams.get('from')
     const target = from || '/'
-    // ALERT TEMPORANEO 30/7/2026 — mostra il valore ESATTO usato nella
-    // navigazione reale, non una copia calcolata a parte. Da rimuovere.
-    alert('BACK -> target esatto: ' + target)
     if (target === '/news') {
       window.history.back()
     } else {
@@ -422,12 +409,6 @@ function StockPageInner() {
           FORWARD<span style={{ color:'var(--text3)' }}>ALPHA</span>
         </div>
       </div>
-      {debugBanner && (
-        <div style={{ background:'#f97316', color:'#000', fontSize:11, padding:'6px 12px',
-          fontFamily:'monospace', wordBreak:'break-all' }}>
-          {debugBanner}
-        </div>
-      )}
 
       <div style={{ maxWidth:1100, margin:'0 auto', padding:'24px 16px' }}>
         <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
