@@ -705,7 +705,7 @@ export async function GET(req: NextRequest) {
     }
 
     console.log(`[TIMING] TOTALE richiesta: ${Date.now() - t0}ms | righe finali=${stocks.length}`)
-    return jsonNoCache({ stocks, source: 'supabase' }, { headers: { 'X-Timing-Total-Ms': String(Date.now() - t0), 'X-Timing-Rows': String(stocks.length) } })
+    return jsonNoCache({ stocks, source: 'supabase' }, { headers: { 'X-Timing-Total-Ms': String(Date.now() - t0), 'X-Timing-Rows': String(stocks.length), 'X-Quintile-Source': usedPrecomputed ? 'PRECALCOLATA' : 'FALLBACK-JS-LENTO' } })
 
   } catch (e) {
     return jsonNoCache({ error: 'Database error' }, { status: 500 })
