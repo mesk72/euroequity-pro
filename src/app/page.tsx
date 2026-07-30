@@ -745,6 +745,11 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
   // (23/7/2026, "All Europe" -> ASML -> indietro mostrava un mix casuale).
   const urlExchange = scrSearchParams.get('scr_ex')
   const [exchange,  setExchange]  = useState(urlExchange || initExchange)
+  // DEBUG TEMPORANEO 30/7/2026 — da rimuovere dopo
+  const [scrDebug, setScrDebug] = useState('')
+  useEffect(() => {
+    setScrDebug(`exchange state: ${exchange}  |  urlExchange (letto da URL al mount): ${urlExchange}  |  initExchange (prop): ${initExchange.length > 40 ? initExchange.slice(0,40)+'...' : initExchange}  |  URL ora: ${typeof window !== 'undefined' ? window.location.search : ''}`)
+  })
   const [stocks,    setStocks]    = useState<Stock[]>([])
   const [loading,   setLoading]   = useState(false)
   const [selected,  setSelected]  = useState<Stock | null>(null)
@@ -917,6 +922,13 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
 
   return (
     <div className="space-y-3 p-3">
+      {scrDebug && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+          background: '#0ea5e9', color: '#000', fontSize: 11, padding: '6px 12px',
+          fontFamily: 'monospace', wordBreak: 'break-all' }}>
+          {scrDebug}
+        </div>
+      )}
 
       {/* Ricerca globale — qualsiasi titolo, qualsiasi mercato */}
       <div className="relative">
