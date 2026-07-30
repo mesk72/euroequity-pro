@@ -857,41 +857,39 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
       minGrowth: initGrowMin > 0 ? initGrowMin : undefined,
       minCombined: initCombinedMin > 0 ? initCombinedMin : undefined,
     }).then(data => {
-      // Calcola euroRank su All Europe usando metriche raw
-      const ey = (pe: number | null) => (pe && pe !== 0 && Math.abs(pe) <= 200) ? 1/pe : null
-      const pctRk = (vals: number[], v: number) => {
-        if (!vals.length) return null
-        return Math.round(vals.filter(x => x < v).length / vals.length * 100)
-      }
-      // Distribuzioni europee pre-calcolate
-      const eyTVals  = data.map((s:any) => ey(s.peTrail)).filter((v:any) => v != null) as number[]
-      const eyFVals  = data.map((s:any) => ey(s.peFwd)).filter((v:any) => v != null) as number[]
-      const pbVals   = data.map((s:any) => s.pb).filter((v:any) => v != null && v > 0 && v < 50) as number[]
-      const egVals   = data.map((s:any) => s.epsGrowth).filter((v:any) => v != null) as number[]
-      const rgVals   = data.map((s:any) => s.revGrowth).filter((v:any) => v != null) as number[]
-      const m6AdjVals  = data.map((s:any) => s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null).filter((v:any) => v != null) as number[]
-      const m12AdjVals = data.map((s:any) => s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null).filter((v:any) => v != null) as number[]
-
-      // Calcola euroVal e euroGrow per ogni titolo
+      // FIX 30/7/2026 — CAUSA REALE dei ~21 secondi di Global per
+      // l'utenza proprietario. RIMOSSO un blocco di CODICE MORTO che
+      // costava un tempo quadratico nel browser.
+      //
+      // Qui veniva calcolato `const euroScores = data.map(...)`, che per
+      // OGNI titolo invocava 7 volte una funzione pctRk() cosi' fatta:
+      //     vals.filter(x => x < v).length / vals.length
+      // cioe' una scansione COMPLETA dell'array PIU' l'allocazione di un
+      // nuovo array, ad ogni singola chiamata. Costo totale: 7 x n^2.
+      //   - utente normale (filtrato a 500 titoli): 7 x 500^2 = 1,7 mln
+      //     di operazioni -> istantaneo, il problema non si vedeva mai
+      //   - proprietario (nessun filtro, ~7.889 titoli): 7 x 7.889^2 =
+      //     ~435 MILIONI di operazioni + ~55.000 array allocati e buttati
+      // Questo spiega anche perche' l'header X-Timing-Total-Ms del server
+      // dichiarava solo ~2 secondi: il tempo non era lato server, era
+      // tutto dentro il browser, DOPO la ricezione dei dati. Le
+      // ottimizzazioni fatte lato server erano sul lato sbagliato.
+      //
+      // La cosa decisiva: `euroScores` non veniva MAI letto. Compariva
+      // una sola volta in tutto il file, nella riga che lo calcolava. Il
+      // callback non muta i titoli (nessuna assegnazione a s.*), e' un
+      // calcolo puro il cui risultato veniva scartato: residuo di quando
+      // il ranking si calcolava nel browser, prima che passasse al DB
+      // (vedi il commento "Usa combinedRank dal DB" qui sotto, che era
+      // gia' la fonte reale dei punteggi mostrati).
+      //
+      // NOTA per Andrea, vista la regola di non toccare le formule dei
+      // punteggi: quel blocco conteneva una vecchia formula value/growth
+      // (per giunta divergente da quella ufficiale — usava "minimo 2 su
+      // 4" per il growth invece di "minimo 3 su 4"). La sua rimozione non
+      // puo' cambiare nessun valore mostrato, perche' il risultato non
+      // era letto da nessuno: i punteggi arrivano da combinedRank del DB.
       const NO_RANK_EX = new Set(['VI','LS','IR'])
-      const euroScores = data.map((s:any) => {
-        if (NO_RANK_EX.has(s.exchange)) return null
-        const eyt = ey(s.peTrail); const eyf = ey(s.peFwd)
-        const pet = eyt != null ? (s.peTrail > 200 ? 1 : pctRk(eyTVals, eyt)) : null
-        const pef = eyf != null ? (s.peFwd   > 200 ? 1 : pctRk(eyFVals, eyf)) : null
-        const pb  = s.pb != null && s.pb > 0 && s.pb < 50 ? (100 - pctRk(pbVals, s.pb)!) : null
-        const vc  = [pet,pef,pb].filter((v:any) => v != null) as number[]
-        const euroVal = vc.length >= 2 ? vc.reduce((a:number,b:number)=>a+b,0)/vc.length : null
-        const m6adj  = s.mom6m  != null && s.mom1w != null ? s.mom6m  - s.mom1w  : null
-        const m12adj = s.mom12m != null && s.mom1m != null ? s.mom12m - s.mom1m : null
-        const eg  = s.epsGrowth != null ? pctRk(egVals,  s.epsGrowth) : null
-        const rg  = s.revGrowth != null ? pctRk(rgVals,  s.revGrowth) : null
-        const m6r = m6adj  != null ? pctRk(m6AdjVals,  m6adj)  : null
-        const m12r= m12adj != null ? pctRk(m12AdjVals, m12adj) : null
-        const gc  = [eg,rg,m6r,m12r].filter((v:any) => v != null) as number[]
-        const euroGrow = gc.length >= 2 ? gc.reduce((a:number,b:number)=>a+b,0)/gc.length : null
-        return euroVal != null && euroGrow != null ? (euroVal + euroGrow) / 2 : null
-      })
 
       // Usa combinedRank dal DB — azzera solo per NO_RANK_EX
       data.forEach((s: any) => {
