@@ -1,8 +1,24 @@
-import requests, time
-url = "https://forwardalpha.pro/api/db/stocks?exchanges=US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX"
-t0 = time.time()
-r = requests.get(url, timeout=60)
-elapsed = time.time() - t0
-print(f"HTTP {r.status_code}, {elapsed:.2f}s totali (rete+server)")
-print("X-Timing-Total-Ms:", r.headers.get("X-Timing-Total-Ms"))
-print("X-Timing-Rows:", r.headers.get("X-Timing-Rows"))
+import requests
+r = requests.get("https://forwardalpha.pro/", timeout=30)
+print("Homepage HTTP:", r.status_code)
+# cerca link a chunk JS
+import re
+js_links = re.findall(r'src="(/_next/static/[^"]+\.js)"', r.text)
+print(f"Trovati {len(js_links)} chunk JS")
+found_old_string = False
+for link in js_links[:15]:
+    full = "https://forwardalpha.pro" + link
+    try:
+        rj = requests.get(full, timeout=20)
+        if "stockBackTo" in rj.text:
+            print(f"TROVATO 'stockBackTo' (CODICE VECCHIO) in: {link}")
+            found_old_string = True
+    except Exception as e:
+        print(f"errore su {link}: {e}")
+if not found_old_string:
+    print("Stringa 'stockBackTo' (codice vecchio) NON trovata nei chunk controllati")
+
+# Controlla header deployment
+print("\nHeader risposta homepage:")
+for h in ["x-vercel-id", "age", "x-vercel-cache", "date"]:
+    print(f"  {h}: {r.headers.get(h)}")
