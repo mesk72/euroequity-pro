@@ -1,4 +1,6 @@
-US soltanto (3002 titoli): 2.36s totali | X-Timing-Total-Ms=1904 | righe=281
-US+TSX (3402 titoli): 1.33s totali | X-Timing-Total-Ms=1170 | righe=304
-EU completa (2137 titoli): 1.90s totali | X-Timing-Total-Ms=1713 | righe=112
-Global (7889 titoli, 23 exchange): 2.49s totali | X-Timing-Total-Ms=2308 | righe=500
+TTFB (primo byte): 2.79s | tempo totale download: 2.80s
+Content-Encoding: br
+Content-Length dichiarato: None
+Byte scaricati (dopo eventuale decompressione): 30276 (0.03 MB)
+Righe: 500, tempo server: 2380ms
+Stima dimensione risposta per proprietario (7889 righe, no filtro): 0.5 MB
