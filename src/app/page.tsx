@@ -26,8 +26,18 @@ import WatchlistButton from '@/components/watchlist/WatchlistButton'
 // client-side di Next.js — meno fluido ma elimina alla radice il problema
 // di cache del router che ha causato tre tentativi di fix falliti.
 function goToStock(ticker: string, exchange: string) {
+  // FIX 29/7/2026 (Kimi + Claude): eliminato sessionStorage. Prima l'origine
+  // veniva passata sia via sessionStorage sia via ?from nell'URL - due
+  // meccanismi paralleli per lo stesso dato, con replaceState() manuale a
+  // fare da collante tra i due. Fragile: bastava una race tra i due
+  // meccanismi (es. sessionStorage scritto da un secondo titolo mentre lo
+  // stato history del primo non era ancora completamente assestato) per
+  // mandare il "Back" nel posto sbagliato al secondo titolo aperto dallo
+  // stesso screener - bug riportato piu' volte, mai risolto del tutto con
+  // fix incrementali sul meccanismo misto. Ora l'origine vive SOLO nell'URL
+  // della pagina titolo (?from=...): ogni voce della cronologia del browser
+  // porta la propria origine, senza stato globale condiviso tra tab/pagine.
   const origin = window.location.pathname + window.location.search
-  try { sessionStorage.setItem('stockBackTo', origin) } catch {}
   window.location.href = `/stock/${ticker}-${exchange}?from=${encodeURIComponent(origin)}`
 }
 
