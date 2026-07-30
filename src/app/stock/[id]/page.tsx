@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import WatchlistButton from '@/components/watchlist/WatchlistButton'
 import { computeScores } from '@/lib/ranking'
@@ -195,6 +195,8 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
 
 function StockPageInner() {
   const params = useParams()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   // FIX 29/7/2026 (Kimi + Claude): riscritto in modalita' stateless.
   // Prima: sessionStorage + ?from nell'URL + replaceState() manuale + 
   // router.push() (soft nav) - quattro meccanismi diversi a coordinare lo
@@ -210,18 +212,27 @@ function StockPageInner() {
   // reale del browser, che era la radice di tutta questa classe di bug.
 
   const handleBack = () => {
-    // FIX 30/7/2026: URLSearchParams.get() decodifica GIA' automaticamente
-    // — la decodeURIComponent() aggiunta qui sopra era una doppia
-    // decodifica ridondante (innocua per gli URL visti finora, ma un bug
-    // latente reale se l'origine avesse mai contenuto un carattere % gia'
-    // codificato, es. un ticker o nome societa' con caratteri speciali).
-    const urlParams = new URLSearchParams(window.location.search)
-    const from = urlParams.get('from')
+    // FIX 30/7/2026 (Kimi): router.back() usa la cronologia REALE del
+    // browser invece di ricostruire manualmente l'URL di destinazione —
+    // elimina la classe di bug (tre tentativi falliti prima di questo,
+    // tutti basati su ricostruire/sincronizzare l'URL a mano). Poiche'
+    // navigateTo/setExchange usano solo router.replace() (mai push,
+    // fix Kimi 30/7), la cronologia non si riempie di voci spurie: back()
+    // atterra sempre sull'unica voce "screener" aggiornata sul posto.
+    // Fallback su router.push(from) solo per accesso diretto (bookmark,
+    // link condiviso) dove non esiste una cronologia app da cui tornare.
+    const from = searchParams.get('from')
     const target = from || '/'
     if (target === '/news') {
+      // Caso speciale preesistente: evita un freeze del Router Cache di
+      // Next.js su questa pagina specifica — non toccato, causa diversa.
       window.history.back()
+      return
+    }
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
     } else {
-      window.location.href = target
+      router.push(target)
     }
   }
   const id = (params?.id as string) || ''
