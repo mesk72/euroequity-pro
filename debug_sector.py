@@ -1,7 +1,4 @@
-import requests, time
-url = "https://forwardalpha.pro/api/db/stocks?exchanges=US,TSX,MIL,XETRA,PA,LSE,SWX,OM,AS,MC,BR,HE,CPSE,OB,GR,VI,IR,LS,TSE,SEHK,ASX,KRX,SGX"
-for i in range(2):
-    t0 = time.time()
-    r = requests.get(url, timeout=60)
-    elapsed = time.time() - t0
-    print(f"Tentativo {i+1}: {elapsed:.2f}s | X-Timing-Total-Ms={r.headers.get('X-Timing-Total-Ms')} | righe={r.headers.get('X-Timing-Rows')} | HTTP={r.status_code}")
+import requests
+r = requests.get("https://forwardalpha.pro/?page=globalscreen&scr_ex=KRX", timeout=30)
+print("HTTP:", r.status_code, "| lunghezza:", len(r.text))
+print("Contiene errore visibile:", "Application error" in r.text or "500" in r.text[:200])
