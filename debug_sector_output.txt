@@ -1,2 +1,4 @@
-HTTP: 200 | lunghezza: 9566
-Contiene errore visibile: False
+stocks (dati titolo) - AAPL: 1.44s | HTTP 200 | 2892 byte
+history (grafico) - AAPL: 0.46s | HTTP 200 | 106 byte
+stocks (dati titolo) - ASML: 0.70s | HTTP 200 | 2538 byte
+history (grafico) - ASML: 0.39s | HTTP 200 | 106 byte
