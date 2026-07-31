@@ -81,6 +81,33 @@ headers_r  = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 headers_up = {**headers_r, "Content-Type": "application/json",
               "Prefer": "resolution=merge-duplicates,return=minimal"}
 
+# ── BLOCCO DI SICUREZZA: si scrivono solo sedute concluse ────
+# FIX 31/7/2026: yfinance, se interrogato a mercato APERTO, restituisce
+# anche una barra PARZIALE del giorno in corso, col prezzo dell'istante
+# invece della chiusura. Una volta scritta in prices_eod diventa
+# indistinguibile da una chiusura vera e falsa prezzi, rendimenti e di
+# conseguenza i punteggi.
+# Caso reale che ha portato a questo controllo: ~380 titoli europei con un
+# prezzo datato 30/07/2026 che Yahoo non conferma come chiusura (es.
+# AKTIA.HE a 11,96 contro 11,30 del 29/07), scritti quasi certamente da
+# un'esecuzione manuale delle 09:06 a mercati aperti durante il debug.
+# Regola: una barra datata D si accetta solo dopo l'orario limite di
+# chiusura di D. Margine volutamente abbondante, valido anche con l'ora
+# solare: meglio saltare una barra e riprenderla alla prossima esecuzione
+# che scriverne una sbagliata. Le esecuzioni programmate non perdono nulla
+# (girano a mercati chiusi da ore).
+ORA_LIMITE_UTC = 10  # Asia-Pacifico: la piu' tarda e' Singapore, 17:00 SGT = 09:00 UTC
+saltate_seduta_aperta = 0
+
+def seduta_conclusa(date_str):
+    """True se la seduta di quella data e' sicuramente gia' chiusa."""
+    try:
+        d = datetime.strptime(date_str, "%Y-%m-%d")
+    except Exception:
+        return False
+    return datetime.utcnow() >= d.replace(hour=ORA_LIMITE_UTC, minute=0, second=0)
+
+
 # LOCK ANTI-DOPPIA-ESECUZIONE (solo per trigger automatici) - FIX 30/7/2026:
 # EU/US sono girati 3 volte in una notte (Vercel cron + cron nativo GitHub
 # aggiunto oggi + eventuali trigger manuali). 'concurrency' nel workflow
@@ -274,6 +301,9 @@ for exchange, tickers in by_exchange.items():
                 for date_idx, price in col_valid.items():
                     date_str = date_idx.strftime("%Y-%m-%d")
                     if date_str <= last: continue
+                    if not seduta_conclusa(date_str):
+                        saltate_seduta_aperta += 1
+                        continue
                     price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
                 ok_yf += 1
         except Exception as e:
@@ -289,6 +319,9 @@ for exchange, tickers in by_exchange.items():
                     for date_idx, price in single["Close"].dropna().items():
                         date_str = date_idx.strftime("%Y-%m-%d")
                         if date_str <= last: continue
+                        if not seduta_conclusa(date_str):
+                            saltate_seduta_aperta += 1
+                            continue
                         price_buf.append({"ticker": tk, "exchange": ex, "date": date_str, "adj_close": round(float(price), 6)})
                     ok_yf += 1
                 except Exception as e2:
@@ -320,6 +353,10 @@ if price_buf:
     if rw.status_code not in (200, 201, 204):
         log(f"  ERRORE SCRITTURA prezzi (finale): HTTP {rw.status_code} - {rw.text[:300]}")
 log("  Prezzi Yahoo: ok=" + str(ok_yf) + " fail=" + str(fail_yf))
+if saltate_seduta_aperta:
+    log("  BLOCCO SICUREZZA: scartate " + str(saltate_seduta_aperta) +
+        " barre di sedute non ancora chiuse (esecuzione a mercato aperto). "
+        "Verranno riprese alla prossima esecuzione a mercati chiusi.")
 ok_prices = ok_yf; fail_prices = fail_yf
 
 # ── 3. LEGGI PREZZI DA prices_eod ────────────────────────────
