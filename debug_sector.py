@@ -1,19 +1,14 @@
 import os, requests
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
-H={"apikey":K,"Authorization":"Bearer "+K}
-r=requests.get(U+"/rest/v1/script_logs",headers=H,
-    params={"select":"created_at,log_text","script_name":"eq.daily_apac_yahoo",
-            "order":"created_at.desc","limit":"1"})
-d=r.json()
-if d:
-    print("Esecuzione:", d[0]["created_at"])
-    for riga in d[0]["log_text"].split("\n"):
-        if any(k in riga for k in ["BLOCCO SICUREZZA","Prezzi Yahoo","latest_prices","Riparazione","mai scritti"]):
-            print("  "+riga.strip())
-# controllo diretto: esiste una barra 31/07 per Tokyo?
-print()
-print("Barre datate 2026-07-31 gia' presenti per TSE:")
-r2=requests.get(U+"/rest/v1/prices_eod",headers=H|{"Prefer":"count=exact"},
-    params={"select":"ticker","exchange":"eq.TSE","date":"eq.2026-07-31","limit":"1"})
-print("  ", r2.headers.get("content-range"))
+H={"apikey":K,"Authorization":"Bearer "+K,"Prefer":"count=exact"}
+EU=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]
+tot=0
+print("Righe datate 2026-07-30 in prices_eod, per mercato europeo:")
+for ex in EU:
+    r=requests.get(U+"/rest/v1/prices_eod",headers=H,
+        params={"select":"ticker","exchange":"eq."+ex,"date":"eq.2026-07-30","limit":"1"})
+    n=int(r.headers.get("content-range","0/0").split("/")[-1])
+    tot+=n
+    if n: print("  %-6s %4d" % (ex,n))
+print("  TOTALE %d" % tot)
