@@ -1,37 +1,10 @@
-PRIMA:
-  XETRA     2
-  AS        1
-  MC        1
-  HE       88
-  SWX       9
-  OM      197
-  CPSE     85
-  TOTALE 383
+Righe in cache ancora al 30/07 (ormai inesistente nei dati grezzi): 383
+Riallineate: 383   senza dato grezzo: 0
 
-CANCELLAZIONE (solo exchange europei, solo data 2026-07-30):
-  XETRA  HTTP 204
-  AS     HTTP 204
-  MC     HTTP 204
-  HE     HTTP 204
-  SWX    HTTP 204
-  OM     HTTP 204
-  CPSE   HTTP 204
+Controllo finale: righe europee ancora al 30/07 in cache
+  residue: 0
 
-DOPO:
-  TOTALE 0
-
-Cancellate: 383 righe
-
-VERIFICA su 3 titoli (ultima data rimasta):
-  AKTIA .HE    [('2026-07-29', 11.3), ('2026-07-28', 11.26)]
-  BURE  .OM    [('2026-07-29', 259.4), ('2026-07-28', 254.8)]
-  ALMB  .CPSE  [('2026-07-29', 17.05), ('2026-07-28', 16.85)]
-
-CONTROLLO che nessun ALTRO mercato sia stato toccato:
-  US     righe al 2026-07-30: 2946
-  TSX    righe al 2026-07-30: 390
-  TSE    righe al 2026-07-30: 999
-  SEHK   righe al 2026-07-30: 498
-  ASX    righe al 2026-07-30: 349
-  KRX    righe al 2026-07-30: 398
-  SGX    righe al 2026-07-30: 100
+Coerenza grezzo/cache su 3 titoli:
+  AKTIA .HE    grezzo=('2026-07-29', 11.3)  cache=('2026-07-29', 11.3)
+  BURE  .OM    grezzo=('2026-07-29', 259.4)  cache=('2026-07-29', 259.4)
+  ALMB  .CPSE  grezzo=('2026-07-29', 17.05)  cache=('2026-07-29', 17.05)
