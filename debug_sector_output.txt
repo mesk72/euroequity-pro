@@ -1,50 +1,83 @@
-Titoli in universo mai scritti o fermi da oltre 7 giorni: 43
 
-=== DA TOGLIERE DALL'UNIVERSO (43) - Yahoo non ha piu' dati recenti ===
-  MBH3      XETRA Maschinenfabrik Berthold Hermle  nostro:MAI SCRITTO  Yahoo non ha dati
-  SPB       XETRA Sedlmayr Grund und Immobilien AG nostro:MAI SCRITTO  Yahoo non ha dati
-  EUK3      XETRA EUROKAI GmbH & Co. KGaA          nostro:MAI SCRITTO  Yahoo non ha dati
-  BFV       XETRA Berliner Effektengesellschaft AG nostro:MAI SCRITTO  Yahoo non ha dati
-  PHH2      XETRA Paul Hartmann AG                 nostro:MAI SCRITTO  Yahoo non ha dati
-  HG1       XETRA HOMAG Group AG                   nostro:MAI SCRITTO  Yahoo non ha dati
-  WBAH      XETRA Wild Bunch AG                    nostro:MAI SCRITTO  Yahoo non ha dati
-  SIM0      XETRA SIMONA Aktiengesellschaft        nostro:MAI SCRITTO  Yahoo non ha dati
-  LEC       XETRA Lechwerke AG                     nostro:MAI SCRITTO  Yahoo non ha dati
-  T2G       XETRA Tradegate AG Wertpapierhandelsba nostro:MAI SCRITTO  Yahoo non ha dati
-  MNV6      XETRA Mainova AG                       nostro:MAI SCRITTO  Yahoo non ha dati
-  SSH       XETRA SÃ¼dwestdeutsche Salzwerke AG    nostro:MAI SCRITTO  Yahoo non ha dati
-  NLM       XETRA FRoSTA Aktiengesellschaft        nostro:MAI SCRITTO  Yahoo non ha dati
-  COFB      BR    Cofinimmo SA                     nostro:2026-07-03   Yahoo non ha dati
-  AT.       LSE   Ashtead Technology Holdings Plc  nostro:MAI SCRITTO  Yahoo non ha dati
-  TANGEN B  OM    TÃ¥ngen Industrikapital AB (publ nostro:MAI SCRITTO  Yahoo non ha dati
-  ROKO B    OM    Röko AB (publ)                   nostro:MAI SCRITTO  Yahoo non ha dati
-  EISP      OB    Eiendomsspar AS                  nostro:2026-06-10   Yahoo non ha dati
-  WEIJHO    CPSE  Investeringsforeningen Investin  nostro:2026-07-23   Yahoo fermo a 2026-07-23
-  ZQXVW9    US    Meridian Fabrication Holdings    nostro:MAI SCRITTO  Yahoo non ha dati
-  NUVL      US    Nuvalent, Inc.                   nostro:2026-07-21   Yahoo fermo a 2026-07-21
-  TMHC      US    Taylor Morrison Home Corporation nostro:2026-07-23   Yahoo fermo a 2026-07-23
-  WSR       US    Whitestone REIT                  nostro:2026-07-13   Yahoo non ha dati
-  ESPR      US    Esperion Therapeutics, Inc.      nostro:2026-07-13   Yahoo non ha dati
-  CNGO      US    Cengage Learning Holdings II, In nostro:2026-07-17   Yahoo non ha dati
-  CPRX      US    Catalyst Pharmaceuticals, Inc.   nostro:2026-07-21   Yahoo fermo a 2026-07-21
-  EEX       US    Emerald Holding, Inc.            nostro:2026-07-14   Yahoo non ha dati
-  XOMA      US    XOMA Royalty Corporation         nostro:2026-07-21   Yahoo fermo a 2026-07-21
-  NSA       US    National Storage Affiliates Trus nostro:2026-07-21   Yahoo fermo a 2026-07-21
-  BLD       US    TopBuild Corp.                   nostro:2026-07-02   Yahoo non ha dati
-  GTLS      US    Chart Industries, Inc.           nostro:2026-07-16   Yahoo non ha dati
-  STEL      US    Stellar Bancorp, Inc.            nostro:2026-06-30   Yahoo non ha dati
-  OLPX      US    Olaplex Holdings, Inc.           nostro:2026-07-13   Yahoo non ha dati
-  ACO.X     TSX   ATCO Ltd.                        nostro:MAI SCRITTO  Yahoo non ha dati
-  BLN       TSX   Blackline Safety Corp.           nostro:2026-07-03   Yahoo non ha dati
-  GO.U      TSX   GO Residential Real Estate Inves nostro:MAI SCRITTO  Yahoo non ha dati
-  IIP.UN    TSX   InterRent Real Estate Investment nostro:MAI SCRITTO  Yahoo non ha dati
-  ISC       TSX   Information Services Corporation nostro:2026-07-07   Yahoo non ha dati
-  4974      TSE   Takara Bio Inc.                  nostro:2026-06-12   Yahoo non ha dati
-  823       SEHK  Link Real Estate Investment Trus nostro:MAI SCRITTO  Yahoo non ha dati
-  778       SEHK  Fortune Real Estate Investment T nostro:MAI SCRITTO  Yahoo non ha dati
-  A012510   KRX   Douzone Bizon Co., Ltd.          nostro:2026-07-14   Yahoo non ha dati
-  A057050   KRX   Hyundai Home Shopping Network Co nostro:2026-07-21   Yahoo fermo a 2026-07-21
+MBH3   Maschinenfabrik Berthold Hermle
+    TROVATO: MBH3.F (Francoforte) ultima 31/07 = 174.00
+    TROVATO: MBH3.MU (Monaco) ultima 31/07 = 176.50
+    TROVATO: MBH3.SG (Stoccarda) ultima 31/07 = 174.50
+    TROVATO: MBH3.HM (Amburgo) ultima 31/07 = 174.00
+    TROVATO: MBH3.DU (Dusseldorf) ultima 31/07 = 174.00
 
-=== PROBLEMA NOSTRO (0) - Yahoo HA i dati ma noi no ===
+SPB    Sedlmayr Grund und Immobilien
+    TROVATO: SPB.F (Francoforte) ultima 31/07 = 1120.00
+    TROVATO: SPB.MU (Monaco) ultima 31/07 = 1090.00
+    TROVATO: SPB.SG (Stoccarda) ultima 31/07 = 1130.00
+    TROVATO: SPB.DU (Dusseldorf) ultima 31/07 = 1090.00
 
-=== DA GUARDARE A MANO (0) ===
+EUK3   EUROKAI
+    TROVATO: EUK3.F (Francoforte) ultima 31/07 = 58.00
+    TROVATO: EUK3.MU (Monaco) ultima 31/07 = 59.20
+    TROVATO: EUK3.SG (Stoccarda) ultima 31/07 = 57.60
+    TROVATO: EUK3.HM (Amburgo) ultima 31/07 = 58.00
+    TROVATO: EUK3.DU (Dusseldorf) ultima 31/07 = 57.40
+
+BFV    Berliner Effektengesellschaft
+    TROVATO: BFV.F (Francoforte) ultima 31/07 = 73.50
+    TROVATO: BFV.MU (Monaco) ultima 31/07 = 74.00
+    TROVATO: BFV.SG (Stoccarda) ultima 31/07 = 73.00
+    TROVATO: BFV.HM (Amburgo) ultima 31/07 = 73.00
+    TROVATO: BFV.DU (Dusseldorf) ultima 31/07 = 72.50
+
+PHH2   Paul Hartmann
+    TROVATO: PHH2.F (Francoforte) ultima 31/07 = 203.00
+    TROVATO: PHH2.MU (Monaco) ultima 31/07 = 204.00
+    TROVATO: PHH2.SG (Stoccarda) ultima 31/07 = 200.00
+    TROVATO: PHH2.HM (Amburgo) ultima 31/07 = 196.00
+    TROVATO: PHH2.DU (Dusseldorf) ultima 31/07 = 199.50
+
+HG1    HOMAG Group
+    TROVATO: HG1.F (Francoforte) ultima 31/07 = 25.00
+    TROVATO: HG1.MU (Monaco) ultima 31/07 = 25.20
+    TROVATO: HG1.SG (Stoccarda) ultima 31/07 = 24.80
+    TROVATO: HG1.HM (Amburgo) ultima 31/07 = 24.80
+    TROVATO: HG1.DU (Dusseldorf) ultima 31/07 = 24.60
+
+WBAH   Wild Bunch
+    TROVATO: WBAH.F (Francoforte) ultima 31/07 = 20.20
+    TROVATO: WBAH.SG (Stoccarda) ultima 31/07 = 20.20
+    TROVATO: WBAH.HM (Amburgo) ultima 31/07 = 20.20
+
+SIM0   SIMONA
+    TROVATO: SIM0.F (Francoforte) ultima 31/07 = 72.50
+    TROVATO: SIM0.MU (Monaco) ultima 31/07 = 72.50
+    TROVATO: SIM0.DU (Dusseldorf) ultima 31/07 = 72.50
+
+LEC    Lechwerke
+    TROVATO: LEC.F (Francoforte) ultima 31/07 = 64.00
+    TROVATO: LEC.MU (Monaco) ultima 31/07 = 65.00
+    TROVATO: LEC.SG (Stoccarda) ultima 31/07 = 64.00
+    TROVATO: LEC.HM (Amburgo) ultima 31/07 = 61.00
+    TROVATO: LEC.DU (Dusseldorf) ultima 31/07 = 63.00
+
+T2G    Tradegate
+    TROVATO: T2G.F (Francoforte) ultima 31/07 = 84.00
+    TROVATO: T2G.MU (Monaco) ultima 31/07 = 87.00
+    TROVATO: T2G.SG (Stoccarda) ultima 31/07 = 86.00
+    TROVATO: T2G.DU (Dusseldorf) ultima 31/07 = 84.50
+
+MNV6   Mainova
+    TROVATO: MNV6.F (Francoforte) ultima 31/07 = 362.00
+    TROVATO: MNV6.MU (Monaco) ultima 31/07 = 386.00
+    TROVATO: MNV6.SG (Stoccarda) ultima 31/07 = 362.00
+    TROVATO: MNV6.DU (Dusseldorf) ultima 31/07 = 360.00
+
+SSH    Suedwestdeutsche Salzwerke
+    TROVATO: SSH.F (Francoforte) ultima 31/07 = 60.00
+    TROVATO: SSH.MU (Monaco) ultima 31/07 = 60.50
+    TROVATO: SSH.SG (Stoccarda) ultima 31/07 = 60.00
+    TROVATO: SSH.DU (Dusseldorf) ultima 31/07 = 60.00
+
+NLM    FRoSTA
+    TROVATO: NLM.F (Francoforte) ultima 31/07 = 104.00
+    TROVATO: NLM.MU (Monaco) ultima 31/07 = 104.00
+    TROVATO: NLM.SG (Stoccarda) ultima 31/07 = 104.00
+    TROVATO: NLM.HM (Amburgo) ultima 31/07 = 104.00
+    TROVATO: NLM.DU (Dusseldorf) ultima 31/07 = 102.50
