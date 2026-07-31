@@ -1,11 +1,11 @@
-Ora del test (UTC): 2026-07-31 03:06:19.306017
+Ora del test (UTC): 2026-07-31 03:07:56.794901
 
 Yahoo ha la chiusura di GIOVEDI 30/07 per questi titoli europei?
-  ASML.AS      errore: 'str' object has no attribute 'strftime'
-  SAP.DE       errore: 'str' object has no attribute 'strftime'
-  MC.PA        errore: 'str' object has no attribute 'strftime'
-  NESN.SW      errore: 'str' object has no attribute 'strftime'
-  SHEL.L       errore: 'str' object has no attribute 'strftime'
-  ISP.MI       errore: 'str' object has no attribute 'strftime'
-  NOKIA.HE     errore: 'str' object has no attribute 'strftime'
-  VOLV-B.ST    errore: 'str' object has no attribute 'strftime'
+  ASML.AS      27/07=1429.80  28/07=1388.40  29/07=1362.20
+  SAP.DE       27/07=151.28  28/07=159.24  29/07=162.04
+  MC.PA        27/07=466.80  28/07=470.30  29/07=467.95
+  NESN.SW      27/07=80.39  28/07=82.40  29/07=82.71
+  SHEL.L       27/07=3277.00  28/07=3234.50  29/07=3323.50
+  ISP.MI       27/07=6.50  28/07=6.48  29/07=6.45
+  NOKIA.HE     27/07=7.93  28/07=7.83  29/07=7.56
+  VOLV-B.ST    27/07=355.50  28/07=364.70  29/07=364.10
