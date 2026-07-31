@@ -1,83 +1,51 @@
+Ora (UTC): 2026-07-31 16:19
 
-MBH3   Maschinenfabrik Berthold Hermle
-    TROVATO: MBH3.F (Francoforte) ultima 31/07 = 174.00
-    TROVATO: MBH3.MU (Monaco) ultima 31/07 = 176.50
-    TROVATO: MBH3.SG (Stoccarda) ultima 31/07 = 174.50
-    TROVATO: MBH3.HM (Amburgo) ultima 31/07 = 174.00
-    TROVATO: MBH3.DU (Dusseldorf) ultima 31/07 = 174.00
+=== 1. Aggiorno yahoo_ticker da .DE a .F ===
+  MBH3   -> MBH3.F   HTTP 204
+  SPB    -> SPB.F   HTTP 204
+  EUK3   -> EUK3.F   HTTP 204
+  BFV    -> BFV.F   HTTP 204
+  PHH2   -> PHH2.F   HTTP 204
+  HG1    -> HG1.F   HTTP 204
+  WBAH   -> WBAH.F   HTTP 204
+  SIM0   -> SIM0.F   HTTP 204
+  LEC    -> LEC.F   HTTP 204
+  T2G    -> T2G.F   HTTP 204
+  MNV6   -> MNV6.F   HTTP 204
+  SSH    -> SSH.F   HTTP 204
+  NLM    -> NLM.F   HTTP 204
 
-SPB    Sedlmayr Grund und Immobilien
-    TROVATO: SPB.F (Francoforte) ultima 31/07 = 1120.00
-    TROVATO: SPB.MU (Monaco) ultima 31/07 = 1090.00
-    TROVATO: SPB.SG (Stoccarda) ultima 31/07 = 1130.00
-    TROVATO: SPB.DU (Dusseldorf) ultima 31/07 = 1090.00
+=== 2. Scarico 5 anni di storico da Francoforte ===
+  MBH3   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  SPB    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  EUK3   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  BFV    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  PHH2   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  HG1    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  WBAH    586 righe scritte (2022-12-02 -> 2026-07-30)  [saltate 1: seduta aperta]
+  SIM0   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  LEC    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  T2G    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  MNV6   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  SSH    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+  NLM    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
 
-EUK3   EUROKAI
-    TROVATO: EUK3.F (Francoforte) ultima 31/07 = 58.00
-    TROVATO: EUK3.MU (Monaco) ultima 31/07 = 59.20
-    TROVATO: EUK3.SG (Stoccarda) ultima 31/07 = 57.60
-    TROVATO: EUK3.HM (Amburgo) ultima 31/07 = 58.00
-    TROVATO: EUK3.DU (Dusseldorf) ultima 31/07 = 57.40
+Totale righe storiche scritte: 15958   saltate per seduta aperta: 13
 
-BFV    Berliner Effektengesellschaft
-    TROVATO: BFV.F (Francoforte) ultima 31/07 = 73.50
-    TROVATO: BFV.MU (Monaco) ultima 31/07 = 74.00
-    TROVATO: BFV.SG (Stoccarda) ultima 31/07 = 73.00
-    TROVATO: BFV.HM (Amburgo) ultima 31/07 = 73.00
-    TROVATO: BFV.DU (Dusseldorf) ultima 31/07 = 72.50
+=== 3. Aggiorno la cache dei prezzi ===
+  cache aggiornata per 13 titoli (HTTP 201)
 
-PHH2   Paul Hartmann
-    TROVATO: PHH2.F (Francoforte) ultima 31/07 = 203.00
-    TROVATO: PHH2.MU (Monaco) ultima 31/07 = 204.00
-    TROVATO: PHH2.SG (Stoccarda) ultima 31/07 = 200.00
-    TROVATO: PHH2.HM (Amburgo) ultima 31/07 = 196.00
-    TROVATO: PHH2.DU (Dusseldorf) ultima 31/07 = 199.50
-
-HG1    HOMAG Group
-    TROVATO: HG1.F (Francoforte) ultima 31/07 = 25.00
-    TROVATO: HG1.MU (Monaco) ultima 31/07 = 25.20
-    TROVATO: HG1.SG (Stoccarda) ultima 31/07 = 24.80
-    TROVATO: HG1.HM (Amburgo) ultima 31/07 = 24.80
-    TROVATO: HG1.DU (Dusseldorf) ultima 31/07 = 24.60
-
-WBAH   Wild Bunch
-    TROVATO: WBAH.F (Francoforte) ultima 31/07 = 20.20
-    TROVATO: WBAH.SG (Stoccarda) ultima 31/07 = 20.20
-    TROVATO: WBAH.HM (Amburgo) ultima 31/07 = 20.20
-
-SIM0   SIMONA
-    TROVATO: SIM0.F (Francoforte) ultima 31/07 = 72.50
-    TROVATO: SIM0.MU (Monaco) ultima 31/07 = 72.50
-    TROVATO: SIM0.DU (Dusseldorf) ultima 31/07 = 72.50
-
-LEC    Lechwerke
-    TROVATO: LEC.F (Francoforte) ultima 31/07 = 64.00
-    TROVATO: LEC.MU (Monaco) ultima 31/07 = 65.00
-    TROVATO: LEC.SG (Stoccarda) ultima 31/07 = 64.00
-    TROVATO: LEC.HM (Amburgo) ultima 31/07 = 61.00
-    TROVATO: LEC.DU (Dusseldorf) ultima 31/07 = 63.00
-
-T2G    Tradegate
-    TROVATO: T2G.F (Francoforte) ultima 31/07 = 84.00
-    TROVATO: T2G.MU (Monaco) ultima 31/07 = 87.00
-    TROVATO: T2G.SG (Stoccarda) ultima 31/07 = 86.00
-    TROVATO: T2G.DU (Dusseldorf) ultima 31/07 = 84.50
-
-MNV6   Mainova
-    TROVATO: MNV6.F (Francoforte) ultima 31/07 = 362.00
-    TROVATO: MNV6.MU (Monaco) ultima 31/07 = 386.00
-    TROVATO: MNV6.SG (Stoccarda) ultima 31/07 = 362.00
-    TROVATO: MNV6.DU (Dusseldorf) ultima 31/07 = 360.00
-
-SSH    Suedwestdeutsche Salzwerke
-    TROVATO: SSH.F (Francoforte) ultima 31/07 = 60.00
-    TROVATO: SSH.MU (Monaco) ultima 31/07 = 60.50
-    TROVATO: SSH.SG (Stoccarda) ultima 31/07 = 60.00
-    TROVATO: SSH.DU (Dusseldorf) ultima 31/07 = 60.00
-
-NLM    FRoSTA
-    TROVATO: NLM.F (Francoforte) ultima 31/07 = 104.00
-    TROVATO: NLM.MU (Monaco) ultima 31/07 = 104.00
-    TROVATO: NLM.SG (Stoccarda) ultima 31/07 = 104.00
-    TROVATO: NLM.HM (Amburgo) ultima 31/07 = 104.00
-    TROVATO: NLM.DU (Dusseldorf) ultima 31/07 = 102.50
+=== 4. VERIFICA FINALE ===
+  MBH3   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 176.5)
+  SPB    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 1090.0)
+  EUK3   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 59.0)
+  BFV    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 73.0)
+  PHH2   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 203.0)
+  HG1    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 24.4)
+  WBAH   storico:  586 righe da 2022-12-02   cache: ('2026-07-30', 21.8)
+  SIM0   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 77.0)
+  LEC    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 65.5)
+  T2G    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 84.0)
+  MNV6   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 362.0)
+  SSH    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 63.0)
+  NLM    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 103.5)
