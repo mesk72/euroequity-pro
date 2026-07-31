@@ -1,40 +1,16 @@
-=== Titoli che nel NOSTRO db hanno il 30/07: Yahoo ce l'ha davvero? ===
+Adesso (UTC): 2026-07-31 03:23
 
-  LOGI B.OM (LOGI B.ST)
-    nostro db: [('2026-07-30', 13.34), ('2026-07-29', 13.36), ('2026-07-28', 13.32)]
-    yahoo ora: []
+APAC (limite 10:00 UTC)
+   oggi         2026-07-31 -> SCARTATA (seduta non chiusa)
+   ieri         2026-07-30 -> ACCETTATA
+   l'altroieri  2026-07-29 -> ACCETTATA
 
-  BURE.OM (BURE.ST)
-    nostro db: [('2026-07-30', 261.0), ('2026-07-29', 259.4), ('2026-07-28', 254.8)]
-    yahoo ora: [('2026-07-27', 263.6), ('2026-07-28', 254.8), ('2026-07-29', 259.4)]
+Europa (limite 17:00 UTC)
+   oggi         2026-07-31 -> SCARTATA (seduta non chiusa)
+   ieri         2026-07-30 -> ACCETTATA
+   l'altroieri  2026-07-29 -> ACCETTATA
 
-  SECU B.OM (SECU B.ST)
-    nostro db: [('2026-07-30', 158.3), ('2026-07-29', 158.2), ('2026-07-28', 158.8)]
-    yahoo ora: []
-
-  ADMCM.HE (ADMCM.HE)
-    nostro db: [('2026-07-30', 25.5), ('2026-07-29', 25.5), ('2026-07-28', 25.5)]
-    yahoo ora: [('2026-07-27', 25.45), ('2026-07-28', 25.5), ('2026-07-29', 25.5)]
-
-  AKTIA.HE (AKTIA.HE)
-    nostro db: [('2026-07-30', 11.96), ('2026-07-29', 11.3), ('2026-07-28', 11.26)]
-    yahoo ora: [('2026-07-27', 11.36), ('2026-07-28', 11.26), ('2026-07-29', 11.3)]
-
-  ALBAV.HE (ALBAV.HE)
-    nostro db: [('2026-07-30', 46.0), ('2026-07-29', 46.0), ('2026-07-28', 46.2)]
-    yahoo ora: [('2026-07-27', 46.0), ('2026-07-28', 46.2), ('2026-07-29', 46.0)]
-
-  ALMB.CPSE (ALMB.CO)
-    nostro db: [('2026-07-30', 17.13), ('2026-07-29', 17.05), ('2026-07-28', 16.85)]
-    yahoo ora: [('2026-07-27', 17.05), ('2026-07-28', 16.85), ('2026-07-29', 17.05)]
-
-  ALSYDB.CPSE (ALSYDB.CO)
-    nostro db: [('2026-07-30', 610.5), ('2026-07-29', 608.0), ('2026-07-28', 607.5)]
-    yahoo ora: [('2026-07-27', 616.0), ('2026-07-28', 607.5), ('2026-07-29', 608.0)]
-
-  BAIDKAA.CPSE (BAIDKAA.CO)
-    nostro db: [('2026-07-30', 114.5), ('2026-07-29', 113.15), ('2026-07-28', 113.15)]
-    yahoo ora: [('2026-07-28', 113.15), ('2026-07-29', 113.15), ('2026-07-30', 114.5)]
-
-=== prices_eod ha una colonna con l'ora di scrittura? ===
-  colonne: ['id', 'ticker', 'exchange', 'date', 'open', 'high', 'low', 'close', 'adj_close', 'volume']
+USA (limite 22:00 UTC)
+   oggi         2026-07-31 -> SCARTATA (seduta non chiusa)
+   ieri         2026-07-30 -> ACCETTATA
+   l'altroieri  2026-07-29 -> ACCETTATA
