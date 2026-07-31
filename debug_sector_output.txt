@@ -1,43 +1,11 @@
-=== 1. DATA PREVALENTE per singolo exchange europeo (latest_prices) ===
-  MIL    n= 117  {'2026-07-29': 117}
-  XETRA  n= 198  {'2026-07-29': 195, '2026-07-30': 2, '2025-12-22': 1}
-  PA     n= 217  {'2026-07-29': 216, '2026-07-28': 1}
-  AS     n=  98  {'2026-07-29': 97, '2026-07-30': 1}
-  MC     n= 100  {'2026-07-29': 93, '2026-07-28': 6, '2026-07-30': 1}
-  BR     n= 100  {'2026-07-29': 98, '2026-07-03': 1, '2026-07-28': 1}
-  LS     n=  35  {'2026-07-29': 35}
-  VI     n=  53  {'2026-07-29': 53}
-  HE     n= 100  {'2026-07-30': 88, '2026-07-29': 12}
-  IR     n=  15  {'2026-07-29': 15}
-  GR     n= 100  {'2026-07-29': 100}
-  LSE    n= 422  {'2026-07-29': 422}
-  SWX    n= 161  {'2026-07-29': 152, '2026-07-30': 9}
-  OM     n= 204  {'2026-07-30': 197, '2026-07-29': 7}
-  OB     n= 100  {'2026-07-29': 99, '2026-06-10': 1}
-  CPSE   n= 101  {'2026-07-30': 85, '2026-07-29': 15, '2026-07-23': 1}
+Ora del test (UTC): 2026-07-31 03:06:19.306017
 
-=== 2. DATI GREZZI prices_eod vs CACHE latest_prices (titoli campione) ===
-  ASML  .AS      grezzo=2026-07-29   cache=2026-07-29
-  SAP   .XETRA   grezzo=2026-07-29   cache=2026-07-29
-  MC    .PA      grezzo=2026-07-29   cache=2026-07-29
-  NESN  .SWX     grezzo=2026-07-29   cache=2026-07-29
-  SHEL  .LSE     grezzo=2026-07-29   cache=2026-07-29
-  ISP   .MIL     grezzo=2026-07-29   cache=2026-07-29
-
-=== 3. ULTIMA DATA in prices_eod per exchange europeo ===
-  MIL     2026-07-29
-  XETRA   2026-07-30
-  PA      2026-07-29
-  AS      2026-07-30
-  MC      2026-07-30
-  BR      2026-07-29
-  LS      2026-07-29
-  VI      2026-07-29
-  HE      2026-07-30
-  IR      2026-07-29
-  GR      2026-07-29
-  LSE     2026-07-29
-  SWX     2026-07-30
-  OM      2026-07-30
-  OB      2026-07-29
-  CPSE    2026-07-30
+Yahoo ha la chiusura di GIOVEDI 30/07 per questi titoli europei?
+  ASML.AS      errore: 'str' object has no attribute 'strftime'
+  SAP.DE       errore: 'str' object has no attribute 'strftime'
+  MC.PA        errore: 'str' object has no attribute 'strftime'
+  NESN.SW      errore: 'str' object has no attribute 'strftime'
+  SHEL.L       errore: 'str' object has no attribute 'strftime'
+  ISP.MI       errore: 'str' object has no attribute 'strftime'
+  NOKIA.HE     errore: 'str' object has no attribute 'strftime'
+  VOLV-B.ST    errore: 'str' object has no attribute 'strftime'
