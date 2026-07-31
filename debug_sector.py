@@ -8,8 +8,13 @@ for t in ["ASML.AS","SAP.DE","MC.PA","NESN.SW","SHEL.L","ISP.MI","NOKIA.HE","VOL
         df = yf.download(t, period="6d", interval="1d", auto_adjust=True, progress=False)
         if df.empty:
             print("  %-12s VUOTO" % t); continue
-        c = df["Close"].dropna()
-        ultime = [(i.strftime("%d/%m"), round(float(v),2)) for i,v in list(c.items())[-3:]]
-        print("  %-12s ultime chiusure: %s" % (t, ultime))
+        close = df["Close"]
+        if isinstance(close, pd.DataFrame):
+            close = close.iloc[:, 0]
+        close = close.dropna()
+        ultime = []
+        for i in range(max(0, len(close)-3), len(close)):
+            ultime.append("%s=%.2f" % (close.index[i].strftime("%d/%m"), float(close.iloc[i])))
+        print("  %-12s %s" % (t, "  ".join(ultime)))
     except Exception as e:
-        print("  %-12s errore: %s" % (t, str(e)[:60]))
+        print("  %-12s errore: %s" % (t, str(e)[:70]))
