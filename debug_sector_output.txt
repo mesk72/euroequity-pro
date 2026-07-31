@@ -1,10 +1,50 @@
-Righe in cache ancora al 30/07 (ormai inesistente nei dati grezzi): 383
-Riallineate: 383   senza dato grezzo: 0
+Titoli in universo mai scritti o fermi da oltre 7 giorni: 43
 
-Controllo finale: righe europee ancora al 30/07 in cache
-  residue: 0
+=== DA TOGLIERE DALL'UNIVERSO (43) - Yahoo non ha piu' dati recenti ===
+  MBH3      XETRA Maschinenfabrik Berthold Hermle  nostro:MAI SCRITTO  Yahoo non ha dati
+  SPB       XETRA Sedlmayr Grund und Immobilien AG nostro:MAI SCRITTO  Yahoo non ha dati
+  EUK3      XETRA EUROKAI GmbH & Co. KGaA          nostro:MAI SCRITTO  Yahoo non ha dati
+  BFV       XETRA Berliner Effektengesellschaft AG nostro:MAI SCRITTO  Yahoo non ha dati
+  PHH2      XETRA Paul Hartmann AG                 nostro:MAI SCRITTO  Yahoo non ha dati
+  HG1       XETRA HOMAG Group AG                   nostro:MAI SCRITTO  Yahoo non ha dati
+  WBAH      XETRA Wild Bunch AG                    nostro:MAI SCRITTO  Yahoo non ha dati
+  SIM0      XETRA SIMONA Aktiengesellschaft        nostro:MAI SCRITTO  Yahoo non ha dati
+  LEC       XETRA Lechwerke AG                     nostro:MAI SCRITTO  Yahoo non ha dati
+  T2G       XETRA Tradegate AG Wertpapierhandelsba nostro:MAI SCRITTO  Yahoo non ha dati
+  MNV6      XETRA Mainova AG                       nostro:MAI SCRITTO  Yahoo non ha dati
+  SSH       XETRA SÃ¼dwestdeutsche Salzwerke AG    nostro:MAI SCRITTO  Yahoo non ha dati
+  NLM       XETRA FRoSTA Aktiengesellschaft        nostro:MAI SCRITTO  Yahoo non ha dati
+  COFB      BR    Cofinimmo SA                     nostro:2026-07-03   Yahoo non ha dati
+  AT.       LSE   Ashtead Technology Holdings Plc  nostro:MAI SCRITTO  Yahoo non ha dati
+  TANGEN B  OM    TÃ¥ngen Industrikapital AB (publ nostro:MAI SCRITTO  Yahoo non ha dati
+  ROKO B    OM    Röko AB (publ)                   nostro:MAI SCRITTO  Yahoo non ha dati
+  EISP      OB    Eiendomsspar AS                  nostro:2026-06-10   Yahoo non ha dati
+  WEIJHO    CPSE  Investeringsforeningen Investin  nostro:2026-07-23   Yahoo fermo a 2026-07-23
+  ZQXVW9    US    Meridian Fabrication Holdings    nostro:MAI SCRITTO  Yahoo non ha dati
+  NUVL      US    Nuvalent, Inc.                   nostro:2026-07-21   Yahoo fermo a 2026-07-21
+  TMHC      US    Taylor Morrison Home Corporation nostro:2026-07-23   Yahoo fermo a 2026-07-23
+  WSR       US    Whitestone REIT                  nostro:2026-07-13   Yahoo non ha dati
+  ESPR      US    Esperion Therapeutics, Inc.      nostro:2026-07-13   Yahoo non ha dati
+  CNGO      US    Cengage Learning Holdings II, In nostro:2026-07-17   Yahoo non ha dati
+  CPRX      US    Catalyst Pharmaceuticals, Inc.   nostro:2026-07-21   Yahoo fermo a 2026-07-21
+  EEX       US    Emerald Holding, Inc.            nostro:2026-07-14   Yahoo non ha dati
+  XOMA      US    XOMA Royalty Corporation         nostro:2026-07-21   Yahoo fermo a 2026-07-21
+  NSA       US    National Storage Affiliates Trus nostro:2026-07-21   Yahoo fermo a 2026-07-21
+  BLD       US    TopBuild Corp.                   nostro:2026-07-02   Yahoo non ha dati
+  GTLS      US    Chart Industries, Inc.           nostro:2026-07-16   Yahoo non ha dati
+  STEL      US    Stellar Bancorp, Inc.            nostro:2026-06-30   Yahoo non ha dati
+  OLPX      US    Olaplex Holdings, Inc.           nostro:2026-07-13   Yahoo non ha dati
+  ACO.X     TSX   ATCO Ltd.                        nostro:MAI SCRITTO  Yahoo non ha dati
+  BLN       TSX   Blackline Safety Corp.           nostro:2026-07-03   Yahoo non ha dati
+  GO.U      TSX   GO Residential Real Estate Inves nostro:MAI SCRITTO  Yahoo non ha dati
+  IIP.UN    TSX   InterRent Real Estate Investment nostro:MAI SCRITTO  Yahoo non ha dati
+  ISC       TSX   Information Services Corporation nostro:2026-07-07   Yahoo non ha dati
+  4974      TSE   Takara Bio Inc.                  nostro:2026-06-12   Yahoo non ha dati
+  823       SEHK  Link Real Estate Investment Trus nostro:MAI SCRITTO  Yahoo non ha dati
+  778       SEHK  Fortune Real Estate Investment T nostro:MAI SCRITTO  Yahoo non ha dati
+  A012510   KRX   Douzone Bizon Co., Ltd.          nostro:2026-07-14   Yahoo non ha dati
+  A057050   KRX   Hyundai Home Shopping Network Co nostro:2026-07-21   Yahoo fermo a 2026-07-21
 
-Coerenza grezzo/cache su 3 titoli:
-  AKTIA .HE    grezzo=('2026-07-29', 11.3)  cache=('2026-07-29', 11.3)
-  BURE  .OM    grezzo=('2026-07-29', 259.4)  cache=('2026-07-29', 259.4)
-  ALMB  .CPSE  grezzo=('2026-07-29', 17.05)  cache=('2026-07-29', 17.05)
+=== PROBLEMA NOSTRO (0) - Yahoo HA i dati ma noi no ===
+
+=== DA GUARDARE A MANO (0) ===
