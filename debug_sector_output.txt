@@ -1,16 +1,11 @@
-Adesso (UTC): 2026-07-31 03:23
+Esecuzione: 2026-07-31T03:32:28.931226+00:00
+  Prezzi Yahoo: ok=2349 fail=0
+  BLOCCO SICUREZZA: scartate 2274 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima esecuzione a mercati chiusi.
+  latest_prices aggiornata: 2346 titoli (falliti: 0)
+  [6/6] Verifica e riparazione latest_prices...
+  latest_prices riparata: 46 titoli corretti, 0 falliti
+  [Riparazione B] Titoli mai scritti in latest_prices...
+  Titoli mai scritti riempiti: 0, non trovati nemmeno in prices_eod: 2
 
-APAC (limite 10:00 UTC)
-   oggi         2026-07-31 -> SCARTATA (seduta non chiusa)
-   ieri         2026-07-30 -> ACCETTATA
-   l'altroieri  2026-07-29 -> ACCETTATA
-
-Europa (limite 17:00 UTC)
-   oggi         2026-07-31 -> SCARTATA (seduta non chiusa)
-   ieri         2026-07-30 -> ACCETTATA
-   l'altroieri  2026-07-29 -> ACCETTATA
-
-USA (limite 22:00 UTC)
-   oggi         2026-07-31 -> SCARTATA (seduta non chiusa)
-   ieri         2026-07-30 -> ACCETTATA
-   l'altroieri  2026-07-29 -> ACCETTATA
+Barre datate 2026-07-31 gia' presenti per TSE:
+   */0
