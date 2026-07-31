@@ -1,0 +1,31 @@
+name: Rapporto giornaliero via email
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:00 UTC = 08:00 in Italia con l'ora legale, 07:00 con l'ora solare.
+    # GitHub usa sempre UTC, non segue il cambio dell'ora italiano.
+    - cron: '0 6 * * *'
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Installa dipendenze
+        run: pip install requests
+      - name: Genera e invia il rapporto
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          REPORT_TO: ${{ secrets.REPORT_TO }}
+        run: python daily_report.py
