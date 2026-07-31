@@ -1,11 +1,9 @@
-Esecuzione: 2026-07-31T03:32:28.931226+00:00
-  Prezzi Yahoo: ok=2349 fail=0
-  BLOCCO SICUREZZA: scartate 2274 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima esecuzione a mercati chiusi.
-  latest_prices aggiornata: 2346 titoli (falliti: 0)
-  [6/6] Verifica e riparazione latest_prices...
-  latest_prices riparata: 46 titoli corretti, 0 falliti
-  [Riparazione B] Titoli mai scritti in latest_prices...
-  Titoli mai scritti riempiti: 0, non trovati nemmeno in prices_eod: 2
-
-Barre datate 2026-07-31 gia' presenti per TSE:
-   */0
+Righe datate 2026-07-30 in prices_eod, per mercato europeo:
+  XETRA     2
+  AS        1
+  MC        1
+  HE       88
+  SWX       9
+  OM      197
+  CPSE     85
+  TOTALE 383
