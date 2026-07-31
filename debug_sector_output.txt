@@ -1,26 +1,46 @@
-OGGETTO: ForwardAlpha OK - 7697/7876 titoli aggiornati (97.7%)
+OGGETTO: ForwardAlpha OK - 6056/7877 titoli al giorno prima (76.9%)
 
-COPERTURA: 7697/7876 aggiornati (97.7%) | 157 in ritardo | 22 assenti
+UNIVERSO: 7877 titoli
 
-MERCATO           UNIV     AGG     RIT     ASS  ULTIMA SEDUTA
-Europa            2126    2043      67      16  2026-07-30
-Stati Uniti       3001    2968      32       1  2026-07-29
-Canada             400     394       3       3  2026-07-29
-Giappone          1000     999       1       0  2026-07-30
-Hong Kong          500     491       7       2  2026-07-30
-Australia          349     349       0       0  2026-07-30
-Corea              400     355      45       0  2026-07-30
-Singapore          100      98       2       0  2026-07-30
+DISTRIBUZIONE PER DATA
+  2026-07-31  oggi                355 titoli    4.5%
+  2026-07-30  il giorno prima    5701 titoli   72.4%
+  2026-07-29  2 giorni fa        1774 titoli   22.5%
+  2026-07-28  3 giorni fa           3 titoli    0.0%
+  2026-07-24  7 giorni fa           1 titoli    0.0%
+  2026-07-23  8 giorni fa           2 titoli    0.0%
+  2026-07-21  10 giorni fa          5 titoli    0.1%
+  2026-07-17  14 giorni fa          1 titoli    0.0%
+  2026-07-16  15 giorni fa          1 titoli    0.0%
+  2026-07-14  17 giorni fa          2 titoli    0.0%
+  2026-07-13  18 giorni fa          3 titoli    0.0%
+  2026-07-07  24 giorni fa          1 titoli    0.0%
+  2026-07-03  28 giorni fa          2 titoli    0.0%
+  2026-07-02  29 giorni fa          1 titoli    0.0%
+  2026-06-30  31 giorni fa          1 titoli    0.0%
+  2026-06-12  49 giorni fa          1 titoli    0.0%
+  2026-06-10  51 giorni fa          1 titoli    0.0%
+  mai scritti                      22 titoli    0.3%
 
-ESECUZIONI ultime 24h: 11
+MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
+Europa           2126    383   1723        4    16  2026-07-29
+Stati Uniti      3002   2946     40       15     1  2026-07-30
+Canada            400    390      4        3     3  2026-07-30
+Giappone         1000    999      0        1     0  2026-07-30
+Hong Kong         500    491      7        0     2  2026-07-30
+Australia         349    349      0        0     0  2026-07-30
+Corea             400    398      0        2     0  2026-07-31
+Singapore         100    100      0        0     0  2026-07-30
+
+ESECUZIONI ultime 24h: 8
+  US+CA  ok=3402 falliti=0 durata=622s
+  EU     ok=2624 falliti=2 durata=517s
   APAC   ok=2349 falliti=0 durata=476s
   EU     ok=2624 falliti=2 durata=729s
   US+CA  ok=3402 falliti=0 durata=670s
   APAC   ok=2349 falliti=0 durata=558s
-  US+CA  ok=3402 falliti=0 durata=717s
-  EU     ok=2624 falliti=2 durata=520s
 
 Quintili precalcolati: 247 righe (aggiornati 2026-07-30)
 
 SMTP non configurato: stampo il rapporto senza inviarlo.
-ForwardAlpha OK - 7697/7876 titoli aggiornati (97.7%)
+ForwardAlpha OK - 6056/7877 titoli al giorno prima (76.9%)
