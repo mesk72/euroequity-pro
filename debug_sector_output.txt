@@ -1,10 +1,37 @@
-Ora test (UTC): 2026-07-31 09:56
+PRIMA:
+  XETRA     2
+  AS        1
+  MC        1
+  HE       88
+  SWX       9
+  OM      197
+  CPSE     85
+  TOTALE 383
 
-  ASML.AS    non fra i 383   30/07: SI   29/07=1362.20  30/07=1440.00  31/07=1465.60
-  SAP.DE     non fra i 383   30/07: SI   29/07=162.04  30/07=155.92  31/07=155.68
-  MC.PA      non fra i 383   30/07: SI   29/07=467.95  30/07=473.30  31/07=473.50
-  SHEL.L     non fra i 383   30/07: SI   29/07=3323.50  30/07=3319.00  31/07=3381.50
-  ISP.MI     non fra i 383   30/07: SI   29/07=6.45  30/07=6.51  31/07=6.60
-  AKTIA.HE   FRA I 383       30/07: SI   29/07=11.30  30/07=11.94  31/07=12.00
-  BURE.ST    FRA I 383       30/07: SI   29/07=259.40  30/07=261.40  31/07=262.60
-  ALMB.CO    FRA I 383       30/07: SI   29/07=17.05  30/07=17.02  31/07=17.06
+CANCELLAZIONE (solo exchange europei, solo data 2026-07-30):
+  XETRA  HTTP 204
+  AS     HTTP 204
+  MC     HTTP 204
+  HE     HTTP 204
+  SWX    HTTP 204
+  OM     HTTP 204
+  CPSE   HTTP 204
+
+DOPO:
+  TOTALE 0
+
+Cancellate: 383 righe
+
+VERIFICA su 3 titoli (ultima data rimasta):
+  AKTIA .HE    [('2026-07-29', 11.3), ('2026-07-28', 11.26)]
+  BURE  .OM    [('2026-07-29', 259.4), ('2026-07-28', 254.8)]
+  ALMB  .CPSE  [('2026-07-29', 17.05), ('2026-07-28', 16.85)]
+
+CONTROLLO che nessun ALTRO mercato sia stato toccato:
+  US     righe al 2026-07-30: 2946
+  TSX    righe al 2026-07-30: 390
+  TSE    righe al 2026-07-30: 999
+  SEHK   righe al 2026-07-30: 498
+  ASX    righe al 2026-07-30: 349
+  KRX    righe al 2026-07-30: 398
+  SGX    righe al 2026-07-30: 100
