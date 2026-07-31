@@ -1,46 +1,43 @@
-OGGETTO: ForwardAlpha OK - 6056/7877 titoli al giorno prima (76.9%)
+=== 1. DATA PREVALENTE per singolo exchange europeo (latest_prices) ===
+  MIL    n= 117  {'2026-07-29': 117}
+  XETRA  n= 198  {'2026-07-29': 195, '2026-07-30': 2, '2025-12-22': 1}
+  PA     n= 217  {'2026-07-29': 216, '2026-07-28': 1}
+  AS     n=  98  {'2026-07-29': 97, '2026-07-30': 1}
+  MC     n= 100  {'2026-07-29': 93, '2026-07-28': 6, '2026-07-30': 1}
+  BR     n= 100  {'2026-07-29': 98, '2026-07-03': 1, '2026-07-28': 1}
+  LS     n=  35  {'2026-07-29': 35}
+  VI     n=  53  {'2026-07-29': 53}
+  HE     n= 100  {'2026-07-30': 88, '2026-07-29': 12}
+  IR     n=  15  {'2026-07-29': 15}
+  GR     n= 100  {'2026-07-29': 100}
+  LSE    n= 422  {'2026-07-29': 422}
+  SWX    n= 161  {'2026-07-29': 152, '2026-07-30': 9}
+  OM     n= 204  {'2026-07-30': 197, '2026-07-29': 7}
+  OB     n= 100  {'2026-07-29': 99, '2026-06-10': 1}
+  CPSE   n= 101  {'2026-07-30': 85, '2026-07-29': 15, '2026-07-23': 1}
 
-UNIVERSO: 7877 titoli
+=== 2. DATI GREZZI prices_eod vs CACHE latest_prices (titoli campione) ===
+  ASML  .AS      grezzo=2026-07-29   cache=2026-07-29
+  SAP   .XETRA   grezzo=2026-07-29   cache=2026-07-29
+  MC    .PA      grezzo=2026-07-29   cache=2026-07-29
+  NESN  .SWX     grezzo=2026-07-29   cache=2026-07-29
+  SHEL  .LSE     grezzo=2026-07-29   cache=2026-07-29
+  ISP   .MIL     grezzo=2026-07-29   cache=2026-07-29
 
-DISTRIBUZIONE PER DATA
-  2026-07-31  oggi                355 titoli    4.5%
-  2026-07-30  il giorno prima    5701 titoli   72.4%
-  2026-07-29  2 giorni fa        1774 titoli   22.5%
-  2026-07-28  3 giorni fa           3 titoli    0.0%
-  2026-07-24  7 giorni fa           1 titoli    0.0%
-  2026-07-23  8 giorni fa           2 titoli    0.0%
-  2026-07-21  10 giorni fa          5 titoli    0.1%
-  2026-07-17  14 giorni fa          1 titoli    0.0%
-  2026-07-16  15 giorni fa          1 titoli    0.0%
-  2026-07-14  17 giorni fa          2 titoli    0.0%
-  2026-07-13  18 giorni fa          3 titoli    0.0%
-  2026-07-07  24 giorni fa          1 titoli    0.0%
-  2026-07-03  28 giorni fa          2 titoli    0.0%
-  2026-07-02  29 giorni fa          1 titoli    0.0%
-  2026-06-30  31 giorni fa          1 titoli    0.0%
-  2026-06-12  49 giorni fa          1 titoli    0.0%
-  2026-06-10  51 giorni fa          1 titoli    0.0%
-  mai scritti                      22 titoli    0.3%
-
-MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
-Europa           2126    383   1723        4    16  2026-07-29
-Stati Uniti      3002   2946     40       15     1  2026-07-30
-Canada            400    390      4        3     3  2026-07-30
-Giappone         1000    999      0        1     0  2026-07-30
-Hong Kong         500    491      7        0     2  2026-07-30
-Australia         349    349      0        0     0  2026-07-30
-Corea             400    398      0        2     0  2026-07-31
-Singapore         100    100      0        0     0  2026-07-30
-
-ESECUZIONI ultime 24h: 8
-  US+CA  ok=3402 falliti=0 durata=622s
-  EU     ok=2624 falliti=2 durata=517s
-  APAC   ok=2349 falliti=0 durata=476s
-  EU     ok=2624 falliti=2 durata=729s
-  US+CA  ok=3402 falliti=0 durata=670s
-  APAC   ok=2349 falliti=0 durata=558s
-
-Quintili precalcolati: 247 righe (aggiornati 2026-07-30)
-
-SMTP non configurato: stampo il rapporto senza inviarlo.
-ForwardAlpha OK - 6056/7877 titoli al giorno prima (76.9%)
+=== 3. ULTIMA DATA in prices_eod per exchange europeo ===
+  MIL     2026-07-29
+  XETRA   2026-07-30
+  PA      2026-07-29
+  AS      2026-07-30
+  MC      2026-07-30
+  BR      2026-07-29
+  LS      2026-07-29
+  VI      2026-07-29
+  HE      2026-07-30
+  IR      2026-07-29
+  GR      2026-07-29
+  LSE     2026-07-29
+  SWX     2026-07-30
+  OM      2026-07-30
+  OB      2026-07-29
+  CPSE    2026-07-30
