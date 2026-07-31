@@ -39,7 +39,7 @@ SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "465"))
 SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
-REPORT_TO = os.environ.get("REPORT_TO", "") or SMTP_USER
+REPORT_TO = os.environ.get("REPORT_TO", "") or "andrea@forwardalpha.pro"
 
 # Raggruppamento per come Andrea ragiona sui mercati, non per come sono
 # organizzati gli script.
@@ -127,8 +127,35 @@ def raccogli_dati():
             "in_ritardo": in_ritardo,
             "assenti": [(tk, nome_per_ticker.get(tk, tk)) for tk in assenti],
             "ultima_seduta": ultima_seduta,
+            # data grezza titolo per titolo: serve per la distribuzione esatta
+            "date": data_per_ticker,
+            "nomi": nome_per_ticker,
         }
     return per_exchange
+
+
+def distribuzione(per_exchange, exchanges, oggi):
+    """Conteggio esatto dei titoli per data di prezzo, con il ritardo in
+    giorni di calendario rispetto al giorno in cui gira il rapporto.
+    Nessuna interpretazione: date assolute e conteggi verificabili."""
+    conta = Counter()
+    mai = 0
+    for ex in exchanges:
+        d = per_exchange[ex]
+        mai += len(d["assenti"])
+        for data in d["date"].values():
+            if data:
+                conta[data] += 1
+            else:
+                mai += 1
+    righe = []
+    for data, n in sorted(conta.items(), reverse=True):
+        try:
+            g = (oggi.date() - datetime.strptime(data, "%Y-%m-%d").date()).days
+        except Exception:
+            g = None
+        righe.append({"data": data, "n": n, "giorni": g})
+    return righe, mai
 
 
 def leggi_esecuzioni():
@@ -173,6 +200,7 @@ def costruisci_email(per_exchange, esecuzioni, quintili):
     tot_ritardo = sum(len(d["in_ritardo"]) for d in per_exchange.values())
     tot_assenti = sum(len(d["assenti"]) for d in per_exchange.values())
     perc = (tot_aggiornati / tot_universo * 100) if tot_universo else 0
+    dist, mai_scritti = distribuzione(per_exchange, TUTTI_EXCHANGE, oggi)
 
     # --- segnalazioni: solo cose che meritano davvero attenzione ---
     allarmi = []
@@ -209,8 +237,10 @@ def costruisci_email(per_exchange, esecuzioni, quintili):
         allarmi.append("tabella quintili vuota: il sito usa il calcolo lento di riserva")
 
     stato = "ATTENZIONE" if allarmi else "OK"
-    oggetto = "ForwardAlpha %s - %d/%d titoli aggiornati (%.1f%%)" % (
-        stato, tot_aggiornati, tot_universo, perc)
+    recenti = sum(r["n"] for r in dist if r["giorni"] is not None and r["giorni"] <= 1)
+    oggetto = "ForwardAlpha %s - %d/%d titoli al giorno prima (%.1f%%)" % (
+        stato, recenti, tot_universo,
+        recenti / tot_universo * 100 if tot_universo else 0)
 
     # ---------------- corpo HTML ----------------
     B = []
@@ -223,12 +253,35 @@ def costruisci_email(per_exchange, esecuzioni, quintili):
     colore = "#b00" if allarmi else "#0a7"
     B.append("<div style='border-left:4px solid %s;padding:10px 14px;"
              "background:#f7f7f7;margin-bottom:18px'>" % colore)
-    B.append("<div style='font-size:22px;font-weight:700'>%d su %d aggiornati "
-             "<span style='color:#666;font-size:16px'>(%.1f%%)</span></div>"
-             % (tot_aggiornati, tot_universo, perc))
-    B.append("<div style='font-size:13px;color:#444;margin-top:4px'>"
-             "%d in ritardo &nbsp;·&nbsp; %d assenti dalla cache</div>"
-             % (tot_ritardo, tot_assenti))
+    B.append("<div style='font-size:15px;font-weight:700;margin-bottom:8px'>"
+             "Universo: %d titoli</div>" % tot_universo)
+    B.append("<table style='border-collapse:collapse;font-size:14px;width:100%'>")
+    for r in dist:
+        g = r["giorni"]
+        if g == 0:
+            etichetta = "oggi"
+        elif g == 1:
+            etichetta = "il giorno prima"
+        elif g is None:
+            etichetta = ""
+        else:
+            etichetta = "%d giorni fa" % g
+        pc = r["n"] / tot_universo * 100 if tot_universo else 0
+        grigio = "#666" if (g or 0) >= 3 else "#111"
+        B.append("<tr style='color:%s'>"
+                 "<td style='padding:2px 10px 2px 0;white-space:nowrap'><b>%s</b>"
+                 " <span style='color:#888'>%s</span></td>"
+                 "<td style='padding:2px 10px;text-align:right;white-space:nowrap'>"
+                 "<b>%d</b> titoli</td>"
+                 "<td style='padding:2px 0;text-align:right;color:#888'>%.1f%%</td>"
+                 "</tr>" % (grigio, r["data"], etichetta, r["n"], pc))
+    if mai_scritti:
+        B.append("<tr style='color:#b00'>"
+                 "<td style='padding:2px 10px 2px 0'><b>mai scritti</b></td>"
+                 "<td style='padding:2px 10px;text-align:right'><b>%d</b> titoli</td>"
+                 "<td style='padding:2px 0;text-align:right;color:#888'>%.1f%%</td>"
+                 "</tr>" % (mai_scritti, mai_scritti / tot_universo * 100 if tot_universo else 0))
+    B.append("</table>")
     B.append("</div>")
 
     if allarmi:
@@ -249,28 +302,31 @@ def costruisci_email(per_exchange, esecuzioni, quintili):
     B.append("<table style='border-collapse:collapse;width:100%;font-size:13px'>")
     B.append("<tr style='background:#f0f0f0;text-align:left'>"
              "<th style='padding:6px'>Mercato</th>"
-             "<th style='padding:6px;text-align:right'>Univ.</th>"
-             "<th style='padding:6px;text-align:right'>Agg.</th>"
-             "<th style='padding:6px;text-align:right'>Rit.</th>"
-             "<th style='padding:6px;text-align:right'>Ass.</th>"
-             "<th style='padding:6px'>Ultima seduta</th></tr>")
+             "<th style='padding:6px;text-align:right'>Tot.</th>"
+             "<th style='padding:6px;text-align:right'>1 g.</th>"
+             "<th style='padding:6px;text-align:right'>2 g.</th>"
+             "<th style='padding:6px;text-align:right'>+vecchi</th>"
+             "<th style='padding:6px;text-align:right'>mai</th>"
+             "<th style='padding:6px'>data prevalente</th></tr>")
     for nome, lista in GRUPPI:
+        d_mkt, mai_mkt = distribuzione(per_exchange, lista, oggi)
         u = sum(per_exchange[e]["universo"] for e in lista)
-        a = sum(per_exchange[e]["aggiornati"] for e in lista)
-        rt = sum(len(per_exchange[e]["in_ritardo"]) for e in lista)
-        asn = sum(len(per_exchange[e]["assenti"]) for e in lista)
-        date_ex = [per_exchange[e]["ultima_seduta"] for e in lista
-                   if per_exchange[e]["ultima_seduta"]]
-        seduta = max(date_ex) if date_ex else "-"
-        col = "#b00" if (rt + asn) > u * 0.05 else "#111"
+        b1 = sum(r["n"] for r in d_mkt if r["giorni"] is not None and r["giorni"] <= 1)
+        b2 = sum(r["n"] for r in d_mkt if r["giorni"] == 2)
+        b3 = sum(r["n"] for r in d_mkt if r["giorni"] is not None and r["giorni"] >= 3)
+        prevalenti = [per_exchange[e]["ultima_seduta"] for e in lista
+                      if per_exchange[e]["ultima_seduta"]]
+        seduta = Counter(prevalenti).most_common(1)[0][0] if prevalenti else "-"
+        col = "#b00" if (b3 + mai_mkt) > u * 0.05 else "#111"
         B.append("<tr style='border-bottom:1px solid #eee;color:%s'>"
                  "<td style='padding:6px'>%s</td>"
                  "<td style='padding:6px;text-align:right'>%d</td>"
+                 "<td style='padding:6px;text-align:right'><b>%d</b></td>"
                  "<td style='padding:6px;text-align:right'>%d</td>"
                  "<td style='padding:6px;text-align:right'>%d</td>"
                  "<td style='padding:6px;text-align:right'>%d</td>"
                  "<td style='padding:6px'>%s</td></tr>"
-                 % (col, nome, u, a, rt, asn, seduta))
+                 % (col, nome, u, b1, b2, b3, mai_mkt, seduta))
     B.append("</table>")
 
     # esecuzioni
@@ -367,17 +423,32 @@ def riepilogo_testuale(per_exchange, esecuzioni, quintili):
     tot_a = sum(d["aggiornati"] for d in per_exchange.values())
     tot_r = sum(len(d["in_ritardo"]) for d in per_exchange.values())
     tot_x = sum(len(d["assenti"]) for d in per_exchange.values())
-    R.append("COPERTURA: %d/%d aggiornati (%.1f%%) | %d in ritardo | %d assenti"
-             % (tot_a, tot_u, (tot_a / tot_u * 100) if tot_u else 0, tot_r, tot_x))
+    oggi = datetime.now(timezone.utc) + timedelta(hours=2)
+    dist, mai = distribuzione(per_exchange, TUTTI_EXCHANGE, oggi)
+    R.append("UNIVERSO: %d titoli" % tot_u)
     R.append("")
-    R.append("%-14s %7s %7s %7s %7s  %s" % ("MERCATO", "UNIV", "AGG", "RIT", "ASS", "ULTIMA SEDUTA"))
+    R.append("DISTRIBUZIONE PER DATA")
+    for r in dist:
+        g = r["giorni"]
+        et = "oggi" if g == 0 else ("il giorno prima" if g == 1 else "%s giorni fa" % g)
+        R.append("  %s  %-16s %6d titoli  %5.1f%%"
+                 % (r["data"], et, r["n"], r["n"] / tot_u * 100 if tot_u else 0))
+    if mai:
+        R.append("  %-10s %-16s %6d titoli  %5.1f%%"
+                 % ("mai scritti", "", mai, mai / tot_u * 100 if tot_u else 0))
+    R.append("")
+    R.append("%-14s %6s %6s %6s %8s %5s  %s"
+             % ("MERCATO", "TOT", "1g", "2g", "+VECCHI", "MAI", "PREVALENTE"))
     for nome, lista in GRUPPI:
+        d_mkt, mai_mkt = distribuzione(per_exchange, lista, oggi)
         u = sum(per_exchange[e]["universo"] for e in lista)
-        a = sum(per_exchange[e]["aggiornati"] for e in lista)
-        rt = sum(len(per_exchange[e]["in_ritardo"]) for e in lista)
-        asn = sum(len(per_exchange[e]["assenti"]) for e in lista)
-        dd = [per_exchange[e]["ultima_seduta"] for e in lista if per_exchange[e]["ultima_seduta"]]
-        R.append("%-14s %7d %7d %7d %7d  %s" % (nome, u, a, rt, asn, max(dd) if dd else "-"))
+        b1 = sum(x["n"] for x in d_mkt if x["giorni"] is not None and x["giorni"] <= 1)
+        b2 = sum(x["n"] for x in d_mkt if x["giorni"] == 2)
+        b3 = sum(x["n"] for x in d_mkt if x["giorni"] is not None and x["giorni"] >= 3)
+        pv = [per_exchange[e]["ultima_seduta"] for e in lista if per_exchange[e]["ultima_seduta"]]
+        R.append("%-14s %6d %6d %6d %8d %5d  %s"
+                 % (nome, u, b1, b2, b3, mai_mkt,
+                    Counter(pv).most_common(1)[0][0] if pv else "-"))
     R.append("")
     R.append("ESECUZIONI ultime 24h: %d" % len(esecuzioni))
     for r in esecuzioni[:6]:
