@@ -1,15 +1,14 @@
-import os, requests
+import os, requests, time
+import yfinance as yf, pandas as pd
 from collections import Counter
 from datetime import datetime, timedelta
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-
 GRUPPI=[("Europa",["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]),
         ("Stati Uniti",["US"]),("Canada",["TSX"]),("Giappone",["TSE"]),
         ("Hong Kong",["SEHK"]),("Australia",["ASX"]),("Corea",["KRX"]),("Singapore",["SGX"])]
 TUTTI=[e for _,l in GRUPPI for e in l]
-oggi=datetime.utcnow()+timedelta(hours=2)
 
 def leggi(tab,sel,ex,extra=None):
     out=[];off=0
@@ -23,63 +22,51 @@ def leggi(tab,sel,ex,extra=None):
         if len(b)<1000: break
     return out
 
-dati={}
-for ex in TUTTI:
-    uni=leggi("stocks","ticker,company",ex,{"in_universe":"eq.true"})
-    pre=leggi("latest_prices","ticker,price_date",ex)
-    nomi={r["ticker"]:(r.get("company") or r["ticker"]) for r in uni}
-    tick=set(nomi)
-    dt={r["ticker"]:r.get("price_date") for r in pre if r["ticker"] in tick}
-    dati[ex]={"uni":tick,"nomi":nomi,"date":dt,"assenti":sorted(tick-set(dt))}
-
-tot_uni=sum(len(d["uni"]) for d in dati.values())
-print("UNIVERSO TOTALE: %d titoli" % tot_uni)
-print()
-print("=== DISTRIBUZIONE PER DATA (tutto il sito) ===")
-c=Counter(); mai=0
-for ex in TUTTI:
-    mai+=len(dati[ex]["assenti"])
-    for d in dati[ex]["date"].values():
-        if d: c[d]+=1
-        else: mai+=1
-for d,n in sorted(c.items(),reverse=True):
-    g=(oggi.date()-datetime.strptime(d,"%Y-%m-%d").date()).days
-    et="oggi" if g==0 else ("ieri" if g==1 else "%d giorni fa"%g)
-    print("  %s  %-14s %5d titoli  %5.1f%%" % (d,et,n,n/tot_uni*100))
-if mai: print("  %-10s %-14s %5d titoli  %5.1f%%" % ("mai scritti","",mai,mai/tot_uni*100))
-
-print()
-print("=== PER MERCATO ===")
-print("%-14s %6s %7s %7s %7s %5s  %s" % ("MERCATO","TOT","31/07","30/07","+VECCHI","MAI","PREVALENTE"))
+print("=== STATO DOPO L'ALLINEAMENTO ===")
+tot=0; c=Counter(); mai=0
+righe=[]
 for nome,lista in GRUPPI:
-    tot=sum(len(dati[e]["uni"]) for e in lista)
-    cc=Counter(); mm=0
-    for e in lista:
-        mm+=len(dati[e]["assenti"])
-        for d in dati[e]["date"].values():
-            if d: cc[d]+=1
-            else: mm+=1
-    n31=cc.get("2026-07-31",0); n30=cc.get("2026-07-30",0)
-    vecchi=sum(v for k,v in cc.items() if k<"2026-07-30")
-    prev=cc.most_common(1)[0][0] if cc else "-"
-    print("%-14s %6d %7d %7d %7d %5d  %s" % (nome,tot,n31,n30,vecchi,mm,prev))
+    cc=Counter(); mm=0; t=0
+    for ex in lista:
+        uni={r["ticker"] for r in leggi("stocks","ticker",ex,{"in_universe":"eq.true"})}
+        pre={r["ticker"]:r.get("price_date") for r in leggi("latest_prices","ticker,price_date",ex)}
+        t+=len(uni)
+        for tk in uni:
+            d=pre.get(tk)
+            if d: cc[d]+=1; c[d]+=1
+            else: mm+=1; mai+=1
+    tot+=t
+    righe.append((nome,t,cc.get("2026-07-31",0),cc.get("2026-07-30",0),
+                  sum(v for k,v in cc.items() if k<"2026-07-30"),mm))
+print("%-14s %6s %7s %7s %8s %5s" % ("MERCATO","TOT","31/07","30/07","+VECCHI","MAI"))
+for r in righe: print("%-14s %6d %7d %7d %8d %5d" % r)
+print()
+print("TOTALE UNIVERSO: %d" % tot)
+for d,n in sorted(c.items(),reverse=True)[:4]:
+    print("  %s : %5d titoli (%.1f%%)" % (d,n,n/tot*100))
+print("  mai scritti: %d" % mai)
 
 print()
-print("=== TITOLI MOLTO INDIETRO (oltre 7 giorni) ===")
-lim=(oggi-timedelta(days=7)).strftime("%Y-%m-%d")
-vecchi=[]
-for ex in TUTTI:
-    for tk,d in dati[ex]["date"].items():
-        if d and d<lim: vecchi.append((d,tk,ex,dati[ex]["nomi"].get(tk,tk)))
-vecchi.sort()
-print("Totale: %d" % len(vecchi))
-for d,tk,ex,az in vecchi:
-    g=(oggi.date()-datetime.strptime(d,"%Y-%m-%d").date()).days
-    print("  %s (%3d gg)  %-9s %-6s %s" % (d,g,tk,ex,az[:42]))
-
-print()
-print("=== MAI SCRITTI ===")
-print("Totale: %d" % mai)
-for ex in TUTTI:
-    for tk in dati[ex]["assenti"]:
-        print("  %-9s %-6s %s" % (tk,ex,dati[ex]["nomi"].get(tk,tk)[:42]))
+print("=== CONTROLLO TICKER SOSPETTI ===")
+prove=[("823","SEHK","Link REIT",["0823.HK","823.HK"]),
+       ("778","SEHK","Fortune REIT",["0778.HK","778.HK"]),
+       ("ACO.X","TSX","ATCO",["ACO-X.TO","ACO.X.TO"]),
+       ("IIP.UN","TSX","InterRent REIT",["IIP-UN.TO","IIP.UN.TO"]),
+       ("GO.U","TSX","GO Residential REIT",["GO-U.TO","GO.U.TO"]),
+       ("AT.","LSE","Ashtead Technology",["AT.L","ATL.L"]),
+       ("ROKO B","OM","Roko AB",["ROKO-B.ST","ROKOB.ST"]),
+       ]
+for tk,ex,nome,cand in prove:
+    print("\n%s (%s.%s)" % (nome,tk,ex))
+    for yt in cand:
+        try:
+            df=yf.download(yt,period="6d",interval="1d",auto_adjust=True,progress=False)
+            if df.empty: print("   %-14s vuoto" % yt); continue
+            cl=df["Close"]
+            if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+            cl=cl.dropna()
+            if len(cl)==0: print("   %-14s vuoto" % yt); continue
+            print("   %-14s FUNZIONA -> ultima %s = %.2f" % (yt,cl.index[-1].strftime("%d/%m"),float(cl.iloc[-1])))
+        except Exception as e:
+            print("   %-14s errore %s" % (yt,str(e)[:40]))
+        time.sleep(0.4)
