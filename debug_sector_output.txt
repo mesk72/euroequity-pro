@@ -1,10 +1,5 @@
-InterRent REIT - provo tutte le varianti plausibili
-  IIP-UN.TO    vuoto
-  IIPZF        vuoto
-  IIP.TO       vuoto
-  IIPUN.TO     vuoto
-  IIP-U.TO     vuoto
-  IIP-UN.V     vuoto
+PRIMA: [{'ticker': 'IIP.UN', 'exchange': 'TSX', 'company': 'InterRent Real Estate Investment Trust', 'in_universe': True}]
+PATCH HTTP: 204
+DOPO: [{'ticker': 'IIP.UN', 'exchange': 'TSX', 'company': 'InterRent Real Estate Investment Trust', 'in_universe': False}]
 
-Storico lungo su IIP-UN.TO (esisteva in passato?)
-  righe: 1   dal 10/07/2026 al 10/07/2026   ultimo prezzo 13.54
+Universo attivo ora: 7876 titoli
