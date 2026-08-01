@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Installa dipendenze
-        run: pip install requests
+        run: pip install requests yfinance pandas
       - name: Genera e invia il rapporto
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
