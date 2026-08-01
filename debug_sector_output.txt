@@ -1,19 +1,12 @@
-=== A. Le notizie sono legate al mercato giusto? ===
-  ROP   -> {('SWX', 'Roche Holding AG'): 5, ('US', 'Roper Technologies, Inc.'): 5}
-  SAN   -> {('MC', 'Banco Santander, S.A.'): 5, ('PA', 'Sanofi'): 5}
-  BMY   -> {('LSE', 'Bloomsbury Publishing Plc'): 5, ('US', 'Bristol-Myers Squibb Company'): 5}
-  UCB   -> {('BR', 'UCB SA'): 5, ('US', 'United Community Banks, Inc.'): 5}
-  COR   -> {('US', 'Cencora, Inc.'): 5}
+=== Wallet farmaceutico: le notizie sono solo dei titoli giusti? ===
+  notizie totali: 0
 
-=== B. Riproduco la chiamata che fa MyScreen ===
-  parametro inviato: ROP.SWX,AMGN.US,SAN.PA,5101.TSE
-  ticker cercati (dopo split sul punto): ['ROP', 'AMGN', 'SAN', '5101']
-  risultati: {('5101', 'TSE'): 5, ('AMGN', 'US'): 5, ('ROP', 'SWX'): 5, ('ROP', 'US'): 5, ('SAN', 'MC'): 5, ('SAN', 'PA'): 5}
+  INTRUSI (societa' omonime su altri mercati): NESSUNO
 
-=== C. Caso critico: ticker con il punto dentro (es. CAR.UN.TSX) ===
-  titoli in watchlist col punto nel ticker: 0 -> []
+=== La pagina News per regione funziona ancora? ===
+  region=americas  0 notizie
+  region=europe    0 notizie
+  region=asia      0 notizie
 
-=== D. La pagina News come chiama l'endpoint? ===
-  region=americas  righe: 16064
-  region=europe    righe: 9183
-  region=asia      righe: 11292
+=== Ticker con il punto dentro (ACO.X, GO.U) ===
+  notizie: 0 -> Counter()
