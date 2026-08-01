@@ -1,29 +1,19 @@
-=== 1. Struttura di news_cache ===
-colonne: ['id', 'ticker', 'exchange', 'region', 'company', 'yahoo_ticker', 'title', 'link', 'pub_date', 'source', 'value_score', 'growth_score', 'best_score', 'mkt_cap', 'fetched_at']
-  esempio: ticker='857' region='asia' fetched_at=2026-08-01T05:27:05.728748
-  esempio: ticker='857' region='asia' fetched_at=2026-08-01T05:27:05.728748
+=== A. Le notizie sono legate al mercato giusto? ===
+  ROP   -> {('SWX', 'Roche Holding AG'): 5, ('US', 'Roper Technologies, Inc.'): 5}
+  SAN   -> {('MC', 'Banco Santander, S.A.'): 5, ('PA', 'Sanofi'): 5}
+  BMY   -> {('LSE', 'Bloomsbury Publishing Plc'): 5, ('US', 'Bristol-Myers Squibb Company'): 5}
+  UCB   -> {('BR', 'UCB SA'): 5, ('US', 'United Community Banks, Inc.'): 5}
+  COR   -> {('US', 'Cencora, Inc.'): 5}
 
-=== 2. Quante righe in totale e quante nelle ultime 24h ===
-righe totali: 36539
-righe ultime 24h: 36539
+=== B. Riproduco la chiamata che fa MyScreen ===
+  parametro inviato: ROP.SWX,AMGN.US,SAN.PA,5101.TSE
+  ticker cercati (dopo split sul punto): ['ROP', 'AMGN', 'SAN', '5101']
+  risultati: {('5101', 'TSE'): 5, ('AMGN', 'US'): 5, ('ROP', 'SWX'): 5, ('ROP', 'US'): 5, ('SAN', 'MC'): 5, ('SAN', 'PA'): 5}
 
-=== 3. Formato dei ticker presenti (campione) ===
-  con punto: 0  -> esempi []
-  senza punto: 400 -> esempi ['857', '857', '857', '857', '857', 'A402340', 'A402340', 'A402340']
-  regioni: {'asia': 357, 'americas': 38, 'europe': 5}
+=== C. Caso critico: ticker con il punto dentro (es. CAR.UN.TSX) ===
+  titoli in watchlist col punto nel ticker: 0 -> []
 
-=== 4. Ticker dei wallet: hanno notizie? ===
-  titoli in watchlist: 100
-  per wallet: {0: 50, 2: 38, 1: 12}
-     5101       TSE    wallet=0  notizie in cache: 5
-     NOVN       SWX    wallet=2  notizie in cache: 5
-     AMGN       US     wallet=2  notizie in cache: 5
-     ROP        SWX    wallet=2  notizie in cache: 10
-     CAH        US     wallet=2  notizie in cache: 5
-     VRTX       US     wallet=2  notizie in cache: 5
-     COR        US     wallet=2  notizie in cache: 5
-     SAN        PA     wallet=2  notizie in cache: 10
-     GSK        LSE    wallet=2  notizie in cache: 5
-     BMY        US     wallet=2  notizie in cache: 10
-     C          US     wallet=0  notizie in cache: 5
-     UCB        BR     wallet=2  notizie in cache: 10
+=== D. La pagina News come chiama l'endpoint? ===
+  region=americas  righe: 16064
+  region=europe    righe: 9183
+  region=asia      righe: 11292
