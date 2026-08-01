@@ -1,3 +1,8 @@
-HTTP: 200
-headers rilevanti: {'Age': '0', 'Cache-Control': 'public', 'Content-Type': 'application/json', 'X-Matched-Path': '/api/news-cache', 'X-Vercel-Cache': 'MISS'}
-corpo (primi 500): {"items":[]}
+Con chiave di servizio (quella che uso io):
+  HTTP 206  righe: 36539
+
+Altre tabelle lette dal sito senza problemi, per confronto:
+  stocks                     HTTP 206 righe 10217
+  latest_prices              HTTP 206 righe 7886
+  sector_quintile_partials   HTTP 206 righe 247
+  news_cache                 HTTP 206 righe 36539
