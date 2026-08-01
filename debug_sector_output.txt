@@ -1,51 +1,69 @@
-Ora (UTC): 2026-07-31 16:19
+UNIVERSO TOTALE: 7877 titoli
 
-=== 1. Aggiorno yahoo_ticker da .DE a .F ===
-  MBH3   -> MBH3.F   HTTP 204
-  SPB    -> SPB.F   HTTP 204
-  EUK3   -> EUK3.F   HTTP 204
-  BFV    -> BFV.F   HTTP 204
-  PHH2   -> PHH2.F   HTTP 204
-  HG1    -> HG1.F   HTTP 204
-  WBAH   -> WBAH.F   HTTP 204
-  SIM0   -> SIM0.F   HTTP 204
-  LEC    -> LEC.F   HTTP 204
-  T2G    -> T2G.F   HTTP 204
-  MNV6   -> MNV6.F   HTTP 204
-  SSH    -> SSH.F   HTTP 204
-  NLM    -> NLM.F   HTTP 204
+=== DISTRIBUZIONE PER DATA (tutto il sito) ===
+  2026-07-31  ieri            4265 titoli   54.1%
+  2026-07-30  2 giorni fa     3576 titoli   45.4%
+  2026-07-29  3 giorni fa        2 titoli    0.0%
+  2026-07-28  4 giorni fa        3 titoli    0.0%
+  2026-07-24  8 giorni fa        1 titoli    0.0%
+  2026-07-23  9 giorni fa        2 titoli    0.0%
+  2026-07-21  11 giorni fa       5 titoli    0.1%
+  2026-07-17  15 giorni fa       1 titoli    0.0%
+  2026-07-16  16 giorni fa       1 titoli    0.0%
+  2026-07-14  18 giorni fa       2 titoli    0.0%
+  2026-07-13  19 giorni fa       3 titoli    0.0%
+  2026-07-07  25 giorni fa       1 titoli    0.0%
+  2026-07-03  29 giorni fa       2 titoli    0.0%
+  2026-07-02  30 giorni fa       1 titoli    0.0%
+  2026-06-30  32 giorni fa       1 titoli    0.0%
+  2026-06-12  50 giorni fa       1 titoli    0.0%
+  2026-06-10  52 giorni fa       1 titoli    0.0%
+  mai scritti                    9 titoli    0.1%
 
-=== 2. Scarico 5 anni di storico da Francoforte ===
-  MBH3   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  SPB    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  EUK3   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  BFV    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  PHH2   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  HG1    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  WBAH    586 righe scritte (2022-12-02 -> 2026-07-30)  [saltate 1: seduta aperta]
-  SIM0   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  LEC    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  T2G    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  MNV6   1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  SSH    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
-  NLM    1281 righe scritte (2021-07-22 -> 2026-07-30)  [saltate 1: seduta aperta]
+=== PER MERCATO ===
+MERCATO           TOT   31/07   30/07 +VECCHI   MAI  PREVALENTE
+Europa           2126      85    2032       6     3  2026-07-30
+Stati Uniti      3002    2946      40      15     1  2026-07-31
+Canada            400     387       7       3     3  2026-07-31
+Giappone         1000       3     996       1     0  2026-07-30
+Hong Kong         500       0     498       0     2  2026-07-30
+Australia         349     346       3       0     0  2026-07-31
+Corea             400     398       0       2     0  2026-07-31
+Singapore         100     100       0       0     0  2026-07-31
 
-Totale righe storiche scritte: 15958   saltate per seduta aperta: 13
+=== TITOLI MOLTO INDIETRO (oltre 7 giorni) ===
+Totale: 22
+  2026-06-10 ( 52 gg)  EISP      OB     Eiendomsspar AS
+  2026-06-12 ( 50 gg)  4974      TSE    Takara Bio Inc.
+  2026-06-30 ( 32 gg)  STEL      US     Stellar Bancorp, Inc.
+  2026-07-02 ( 30 gg)  BLD       US     TopBuild Corp.
+  2026-07-03 ( 29 gg)  BLN       TSX    Blackline Safety Corp.
+  2026-07-03 ( 29 gg)  COFB      BR     Cofinimmo SA
+  2026-07-07 ( 25 gg)  ISC       TSX    Information Services Corporation
+  2026-07-13 ( 19 gg)  ESPR      US     Esperion Therapeutics, Inc.
+  2026-07-13 ( 19 gg)  OLPX      US     Olaplex Holdings, Inc.
+  2026-07-13 ( 19 gg)  WSR       US     Whitestone REIT
+  2026-07-14 ( 18 gg)  A012510   KRX    Douzone Bizon Co., Ltd.
+  2026-07-14 ( 18 gg)  EEX       US     Emerald Holding, Inc.
+  2026-07-16 ( 16 gg)  GTLS      US     Chart Industries, Inc.
+  2026-07-17 ( 15 gg)  CNGO      US     Cengage Learning Holdings II, Inc.
+  2026-07-21 ( 11 gg)  A057050   KRX    Hyundai Home Shopping Network Corporation
+  2026-07-21 ( 11 gg)  CPRX      US     Catalyst Pharmaceuticals, Inc.
+  2026-07-21 ( 11 gg)  NSA       US     National Storage Affiliates Trust
+  2026-07-21 ( 11 gg)  NUVL      US     Nuvalent, Inc.
+  2026-07-21 ( 11 gg)  XOMA      US     XOMA Royalty Corporation
+  2026-07-23 (  9 gg)  TMHC      US     Taylor Morrison Home Corporation
+  2026-07-23 (  9 gg)  WEIJHO    CPSE   Investeringsforeningen Investin - K Invest
+  2026-07-24 (  8 gg)  AVNS      US     Avanos Medical, Inc.
 
-=== 3. Aggiorno la cache dei prezzi ===
-  cache aggiornata per 13 titoli (HTTP 201)
-
-=== 4. VERIFICA FINALE ===
-  MBH3   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 176.5)
-  SPB    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 1090.0)
-  EUK3   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 59.0)
-  BFV    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 73.0)
-  PHH2   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 203.0)
-  HG1    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 24.4)
-  WBAH   storico:  586 righe da 2022-12-02   cache: ('2026-07-30', 21.8)
-  SIM0   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 77.0)
-  LEC    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 65.5)
-  T2G    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 84.0)
-  MNV6   storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 362.0)
-  SSH    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 63.0)
-  NLM    storico: 1281 righe da 2021-07-22   cache: ('2026-07-30', 103.5)
+=== MAI SCRITTI ===
+Totale: 9
+  AT.       LSE    Ashtead Technology Holdings Plc
+  ROKO B    OM     Röko AB (publ)
+  TANGEN B  OM     TÃ¥ngen Industrikapital AB (publ)
+  ZQXVW9    US     Meridian Fabrication Holdings
+  ACO.X     TSX    ATCO Ltd.
+  GO.U      TSX    GO Residential Real Estate Investment Trus
+  IIP.UN    TSX    InterRent Real Estate Investment Trust
+  778       SEHK   Fortune Real Estate Investment Trust
+  823       SEHK   Link Real Estate Investment Trust
