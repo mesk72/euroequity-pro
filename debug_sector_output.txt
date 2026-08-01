@@ -1,12 +1,3 @@
-=== Wallet farmaceutico: le notizie sono solo dei titoli giusti? ===
-  notizie totali: 0
-
-  INTRUSI (societa' omonime su altri mercati): NESSUNO
-
-=== La pagina News per regione funziona ancora? ===
-  region=americas  0 notizie
-  region=europe    0 notizie
-  region=asia      0 notizie
-
-=== Ticker con il punto dentro (ACO.X, GO.U) ===
-  notizie: 0 -> Counter()
+HTTP: 200
+headers rilevanti: {'Age': '0', 'Cache-Control': 'public', 'Content-Type': 'application/json', 'X-Matched-Path': '/api/news-cache', 'X-Vercel-Cache': 'MISS'}
+corpo (primi 500): {"items":[]}
