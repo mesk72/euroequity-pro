@@ -29,6 +29,8 @@ from collections import Counter
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 
+import time
+
 import requests
 
 SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
@@ -158,6 +160,75 @@ def distribuzione(per_exchange, exchanges, oggi):
     return righe, mai
 
 
+def triage_cronici(per_exchange, oggi, giorni_soglia=7):
+    """Per i titoli fermi da oltre una settimana chiede a Yahoo se il dato
+    esiste. Distingue due situazioni molto diverse:
+      - Yahoo NON ha nulla di piu' recente -> titolo delistato/sospeso:
+        va tolto dall'universo, nessuna urgenza tecnica
+      - Yahoo HA un prezzo piu' recente del nostro -> problema NOSTRO:
+        di solito il codice yahoo_ticker e' sbagliato (visto piu' volte:
+        REIT canadesi col punto invece del trattino, coreani col prefisso
+        "A", tedeschi su Xetra invece che Francoforte, Hong Kong senza lo
+        zero iniziale). Sono gli unici casi che richiedono un intervento.
+    Interroga solo poche decine di titoli, quindi non pesa sull'esecuzione.
+    """
+    limite = (oggi - timedelta(days=giorni_soglia)).strftime("%Y-%m-%d")
+    candidati = []
+    for ex, d in per_exchange.items():
+        for tk, data in d["date"].items():
+            if data and data < limite:
+                candidati.append((data, tk, ex, d["nomi"].get(tk, tk)))
+        for tk, azienda in d["assenti"]:
+            candidati.append((None, tk, ex, azienda))
+    candidati.sort(key=lambda x: (x[0] or ""))
+
+    nostri, delistati, incerti = [], [], []
+    if not candidati:
+        return nostri, delistati, incerti
+    try:
+        import yfinance as yf
+        import pandas as pd
+    except Exception:
+        return nostri, delistati, candidati  # senza yfinance non si distingue
+
+    for data, tk, ex, azienda in candidati[:60]:
+        yt = None
+        try:
+            r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=HEADERS,
+                             params={"select": "yahoo_ticker", "ticker": "eq." + tk,
+                                     "exchange": "eq." + ex}, timeout=30)
+            rows = r.json()
+            if isinstance(rows, list) and rows:
+                yt = rows[0].get("yahoo_ticker")
+        except Exception:
+            pass
+        if not yt:
+            incerti.append((data, tk, ex, azienda, "nessun codice Yahoo impostato"))
+            continue
+        try:
+            df = yf.download(yt, period="10d", interval="1d",
+                             auto_adjust=True, progress=False)
+            if df.empty:
+                delistati.append((data, tk, ex, azienda, yt))
+                continue
+            cl = df["Close"]
+            if isinstance(cl, pd.DataFrame):
+                cl = cl.iloc[:, 0]
+            cl = cl.dropna()
+            if len(cl) == 0:
+                delistati.append((data, tk, ex, azienda, yt))
+                continue
+            ultima_yahoo = cl.index[-1].strftime("%Y-%m-%d")
+            if data is None or ultima_yahoo > data:
+                nostri.append((data, tk, ex, azienda, yt, ultima_yahoo))
+            else:
+                delistati.append((data, tk, ex, azienda, yt))
+        except Exception:
+            incerti.append((data, tk, ex, azienda, "errore interrogando Yahoo"))
+        time.sleep(0.25)
+    return nostri, delistati, incerti
+
+
 def leggi_esecuzioni():
     """Esiti degli script nelle ultime 24 ore."""
     da = (datetime.now(timezone.utc) - timedelta(hours=26)).isoformat()
@@ -192,7 +263,7 @@ def leggi_sentinella_quintili():
         return 0, None
 
 
-def costruisci_email(per_exchange, esecuzioni, quintili):
+def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     oggi = datetime.now(timezone.utc) + timedelta(hours=2)  # CEST
 
     tot_universo = sum(d["universo"] for d in per_exchange.values())
@@ -201,6 +272,7 @@ def costruisci_email(per_exchange, esecuzioni, quintili):
     tot_assenti = sum(len(d["assenti"]) for d in per_exchange.values())
     perc = (tot_aggiornati / tot_universo * 100) if tot_universo else 0
     dist, mai_scritti = distribuzione(per_exchange, TUTTI_EXCHANGE, oggi)
+    nostri, delistati, incerti = triage
 
     # --- segnalazioni: solo cose che meritano davvero attenzione ---
     allarmi = []
@@ -231,7 +303,14 @@ def costruisci_email(per_exchange, esecuzioni, quintili):
         if atteso not in visti:
             allarmi.append("script %s: nessuna esecuzione nelle ultime 24 ore" % atteso)
 
-    # 3. sentinella quintili
+    # 3. titoli con codice Yahoo sbagliato: unico caso che richiede intervento
+    if nostri:
+        allarmi.append("%d titoli con dato disponibile su Yahoo ma non nostro "
+                       "(probabile codice errato): %s"
+                       % (len(nostri), ", ".join("%s.%s" % (x[1], x[2]) for x in nostri[:5])
+                          + (" e altri" if len(nostri) > 5 else "")))
+
+    # 4. sentinella quintili
     n_quint, agg_quint = quintili
     if n_quint == 0:
         allarmi.append("tabella quintili vuota: il sito usa il calcolo lento di riserva")
@@ -361,28 +440,60 @@ def costruisci_email(per_exchange, esecuzioni, quintili):
         B.append("<div style='color:#b00;font-size:14px'>Nessuna esecuzione "
                  "registrata nelle ultime 24 ore.</div>")
 
-    # elenco dei casi che restano indietro da tempo
-    cronici = []
-    limite_cronico = (oggi - timedelta(days=7)).strftime("%Y-%m-%d")
-    for nome, lista in GRUPPI:
-        for ex in lista:
-            for tk, azienda, d in per_exchange[ex]["in_ritardo"]:
-                if d and d < limite_cronico:
-                    cronici.append((d, tk, ex, azienda))
-    cronici.sort()
-    if cronici:
-        B.append("<h3 style='margin:18px 0 6px;font-size:15px'>Fermi da oltre "
-                 "una settimana <span style='font-weight:400;color:#666;"
-                 "font-size:13px'>(%d)</span></h3>" % len(cronici))
-        B.append("<div style='font-size:13px;color:#444'>")
-        for d, tk, ex, azienda in cronici[:25]:
-            B.append("%s.%s &nbsp;<span style='color:#888'>%s</span> &nbsp;→&nbsp; %s<br>"
-                     % (tk, ex, azienda[:38], d))
-        if len(cronici) > 25:
-            B.append("<i>...e altri %d</i>" % (len(cronici) - 25))
-        B.append("<div style='color:#888;margin-top:6px'>Di solito titoli "
-                 "sospesi o delistati: se confermato, vanno messi "
-                 "in_universe=false.</div>")
+    # ── Titoli fermi da tempo, divisi per CAUSA ───────────────
+    # La distinzione e' la parte utile: i delistati non richiedono nulla
+    # di tecnico, i "problema nostro" sono azioni concrete da fare.
+
+    if nostri:
+        B.append("<div style='border:2px solid #b00;background:#fff5f5;"
+                 "padding:12px 14px;margin-top:20px'>")
+        B.append("<b style='color:#b00;font-size:15px'>DA SISTEMARE: %d titoli "
+                 "per cui Yahoo ha il dato e noi no</b>" % len(nostri))
+        B.append("<div style='font-size:13px;color:#444;margin:6px 0 8px'>"
+                 "Quasi sempre e' il codice Yahoo sbagliato in "
+                 "<code>stocks.yahoo_ticker</code>.</div>")
+        B.append("<table style='border-collapse:collapse;width:100%;font-size:13px'>")
+        B.append("<tr style='background:#ffe8e8;text-align:left'>"
+                 "<th style='padding:5px'>Titolo</th>"
+                 "<th style='padding:5px'>Societa'</th>"
+                 "<th style='padding:5px'>Codice usato</th>"
+                 "<th style='padding:5px'>Nostro</th>"
+                 "<th style='padding:5px'>Yahoo ha</th></tr>")
+        for data, tk, ex, azienda, yt, uy in nostri:
+            B.append("<tr style='border-bottom:1px solid #f0d0d0'>"
+                     "<td style='padding:5px'><b>%s.%s</b></td>"
+                     "<td style='padding:5px'>%s</td>"
+                     "<td style='padding:5px'><code>%s</code></td>"
+                     "<td style='padding:5px'>%s</td>"
+                     "<td style='padding:5px;color:#b00'><b>%s</b></td></tr>"
+                     % (tk, ex, azienda[:30], yt, data or "mai scritto", uy))
+        B.append("</table></div>")
+
+    if delistati:
+        B.append("<h3 style='margin:20px 0 6px;font-size:15px'>Fermi ma non e' "
+                 "colpa nostra <span style='font-weight:400;color:#666;"
+                 "font-size:13px'>(%d)</span></h3>" % len(delistati))
+        B.append("<div style='font-size:13px;color:#444'>"
+                 "Yahoo non ha nulla di piu' recente: societa' delistate, "
+                 "acquisite o sospese. Nessun intervento tecnico, "
+                 "eventualmente da togliere dall'universo.<br><br>")
+        for data, tk, ex, azienda, yt in delistati[:20]:
+            g = ""
+            if data:
+                try:
+                    g = " (%d gg)" % (oggi.date() - datetime.strptime(data, "%Y-%m-%d").date()).days
+                except Exception:
+                    pass
+            B.append("%s.%s <span style='color:#888'>%s</span> &nbsp;fermo al %s%s<br>"
+                     % (tk, ex, azienda[:32], data or "mai scritto", g))
+        if len(delistati) > 20:
+            B.append("<i>...e altri %d</i>" % (len(delistati) - 20))
+        B.append("</div>")
+
+    if incerti:
+        B.append("<div style='font-size:13px;color:#888;margin-top:12px'>"
+                 "Non verificati (%d): " % len(incerti))
+        B.append(", ".join("%s.%s" % (x[1], x[2]) for x in incerti[:15]))
         B.append("</div>")
 
     B.append("<div style='margin-top:22px;padding-top:10px;border-top:1px solid #ddd;"
@@ -416,7 +527,7 @@ def invia(oggetto, corpo_html):
     return True
 
 
-def riepilogo_testuale(per_exchange, esecuzioni, quintili):
+def riepilogo_testuale(per_exchange, esecuzioni, quintili, triage):
     """Stessa fotografia in testo, stampata nei log dell'esecuzione."""
     R = []
     tot_u = sum(d["universo"] for d in per_exchange.values())
@@ -456,6 +567,17 @@ def riepilogo_testuale(per_exchange, esecuzioni, quintili):
                  % (r.get("market"), r.get("prices_updated"),
                     r.get("prices_failed"), r.get("duration_seconds")))
     R.append("")
+    nostri_t, delist_t, _ = triage
+    R.append("")
+    if nostri_t:
+        R.append("DA SISTEMARE (Yahoo ha il dato, noi no): %d" % len(nostri_t))
+        for data, tk, ex, az, yt, uy in nostri_t:
+            R.append("  %-9s %-5s codice=%-12s nostro=%-10s yahoo=%s"
+                     % (tk, ex, yt, data or "mai", uy))
+    else:
+        R.append("DA SISTEMARE: nessuno")
+    R.append("Delistati/sospesi (nessun intervento): %d" % len(delist_t))
+    R.append("")
     R.append("Quintili precalcolati: %d righe (aggiornati %s)" % (quintili[0], quintili[1]))
     return "\n".join(R)
 
@@ -464,9 +586,11 @@ if __name__ == "__main__":
     per_exchange = raccogli_dati()
     esecuzioni = leggi_esecuzioni()
     quintili = leggi_sentinella_quintili()
-    oggetto, corpo = costruisci_email(per_exchange, esecuzioni, quintili)
+    # calcolato UNA volta sola: interroga Yahoo, non va ripetuto
+    triage = triage_cronici(per_exchange, datetime.now(timezone.utc) + timedelta(hours=2))
+    oggetto, corpo = costruisci_email(per_exchange, esecuzioni, quintili, triage)
     print("OGGETTO:", oggetto)
     print()
-    print(riepilogo_testuale(per_exchange, esecuzioni, quintili))
+    print(riepilogo_testuale(per_exchange, esecuzioni, quintili, triage))
     print()
     invia(oggetto, corpo)
