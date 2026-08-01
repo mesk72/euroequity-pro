@@ -1,47 +1,26 @@
-=== STATO DOPO L'ALLINEAMENTO ===
-MERCATO           TOT   31/07   30/07  +VECCHI   MAI
-Europa           2126     525    1593        5     3
-Stati Uniti      3002    2986       0       15     1
-Canada            400     394       0        3     3
-Giappone         1000     999       0        1     0
-Hong Kong         500     498       0        0     2
-Australia         349     349       0        0     0
-Corea             400     398       0        2     0
-Singapore         100     100       0        0     0
+=== 1. Correggo yahoo_ticker ===
+  823       SEHK  -> 0823.HK      HTTP 204
+  778       SEHK  -> 0778.HK      HTTP 204
+  ACO.X     TSX   -> ACO-X.TO     HTTP 204
+  GO.U      TSX   -> GO-U.TO      HTTP 204
+  AT.       LSE   -> AT.L         HTTP 204
+  ROKO B    OM    -> ROKO-B.ST    HTTP 204
 
-TOTALE UNIVERSO: 7877
-  2026-07-31 :  6249 titoli (79.3%)
-  2026-07-30 :  1593 titoli (20.2%)
-  2026-07-29 :     1 titoli (0.0%)
-  2026-07-28 :     3 titoli (0.0%)
-  mai scritti: 9
+=== 2. Scarico 5 anni di storico ===
+  823        1233 righe (2021-07-23 -> 2026-07-31)
+  778        1233 righe (2021-07-23 -> 2026-07-31)
+  ACO.X      1261 righe (2021-07-23 -> 2026-07-31)
+  GO.U        256 righe (2025-07-25 -> 2026-07-31)
+  AT.        1182 righe (2021-11-23 -> 2026-07-31)
+  ROKO B      346 righe (2025-03-11 -> 2026-07-30)
 
-=== CONTROLLO TICKER SOSPETTI ===
+=== 3. Aggiorno cache ===
+  aggiornati 6 titoli (HTTP 201)
 
-Link REIT (823.SEHK)
-   0823.HK        FUNZIONA -> ultima 31/07 = 39.12
-   823.HK         vuoto
-
-Fortune REIT (778.SEHK)
-   0778.HK        FUNZIONA -> ultima 31/07 = 4.83
-   778.HK         vuoto
-
-ATCO (ACO.X.TSX)
-   ACO-X.TO       FUNZIONA -> ultima 31/07 = 79.81
-   ACO.X.TO       vuoto
-
-InterRent REIT (IIP.UN.TSX)
-   IIP-UN.TO      vuoto
-   IIP.UN.TO      vuoto
-
-GO Residential REIT (GO.U.TSX)
-   GO-U.TO        FUNZIONA -> ultima 31/07 = 9.65
-   GO.U.TO        vuoto
-
-Ashtead Technology (AT..LSE)
-   AT.L           FUNZIONA -> ultima 31/07 = 409.50
-   ATL.L          vuoto
-
-Roko AB (ROKO B.OM)
-   ROKO-B.ST      FUNZIONA -> ultima 30/07 = 1856.00
-   ROKOB.ST       vuoto
+=== 4. VERIFICA ===
+  823       SEHK  storico: 1233 righe   cache: ('2026-07-31', 39.12)
+  778       SEHK  storico: 1233 righe   cache: ('2026-07-31', 4.83)
+  ACO.X     TSX   storico: 1261 righe   cache: ('2026-07-31', 79.81)
+  GO.U      TSX   storico:  256 righe   cache: ('2026-07-31', 9.65)
+  AT.       LSE   storico: 1182 righe   cache: ('2026-07-31', 409.5)
+  ROKO B    OM    storico:  346 righe   cache: ('2026-07-30', 1856.0)
