@@ -258,15 +258,27 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
   // solo sui ticker presenti in questo specifico wallet.
   const [walletNews, setWalletNews] = useState<any[]>([])
   const [newsLoading, setNewsLoading] = useState(false)
+  // FIX 1/8/2026: le dipendenze erano [activeWallet, stocks.length] — la
+  // sola LUNGHEZZA della lista. Cambiando wallet con lo stesso numero di
+  // titoli (es. due wallet da 12) nessuna delle due dipendenze cambiava e
+  // le notizie restavano quelle del wallet precedente. Ora si usa l'elenco
+  // vero dei titoli, quindi qualsiasi cambio di composizione ricarica.
+  // Il limite passa da 50 a 200: con 50 titoli in wallet e ~5 notizie
+  // ciascuno il tetto veniva raggiunto subito e i titoli in fondo alla
+  // lista non mostravano mai nulla.
+  const tickersParam = stocks.map(s => `${s.ticker}.${s.exchange}`).join(',')
   useEffect(() => {
-    if (stocks.length === 0) { setWalletNews([]); return }
-    const tickersParam = stocks.map(s => `${s.ticker}.${s.exchange}`).join(',')
+    if (!tickersParam) { setWalletNews([]); return }
+    let annullato = false
     setNewsLoading(true)
-    fetch(`/api/news-cache?tickers=${encodeURIComponent(tickersParam)}&limit=50`, { cache: 'no-store' })
+    fetch(`/api/news-cache?tickers=${encodeURIComponent(tickersParam)}&limit=200`, { cache: 'no-store' })
       .then(r => r.ok ? r.json() : { items: [] })
-      .then(d => { setWalletNews(d.items || []); setNewsLoading(false) })
-      .catch(() => setNewsLoading(false))
-  }, [activeWallet, stocks.length])
+      .then(d => { if (!annullato) { setWalletNews(d.items || []); setNewsLoading(false) } })
+      .catch(() => { if (!annullato) setNewsLoading(false) })
+    // se l'utente cambia wallet mentre una richiesta e' in volo, la
+    // risposta vecchia non deve sovrascrivere quella nuova
+    return () => { annullato = true }
+  }, [tickersParam])
 
   // Ordinamento per colonna — clic sull'intestazione per Settore, Market
   // Cap, 1D/1W/1M/6M/12M, Value/Growth/Best
