@@ -1,5 +1,5 @@
 ======================================================================
-HEALTH CHECK — 2026-07-31 05:06 UTC
+HEALTH CHECK — 2026-08-01 04:59 UTC
 ======================================================================
 US       count= 3002/3000   campione_fresco=19/20  eta_max_campione=1gg  [OK]
 TSX      count=  400/400    campione_fresco=19/20  eta_max_campione=1gg  [OK]
@@ -19,8 +19,8 @@ GR       count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
 VI       count=   53/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
 IR       count=   15/-      campione_fresco=15/15  eta_max_campione=2gg  [OK]
 LS       count=   35/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
-TSE      count= 1000/1000   campione_fresco=20/20  eta_max_campione=1gg  [OK]
-SEHK     count=  500/500    campione_fresco=20/20  eta_max_campione=1gg  [OK]
+TSE      count= 1000/1000   campione_fresco=20/20  eta_max_campione=2gg  [OK]
+SEHK     count=  500/500    campione_fresco=20/20  eta_max_campione=2gg  [OK]
 ASX      count=  349/350    campione_fresco=20/20  eta_max_campione=1gg  [OK]
 KRX      count=  400/400    campione_fresco=20/20  eta_max_campione=1gg  [OK]
 SGX      count=  100/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
