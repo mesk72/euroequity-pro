@@ -1,5 +1,29 @@
-PRIMA: [{'ticker': 'IIP.UN', 'exchange': 'TSX', 'company': 'InterRent Real Estate Investment Trust', 'in_universe': True}]
-PATCH HTTP: 204
-DOPO: [{'ticker': 'IIP.UN', 'exchange': 'TSX', 'company': 'InterRent Real Estate Investment Trust', 'in_universe': False}]
+=== 1. Struttura di news_cache ===
+colonne: ['id', 'ticker', 'exchange', 'region', 'company', 'yahoo_ticker', 'title', 'link', 'pub_date', 'source', 'value_score', 'growth_score', 'best_score', 'mkt_cap', 'fetched_at']
+  esempio: ticker='857' region='asia' fetched_at=2026-08-01T05:27:05.728748
+  esempio: ticker='857' region='asia' fetched_at=2026-08-01T05:27:05.728748
 
-Universo attivo ora: 7876 titoli
+=== 2. Quante righe in totale e quante nelle ultime 24h ===
+righe totali: 36539
+righe ultime 24h: 36539
+
+=== 3. Formato dei ticker presenti (campione) ===
+  con punto: 0  -> esempi []
+  senza punto: 400 -> esempi ['857', '857', '857', '857', '857', 'A402340', 'A402340', 'A402340']
+  regioni: {'asia': 357, 'americas': 38, 'europe': 5}
+
+=== 4. Ticker dei wallet: hanno notizie? ===
+  titoli in watchlist: 100
+  per wallet: {0: 50, 2: 38, 1: 12}
+     5101       TSE    wallet=0  notizie in cache: 5
+     NOVN       SWX    wallet=2  notizie in cache: 5
+     AMGN       US     wallet=2  notizie in cache: 5
+     ROP        SWX    wallet=2  notizie in cache: 10
+     CAH        US     wallet=2  notizie in cache: 5
+     VRTX       US     wallet=2  notizie in cache: 5
+     COR        US     wallet=2  notizie in cache: 5
+     SAN        PA     wallet=2  notizie in cache: 10
+     GSK        LSE    wallet=2  notizie in cache: 5
+     BMY        US     wallet=2  notizie in cache: 10
+     C          US     wallet=0  notizie in cache: 5
+     UCB        BR     wallet=2  notizie in cache: 10
