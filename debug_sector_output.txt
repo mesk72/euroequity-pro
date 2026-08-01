@@ -1,26 +1,10 @@
-=== 1. Correggo yahoo_ticker ===
-  823       SEHK  -> 0823.HK      HTTP 204
-  778       SEHK  -> 0778.HK      HTTP 204
-  ACO.X     TSX   -> ACO-X.TO     HTTP 204
-  GO.U      TSX   -> GO-U.TO      HTTP 204
-  AT.       LSE   -> AT.L         HTTP 204
-  ROKO B    OM    -> ROKO-B.ST    HTTP 204
+InterRent REIT - provo tutte le varianti plausibili
+  IIP-UN.TO    vuoto
+  IIPZF        vuoto
+  IIP.TO       vuoto
+  IIPUN.TO     vuoto
+  IIP-U.TO     vuoto
+  IIP-UN.V     vuoto
 
-=== 2. Scarico 5 anni di storico ===
-  823        1233 righe (2021-07-23 -> 2026-07-31)
-  778        1233 righe (2021-07-23 -> 2026-07-31)
-  ACO.X      1261 righe (2021-07-23 -> 2026-07-31)
-  GO.U        256 righe (2025-07-25 -> 2026-07-31)
-  AT.        1182 righe (2021-11-23 -> 2026-07-31)
-  ROKO B      346 righe (2025-03-11 -> 2026-07-30)
-
-=== 3. Aggiorno cache ===
-  aggiornati 6 titoli (HTTP 201)
-
-=== 4. VERIFICA ===
-  823       SEHK  storico: 1233 righe   cache: ('2026-07-31', 39.12)
-  778       SEHK  storico: 1233 righe   cache: ('2026-07-31', 4.83)
-  ACO.X     TSX   storico: 1261 righe   cache: ('2026-07-31', 79.81)
-  GO.U      TSX   storico:  256 righe   cache: ('2026-07-31', 9.65)
-  AT.       LSE   storico: 1182 righe   cache: ('2026-07-31', 409.5)
-  ROKO B    OM    storico:  346 righe   cache: ('2026-07-30', 1856.0)
+Storico lungo su IIP-UN.TO (esisteva in passato?)
+  righe: 1   dal 10/07/2026 al 10/07/2026   ultimo prezzo 13.54
