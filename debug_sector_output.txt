@@ -1,48 +1,25 @@
-OGGETTO: ForwardAlpha OK - 0/7217 titoli al giorno prima (0.0%)
+US in_universe=true : 3002
+US in_universe=false: 32
+US totale          : 3034
 
-UNIVERSO: 7217 titoli
+Righe US in prices_eod al 31/07:
+   2986
+Righe US in latest_prices:
+   3001
 
-DISTRIBUZIONE PER DATA
-  2026-07-31  2 giorni fa        7189 titoli   99.6%
-  2026-07-30  3 giorni fa           2 titoli    0.0%
-  2026-07-29  4 giorni fa           1 titoli    0.0%
-  2026-07-28  5 giorni fa           3 titoli    0.0%
-  2026-07-24  9 giorni fa           1 titoli    0.0%
-  2026-07-23  10 giorni fa          2 titoli    0.0%
-  2026-07-21  12 giorni fa          5 titoli    0.1%
-  2026-07-17  16 giorni fa          1 titoli    0.0%
-  2026-07-16  17 giorni fa          1 titoli    0.0%
-  2026-07-14  19 giorni fa          2 titoli    0.0%
-  2026-07-13  20 giorni fa          2 titoli    0.0%
-  2026-07-07  26 giorni fa          1 titoli    0.0%
-  2026-07-03  30 giorni fa          2 titoli    0.0%
-  2026-07-02  31 giorni fa          1 titoli    0.0%
-  2026-06-30  33 giorni fa          1 titoli    0.0%
-  2026-06-12  51 giorni fa          1 titoli    0.0%
-  2026-06-10  53 giorni fa          1 titoli    0.0%
-  mai scritti                       1 titoli    0.0%
-
-MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
-Europa           2126      0   2118        7     1  2026-07-31
-Stati Uniti      2343      0   2329       14     0  2026-07-31
-Canada            399      0    396        3     0  2026-07-31
-Giappone         1000      0    999        1     0  2026-07-31
-Hong Kong         500      0    500        0     0  2026-07-31
-Australia         349      0    349        0     0  2026-07-31
-Corea             400      0    398        2     0  2026-07-31
-Singapore         100      0    100        0     0  2026-07-31
-
-ESECUZIONI ultime 24h: 4
-  EU     ok=2625 falliti=1 durata=460s
-  APAC   ok=2349 falliti=0 durata=505s
-  US+CA  ok=3401 falliti=0 durata=643s
-  EU     ok=2625 falliti=1 durata=569s
-
-
-DA SISTEMARE: nessuno
-Delistati/sospesi (nessun intervento): 22
-
-Quintili precalcolati: 247 righe (aggiornati 2026-07-30)
-
-SMTP non configurato: stampo il rapporto senza inviarlo.
-ForwardAlpha OK - 0/7217 titoli al giorno prima (0.0%)
+Campione di titoli US ora fuori universo:
+  FCNC.A   First Citizens BancShares, Inc.
+  LBTY.A   Liberty Global Ltd.
+  RUSH.A   Rush Enterprises, Inc.
+  FET      Forum Energy Technologies, Inc.
+  BELF.A   Bel Fuse Inc.
+  BATR.K   Atlanta Braves Holdings, Inc.
+  CLB      Core Laboratories Inc.
+  HONA.V   Honeywell Aerospace Inc.
+  PLWN     Pinelawn Cemetery
+  IMKT.A   Ingles Markets, Incorporated
+  LLYV.K   Liberty Live Holdings, Inc.
+  SILA     Sila Realty Trust, Inc.
+  CNTA     Centessa Pharmaceuticals plc
+  MASI     Masimo Corporation
+  LC       LendingClub Corporation
