@@ -1,5 +1,5 @@
 ============================================================
-FORWARDALPHA WEEKLY APAC LOAD — 2026-07-26
+FORWARDALPHA WEEKLY APAC LOAD — 2026-08-02
 ============================================================
 
  Legge fiscal year end...
@@ -8,7 +8,7 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-26
  Legge stocks APAC dal DB...
  TSE: 1000 in_universe=true nel DB
  SEHK: 500 in_universe=true nel DB
- ASX: 350 in_universe=true nel DB
+ ASX: 349 in_universe=true nel DB
  KRX: 400 in_universe=true nel DB
  SGX: 100 in_universe=true nel DB
 
@@ -16,25 +16,25 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-07-26
  DEBUG: candidati SGX nel file TIKR (raw_rows): 508
  DEBUG: ticker SGX in stocks_tickers: 100
  DEBUG: primi 5 ticker SGX dal TIKR: ['7485', '2928', '6623', '9357', '1869']
- DEBUG: primi 5 ticker SGX in stocks: ['A17U', 'BEC', 'ADN', 'TS0U', 'O39']
+ DEBUG: primi 5 ticker SGX in stocks: ['E5H', 'U14', 'U11', 'CY6U', 'T6I']
  TIKR TSE: 1000 (in_universe ufficiale, target di riferimento=1000)
  TIKR SEHK: 500 (in_universe ufficiale, target di riferimento=500)
- TIKR ASX: 350 (in_universe ufficiale, target di riferimento=350)
+ TIKR ASX: 349 (in_universe ufficiale, target di riferimento=350)
  TIKR KRX: 400 (in_universe ufficiale, target di riferimento=400)
  TIKR SGX: 100 (in_universe ufficiale, target di riferimento=100)
- TIKR APAC totale: 2350
+ TIKR APAC totale: 2349
 
  Calcola fondamentali...
- Fondamentali: 2350/2350
- Momentum: 2350
- Fondamentali DB: 2350
+ Fondamentali: 2349/2349
+ Momentum: 2349
+ Fondamentali DB: 2349
  JPN: 1000
  HKG: 500
- AUS: 350
+ AUS: 349
  KOR: 400
  SGP: 100
- Rank APAC paese: 2350/2350
- Combined APAC (TSE+SEHK+ASX+KRX+SGX): 1963/1963
+ Rank APAC paese: 2349/2349
+ Combined APAC (TSE+SEHK+ASX+KRX+SGX): 1964/1964
 
-Weekly APAC completato in 20s
+Weekly APAC completato in 25s
 ============================================================
