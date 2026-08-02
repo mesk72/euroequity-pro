@@ -37,7 +37,10 @@ SUPABASE_URL = "https://mlqkisnizgyvvqajdvbh.supabase.co"
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 HEADERS = {"apikey": SERVICE_KEY, "Authorization": "Bearer " + SERVICE_KEY}
 
-SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+# Namecheap Private Email: host unico mail.privateemail.com, porta 465
+# con SSL. Serve la normale password della casella, nessuna password
+# applicativa da generare (a differenza di Gmail).
+SMTP_HOST = os.environ.get("SMTP_HOST", "mail.privateemail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "465"))
 SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
@@ -89,7 +92,24 @@ def leggi_tutto(tabella, select, exchange, filtri=None):
         if len(blocco) < 1000:
             break
         offset += 1000
+        if offset > 50000:      # salvagente contro cicli infiniti
+            break
     return righe
+
+
+def conta_esatto(tabella, filtri):
+    """Conteggio server-side via header Content-Range. Da usare SEMPRE al
+    posto di len() su una lettura non paginata: e' il modo in cui, il
+    31/7 e il 2/8, un conteggio parziale mi ha fatto credere per errore
+    che l'universo USA fosse crollato da 3002 a 2343 titoli."""
+    try:
+        r = requests.get(SUPABASE_URL + "/rest/v1/" + tabella,
+                         headers={**HEADERS, "Prefer": "count=exact"},
+                         params={**filtri, "select": "ticker", "limit": "1"},
+                         timeout=60)
+        return int(r.headers.get("content-range", "0/0").split("/")[-1])
+    except Exception:
+        return None
 
 
 def raccogli_dati():
@@ -136,6 +156,25 @@ def raccogli_dati():
     return per_exchange
 
 
+def giorni_di_borsa(data_str, oggi):
+    """Distanza in GIORNI DI BORSA, non di calendario. Di domenica l'ultima
+    seduta e' venerdi': col calendario risulterebbe "2 giorni fa" e il
+    rapporto segnalerebbe 0% aggiornati con tutto perfettamente in ordine.
+    Non tiene conto delle festivita' infrasettimanali, ma per un rapporto
+    giornaliero l'approssimazione e' irrilevante."""
+    d = datetime.strptime(data_str, "%Y-%m-%d").date()
+    fine = oggi.date()
+    if d >= fine:
+        return 0
+    n = 0
+    cur = d
+    while cur < fine:
+        cur += timedelta(days=1)
+        if cur.weekday() < 5:   # 0-4 = lunedi-venerdi
+            n += 1
+    return n
+
+
 def distribuzione(per_exchange, exchanges, oggi):
     """Conteggio esatto dei titoli per data di prezzo, con il ritardo in
     giorni di calendario rispetto al giorno in cui gira il rapporto.
@@ -153,7 +192,7 @@ def distribuzione(per_exchange, exchanges, oggi):
     righe = []
     for data, n in sorted(conta.items(), reverse=True):
         try:
-            g = (oggi.date() - datetime.strptime(data, "%Y-%m-%d").date()).days
+            g = giorni_di_borsa(data, oggi)
         except Exception:
             g = None
         righe.append({"data": data, "n": n, "giorni": g})
@@ -317,7 +356,7 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
 
     stato = "ATTENZIONE" if allarmi else "OK"
     recenti = sum(r["n"] for r in dist if r["giorni"] is not None and r["giorni"] <= 1)
-    oggetto = "ForwardAlpha %s - %d/%d titoli al giorno prima (%.1f%%)" % (
+    oggetto = "ForwardAlpha %s - %d/%d titoli aggiornati (%.1f%%)" % (
         stato, recenti, tot_universo,
         recenti / tot_universo * 100 if tot_universo else 0)
 
@@ -338,13 +377,13 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     for r in dist:
         g = r["giorni"]
         if g == 0:
-            etichetta = "oggi"
+            etichetta = "ultima seduta"
         elif g == 1:
-            etichetta = "il giorno prima"
+            etichetta = "una seduta indietro"
         elif g is None:
             etichetta = ""
         else:
-            etichetta = "%d giorni fa" % g
+            etichetta = "%d sedute indietro" % g
         pc = r["n"] / tot_universo * 100 if tot_universo else 0
         grigio = "#666" if (g or 0) >= 3 else "#111"
         B.append("<tr style='color:%s'>"
@@ -541,7 +580,7 @@ def riepilogo_testuale(per_exchange, esecuzioni, quintili, triage):
     R.append("DISTRIBUZIONE PER DATA")
     for r in dist:
         g = r["giorni"]
-        et = "oggi" if g == 0 else ("il giorno prima" if g == 1 else "%s giorni fa" % g)
+        et = "ultima seduta" if g == 0 else ("1 seduta indietro" if g == 1 else "%s sedute indietro" % g)
         R.append("  %s  %-16s %6d titoli  %5.1f%%"
                  % (r["data"], et, r["n"], r["n"] / tot_u * 100 if tot_u else 0))
     if mai:
@@ -584,6 +623,17 @@ def riepilogo_testuale(per_exchange, esecuzioni, quintili, triage):
 
 if __name__ == "__main__":
     per_exchange = raccogli_dati()
+    # Controllo di coerenza: il totale letto deve combaciare col conteggio
+    # fatto dal database. Se non combacia, una lettura e' stata troncata e
+    # TUTTI i numeri del rapporto sarebbero sbagliati.
+    letto = sum(d["universo"] for d in per_exchange.values())
+    atteso = sum(conta_esatto("stocks", {"exchange": "eq." + ex,
+                                         "in_universe": "eq.true"}) or 0
+                 for ex in TUTTI_EXCHANGE)
+    if letto != atteso:
+        print("ATTENZIONE: letti %d titoli ma il database ne conta %d. "
+              "Una lettura e' stata troncata, i numeri sotto non sono "
+              "affidabili." % (letto, atteso))
     esecuzioni = leggi_esecuzioni()
     quintili = leggi_sentinella_quintili()
     # calcolato UNA volta sola: interroga Yahoo, non va ripetuto
