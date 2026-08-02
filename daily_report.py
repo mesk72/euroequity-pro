@@ -547,9 +547,24 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     return oggetto, "".join(B)
 
 
+def traccia(esito, dettaglio=""):
+    """Registra l'esito dell'invio in script_logs: i log di GitHub Actions
+    non sono sempre leggibili dall'esterno, cosi' l'esito resta comunque
+    verificabile con una query."""
+    try:
+        requests.post(SUPABASE_URL + "/rest/v1/script_logs",
+                      headers={**HEADERS, "Content-Type": "application/json"},
+                      json=[{"script_name": "daily_report",
+                             "log_text": "INVIO EMAIL: %s %s" % (esito, dettaglio)}],
+                      timeout=30)
+    except Exception:
+        pass
+
+
 def invia(oggetto, corpo_html):
     if not SMTP_USER or not SMTP_PASS:
         print("SMTP non configurato: stampo il rapporto senza inviarlo.")
+        traccia("NON CONFIGURATO", "SMTP_USER o SMTP_PASS mancanti")
         print(oggetto)
         return False
     msg = EmailMessage()
@@ -559,10 +574,16 @@ def invia(oggetto, corpo_html):
     msg.set_content("Rapporto ForwardAlpha in formato HTML.")
     msg.add_alternative(corpo_html, subtype="html")
     ctx = ssl.create_default_context()
-    with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as s:
-        s.login(SMTP_USER, SMTP_PASS)
-        s.send_message(msg)
+    try:
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as s:
+            s.login(SMTP_USER, SMTP_PASS)
+            s.send_message(msg)
+    except Exception as e:
+        print("ERRORE INVIO: %s" % e)
+        traccia("ERRORE", "%s: %s" % (type(e).__name__, str(e)[:200]))
+        return False
     print("Email inviata a %s" % REPORT_TO)
+    traccia("OK", "-> %s" % REPORT_TO)
     return True
 
 
