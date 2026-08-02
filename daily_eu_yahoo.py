@@ -803,7 +803,13 @@ while True:
 
 partial_rows = [{"exchange": ex, "sector": sec, "sum_eps_weighted": v["sum_eps_w"],
     "sum_eps_weight": v["sum_eps_wt"], "sum_rev_weighted": v["sum_rev_w"],
-    "sum_rev_weight": v["sum_rev_wt"], "n_stocks": v["n"]} for (ex, sec), v in partials.items()]
+    "sum_rev_weight": v["sum_rev_wt"], "n_stocks": v["n"],
+    # FIX 2/8/2026: updated_at va scritto ESPLICITAMENTE. Il valore di
+    # default della colonna scatta solo alla CREAZIONE della riga, non
+    # sugli aggiornamenti successivi: le righe create il 30/7 mostravano
+    # ancora quella data pur essendo i valori riscritti ogni notte, e il
+    # rapporto giornaliero segnalava (a torto) i quintili come fermi.
+    "updated_at": datetime.utcnow().isoformat()} for (ex, sec), v in partials.items()]
 q_ok = 0
 for i in range(0, len(partial_rows), 500):
     rq = requests.post(SUPABASE_URL + "/rest/v1/sector_quintile_partials?on_conflict=exchange,sector",
