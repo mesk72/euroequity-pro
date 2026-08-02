@@ -1,9 +1,9 @@
-OGGETTO: ForwardAlpha OK - 0/7876 titoli al giorno prima (0.0%)
+OGGETTO: ForwardAlpha OK - 0/7217 titoli al giorno prima (0.0%)
 
-UNIVERSO: 7876 titoli
+UNIVERSO: 7217 titoli
 
 DISTRIBUZIONE PER DATA
-  2026-07-31  2 giorni fa        7846 titoli   99.6%
+  2026-07-31  2 giorni fa        7189 titoli   99.6%
   2026-07-30  3 giorni fa           2 titoli    0.0%
   2026-07-29  4 giorni fa           1 titoli    0.0%
   2026-07-28  5 giorni fa           3 titoli    0.0%
@@ -13,18 +13,18 @@ DISTRIBUZIONE PER DATA
   2026-07-17  16 giorni fa          1 titoli    0.0%
   2026-07-16  17 giorni fa          1 titoli    0.0%
   2026-07-14  19 giorni fa          2 titoli    0.0%
-  2026-07-13  20 giorni fa          3 titoli    0.0%
+  2026-07-13  20 giorni fa          2 titoli    0.0%
   2026-07-07  26 giorni fa          1 titoli    0.0%
   2026-07-03  30 giorni fa          2 titoli    0.0%
   2026-07-02  31 giorni fa          1 titoli    0.0%
   2026-06-30  33 giorni fa          1 titoli    0.0%
   2026-06-12  51 giorni fa          1 titoli    0.0%
   2026-06-10  53 giorni fa          1 titoli    0.0%
-  mai scritti                       2 titoli    0.0%
+  mai scritti                       1 titoli    0.0%
 
 MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
 Europa           2126      0   2118        7     1  2026-07-31
-Stati Uniti      3002      0   2986       15     1  2026-07-31
+Stati Uniti      2343      0   2329       14     0  2026-07-31
 Canada            399      0    396        3     0  2026-07-31
 Giappone         1000      0    999        1     0  2026-07-31
 Hong Kong         500      0    500        0     0  2026-07-31
@@ -40,9 +40,9 @@ ESECUZIONI ultime 24h: 4
 
 
 DA SISTEMARE: nessuno
-Delistati/sospesi (nessun intervento): 24
+Delistati/sospesi (nessun intervento): 22
 
 Quintili precalcolati: 247 righe (aggiornati 2026-07-30)
 
 SMTP non configurato: stampo il rapporto senza inviarlo.
-ForwardAlpha OK - 0/7876 titoli al giorno prima (0.0%)
+ForwardAlpha OK - 0/7217 titoli al giorno prima (0.0%)
