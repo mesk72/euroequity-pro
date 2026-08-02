@@ -1,12 +1,3 @@
-=== daily_eu_yahoo ===
-  eseguito: 2026-08-02T17:49:51.201258+00:00
-  >> [Quintili] Calcolo somme parziali per settore...
-  >> Quintili di settore: 189 righe (exchange,settore) aggiornate
-=== daily_us_yahoo ===
-  eseguito: 2026-08-02T00:41:55.207684+00:00
-  >> [Quintili] Calcolo somme parziali per settore...
-  >> Quintili di settore: 23 righe (exchange,settore) aggiornate
-=== daily_apac_yahoo ===
-  eseguito: 2026-08-02T16:10:14.528843+00:00
-  >> [Quintili] Calcolo somme parziali per settore...
-  >> Quintili di settore: 52 righe (exchange,settore) aggiornate
+righe scritte: 247
+data piu' recente ora: 2026-08-02T20:10:58
+distribuzione: {'2026-08-02': 247}
