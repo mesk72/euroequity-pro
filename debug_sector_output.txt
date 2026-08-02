@@ -1,28 +1,12 @@
-righe totali: 247
-distribuzione per data di aggiornamento:
-  2026-07-30 : 247 righe
-
-per exchange, data piu' recente:
-  AS     2026-07-30
-  ASX    2026-07-30
-  BR     2026-07-30
-  CPSE   2026-07-30
-  GR     2026-07-30
-  HE     2026-07-30
-  IR     2026-07-30
-  KRX    2026-07-30
-  LS     2026-07-30
-  LSE    2026-07-30
-  MC     2026-07-30
-  MIL    2026-07-30
-  OB     2026-07-30
-  OM     2026-07-30
-  PA     2026-07-30
-  SEHK   2026-07-30
-  SGX    2026-07-30
-  SWX    2026-07-30
-  TSE    2026-07-30
-  TSX    2026-07-30
-  US     2026-07-30
-  VI     2026-07-30
-  XETRA  2026-07-30
+=== daily_eu_yahoo ===
+  eseguito: 2026-08-02T17:49:51.201258+00:00
+  >> [Quintili] Calcolo somme parziali per settore...
+  >> Quintili di settore: 189 righe (exchange,settore) aggiornate
+=== daily_us_yahoo ===
+  eseguito: 2026-08-02T00:41:55.207684+00:00
+  >> [Quintili] Calcolo somme parziali per settore...
+  >> Quintili di settore: 23 righe (exchange,settore) aggiornate
+=== daily_apac_yahoo ===
+  eseguito: 2026-08-02T16:10:14.528843+00:00
+  >> [Quintili] Calcolo somme parziali per settore...
+  >> Quintili di settore: 52 righe (exchange,settore) aggiornate
