@@ -1,44 +1,42 @@
-OGGETTO: ForwardAlpha OK - 6254/7876 titoli al giorno prima (79.4%)
+OGGETTO: ForwardAlpha OK - 0/7876 titoli al giorno prima (0.0%)
 
 UNIVERSO: 7876 titoli
 
 DISTRIBUZIONE PER DATA
-  2026-07-31  il giorno prima    6254 titoli   79.4%
-  2026-07-30  2 giorni fa        1594 titoli   20.2%
-  2026-07-29  3 giorni fa           1 titoli    0.0%
-  2026-07-28  4 giorni fa           3 titoli    0.0%
-  2026-07-24  8 giorni fa           1 titoli    0.0%
-  2026-07-23  9 giorni fa           2 titoli    0.0%
-  2026-07-21  11 giorni fa          5 titoli    0.1%
-  2026-07-17  15 giorni fa          1 titoli    0.0%
-  2026-07-16  16 giorni fa          1 titoli    0.0%
-  2026-07-14  18 giorni fa          2 titoli    0.0%
-  2026-07-13  19 giorni fa          3 titoli    0.0%
-  2026-07-07  25 giorni fa          1 titoli    0.0%
-  2026-07-03  29 giorni fa          2 titoli    0.0%
-  2026-07-02  30 giorni fa          1 titoli    0.0%
-  2026-06-30  32 giorni fa          1 titoli    0.0%
-  2026-06-12  50 giorni fa          1 titoli    0.0%
-  2026-06-10  52 giorni fa          1 titoli    0.0%
+  2026-07-31  2 giorni fa        7846 titoli   99.6%
+  2026-07-30  3 giorni fa           2 titoli    0.0%
+  2026-07-29  4 giorni fa           1 titoli    0.0%
+  2026-07-28  5 giorni fa           3 titoli    0.0%
+  2026-07-24  9 giorni fa           1 titoli    0.0%
+  2026-07-23  10 giorni fa          2 titoli    0.0%
+  2026-07-21  12 giorni fa          5 titoli    0.1%
+  2026-07-17  16 giorni fa          1 titoli    0.0%
+  2026-07-16  17 giorni fa          1 titoli    0.0%
+  2026-07-14  19 giorni fa          2 titoli    0.0%
+  2026-07-13  20 giorni fa          3 titoli    0.0%
+  2026-07-07  26 giorni fa          1 titoli    0.0%
+  2026-07-03  30 giorni fa          2 titoli    0.0%
+  2026-07-02  31 giorni fa          1 titoli    0.0%
+  2026-06-30  33 giorni fa          1 titoli    0.0%
+  2026-06-12  51 giorni fa          1 titoli    0.0%
+  2026-06-10  53 giorni fa          1 titoli    0.0%
   mai scritti                       2 titoli    0.0%
 
 MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
-Europa           2126    526   1594        5     1  2026-07-30
-Stati Uniti      3002   2986      0       15     1  2026-07-31
-Canada            399    396      0        3     0  2026-07-31
-Giappone         1000    999      0        1     0  2026-07-31
-Hong Kong         500    500      0        0     0  2026-07-31
-Australia         349    349      0        0     0  2026-07-31
-Corea             400    398      0        2     0  2026-07-31
-Singapore         100    100      0        0     0  2026-07-31
+Europa           2126      0   2118        7     1  2026-07-31
+Stati Uniti      3002      0   2986       15     1  2026-07-31
+Canada            399      0    396        3     0  2026-07-31
+Giappone         1000      0    999        1     0  2026-07-31
+Hong Kong         500      0    500        0     0  2026-07-31
+Australia         349      0    349        0     0  2026-07-31
+Corea             400      0    398        2     0  2026-07-31
+Singapore         100      0    100        0     0  2026-07-31
 
-ESECUZIONI ultime 24h: 6
-  EU     ok=2624 falliti=2 durata=697s
-  US+CA  ok=3402 falliti=0 durata=494s
-  APAC   ok=2349 falliti=0 durata=424s
-  US+CA  ok=3402 falliti=0 durata=620s
-  EU     ok=2624 falliti=2 durata=488s
-  APAC   ok=2349 falliti=0 durata=411s
+ESECUZIONI ultime 24h: 4
+  EU     ok=2625 falliti=1 durata=460s
+  APAC   ok=2349 falliti=0 durata=505s
+  US+CA  ok=3401 falliti=0 durata=643s
+  EU     ok=2625 falliti=1 durata=569s
 
 
 DA SISTEMARE: nessuno
@@ -47,4 +45,4 @@ Delistati/sospesi (nessun intervento): 24
 Quintili precalcolati: 247 righe (aggiornati 2026-07-30)
 
 SMTP non configurato: stampo il rapporto senza inviarlo.
-ForwardAlpha OK - 6254/7876 titoli al giorno prima (79.4%)
+ForwardAlpha OK - 0/7876 titoli al giorno prima (0.0%)
