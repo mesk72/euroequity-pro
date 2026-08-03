@@ -1,6 +1,5 @@
-import os, requests, re, json
+import requests, re
 BASE="https://mlqkisnizgyvvqajdvbh.supabase.co"
-SK=os.environ.get("SUPABASE_SERVICE_KEY","")
 r=requests.get("https://forwardalpha.pro/",timeout=30)
 anon=None
 for c in set(re.findall(r'/_next/static/[^"\']+?\.js[^"\']*', r.text)):
@@ -10,15 +9,9 @@ for c in set(re.findall(r'/_next/static/[^"\']+?\.js[^"\']*', r.text)):
         if k: anon=k.group(); break
     except Exception: pass
 HA={"apikey":anon,"Authorization":"Bearer "+anon}
-
-print("Cosa vede un ANONIMO oggi (quantita' di righe leggibili):")
-for t in ["stocks","fundamentals","prices_eod","latest_prices","sector_quintile_partials",
-          "top500_universe","watchlist","profiles","daily_log","script_logs"]:
-    try:
-        rr=requests.get(BASE+"/rest/v1/"+t,headers={**HA,"Prefer":"count=exact"},
-            params={"select":"*","limit":"1"},timeout=25)
-        cr=rr.headers.get("content-range","")
-        n=cr.split("/")[-1] if "/" in cr else "?"
-        print("  %-26s HTTP %s   righe accessibili: %s" % (t,rr.status_code,n))
-    except Exception as e:
-        print("  %-26s errore %s" % (t,str(e)[:35]))
+# storico di un titolo qualsiasi: e' la parte di valore
+r=requests.get(BASE+"/rest/v1/prices_eod",headers=HA,
+    params={"select":"date,adj_close","ticker":"eq.AAPL","exchange":"eq.US",
+            "order":"date.desc","limit":"5"},timeout=30)
+print("storico AAPL leggibile da anonimo -> HTTP", r.status_code)
+print(r.text[:250])
