@@ -1,52 +1,46 @@
-import re, requests, json
-print("=== 1. La chiave pubblica e' estraibile dal sito? ===")
-anon=None
+import re, requests, json, base64
+BASE="https://mlqkisnizgyvvqajdvbh.supabase.co"
 r=requests.get("https://forwardalpha.pro/",timeout=30)
-m=re.findall(r'app/[a-zA-Z0-9\-\/_\[\]]+\.js[^"\']*', r.text)
-chunks=set(re.findall(r'/_next/static/[^"\']+?\.js[^"\']*', r.text))
-for c in list(chunks)[:20]:
+anon=None
+for c in set(re.findall(r'/_next/static/[^"\']+?\.js[^"\']*', r.text)):
     try:
         j=requests.get("https://forwardalpha.pro"+c,timeout=20).text
         k=re.search(r'eyJ[A-Za-z0-9_\-]{20,}\.[A-Za-z0-9_\-]{20,}\.[A-Za-z0-9_\-]{20,}', j)
-        if k:
-            anon=k.group(); print("  TROVATA nel bundle:", c[:60]); break
+        if k: anon=k.group(); break
     except Exception: pass
-if not anon:
-    k=re.search(r'eyJ[A-Za-z0-9_\-]{20,}\.[A-Za-z0-9_\-]{20,}\.[A-Za-z0-9_\-]{20,}', r.text)
-    if k: anon=k.group(); print("  TROVATA nell'HTML")
-print("  chiave trovata:", "SI" if anon else "no")
-if anon:
-    import base64
-    p=anon.split(".")[1]; p+="="*(-len(p)%4)
-    try: print("  ruolo:", json.loads(base64.b64decode(p)).get("role"))
-    except Exception: pass
+H={"apikey":anon,"Authorization":"Bearer "+anon}
 
-    print()
-    print("=== 2. Con quella chiave, cosa si puo' LEGGERE? ===")
-    H={"apikey":anon,"Authorization":"Bearer "+anon}
-    for t in ["stocks","fundamentals","prices_eod","latest_prices","profiles",
-              "watchlist","portfolios","institutional_viewers","script_logs",
-              "daily_log","sector_quintile_partials","top500_universe"]:
-        try:
-            rr=requests.get("https://mlqkisnizgyvvqajdvbh.supabase.co/rest/v1/"+t,
-                headers=H,params={"select":"*","limit":"1"},timeout=20)
-            n=len(rr.json()) if rr.status_code==200 and isinstance(rr.json(),list) else 0
-            flag="<-- LEGGE DATI" if n>0 else ""
-            print("  %-26s HTTP %s  %s" % (t,rr.status_code,flag))
-        except Exception as e:
-            print("  %-26s errore" % t)
+print("PROVA CONTROLLATA su UNA sola riga di latest_prices")
+print("(uso un ticker che NON esiste: se la policy blocca, e' 401/403;")
+print(" se permette, e' 204 ma con 0 righe toccate -> serve il conteggio)")
+print()
+# 1) quante righe ci sono ADESSO per un exchange piccolo
+rc=requests.get(BASE+"/rest/v1/latest_prices",headers={**H,"Prefer":"count=exact"},
+    params={"select":"ticker","exchange":"eq.SGX","limit":"1"},timeout=20)
+prima=rc.headers.get("content-range","?")
+print("  righe SGX prima:", prima)
 
-    print()
-    print("=== 3. Con quella chiave, si puo' SCRIVERE o CANCELLARE? ===")
-    for t in ["stocks","prices_eod","latest_prices"]:
-        try:
-            w=requests.post("https://mlqkisnizgyvvqajdvbh.supabase.co/rest/v1/"+t,
-                headers={**H,"Content-Type":"application/json"},
-                json=[{"ticker":"ZZTEST","exchange":"ZZ"}],timeout=20)
-            print("  INSERT %-16s HTTP %s %s" % (t,w.status_code,"<-- SCRITTURA PERMESSA!" if w.status_code in (200,201,204) else ""))
-        except Exception: print("  INSERT %-16s errore" % t)
-        try:
-            d=requests.delete("https://mlqkisnizgyvvqajdvbh.supabase.co/rest/v1/"+t,
-                headers=H,params={"ticker":"eq.ZZTEST_NON_ESISTE"},timeout=20)
-            print("  DELETE %-16s HTTP %s %s" % (t,d.status_code,"<-- CANCELLAZIONE PERMESSA!" if d.status_code in (200,204) else ""))
-        except Exception: print("  DELETE %-16s errore" % t)
+# 2) tento una DELETE che, se permessa, cancellerebbe DAVVERO
+#    uso un filtro che matcha una riga reale ma la richiedo con return
+d=requests.delete(BASE+"/rest/v1/latest_prices",
+    headers={**H,"Prefer":"return=representation"},
+    params={"exchange":"eq.SGX","ticker":"eq.__NON_ESISTE__"},timeout=20)
+print("  DELETE su ticker inesistente -> HTTP %s, corpo: %s" % (d.status_code, d.text[:120]))
+
+# 3) verifica che il conteggio NON sia cambiato
+rc2=requests.get(BASE+"/rest/v1/latest_prices",headers={**H,"Prefer":"count=exact"},
+    params={"select":"ticker","exchange":"eq.SGX","limit":"1"},timeout=20)
+print("  righe SGX dopo :", rc2.headers.get("content-range","?"))
+
+# 4) LA PROVA DECISIVA: chiedo la rappresentazione di cio' che verrebbe cancellato
+#    con un filtro che matcha righe VERE. Se la policy permette, il corpo
+#    conterrebbe le righe. NON eseguo se il corpo torna pieno: e' gia' la prova.
+d2=requests.delete(BASE+"/rest/v1/latest_prices",
+    headers={**H,"Prefer":"return=representation"},
+    params={"exchange":"eq.__EXCHANGE_INESISTENTE__"},timeout=20)
+print("  DELETE su exchange inesistente -> HTTP %s, corpo: %s" % (d2.status_code, d2.text[:120]))
+print()
+print("INTERPRETAZIONE:")
+print("  se il corpo e' [] -> la DELETE e' ACCETTATA ma non tocca nulla")
+print("     (policy assente = nessuna riga corrisponde alla condizione)")
+print("  se fosse 401/403 -> policy che blocca esplicitamente")
