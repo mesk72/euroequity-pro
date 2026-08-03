@@ -1,13 +1,6 @@
-PROVA CONTROLLATA su UNA sola riga di latest_prices
-(uso un ticker che NON esiste: se la policy blocca, e' 401/403;
- se permette, e' 204 ma con 0 righe toccate -> serve il conteggio)
+creo riga esca -> HTTP 201
+esca presente: True
+DELETE con chiave pubblica -> HTTP 200 corpo []
 
-  righe SGX prima: 0-0/100
-  DELETE su ticker inesistente -> HTTP 200, corpo: []
-  righe SGX dopo : 0-0/100
-  DELETE su exchange inesistente -> HTTP 200, corpo: []
-
-INTERPRETAZIONE:
-  se il corpo e' [] -> la DELETE e' ACCETTATA ma non tocca nulla
-     (policy assente = nessuna riga corrisponde alla condizione)
-  se fosse 401/403 -> policy che blocca esplicitamente
+>>> VERDETTO: la riga ESISTE ANCORA -> cancellazione BLOCCATA (siamo protetti)
+pulizia esca completata: True
