@@ -1,15 +1,26 @@
-=== TEST DI ACCESSO ANONIMO (senza chiave) ===
-  stocks                     HTTP 401 
-  fundamentals               HTTP 401 
-  prices_eod                 HTTP 401 
-  latest_prices              HTTP 401 
-  profiles                   HTTP 401 
-  watchlist                  HTTP 401 
-  portfolios                 HTTP 401 
-  institutional_viewers      HTTP 401 
-  script_logs                HTTP 401 
-  daily_log                  HTTP 401 
-  sector_quintile_partials   HTTP 401 
-  top500_universe            HTTP 401 
-  report_requests            HTTP 401 
-  news_cache                 HTTP 401 
+=== 1. La chiave pubblica e' estraibile dal sito? ===
+  TROVATA nel bundle: /_next/static/chunks/945-4bb5260d7bd68dd5.js?dpl=dpl_3RSZTwc
+  chiave trovata: SI
+  ruolo: anon
+
+=== 2. Con quella chiave, cosa si puo' LEGGERE? ===
+  stocks                     HTTP 200  <-- LEGGE DATI
+  fundamentals               HTTP 200  <-- LEGGE DATI
+  prices_eod                 HTTP 200  <-- LEGGE DATI
+  latest_prices              HTTP 200  <-- LEGGE DATI
+  profiles                   HTTP 200  
+  watchlist                  HTTP 200  
+  portfolios                 HTTP 200  
+  institutional_viewers      HTTP 200  
+  script_logs                HTTP 200  
+  daily_log                  HTTP 200  
+  sector_quintile_partials   HTTP 200  <-- LEGGE DATI
+  top500_universe            HTTP 200  <-- LEGGE DATI
+
+=== 3. Con quella chiave, si puo' SCRIVERE o CANCELLARE? ===
+  INSERT stocks           HTTP 401 
+  DELETE stocks           HTTP 204 <-- CANCELLAZIONE PERMESSA!
+  INSERT prices_eod       HTTP 401 
+  DELETE prices_eod       HTTP 204 <-- CANCELLAZIONE PERMESSA!
+  INSERT latest_prices    HTTP 401 
+  DELETE latest_prices    HTTP 204 <-- CANCELLAZIONE PERMESSA!
