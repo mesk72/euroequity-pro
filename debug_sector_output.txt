@@ -1,3 +1,15 @@
-righe scritte: 247
-data piu' recente ora: 2026-08-02T20:10:58
-distribuzione: {'2026-08-02': 247}
+=== TEST DI ACCESSO ANONIMO (senza chiave) ===
+  stocks                     HTTP 401 
+  fundamentals               HTTP 401 
+  prices_eod                 HTTP 401 
+  latest_prices              HTTP 401 
+  profiles                   HTTP 401 
+  watchlist                  HTTP 401 
+  portfolios                 HTTP 401 
+  institutional_viewers      HTTP 401 
+  script_logs                HTTP 401 
+  daily_log                  HTTP 401 
+  sector_quintile_partials   HTTP 401 
+  top500_universe            HTTP 401 
+  report_requests            HTTP 401 
+  news_cache                 HTTP 401 
