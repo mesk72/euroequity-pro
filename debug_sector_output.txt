@@ -1,6 +1,18 @@
-storico AAPL nel database: [{'date': '2026-07-31', 'adj_close': 308.91}, {'date': '2026-07-30', 'adj_close': 333.43}, {'date': '2026-07-29', 'adj_close': 338.19}]
+=== 1. UN ATTACCANTE COSA RIESCE A LEGGERE ORA? ===
+  stocks                     HTTP 200  -> chiusa
+  fundamentals               HTTP 200  -> chiusa
+  prices_eod                 HTTP 500  -> chiusa
+  latest_prices              HTTP 200  -> chiusa
+  top500_universe            HTTP 200  -> chiusa
+  sector_quintile_partials   HTTP 200  -> chiusa
+  watchlist                  HTTP 200  -> chiusa
+  profiles                   HTTP 200  -> chiusa
 
-API senza login -> HTTP 200, corpo: {"history":[],"momentum":{"mom1w":null,"mom1m":null,"mom6m":null,"mom12m":null,"mom3y":null,"mom5y":null}}
+=== 2. SCRITTURA/CANCELLAZIONE anonima ancora bloccata? ===
+  INSERT stocks -> HTTP 401 BLOCCATO
 
-Se il database ha i dati e l'API vuota risponde 200 con lista vuota,
-il comportamento e' quello previsto: lo storico e' riservato ai registrati.
+=== 3. IL SITO FUNZIONA ANCORA? ===
+  homepage             HTTP 200
+  API titoli US        HTTP 200 | titoli restituiti: 281
+  API singolo titolo   HTTP 200 | titoli restituiti: 1
+  API grafico          HTTP 200 | punti storico: 0
