@@ -1,13 +1,6 @@
-=== IL SITO FUNZIONA? ===
-  homepage         HTTP 200
-  titoli US        HTTP 200 - 281 elementi
-  titoli Global    HTTP 200 - 500 elementi
-  storico AAPL     HTTP 200 - 0 elementi
-  indici           HTTP 200
+storico AAPL nel database: [{'date': '2026-07-31', 'adj_close': 308.91}, {'date': '2026-07-30', 'adj_close': 333.43}, {'date': '2026-07-29', 'adj_close': 338.19}]
 
-=== I DATI SONO ANCORA CHIUSI AL PUBBLICO? ===
-  stocks               CHIUSA
-  fundamentals         CHIUSA
-  prices_eod           HTTP 500
-  latest_prices        CHIUSA
-  top500_universe      CHIUSA
+API senza login -> HTTP 200, corpo: {"history":[],"momentum":{"mom1w":null,"mom1m":null,"mom6m":null,"mom12m":null,"mom3y":null,"mom5y":null}}
+
+Se il database ha i dati e l'API vuota risponde 200 con lista vuota,
+il comportamento e' quello previsto: lo storico e' riservato ai registrati.
