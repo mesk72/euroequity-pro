@@ -1,26 +1,13 @@
-=== 1. La chiave pubblica e' estraibile dal sito? ===
-  TROVATA nel bundle: /_next/static/chunks/945-4bb5260d7bd68dd5.js?dpl=dpl_3RSZTwc
-  chiave trovata: SI
-  ruolo: anon
+PROVA CONTROLLATA su UNA sola riga di latest_prices
+(uso un ticker che NON esiste: se la policy blocca, e' 401/403;
+ se permette, e' 204 ma con 0 righe toccate -> serve il conteggio)
 
-=== 2. Con quella chiave, cosa si puo' LEGGERE? ===
-  stocks                     HTTP 200  <-- LEGGE DATI
-  fundamentals               HTTP 200  <-- LEGGE DATI
-  prices_eod                 HTTP 200  <-- LEGGE DATI
-  latest_prices              HTTP 200  <-- LEGGE DATI
-  profiles                   HTTP 200  
-  watchlist                  HTTP 200  
-  portfolios                 HTTP 200  
-  institutional_viewers      HTTP 200  
-  script_logs                HTTP 200  
-  daily_log                  HTTP 200  
-  sector_quintile_partials   HTTP 200  <-- LEGGE DATI
-  top500_universe            HTTP 200  <-- LEGGE DATI
+  righe SGX prima: 0-0/100
+  DELETE su ticker inesistente -> HTTP 200, corpo: []
+  righe SGX dopo : 0-0/100
+  DELETE su exchange inesistente -> HTTP 200, corpo: []
 
-=== 3. Con quella chiave, si puo' SCRIVERE o CANCELLARE? ===
-  INSERT stocks           HTTP 401 
-  DELETE stocks           HTTP 204 <-- CANCELLAZIONE PERMESSA!
-  INSERT prices_eod       HTTP 401 
-  DELETE prices_eod       HTTP 204 <-- CANCELLAZIONE PERMESSA!
-  INSERT latest_prices    HTTP 401 
-  DELETE latest_prices    HTTP 204 <-- CANCELLAZIONE PERMESSA!
+INTERPRETAZIONE:
+  se il corpo e' [] -> la DELETE e' ACCETTATA ma non tocca nulla
+     (policy assente = nessuna riga corrisponde alla condizione)
+  se fosse 401/403 -> policy che blocca esplicitamente
