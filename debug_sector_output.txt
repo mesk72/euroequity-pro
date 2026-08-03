@@ -1,11 +1,6 @@
-Cosa vede un ANONIMO oggi (quantita' di righe leggibili):
-  stocks                     HTTP 206   righe accessibili: 10217
-  fundamentals               HTTP 206   righe accessibili: 12191
-  prices_eod                 HTTP 500   righe accessibili: ?
-  latest_prices              HTTP 206   righe accessibili: 7886
-  sector_quintile_partials   HTTP 206   righe accessibili: 247
-  top500_universe            HTTP 206   righe accessibili: 500
-  watchlist                  HTTP 200   righe accessibili: 0
-  profiles                   HTTP 200   righe accessibili: 0
-  daily_log                  HTTP 200   righe accessibili: 0
-  script_logs                HTTP 200   righe accessibili: 0
+storico AAPL leggibile da anonimo -> HTTP 200
+[{"date":"2026-07-31","adj_close":308.9100}, 
+ {"date":"2026-07-30","adj_close":333.4300}, 
+ {"date":"2026-07-29","adj_close":338.1900}, 
+ {"date":"2026-07-28","adj_close":340.0800}, 
+ {"date":"2026-07-27","adj_close":336.9100}]
