@@ -1,5 +1,7 @@
-dati grezzi AAPL (chiave servizio): 200 [{"date":"2026-07-31","adj_close":308.9100}, 
- {"date":"2026-07-30","adj_close":333.4300}, 
- {"date":"2026-07-29","adj_close":338.1900}]
+PROVA REALE con la chiave pubblica del sito
+(riga esca creata con chiave di servizio, poi tento di alterarla da anonimo)
 
-API grafico senza login: 200 {"history":[],"momentum":{"mom1w":null,"mom1m":null,"mom6m":null,"mom12m":null,"mom3y":null,"mom5y":null}}
+  latest_prices            UPDATE:204  DELETE:204  -> PROTETTA
+  stocks                   UPDATE:204  DELETE:204  -> PROTETTA
+  prices_eod               UPDATE:204  DELETE:204  -> PROTETTA
+  sector_quintile_partials UPDATE:204  DELETE:204  -> PROTETTA
