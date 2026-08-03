@@ -1,18 +1,13 @@
-=== 1. UN ANONIMO PUO' ANCORA LEGGERE? ===
-  stocks                     CHIUSA
-  fundamentals               CHIUSA
-  prices_eod                 HTTP 500
-  latest_prices              CHIUSA
-  top500_universe            CHIUSA
-  sector_quintile_partials   CHIUSA
+=== IL SITO FUNZIONA? ===
+  homepage         HTTP 200
+  titoli US        HTTP 200 - 281 elementi
+  titoli Global    HTTP 200 - 500 elementi
+  storico AAPL     HTTP 200 - 0 elementi
+  indici           HTTP 200
 
-=== 2. GLI SCRIPT NOTTURNI FUNZIONANO ANCORA? (chiave di servizio) ===
-  lettura stocks           OK
-  lettura prices_eod       OK
-  lettura latest_prices    OK
-  scrittura latest_prices  OK
-
-=== 3. IL SITO FUNZIONA? ===
-  homepage           HTTP 200
-  api titoli US      HTTP 200 - 0 titoli
-  api storico AAPL   HTTP 200 - 0 prezzi
+=== I DATI SONO ANCORA CHIUSI AL PUBBLICO? ===
+  stocks               CHIUSA
+  fundamentals         CHIUSA
+  prices_eod           HTTP 500
+  latest_prices        CHIUSA
+  top500_universe      CHIUSA
