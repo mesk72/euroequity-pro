@@ -1,6 +1,18 @@
-storico AAPL leggibile da anonimo -> HTTP 200
-[{"date":"2026-07-31","adj_close":308.9100}, 
- {"date":"2026-07-30","adj_close":333.4300}, 
- {"date":"2026-07-29","adj_close":338.1900}, 
- {"date":"2026-07-28","adj_close":340.0800}, 
- {"date":"2026-07-27","adj_close":336.9100}]
+=== 1. UN ANONIMO PUO' ANCORA LEGGERE? ===
+  stocks                     CHIUSA
+  fundamentals               CHIUSA
+  prices_eod                 HTTP 500
+  latest_prices              CHIUSA
+  top500_universe            CHIUSA
+  sector_quintile_partials   CHIUSA
+
+=== 2. GLI SCRIPT NOTTURNI FUNZIONANO ANCORA? (chiave di servizio) ===
+  lettura stocks           OK
+  lettura prices_eod       OK
+  lettura latest_prices    OK
+  scrittura latest_prices  OK
+
+=== 3. IL SITO FUNZIONA? ===
+  homepage           HTTP 200
+  api titoli US      HTTP 200 - 0 titoli
+  api storico AAPL   HTTP 200 - 0 prezzi
