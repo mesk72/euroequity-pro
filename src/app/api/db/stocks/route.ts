@@ -15,9 +15,14 @@ function jsonNoCache(body: any, init?: any) {
   return res
 }
 
+// FIX 3/8/2026 (sicurezza): questa route gira SUL SERVER e deve usare la
+// chiave di servizio, non quella pubblica. La chiave pubblica e'
+// estraibile dal browser: finche' le API la usavano, era necessario
+// lasciare le tabelle leggibili a chiunque — cioe' l'intero database di
+// prezzi e fondamentali era scaricabile da chiunque senza registrarsi.
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 // Rate limiting semplice per IP — protegge contro scraping massiccio
