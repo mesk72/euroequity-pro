@@ -741,8 +741,8 @@ function mapStock(s: any, f: any) {
     // Il prezzo viene ESCLUSIVAMENTE da latest_prices, che deriva da
     // prices_eod — la stessa e unica fonte che alimenta il grafico.
     // Se manca, resta null: meglio nessun numero che uno sbagliato.
-    price: null,
-    change1d: null,
+    price: null as number | null,
+    change1d: null as number | null,
     ke: f.ke ?? null,
     impliedGrowth10y: f.implied_growth_10y ?? null,
     epsNtmDcf: f.eps_ntm_dcf ?? null,
@@ -753,7 +753,7 @@ function mapStock(s: any, f: any) {
     epsCagr2y: f.eps_cagr_2y ?? null,
     // come price e change1d: la data viene da latest_prices, non dalla
     // copia in stocks (che per ASML era ferma al 23 giugno).
-    lastPriceDate: null,
+    lastPriceDate: null as string | null,
     volume: null,
     mktCap: f.mkt_cap != null ? Math.round(f.mkt_cap / 1000 * 100) / 100 : null,
     peTrail: f.pe_trailing ?? null,
