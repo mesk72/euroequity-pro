@@ -1,22 +1,19 @@
-import os, requests
-U="https://mlqkisnizgyvvqajdvbh.supabase.co"
-K=os.environ.get("SUPABASE_SERVICE_KEY","")
-H={"apikey":K,"Authorization":"Bearer "+K}
-print("=== Quante righe torna la query di fetchLatestPrices SENZA paginazione? ===")
-for exlist,eti in [(["US"],"solo US (in DB: 3001)"),
-                   (["US","TSX"],"US+TSX"),
-                   (["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"],"Europa (in DB: ~2126)")]:
-    inlist="(" + ",".join(exlist) + ")"
-    r=requests.get(U+"/rest/v1/latest_prices",headers=H,
-        params={"select":"ticker,exchange,price,price_date,change1d","exchange":"in."+inlist})
-    n=len(r.json()) if isinstance(r.json(),list) else 0
-    print("  %-26s -> %d righe restituite" % (eti,n))
+import requests
+from collections import Counter
+print("=== API del sito: distribuzione delle date di prezzo restituite ===")
+for eti,url in [("US","https://forwardalpha.pro/api/db/stocks?exchanges=US"),
+                ("Europa","https://forwardalpha.pro/api/db/stocks?exchanges=MIL,XETRA,PA,AS,MC,BR,LS,VI,HE,IR,GR,LSE,SWX,OM,OB,CPSE")]:
+    r=requests.get(url,timeout=90)
+    d=r.json().get("stocks",[])
+    c=Counter(s.get("lastPriceDate") or "SENZA DATA" for s in d)
+    senza=sum(1 for s in d if s.get("price") is None)
+    print("\n  %s — %d titoli restituiti" % (eti,len(d)))
+    for k,v in sorted(c.items(),reverse=True)[:5]:
+        print("     %-14s %4d" % (k,v))
+    print("     senza prezzo: %d" % senza)
 
 print()
-print("=== Conseguenza: quanti titoli US NON ricevono il prezzo fresco ===")
-rc=requests.get(U+"/rest/v1/latest_prices",headers={**H,"Prefer":"count=exact"},
-    params={"select":"ticker","exchange":"eq.US","limit":"1"})
-tot=int(rc.headers.get("content-range","0/0").split("/")[-1])
-print("  righe reali in latest_prices per US:",tot)
-print("  righe che il sito riesce a leggere: 1000 (limite PostgREST)")
-print("  titoli che ricadono su fundamentals/stocks:",tot-1000)
+print("=== ASML: la tabella ora coincide col grafico? ===")
+r=requests.get("https://forwardalpha.pro/api/db/stocks?ticker=ASML&exchange=AS",timeout=60)
+s=r.json().get("stocks",[{}])[0]
+print("  tabella -> prezzo %s  data %s  var %s" % (s.get("price"),s.get("lastPriceDate"),s.get("change1d")))
