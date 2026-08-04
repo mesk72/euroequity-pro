@@ -1,28 +1,45 @@
 import os, requests, yfinance as yf, pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-print("Ora test (UTC):", datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
+
+TODAY=datetime.now().strftime("%Y-%m-%d")
+END_FOR_DOWNLOAD=(datetime.now()+timedelta(days=2)).strftime("%Y-%m-%d")
+ORA_LIMITE_UTC=17
+def seduta_conclusa(ds):
+    d=datetime.strptime(ds,"%Y-%m-%d")
+    return datetime.utcnow()>=d.replace(hour=ORA_LIMITE_UTC,minute=0,second=0)
+
+print("TODAY =",TODAY," END_FOR_DOWNLOAD =",END_FOR_DOWNLOAD)
+print("utcnow =",datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
+print("seduta_conclusa('2026-08-03') =",seduta_conclusa("2026-08-03"))
+print("seduta_conclusa('2026-08-04') =",seduta_conclusa("2026-08-04"))
 print()
-print("=== YAHOO: ha la chiusura di LUNEDI 3 AGOSTO per l'Europa? ===")
-prova=[("ASML.AS","AS","ASML"),("SAP.DE","XETRA","SAP"),("MC.PA","PA","MC"),
-       ("SHEL.L","LSE","SHEL"),("ISP.MI","MIL","ISP"),("NESN.SW","SWX","NESN"),
-       ("NOKIA.HE","HE","NOKIA"),("VOLV-B.ST","OM","VOLV B")]
-for yt,ex,tk in prova:
-    try:
-        df=yf.download(yt,period="8d",interval="1d",auto_adjust=True,progress=False)
-        cl=df["Close"]
-        if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
-        cl=cl.dropna()
-        date_y=[cl.index[i].strftime("%Y-%m-%d") for i in range(len(cl))]
-        ha3="2026-08-03" in date_y
-        ultime=" ".join("%s=%.2f" % (cl.index[i].strftime("%d/%m"),float(cl.iloc[i])) for i in range(max(0,len(cl)-3),len(cl)))
-        # cosa abbiamo noi
-        r=requests.get(U+"/rest/v1/prices_eod",headers=H,
-            params={"select":"date","ticker":"eq."+tk,"exchange":"eq."+ex,"order":"date.desc","limit":"1"})
-        d=r.json()
-        nostro=d[0]["date"] if isinstance(d,list) and d else "-"
-        print("  %-11s yahoo ha 3/8: %-3s | nostro DB: %s | yahoo: %s" % (yt,"SI" if ha3 else "NO",nostro,ultime))
-    except Exception as e:
-        print("  %-11s errore %s" % (yt,str(e)[:50]))
+
+ex="AS"
+rg=requests.get(U+"/rest/v1/prices_eod",headers=H,
+    params={"select":"date","exchange":"eq."+ex,"order":"date.desc","limit":"1"})
+most_recent=rg.json()[0]["date"]
+safety=(datetime.strptime(most_recent,"%Y-%m-%d")-timedelta(days=10)).strftime("%Y-%m-%d")
+start_dt=(datetime.strptime(safety,"%Y-%m-%d")+timedelta(days=1)).strftime("%Y-%m-%d")
+print("Mercato %s: most_recent=%s  base=%s  start_dt=%s" % (ex,most_recent,safety,start_dt))
+print("  last_dates >= TODAY ? %s  (se SI il titolo viene SALTATO)" % (safety>=TODAY))
+print()
+
+df=yf.download(tickers="ASML.AS PHIA.AS",start=start_dt,end=END_FOR_DOWNLOAD,
+               interval="1d",auto_adjust=True,progress=False,threads=True)
+print("colonne:",type(df.columns).__name__)
+closes=df["Close"] if isinstance(df.columns,pd.MultiIndex) else df[["Close"]]
+print("colonne closes:",list(closes.columns))
+for yt in ["ASML.AS"]:
+    if yt not in closes.columns:
+        print("  %s NON presente!" % yt); continue
+    s=closes[yt].dropna()
+    print("\n  %s — decisione riga per riga (last=%s):" % (yt,safety))
+    for idx,pr in list(s.items())[-6:]:
+        ds=idx.strftime("%Y-%m-%d")
+        scarta_last = ds<=safety
+        scarta_guard = not seduta_conclusa(ds)
+        esito="SCARTATA (gia' presente)" if scarta_last else ("SCARTATA (seduta aperta)" if scarta_guard else "SCRITTA")
+        print("    %s  %.2f  -> %s" % (ds,float(pr),esito))
