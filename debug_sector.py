@@ -1,21 +1,21 @@
-import os, requests
+import yfinance as yf, pandas as pd, os, requests
+from datetime import datetime
+print("Ora UTC:", datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
+print("Amsterdam/Milano hanno chiuso alle 15:30 UTC")
+print()
+print("=== Yahoo ha la chiusura del 4 AGOSTO (oggi) per l'Europa? ===")
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-print("=== ASML.AS — le tre fonti a confronto ===")
-r1=requests.get(U+"/rest/v1/prices_eod",headers=H,
-    params={"select":"date,adj_close","ticker":"eq.ASML","exchange":"eq.AS","order":"date.desc","limit":"5"}).json()
-print("\n1) prices_eod  (lo legge il GRAFICO):")
-for x in r1: print("     %s  %.2f" % (x["date"],x["adj_close"]))
-r2=requests.get(U+"/rest/v1/latest_prices",headers=H,
-    params={"select":"price,prev_price,price_date,change1d","ticker":"eq.ASML","exchange":"eq.AS"}).json()
-print("\n2) latest_prices  (lo leggono SCREENER e TABELLA):")
-print("    ",r2)
-r3=requests.get(U+"/rest/v1/fundamentals",headers=H,
-    params={"select":"price,change1d,mom1w,mom1m,mom6m,mom12m","ticker":"eq.ASML","exchange":"eq.AS"}).json()
-print("\n3) fundamentals  (contiene un'ALTRA copia del prezzo + i momentum):")
-print("    ",r3)
-r4=requests.get(U+"/rest/v1/stocks",headers=H,
-    params={"select":"price,last_price_date","ticker":"eq.ASML","exchange":"eq.AS"}).json()
-print("\n4) stocks  (contiene una QUARTA copia del prezzo):")
-print("    ",r4)
+prova=["ASML.AS","SAP.DE","MC.PA","ISP.MI","SHEL.L","NESN.SW","NOKIA.HE","VOLV-B.ST"]
+# download di GRUPPO, come fa lo script
+df=yf.download(tickers=" ".join(prova),start="2026-07-28",end="2026-08-06",
+               interval="1d",auto_adjust=True,progress=False,threads=True)
+cl=df["Close"] if isinstance(df.columns,pd.MultiIndex) else df[["Close"]]
+for c in prova:
+    if c not in cl.columns: print("  %-11s assente" % c); continue
+    s=cl[c].dropna()
+    date=[i.strftime("%Y-%m-%d") for i in s.index]
+    ha3="2026-08-03" in date; ha4="2026-08-04" in date
+    ult=" ".join("%s=%.2f" % (s.index[i].strftime("%d/%m"),float(s.iloc[i])) for i in range(max(0,len(s)-3),len(s)))
+    print("  %-11s 3/8:%s 4/8:%s | %s" % (c,"SI" if ha3 else "no","SI" if ha4 else "no",ult))
