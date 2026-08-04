@@ -1,9 +1,14 @@
-=== Quante righe torna la query di fetchLatestPrices SENZA paginazione? ===
-  solo US (in DB: 3001)      -> 1000 righe restituite
-  US+TSX                     -> 1000 righe restituite
-  Europa (in DB: ~2126)      -> 1000 righe restituite
+=== API del sito: distribuzione delle date di prezzo restituite ===
 
-=== Conseguenza: quanti titoli US NON ricevono il prezzo fresco ===
-  righe reali in latest_prices per US: 3001
-  righe che il sito riesce a leggere: 1000 (limite PostgREST)
-  titoli che ricadono su fundamentals/stocks: 2001
+  US — 281 titoli restituiti
+     2026-08-03      280
+     2026-07-31        1
+     senza prezzo: 0
+
+  Europa — 112 titoli restituiti
+     2026-08-03        6
+     2026-07-31      106
+     senza prezzo: 0
+
+=== ASML: la tabella ora coincide col grafico? ===
+  tabella -> prezzo 1419.6  data 2026-08-03  var None
