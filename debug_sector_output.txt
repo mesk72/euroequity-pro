@@ -1,23 +1,8 @@
-=== 1. Ultimo log EU: ci sono errori di scrittura? ===
-eseguito: 2026-08-04T12:19:38.896439+00:00
-   Data piu' recente nel mercato AS: 2026-08-03 — uso 2026-07-24 come base (margine di sicurezza)
-   Data piu' recente nel mercato MIL: 2026-07-31 — uso 2026-07-21 come base (margine di sicurezza)
-   Prezzi Yahoo: ok=2625 fail=1
-   BLOCCO SICUREZZA: scartate 2483 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima esecuzione a mercati chiusi.
+Test su 117 ticker MIL. Cerco chi ha la barra del 2026-08-03.
+Ora UTC: 16:29
 
-=== 2. Quante righe al 3/8 esistono per mercato europeo? ===
-  XETRA     1
-  AS        1
-  SWX      51
-  OM        3
-  CPSE     39
-  TOTALE al 3/8: 95
-
-=== 3. PROVA DI SCRITTURA con la chiave attuale ===
-  POST -> HTTP 201 
-  riga presente dopo scrittura: [{'ticker': '__WTEST__', 'date': '2026-08-03'}]
-  (pulita)
-
-=== 4. Scrittura di un ticker VERO mancante (ASML 3/8) ===
-  POST -> HTTP 201
-  ASML ora: [{'date': '2026-08-03', 'adj_close': 1419.6}, {'date': '2026-07-31', 'adj_close': 1434.2}, {'date': '2026-07-30', 'adj_close': 1440.0}]
+  blocco da 150 (come lo script)     117/117 hanno il 3/8   (5s)
+  blocco da 50                        50/ 50 hanno il 3/8   (1s)
+  blocco da 20                        20/ 20 hanno il 3/8   (1s)
+  blocco da 20 SENZA threads          20/ 20 hanno il 3/8   (1s)
+  singoli                              8/  8 hanno il 3/8
