@@ -1,12 +1,9 @@
-Ora UTC: 2026-08-04 17:11
-Amsterdam/Milano hanno chiuso alle 15:30 UTC
+=== Quante righe torna la query di fetchLatestPrices SENZA paginazione? ===
+  solo US (in DB: 3001)      -> 1000 righe restituite
+  US+TSX                     -> 1000 righe restituite
+  Europa (in DB: ~2126)      -> 1000 righe restituite
 
-=== Yahoo ha la chiusura del 4 AGOSTO (oggi) per l'Europa? ===
-  ASML.AS     3/8:SI 4/8:SI | 30/07=1440.00 03/08=1419.60 04/08=1472.60
-  SAP.DE      3/8:SI 4/8:SI | 30/07=155.92 03/08=164.64 04/08=167.38
-  MC.PA       3/8:SI 4/8:SI | 30/07=473.30 03/08=486.90 04/08=485.00
-  ISP.MI      3/8:SI 4/8:SI | 30/07=6.51 03/08=6.70 04/08=6.79
-  SHEL.L      3/8:SI 4/8:SI | 31/07=3383.50 03/08=3405.50 04/08=3321.50
-  NESN.SW     3/8:SI 4/8:SI | 31/07=81.01 03/08=80.77 04/08=80.66
-  NOKIA.HE    3/8:SI 4/8:SI | 30/07=7.93 03/08=8.10 04/08=8.63
-  VOLV-B.ST   3/8:SI 4/8:SI | 30/07=364.20 03/08=369.40 04/08=371.50
+=== Conseguenza: quanti titoli US NON ricevono il prezzo fresco ===
+  righe reali in latest_prices per US: 3001
+  righe che il sito riesce a leggere: 1000 (limite PostgREST)
+  titoli che ricadono su fundamentals/stocks: 2001
