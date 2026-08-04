@@ -177,15 +177,35 @@ async function fetchLatestPrices(exchangeList: string[]) {
   // lenti su tutto l'universo (causa reale dei 20 secondi di
   // caricamento, 25/7/2026 — diagnosi Kimi, stesso principio gia'
   // usato per top500_universe e sector_aggregates).
+  // FIX 4/8/2026 — CAUSA REALE della discrepanza fra grafico e tabella,
+  // segnalata molte volte e mai risolta finora. Questa query NON era
+  // paginata: PostgREST restituisce al massimo 1000 righe, quindi su
+  // 3.001 titoli USA solo 1.000 ricevevano il prezzo aggiornato e gli
+  // altri 2.001 ricadevano su fundamentals.price o, peggio, su
+  // stocks.price (verificato su ASML: 1.560,80 fermo al 23 giugno).
+  // Il grafico invece legge sempre prices_eod e mostrava il dato giusto:
+  // di qui la divergenza. Ora si pagina, come gia' fatto altrove.
   const result: Record<string, { price: number; date: string; change1d: number | null }> = {}
-  const { data, error } = await supabase
-    .from('latest_prices')
-    .select('ticker,exchange,price,price_date,change1d')
-    .in('exchange', exchangeList)
-  if (error || !data) return result
-  for (const row of data) {
-    const key = `${row.ticker}.${row.exchange}`
-    result[key] = { price: row.price, date: row.price_date, change1d: row.change1d }
+  const PAGE = 1000
+  const richieste: any[] = []
+  for (const exchange of exchangeList) {
+    for (let page = 0; page < 5; page++) {   // fino a 5.000 titoli per mercato
+      richieste.push(
+        supabase.from('latest_prices')
+          .select('ticker,exchange,price,price_date,change1d')
+          .eq('exchange', exchange)
+          .order('ticker', { ascending: true })
+          .range(page * PAGE, page * PAGE + PAGE - 1)
+      )
+    }
+  }
+  const risposte = await Promise.all(richieste)
+  for (const { data, error } of risposte) {
+    if (error || !data) continue
+    for (const row of data) {
+      const key = `${row.ticker}.${row.exchange}`
+      result[key] = { price: row.price, date: row.price_date, change1d: row.change1d }
+    }
   }
   return result
 }
@@ -715,8 +735,14 @@ function mapStock(s: any, f: any) {
     country: s.country ?? null,
     flag: s.flag ?? null,
     website: s.website ?? null,
-    price: f.price ?? s.price ?? null,
-    change1d: f.change1d ?? null,
+    // FIX 4/8/2026: niente piu' ricaduta su f.price / s.price. Erano
+    // copie separate del prezzo, aggiornate da percorsi diversi e spesso
+    // vecchie di settimane (stocks.price di ASML era fermo al 23 giugno).
+    // Il prezzo viene ESCLUSIVAMENTE da latest_prices, che deriva da
+    // prices_eod — la stessa e unica fonte che alimenta il grafico.
+    // Se manca, resta null: meglio nessun numero che uno sbagliato.
+    price: null,
+    change1d: null,
     ke: f.ke ?? null,
     impliedGrowth10y: f.implied_growth_10y ?? null,
     epsNtmDcf: f.eps_ntm_dcf ?? null,
@@ -725,7 +751,9 @@ function mapStock(s: any, f: any) {
     epsGrowth1224m: f.eps_growth_12_24m ?? null,
     epsGrowth2436m: f.eps_growth_24_36m ?? null,
     epsCagr2y: f.eps_cagr_2y ?? null,
-    lastPriceDate: s.last_price_date ?? null,
+    // come price e change1d: la data viene da latest_prices, non dalla
+    // copia in stocks (che per ASML era ferma al 23 giugno).
+    lastPriceDate: null,
     volume: null,
     mktCap: f.mkt_cap != null ? Math.round(f.mkt_cap / 1000 * 100) / 100 : null,
     peTrail: f.pe_trailing ?? null,
