@@ -1,45 +1,47 @@
-import os, requests, yfinance as yf, pandas as pd
-from datetime import datetime, timedelta
+import os, requests
+from datetime import datetime
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
+HU={**H,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"}
 
-TODAY=datetime.now().strftime("%Y-%m-%d")
-END_FOR_DOWNLOAD=(datetime.now()+timedelta(days=2)).strftime("%Y-%m-%d")
-ORA_LIMITE_UTC=17
-def seduta_conclusa(ds):
-    d=datetime.strptime(ds,"%Y-%m-%d")
-    return datetime.utcnow()>=d.replace(hour=ORA_LIMITE_UTC,minute=0,second=0)
+print("=== 1. Ultimo log EU: ci sono errori di scrittura? ===")
+r=requests.get(U+"/rest/v1/script_logs",headers=H,
+    params={"select":"created_at,log_text","script_name":"eq.daily_eu_yahoo","order":"created_at.desc","limit":"1"})
+d=r.json()
+if d:
+    print("eseguito:",d[0]["created_at"])
+    for riga in d[0]["log_text"].split("\n"):
+        if any(k in riga for k in ["ERRORE","Prezzi Yahoo","BLOCCO","Data piu' recente nel mercato AS","Data piu' recente nel mercato MIL"]):
+            print("  ",riga.strip())
 
-print("TODAY =",TODAY," END_FOR_DOWNLOAD =",END_FOR_DOWNLOAD)
-print("utcnow =",datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
-print("seduta_conclusa('2026-08-03') =",seduta_conclusa("2026-08-03"))
-print("seduta_conclusa('2026-08-04') =",seduta_conclusa("2026-08-04"))
 print()
+print("=== 2. Quante righe al 3/8 esistono per mercato europeo? ===")
+EU=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]
+tot=0
+for ex in EU:
+    rc=requests.get(U+"/rest/v1/prices_eod",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker","exchange":"eq."+ex,"date":"eq.2026-08-03","limit":"1"})
+    n=int(rc.headers.get("content-range","0/0").split("/")[-1]); tot+=n
+    if n: print("  %-6s %4d" % (ex,n))
+print("  TOTALE al 3/8: %d" % tot)
 
-ex="AS"
-rg=requests.get(U+"/rest/v1/prices_eod",headers=H,
-    params={"select":"date","exchange":"eq."+ex,"order":"date.desc","limit":"1"})
-most_recent=rg.json()[0]["date"]
-safety=(datetime.strptime(most_recent,"%Y-%m-%d")-timedelta(days=10)).strftime("%Y-%m-%d")
-start_dt=(datetime.strptime(safety,"%Y-%m-%d")+timedelta(days=1)).strftime("%Y-%m-%d")
-print("Mercato %s: most_recent=%s  base=%s  start_dt=%s" % (ex,most_recent,safety,start_dt))
-print("  last_dates >= TODAY ? %s  (se SI il titolo viene SALTATO)" % (safety>=TODAY))
 print()
+print("=== 3. PROVA DI SCRITTURA con la chiave attuale ===")
+test={"ticker":"__WTEST__","exchange":"AS","date":"2026-08-03","adj_close":1.23}
+w=requests.post(U+"/rest/v1/prices_eod?on_conflict=ticker,exchange,date",headers=HU,json=[test])
+print("  POST -> HTTP",w.status_code, w.text[:200])
+chk=requests.get(U+"/rest/v1/prices_eod",headers=H,
+    params={"select":"ticker,date","ticker":"eq.__WTEST__"}).json()
+print("  riga presente dopo scrittura:", chk)
+requests.delete(U+"/rest/v1/prices_eod",headers=H,params={"ticker":"eq.__WTEST__"})
+print("  (pulita)")
 
-df=yf.download(tickers="ASML.AS PHIA.AS",start=start_dt,end=END_FOR_DOWNLOAD,
-               interval="1d",auto_adjust=True,progress=False,threads=True)
-print("colonne:",type(df.columns).__name__)
-closes=df["Close"] if isinstance(df.columns,pd.MultiIndex) else df[["Close"]]
-print("colonne closes:",list(closes.columns))
-for yt in ["ASML.AS"]:
-    if yt not in closes.columns:
-        print("  %s NON presente!" % yt); continue
-    s=closes[yt].dropna()
-    print("\n  %s — decisione riga per riga (last=%s):" % (yt,safety))
-    for idx,pr in list(s.items())[-6:]:
-        ds=idx.strftime("%Y-%m-%d")
-        scarta_last = ds<=safety
-        scarta_guard = not seduta_conclusa(ds)
-        esito="SCARTATA (gia' presente)" if scarta_last else ("SCARTATA (seduta aperta)" if scarta_guard else "SCRITTA")
-        print("    %s  %.2f  -> %s" % (ds,float(pr),esito))
+print()
+print("=== 4. Scrittura di un ticker VERO mancante (ASML 3/8) ===")
+real={"ticker":"ASML","exchange":"AS","date":"2026-08-03","adj_close":1419.60}
+w2=requests.post(U+"/rest/v1/prices_eod?on_conflict=ticker,exchange,date",headers=HU,json=[real])
+print("  POST -> HTTP",w2.status_code)
+chk2=requests.get(U+"/rest/v1/prices_eod",headers=H,
+    params={"select":"date,adj_close","ticker":"eq.ASML","exchange":"eq.AS","order":"date.desc","limit":"3"}).json()
+print("  ASML ora:",chk2)
