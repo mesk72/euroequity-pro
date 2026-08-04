@@ -1,13 +1,14 @@
-=== Il sito ora mostra prezzi coerenti col grafico? ===
+=== Quante righe restituisce la query SENZA paginazione? ===
+  righe ottenute: 1000
+  righe REALMENTE esistenti: 7886
 
-API scheda titolo ASML:
-   price      : 1419.6
-   change1d   : None
-   lastPriceDate: 2026-08-03
-   (in prices_eod: 2026-08-03 = 1419.60)
+=== Conseguenza: quanti titoli restano col prezzo vecchio ===
+  serviti col prezzo fresco : 1000
+  serviti col prezzo VECCHIO: 6886
 
-=== Quanti titoli ricevono ora il prezzo? (mercato grande) ===
-   titoli restituiti: 281
-   con prezzo       : 281
-   senza prezzo     : 0
-   date presenti    : {'2026-08-03': 280, '2026-07-31': 1}
+=== Esempio: ASML e' tra i mille? ===
+  ASML.AS    si (prezzo fresco)
+  SAP.XETRA  NO -> mostra il prezzo vecchio
+  MC.PA      NO -> mostra il prezzo vecchio
+  AAPL.US    NO -> mostra il prezzo vecchio
+  ISP.MIL    NO -> mostra il prezzo vecchio
