@@ -1,8 +1,3 @@
-Confronto: quello che dice il DATABASE vs quello che serve l'API del sito
-(SAP, LVMH, Apple, Intesa erano tra i 6.886 esclusi dal taglio a 1000)
-
-  SAP   .XETRA  grafico(prices_eod)=(157.68, '2026-07-31') | cache=(157.68, '2026-07-31') | API sito=157.68 2026-07-31  -> OK
-  MC    .PA     grafico(prices_eod)=(475.15, '2026-07-31') | cache=(475.15, '2026-07-31') | API sito=475.15 2026-07-31  -> OK
-  AAPL  .US     grafico(prices_eod)=(303.42, '2026-08-03') | cache=(303.42, '2026-08-03') | API sito=303.42 2026-08-03  -> OK
-  ISP   .MIL    grafico(prices_eod)=(6.539, '2026-07-31') | cache=(6.539, '2026-07-31') | API sito=6.539 2026-07-31  -> OK
-  ASML  .AS     grafico(prices_eod)=(1419.6, '2026-08-03') | cache=(1434.2, '2026-07-31') | API sito=1419.6 2026-08-03  -> OK
+Screener (percorso BULK) vs scheda titolo (percorso SINGOLO) — ASML
+  screener : (1434.2, '2026-07-31')
+  scheda   : (1419.6, '2026-08-03')
