@@ -1,17 +1,12 @@
-=== ASML.AS — le tre fonti a confronto ===
+Ora UTC: 2026-08-04 17:11
+Amsterdam/Milano hanno chiuso alle 15:30 UTC
 
-1) prices_eod  (lo legge il GRAFICO):
-     2026-08-03  1419.60
-     2026-07-31  1434.20
-     2026-07-30  1440.00
-     2026-07-29  1362.20
-     2026-07-28  1388.40
-
-2) latest_prices  (lo leggono SCREENER e TABELLA):
-     [{'price': 1434.2, 'prev_price': 1440.000321294173, 'price_date': '2026-07-31', 'change1d': -0.004028}]
-
-3) fundamentals  (contiene un'ALTRA copia del prezzo + i momentum):
-     [{'price': 1434.2, 'change1d': -0.004028, 'mom1w': 0.0031, 'mom1m': -0.1263, 'mom6m': 0.1751, 'mom12m': 1.4233}]
-
-4) stocks  (contiene una QUARTA copia del prezzo):
-     [{'price': 1560.8, 'last_price_date': '2026-06-23'}]
+=== Yahoo ha la chiusura del 4 AGOSTO (oggi) per l'Europa? ===
+  ASML.AS     3/8:SI 4/8:SI | 30/07=1440.00 03/08=1419.60 04/08=1472.60
+  SAP.DE      3/8:SI 4/8:SI | 30/07=155.92 03/08=164.64 04/08=167.38
+  MC.PA       3/8:SI 4/8:SI | 30/07=473.30 03/08=486.90 04/08=485.00
+  ISP.MI      3/8:SI 4/8:SI | 30/07=6.51 03/08=6.70 04/08=6.79
+  SHEL.L      3/8:SI 4/8:SI | 31/07=3383.50 03/08=3405.50 04/08=3321.50
+  NESN.SW     3/8:SI 4/8:SI | 31/07=81.01 03/08=80.77 04/08=80.66
+  NOKIA.HE    3/8:SI 4/8:SI | 30/07=7.93 03/08=8.10 04/08=8.63
+  VOLV-B.ST   3/8:SI 4/8:SI | 30/07=364.20 03/08=369.40 04/08=371.50
