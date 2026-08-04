@@ -1,8 +1,17 @@
-Test su 117 ticker MIL. Cerco chi ha la barra del 2026-08-03.
-Ora UTC: 16:29
+=== ASML.AS — le tre fonti a confronto ===
 
-  blocco da 150 (come lo script)     117/117 hanno il 3/8   (5s)
-  blocco da 50                        50/ 50 hanno il 3/8   (1s)
-  blocco da 20                        20/ 20 hanno il 3/8   (1s)
-  blocco da 20 SENZA threads          20/ 20 hanno il 3/8   (1s)
-  singoli                              8/  8 hanno il 3/8
+1) prices_eod  (lo legge il GRAFICO):
+     2026-08-03  1419.60
+     2026-07-31  1434.20
+     2026-07-30  1440.00
+     2026-07-29  1362.20
+     2026-07-28  1388.40
+
+2) latest_prices  (lo leggono SCREENER e TABELLA):
+     [{'price': 1434.2, 'prev_price': 1440.000321294173, 'price_date': '2026-07-31', 'change1d': -0.004028}]
+
+3) fundamentals  (contiene un'ALTRA copia del prezzo + i momentum):
+     [{'price': 1434.2, 'change1d': -0.004028, 'mom1w': 0.0031, 'mom1m': -0.1263, 'mom6m': 0.1751, 'mom12m': 1.4233}]
+
+4) stocks  (contiene una QUARTA copia del prezzo):
+     [{'price': 1560.8, 'last_price_date': '2026-06-23'}]
