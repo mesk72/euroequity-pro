@@ -1,47 +1,48 @@
-import os, requests
+import yfinance as yf, pandas as pd, os, requests, time
 from datetime import datetime
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-HU={**H,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"}
-
-print("=== 1. Ultimo log EU: ci sono errori di scrittura? ===")
-r=requests.get(U+"/rest/v1/script_logs",headers=H,
-    params={"select":"created_at,log_text","script_name":"eq.daily_eu_yahoo","order":"created_at.desc","limit":"1"})
-d=r.json()
-if d:
-    print("eseguito:",d[0]["created_at"])
-    for riga in d[0]["log_text"].split("\n"):
-        if any(k in riga for k in ["ERRORE","Prezzi Yahoo","BLOCCO","Data piu' recente nel mercato AS","Data piu' recente nel mercato MIL"]):
-            print("  ",riga.strip())
-
+# prendo 150 ticker veri del mercato MIL (fermo al 31/7)
+r=requests.get(U+"/rest/v1/stocks",headers=H,
+    params={"select":"ticker,yahoo_ticker","exchange":"eq.MIL","in_universe":"eq.true","limit":"150"})
+rows=r.json()
+yts=[(x.get("yahoo_ticker") or (x["ticker"]+".MI")) for x in rows]
+print("Test su %d ticker MIL. Cerco chi ha la barra del 2026-08-03." % len(yts))
+print("Ora UTC:", datetime.utcnow().strftime("%H:%M"))
 print()
-print("=== 2. Quante righe al 3/8 esistono per mercato europeo? ===")
-EU=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]
-tot=0
-for ex in EU:
-    rc=requests.get(U+"/rest/v1/prices_eod",headers={**H,"Prefer":"count=exact"},
-        params={"select":"ticker","exchange":"eq."+ex,"date":"eq.2026-08-03","limit":"1"})
-    n=int(rc.headers.get("content-range","0/0").split("/")[-1]); tot+=n
-    if n: print("  %-6s %4d" % (ex,n))
-print("  TOTALE al 3/8: %d" % tot)
 
-print()
-print("=== 3. PROVA DI SCRITTURA con la chiave attuale ===")
-test={"ticker":"__WTEST__","exchange":"AS","date":"2026-08-03","adj_close":1.23}
-w=requests.post(U+"/rest/v1/prices_eod?on_conflict=ticker,exchange,date",headers=HU,json=[test])
-print("  POST -> HTTP",w.status_code, w.text[:200])
-chk=requests.get(U+"/rest/v1/prices_eod",headers=H,
-    params={"select":"ticker,date","ticker":"eq.__WTEST__"}).json()
-print("  riga presente dopo scrittura:", chk)
-requests.delete(U+"/rest/v1/prices_eod",headers=H,params={"ticker":"eq.__WTEST__"})
-print("  (pulita)")
+def quanti_hanno_il_3(lista, etichetta, **kw):
+    t0=time.time()
+    df=yf.download(tickers=" ".join(lista),start="2026-07-25",end="2026-08-06",
+                   interval="1d",auto_adjust=True,progress=False,**kw)
+    if df.empty:
+        print("  %-34s VUOTO" % etichetta); return
+    cl=df["Close"] if isinstance(df.columns,pd.MultiIndex) else df[["Close"]]
+    n=0; tot=0
+    for c in cl.columns:
+        s=cl[c].dropna()
+        date=[i.strftime("%Y-%m-%d") for i in s.index]
+        tot+=1
+        if "2026-08-03" in date: n+=1
+    print("  %-34s %3d/%3d hanno il 3/8   (%.0fs)" % (etichetta,n,tot,time.time()-t0))
 
-print()
-print("=== 4. Scrittura di un ticker VERO mancante (ASML 3/8) ===")
-real={"ticker":"ASML","exchange":"AS","date":"2026-08-03","adj_close":1419.60}
-w2=requests.post(U+"/rest/v1/prices_eod?on_conflict=ticker,exchange,date",headers=HU,json=[real])
-print("  POST -> HTTP",w2.status_code)
-chk2=requests.get(U+"/rest/v1/prices_eod",headers=H,
-    params={"select":"date,adj_close","ticker":"eq.ASML","exchange":"eq.AS","order":"date.desc","limit":"3"}).json()
-print("  ASML ora:",chk2)
+quanti_hanno_il_3(yts,"blocco da 150 (come lo script)",threads=True)
+time.sleep(3)
+quanti_hanno_il_3(yts[:50],"blocco da 50",threads=True)
+time.sleep(3)
+quanti_hanno_il_3(yts[:20],"blocco da 20",threads=True)
+time.sleep(3)
+quanti_hanno_il_3(yts[:20],"blocco da 20 SENZA threads",threads=False)
+time.sleep(3)
+# singoli
+n=0
+for yt in yts[:8]:
+    try:
+        d=yf.download(yt,start="2026-07-25",end="2026-08-06",interval="1d",auto_adjust=True,progress=False)
+        cl=d["Close"]
+        if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+        if "2026-08-03" in [i.strftime("%Y-%m-%d") for i in cl.dropna().index]: n+=1
+    except Exception: pass
+    time.sleep(0.4)
+print("  %-34s %3d/  8 hanno il 3/8" % ("singoli",n))
