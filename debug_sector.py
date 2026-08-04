@@ -1,42 +1,28 @@
-import os, requests, re
-BASE="https://mlqkisnizgyvvqajdvbh.supabase.co"
-SK=os.environ.get("SUPABASE_SERVICE_KEY","")
-HS={"apikey":SK,"Authorization":"Bearer "+SK}
-r=requests.get("https://forwardalpha.pro/",timeout=30)
-anon=None
-for c in set(re.findall(r'/_next/static/[^"\']+?\.js[^"\']*', r.text)):
-    try:
-        j=requests.get("https://forwardalpha.pro"+c,timeout=20).text
-        k=re.search(r'eyJ[A-Za-z0-9_\-]{20,}\.[A-Za-z0-9_\-]{20,}\.[A-Za-z0-9_\-]{20,}', j)
-        if k: anon=k.group(); break
-    except Exception: pass
-HA={"apikey":anon,"Authorization":"Bearer "+anon,"Content-Type":"application/json"}
-
-print("PROVA REALE con la chiave pubblica del sito")
-print("(riga esca creata con chiave di servizio, poi tento di alterarla da anonimo)")
+import os, requests, yfinance as yf, pandas as pd
+from datetime import datetime
+U="https://mlqkisnizgyvvqajdvbh.supabase.co"
+K=os.environ.get("SUPABASE_SERVICE_KEY","")
+H={"apikey":K,"Authorization":"Bearer "+K}
+print("Ora test (UTC):", datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
 print()
-
-def prova(tab, esca, chiave_filtro):
-    # crea esca
-    requests.post(BASE+"/rest/v1/"+tab+"?on_conflict="+chiave_filtro,
-        headers={**HS,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"},
-        json=[esca],timeout=25)
-    f={k:"eq."+str(v) for k,v in esca.items() if k in chiave_filtro.split(",")}
-    esiste=lambda: len(requests.get(BASE+"/rest/v1/"+tab,headers=HS,params={**f,"select":"*"},timeout=25).json())>0
-    if not esiste():
-        print("  %-24s (impossibile creare esca, salto)" % tab); return
-    # UPDATE anonimo
-    u=requests.patch(BASE+"/rest/v1/"+tab,headers=HA,params=f,json={"exchange":esca["exchange"]},timeout=25)
-    # DELETE anonimo
-    d=requests.delete(BASE+"/rest/v1/"+tab,headers=HA,params=f,timeout=25)
-    sopravvissuta=esiste()
-    print("  %-24s UPDATE:%s  DELETE:%s  -> %s" % (
-        tab,u.status_code,d.status_code,
-        "PROTETTA" if sopravvissuta else "!!! DATI CANCELLABILI DA CHIUNQUE !!!"))
-    # pulizia
-    requests.delete(BASE+"/rest/v1/"+tab,headers=HS,params=f,timeout=25)
-
-prova("latest_prices",{"ticker":"__SEC__","exchange":"SGX","price":1.0,"price_date":"2020-01-01"},"ticker,exchange")
-prova("stocks",{"ticker":"__SEC__","exchange":"SGX"},"ticker,exchange")
-prova("prices_eod",{"ticker":"__SEC__","exchange":"SGX","date":"2020-01-01","adj_close":1.0},"ticker,exchange,date")
-prova("sector_quintile_partials",{"exchange":"__SEC__","sector":"__SEC__"},"exchange,sector")
+print("=== YAHOO: ha la chiusura di LUNEDI 3 AGOSTO per l'Europa? ===")
+prova=[("ASML.AS","AS","ASML"),("SAP.DE","XETRA","SAP"),("MC.PA","PA","MC"),
+       ("SHEL.L","LSE","SHEL"),("ISP.MI","MIL","ISP"),("NESN.SW","SWX","NESN"),
+       ("NOKIA.HE","HE","NOKIA"),("VOLV-B.ST","OM","VOLV B")]
+for yt,ex,tk in prova:
+    try:
+        df=yf.download(yt,period="8d",interval="1d",auto_adjust=True,progress=False)
+        cl=df["Close"]
+        if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+        cl=cl.dropna()
+        date_y=[cl.index[i].strftime("%Y-%m-%d") for i in range(len(cl))]
+        ha3="2026-08-03" in date_y
+        ultime=" ".join("%s=%.2f" % (cl.index[i].strftime("%d/%m"),float(cl.iloc[i])) for i in range(max(0,len(cl)-3),len(cl)))
+        # cosa abbiamo noi
+        r=requests.get(U+"/rest/v1/prices_eod",headers=H,
+            params={"select":"date","ticker":"eq."+tk,"exchange":"eq."+ex,"order":"date.desc","limit":"1"})
+        d=r.json()
+        nostro=d[0]["date"] if isinstance(d,list) and d else "-"
+        print("  %-11s yahoo ha 3/8: %-3s | nostro DB: %s | yahoo: %s" % (yt,"SI" if ha3 else "NO",nostro,ultime))
+    except Exception as e:
+        print("  %-11s errore %s" % (yt,str(e)[:50]))
