@@ -1,11 +1,18 @@
-Ora test (UTC): 2026-08-04 16:12
+TODAY = 2026-08-04  END_FOR_DOWNLOAD = 2026-08-06
+utcnow = 2026-08-04 16:15
+seduta_conclusa('2026-08-03') = True
+seduta_conclusa('2026-08-04') = False
 
-=== YAHOO: ha la chiusura di LUNEDI 3 AGOSTO per l'Europa? ===
-  ASML.AS     yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=1434.20 03/08=1419.60 04/08=1472.60
-  SAP.DE      yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=157.68 03/08=164.64 04/08=167.38
-  MC.PA       yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=475.15 03/08=486.90 04/08=485.00
-  SHEL.L      yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=3383.50 03/08=3405.50 04/08=3321.50
-  ISP.MI      yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=6.54 03/08=6.70 04/08=6.79
-  NESN.SW     yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=81.01 03/08=80.77 04/08=80.66
-  NOKIA.HE    yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=7.96 03/08=8.10 04/08=8.63
-  VOLV-B.ST   yahoo ha 3/8: SI  | nostro DB: 2026-07-31 | yahoo: 31/07=364.30 03/08=369.40 04/08=371.50
+Mercato AS: most_recent=2026-08-03  base=2026-07-24  start_dt=2026-07-25
+  last_dates >= TODAY ? False  (se SI il titolo viene SALTATO)
+
+colonne: MultiIndex
+colonne closes: ['ASML.AS', 'PHIA.AS']
+
+  ASML.AS — decisione riga per riga (last=2026-07-24):
+    2026-07-28  1388.40  -> SCRITTA
+    2026-07-29  1362.20  -> SCRITTA
+    2026-07-30  1440.00  -> SCRITTA
+    2026-07-31  1434.20  -> SCRITTA
+    2026-08-03  1419.60  -> SCRITTA
+    2026-08-04  1472.60  -> SCARTATA (seduta aperta)
