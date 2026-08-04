@@ -1,14 +1,13 @@
-=== API del sito: distribuzione delle date di prezzo restituite ===
+=== Il sito ora mostra prezzi coerenti col grafico? ===
 
-  US — 281 titoli restituiti
-     2026-08-03      280
-     2026-07-31        1
-     senza prezzo: 0
+API scheda titolo ASML:
+   price      : 1419.6
+   change1d   : None
+   lastPriceDate: 2026-08-03
+   (in prices_eod: 2026-08-03 = 1419.60)
 
-  Europa — 112 titoli restituiti
-     2026-08-03        6
-     2026-07-31      106
-     senza prezzo: 0
-
-=== ASML: la tabella ora coincide col grafico? ===
-  tabella -> prezzo 1419.6  data 2026-08-03  var None
+=== Quanti titoli ricevono ora il prezzo? (mercato grande) ===
+   titoli restituiti: 281
+   con prezzo       : 281
+   senza prezzo     : 0
+   date presenti    : {'2026-08-03': 280, '2026-07-31': 1}
