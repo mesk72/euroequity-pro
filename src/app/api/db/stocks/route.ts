@@ -170,7 +170,15 @@ function redactRawData<T extends Record<string, any>>(obj: T): T {
 }
 
 async function fetchLatestPrices(exchangeList: string[]) {
-  // Legge da latest_prices — tabella PRE-CALCOLATA dai daily script,
+  // FIX 5/8/2026 — FONTE UNICA: legge da latest_prices_mv, una VISTA
+  // MATERIALIZZATA calcolata su prices_eod (la stessa tabella che
+  // alimenta il grafico). Prima leggeva la tabella latest_prices, che
+  // veniva scritta separatamente dagli script: bastava che una delle due
+  // scritture restasse indietro e lo stesso titolo mostrava due prezzi
+  // diversi nella stessa pagina (caso riprodotto: ASML 1434,20 nello
+  // screener contro 1419,60 nel grafico). Una vista calcolata non puo'
+  // divergere dalla sua fonte.
+  // Legge da latest_prices_mv — vista PRE-CALCOLATA, aggiornata dagli script,
   // aggiornata una volta al giorno. Nessun calcolo pesante in tempo
   // reale: sostituisce tutti i tentativi precedenti (query dirette,
   // RPC con window function/DISTINCT ON) che erano corretti ma troppo
@@ -191,7 +199,7 @@ async function fetchLatestPrices(exchangeList: string[]) {
   for (const exchange of exchangeList) {
     for (let page = 0; page < 5; page++) {   // fino a 5.000 titoli per mercato
       richieste.push(
-        supabase.from('latest_prices')
+        supabase.from('latest_prices_mv')
           .select('ticker,exchange,price,price_date,change1d')
           .eq('exchange', exchange)
           .order('ticker', { ascending: true })
