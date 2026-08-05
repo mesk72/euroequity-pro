@@ -437,7 +437,7 @@ for _ex, _tickers in by_exchange.items():
     if not _mancanti:
         log(f"  {_ex}: seduta {_seduta} completa ({len(_tickers)} titoli)")
         continue
-    log(f"  {_ex}: seduta {_seduta} — mancano {len(_mancanti)}/{len(_tickers)}, li riscarico")
+    log(f"  {_ex}: seduta {_seduta} — {len(_mancanti)}/{len(_tickers)} senza questa seduta, verifico su Yahoo")
     _buf = []
     _da = (datetime.strptime(_seduta, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d")
     _a = (datetime.strptime(_seduta, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -488,7 +488,11 @@ for _ex, _tickers in by_exchange.items():
         else:
             log(f"    ERRORE scrittura recupero: HTTP {_rw.status_code} - {_rw.text[:150]}")
     recuperati_tot += _scritte
-    log(f"    recuperati {_scritte} titoli")
+    if _scritte:
+        log(f"    recuperati {_scritte} titoli")
+    else:
+        log(f"    nessun recupero: Yahoo non ha la seduta {_seduta} per questi titoli "
+            f"(poco scambiati o non ancora pubblicati) — nessuna azione necessaria")
 log(f"  Verifica seduta: {recuperati_tot} prezzi recuperati")
 
 # ── 3. LEGGI PREZZI DA prices_eod ────────────────────────────
