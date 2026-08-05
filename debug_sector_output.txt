@@ -1,38 +1,4 @@
-=== LOG della fase di verifica ===
-eseguito: 2026-08-05T06:03:00.016673+00:00
-   [2b/5] Verifica ultima seduta per mercato...
-   LSE: seduta 2026-08-03 completa (423 titoli)
-   SGX: seduta 2026-08-04 completa (100 titoli)
-   GR: seduta 2026-08-03 completa (100 titoli)
-   XETRA: seduta 2026-08-03 — mancano 2/210, li riscarico
-   recuperati 0 titoli
-   SWX: seduta 2026-08-04 — mancano 134/161, li riscarico
-   recuperati 0 titoli
-   KRX: seduta 2026-08-04 — mancano 2/400, li riscarico
-   recuperati 0 titoli
-   HE: seduta 2026-08-03 completa (100 titoli)
-   OM: seduta 2026-08-03 — mancano 1/206, li riscarico
-   recuperati 0 titoli
-   CPSE: seduta 2026-08-04 — mancano 63/101, li riscarico
-   recuperati 0 titoli
-   PA: seduta 2026-08-03 completa (216 titoli)
-   BR: seduta 2026-08-03 — mancano 2/100, li riscarico
-   recuperati 0 titoli
-   AS: seduta 2026-08-03 completa (98 titoli)
-   VI: seduta 2026-08-03 completa (53 titoli)
-   MC: seduta 2026-08-03 completa (91 titoli)
-   IR: seduta 2026-08-03 completa (15 titoli)
-   MIL: seduta 2026-08-03 completa (117 titoli)
-   OB: seduta 2026-08-03 — mancano 1/100, li riscarico
-   recuperati 0 titoli
-   LS: seduta 2026-08-03 completa (35 titoli)
-   Verifica seduta: 0 prezzi recuperati
-  >> Prezzi Yahoo: ok=2625 fail=1
-  >> BLOCCO SICUREZZA: scartate 459 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima esecuzione a mercati chiusi.
+Ora UTC: 2026-08-05 06:10 — la seduta del 4/8 e' chiusa da ~15 ore
 
-=== EUROPA: distribuzione date nella vista ===
-   2026-08-04 :    71 titoli
-   2026-08-03 :  2048 titoli
-   2026-07-31 :     2 titoli
-   2026-07-29 :     3 titoli
-   2026-07-28 :     8 titoli
+  5 grandi (blue chip)          0/ 5 hanno il 4 agosto
+  15 a bassa capitalizzazione   0/15 hanno il 4 agosto
