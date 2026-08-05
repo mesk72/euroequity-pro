@@ -819,6 +819,26 @@ for i in range(0, len(partial_rows), 500):
         log(f"  ERRORE SCRITTURA sector_quintile_partials: HTTP {rq.status_code} - {rq.text[:200]}")
 log(f"  Quintili di settore: {q_ok} righe (exchange,settore) aggiornate")
 
+
+# ── AGGIORNA LA VISTA DEI PREZZI CORRENTI ────────────────────
+# FIX 5/8/2026 — FONTE UNICA: la tabella latest_prices e' stata
+# sostituita dalla vista materializzata latest_prices_mv, calcolata su
+# prices_eod. Non va piu' scritta: va solo ricalcolata. Cosi' lo screener
+# e il grafico mostrano per forza lo stesso numero, perche' leggono la
+# stessa fonte. Prima erano due scritture separate e bastava che una
+# restasse indietro per far divergere i due valori nella stessa pagina.
+log("\n[Vista prezzi] Aggiornamento latest_prices_mv...")
+try:
+    rmv = requests.post(SUPABASE_URL + "/rest/v1/rpc/refresh_latest_prices",
+                        headers={**headers_r, "Content-Type": "application/json"},
+                        json={}, timeout=300)
+    if rmv.status_code in (200, 204):
+        log("  vista aggiornata")
+    else:
+        log(f"  ERRORE aggiornamento vista: HTTP {rmv.status_code} - {rmv.text[:200]}")
+except Exception as e:
+    log(f"  ERRORE aggiornamento vista: {e}")
+
 log_entry = {"run_date": TODAY, "market": "APAC", "prices_updated": ok_prices,
              "prices_failed": fail_prices, "last_price_date": TODAY,
              "momentum_updated": ok_momentum, "rank_updated": ok_rank,
