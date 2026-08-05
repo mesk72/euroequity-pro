@@ -366,42 +366,31 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     # --- segnalazioni: solo cose che meritano davvero attenzione ---
     allarmi = []
 
-    # 1. MERCATO INDIETRO RISPETTO AGLI ALTRI
-    # FIX 5/8/2026: la regola precedente allarmava solo dopo 5 giorni di
-    # fermo. Il 4/8 l'Europa era indietro di un'intera seduta — 2.126
-    # titoli — e il rapporto ha scritto "nessuna anomalia": una falsa
-    # sicurezza, che e' peggio di nessun rapporto.
-    # Ora si confronta ogni mercato con il piu' avanzato. Ma un mercato
-    # puo' essere indietro legittimamente perche' era CHIUSO PER FESTA
-    # (es. Toronto lunedi 3/8, Civic Holiday): prima di allarmare si
-    # chiede a Yahoo qual e' davvero l'ultima seduta di quel mercato. Si
-    # allarma solo se Yahoo ha una seduta che noi non abbiamo.
-    piu_avanzato = None
+    # 1. MERCATO INDIETRO RISPETTO A CIO' CHE YAHOO HA GIA'
+    # FIX 6/8/2026: la prima versione confrontava i mercati FRA LORO, ma
+    # i loro script girano a orari diversi (Europa alle 21, USA alle 3:23)
+    # e a meta' notte l'Europa ha legittimamente una seduta in piu' degli
+    # Stati Uniti: avrebbe allarmato ogni notte senza motivo.
+    # Ora ogni mercato si confronta con SE STESSO: si chiede a Yahoo qual
+    # e' la sua ultima seduta chiusa e si allarma solo se noi non ce
+    # l'abbiamo. Indipendente da fusi orari, orari degli script e
+    # festivita' locali (se la borsa era chiusa, Yahoo non ha nulla di
+    # piu' recente e non scatta nessun allarme).
     for nome, lista in GRUPPI:
-        for ex in lista:
-            d = per_exchange[ex]
-            if d["universo"] and d["ultima_seduta"]:
-                if piu_avanzato is None or d["ultima_seduta"] > piu_avanzato:
-                    piu_avanzato = d["ultima_seduta"]
-
-    for nome, lista in GRUPPI:
-        # data prevalente del gruppo (un gruppo = un mercato per l'utente)
+        titoli_gruppo = sum(per_exchange[e]["universo"] for e in lista)
+        if not titoli_gruppo:
+            continue
         date_gruppo = [per_exchange[e]["ultima_seduta"] for e in lista
                        if per_exchange[e]["universo"] and per_exchange[e]["ultima_seduta"]]
-        titoli_gruppo = sum(per_exchange[e]["universo"] for e in lista)
         if not date_gruppo:
-            if titoli_gruppo:
-                allarmi.append("%s: nessun prezzo disponibile" % nome)
+            allarmi.append("%s: nessun prezzo disponibile (%d titoli)" % (nome, titoli_gruppo))
             continue
         seduta_nostra = max(date_gruppo)
-        if not piu_avanzato or seduta_nostra >= piu_avanzato:
-            continue
-        # e' indietro: verifica se e' colpa nostra o se il mercato era chiuso
         reale = seduta_reale_di_mercato(per_exchange, lista, oggi)
         if reale and reale > seduta_nostra:
             allarmi.append(
-                "%s: fermo alla seduta del %s mentre Yahoo ha gia' quella del %s "
-                "(%d titoli coinvolti)" % (nome, seduta_nostra, reale, titoli_gruppo))
+                "%s: siamo fermi alla seduta del %s, Yahoo ha gia' quella del %s "
+                "(%d titoli)" % (nome, seduta_nostra, reale, titoli_gruppo))
 
     # 2. script non girato o con molti fallimenti
     visti = set()
