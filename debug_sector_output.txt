@@ -1,35 +1,10 @@
-=== daily_eu_yahoo ===
-  eseguito: 2026-08-05T06:03:00
-    [2b/5] Verifica ultima seduta per mercato...
-    LSE: seduta 2026-08-03 completa (423 titoli)
-    SGX: seduta 2026-08-04 completa (100 titoli)
-    GR: seduta 2026-08-03 completa (100 titoli)
-    XETRA: seduta 2026-08-03 — mancano 2/210, li riscarico
-    recuperati 0 titoli
-    SWX: seduta 2026-08-04 — mancano 134/161, li riscarico
-    recuperati 0 titoli
-    KRX: seduta 2026-08-04 — mancano 2/400, li riscarico
-    recuperati 0 titoli
-    HE: seduta 2026-08-03 completa (100 titoli)
-    OM: seduta 2026-08-03 — mancano 1/206, li riscarico
-    recuperati 0 titoli
-    CPSE: seduta 2026-08-04 — mancano 63/101, li riscarico
-    recuperati 0 titoli
-    PA: seduta 2026-08-03 completa (216 titoli)
-    BR: seduta 2026-08-03 — mancano 2/100, li riscarico
-    recuperati 0 titoli
-    AS: seduta 2026-08-03 completa (98 titoli)
-    VI: seduta 2026-08-03 completa (53 titoli)
-    MC: seduta 2026-08-03 completa (91 titoli)
-    IR: seduta 2026-08-03 completa (15 titoli)
-    MIL: seduta 2026-08-03 completa (117 titoli)
-    OB: seduta 2026-08-03 — mancano 1/100, li riscarico
-    recuperati 0 titoli
-    LS: seduta 2026-08-03 completa (35 titoli)
-    Verifica seduta: 0 prezzi recuperati
-    [Vista prezzi] Aggiornamento latest_prices_mv...
-    ERRORE aggiornamento vista: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling stateme
-=== daily_us_yahoo ===
-  eseguito: 2026-08-05T03:54:23
-=== daily_apac_yahoo ===
-  eseguito: 2026-08-04T06:32:16
+=== Il sito serve i valori della vista? ===
+  ASML  .AS    vista=(1419.6, '2026-08-03') | storico=(1419.6, '2026-08-03') | screener=(1419.6, '2026-08-03')
+  NESN  .SWX   vista=(80.66, '2026-08-04') | storico=(80.66, '2026-08-04') | screener=(80.66, '2026-08-04')
+  AAPL  .US    vista=(309.38, '2026-08-04') | storico=(309.38, '2026-08-04') | screener=(309.38, '2026-08-04')
+
+=== Perche' il recupero scrive zero: provo a riscaricare un titolo SWX mancante ===
+  esempi mancanti al 4/8: [('SIC', 'SIC.SW'), ('ROP', 'ROP.SW'), ('NREN', 'NREN.SW'), ('SIAT', 'SIAT.SW'), ('SLREFS', 'SLREFS.SW')]
+    SIC.SW       Yahoo: [('03/08', 212.0)]
+    ROP.SW       Yahoo: [('03/08', 356.0)]
+    NREN.SW      Yahoo: [('03/08', 39.8)]
