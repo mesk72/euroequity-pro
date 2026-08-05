@@ -3,7 +3,17 @@ name: Daily EU Yahoo Finance
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 0 * * *'  # 02:30 CEST - backup nativo GitHub, indipendente da Vercel
+    # FIX 5/8/2026: spostato dalle 00:30 UTC alle 19:00 UTC (21:00 italiane
+    # d'estate, 20:00 d'inverno). Alle 00:30 lo script prendeva sempre la
+    # seduta del GIORNO PRIMA: girando la sera, dopo la chiusura europea
+    # delle 17:30, prende la seduta appena conclusa e il sito e' aggiornato
+    # la sera stessa invece che l'indomani. Yahoo pubblica le chiusure
+    # europee definitive circa 40 minuti dopo la campana (verificato il
+    # 4/8/2026 su otto titoli, con doppia lettura a un'ora di distanza).
+    - cron: '0 19 * * *'
+    # Seconda passata a notte fonda: recupera i titoli che alle 21 non
+    # fossero ancora stati pubblicati da Yahoo.
+    - cron: '30 0 * * *'
 
 concurrency:
   group: daily-eu-yahoo
