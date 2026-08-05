@@ -3,9 +3,13 @@ name: Rapporto giornaliero via email
 on:
   workflow_dispatch:
   schedule:
+    # Orari a minuti dispari: GitHub accoda i lavori programmati e negli
+    # orari tondi il ritardo e' sistematico (misurato sul daily US:
+    # oltre 3 ore ogni giorno dal 2 al 5 agosto, sempre verso le 04:00
+    # invece delle 00:30). I minuti dispari riducono molto la coda.
     # 06:00 UTC = 08:00 in Italia con l'ora legale, 07:00 con l'ora solare.
     # GitHub usa sempre UTC, non segue il cambio dell'ora italiano.
-    - cron: '0 6 * * *'
+    - cron: '17 6 * * *'
 
 concurrency:
   group: daily-report
