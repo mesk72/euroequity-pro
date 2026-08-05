@@ -302,6 +302,56 @@ def leggi_sentinella_quintili():
         return 0, None
 
 
+def seduta_reale_di_mercato(per_exchange, exchanges, oggi):
+    """Ultima seduta realmente disponibile su Yahoo per questo mercato,
+    stabilita con download SINGOLI (affidabili) su qualche titolo di
+    riferimento. Serve a distinguere "siamo indietro noi" da "il mercato
+    era chiuso per festa": senza questa verifica il rapporto darebbe un
+    falso allarme ogni volta che una borsa osserva una festivita' locale."""
+    try:
+        import yfinance as yf
+        import pandas as pd
+    except Exception:
+        return None
+    migliore = None
+    for ex in exchanges:
+        tickers = list(per_exchange[ex]["date"].keys())[:2]
+        for tk in tickers:
+            try:
+                r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=HEADERS,
+                                 params={"select": "yahoo_ticker", "ticker": "eq." + tk,
+                                         "exchange": "eq." + ex}, timeout=30)
+                rows = r.json()
+                yt = rows[0].get("yahoo_ticker") if isinstance(rows, list) and rows else None
+                if not yt:
+                    continue
+                df = yf.download(yt, period="12d", interval="1d",
+                                 auto_adjust=True, progress=False)
+                if df.empty:
+                    continue
+                cl = df["Close"]
+                if isinstance(cl, pd.DataFrame):
+                    cl = cl.iloc[:, 0]
+                cl = cl.dropna()
+                if len(cl) == 0:
+                    continue
+                # la barra piu' recente puo' essere del giorno IN CORSO e
+                # quindi provvisoria: si scarta se il mercato non ha ancora
+                # chiuso da almeno un'ora.
+                for i in range(len(cl) - 1, -1, -1):
+                    ds = cl.index[i].strftime("%Y-%m-%d")
+                    if ds < oggi.strftime("%Y-%m-%d"):
+                        if migliore is None or ds > migliore:
+                            migliore = ds
+                        break
+            except Exception:
+                pass
+            time.sleep(0.3)
+        if migliore:
+            break
+    return migliore
+
+
 def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     oggi = datetime.now(timezone.utc) + timedelta(hours=2)  # CEST
 
@@ -316,18 +366,31 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     # --- segnalazioni: solo cose che meritano davvero attenzione ---
     allarmi = []
 
-    # 1. un mercato intero fermo da troppo tempo = problema nostro
-    limite = (oggi - timedelta(days=5)).strftime("%Y-%m-%d")
+    # 1. MERCATO INDIETRO RISPETTO A CIO' CHE YAHOO HA GIA'
+    # FIX 6/8/2026: la prima versione confrontava i mercati FRA LORO, ma
+    # i loro script girano a orari diversi (Europa alle 21, USA alle 3:23)
+    # e a meta' notte l'Europa ha legittimamente una seduta in piu' degli
+    # Stati Uniti: avrebbe allarmato ogni notte senza motivo.
+    # Ora ogni mercato si confronta con SE STESSO: si chiede a Yahoo qual
+    # e' la sua ultima seduta chiusa e si allarma solo se noi non ce
+    # l'abbiamo. Indipendente da fusi orari, orari degli script e
+    # festivita' locali (se la borsa era chiusa, Yahoo non ha nulla di
+    # piu' recente e non scatta nessun allarme).
     for nome, lista in GRUPPI:
-        for ex in lista:
-            d = per_exchange[ex]
-            if d["universo"] == 0:
-                continue
-            if not d["ultima_seduta"]:
-                allarmi.append("%s (%s): nessun prezzo in cache" % (nome, ex))
-            elif d["ultima_seduta"] < limite:
-                allarmi.append("%s (%s): tutto il mercato fermo al %s"
-                               % (nome, ex, d["ultima_seduta"]))
+        titoli_gruppo = sum(per_exchange[e]["universo"] for e in lista)
+        if not titoli_gruppo:
+            continue
+        date_gruppo = [per_exchange[e]["ultima_seduta"] for e in lista
+                       if per_exchange[e]["universo"] and per_exchange[e]["ultima_seduta"]]
+        if not date_gruppo:
+            allarmi.append("%s: nessun prezzo disponibile (%d titoli)" % (nome, titoli_gruppo))
+            continue
+        seduta_nostra = max(date_gruppo)
+        reale = seduta_reale_di_mercato(per_exchange, lista, oggi)
+        if reale and reale > seduta_nostra:
+            allarmi.append(
+                "%s: siamo fermi alla seduta del %s, Yahoo ha gia' quella del %s "
+                "(%d titoli)" % (nome, seduta_nostra, reale, titoli_gruppo))
 
     # 2. script non girato o con molti fallimenti
     visti = set()
