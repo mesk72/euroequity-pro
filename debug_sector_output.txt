@@ -1,22 +1,52 @@
-=== endpoint nuovi ===
-  rapporto     HTTP 200  {"triggered":true,"status":204,"timestamp":"2026-08-05T06:59:10.410Z"}
-  Europa sera  HTTP 200  {"triggered":true,"status":204,"timestamp":"2026-08-05T06:59:11.731Z"}
+ATTENZIONE: letti 7874 titoli ma il database ne conta 7876. Una lettura e' stata troncata, i numeri sotto non sono affidabili.
+OGGETTO: ForwardAlpha ATTENZIONE - 2402/7874 titoli aggiornati (30.5%)
 
-=== esito fase di verifica negli script appena girati ===
---- daily_apac_yahoo ---
-   eseguito: 2026-08-05T06:57:31
-     Prezzi Yahoo: ok=2349 fail=0
---- daily_us_yahoo ---
-   eseguito: 2026-08-05T06:56:13
-     Prezzi Yahoo: ok=3401 fail=0
---- daily_eu_yahoo ---
-   eseguito: 2026-08-05T06:59:02
-     Prezzi Yahoo: ok=2625 fail=1
-     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
-     nessun recupero: Yahoo non ha la seduta 2026-08-04 per questi titoli (poco scambiati o non ancora pubblicati) — nes
-     nessun recupero: Yahoo non ha la seduta 2026-08-04 per questi titoli (poco scambiati o non ancora pubblicati) — nes
-     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
-     nessun recupero: Yahoo non ha la seduta 2026-08-04 per questi titoli (poco scambiati o non ancora pubblicati) — nes
-     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
-     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
-     Verifica seduta: 0 prezzi recuperati
+UNIVERSO: 7874 titoli
+
+DISTRIBUZIONE PER DATA
+  2026-08-05  1 seduta indietro   2402 titoli   30.5%
+  2026-08-04  2 sedute indietro   5408 titoli   68.7%
+  2026-08-03  3 sedute indietro     33 titoli    0.4%
+  2026-07-31  4 sedute indietro      4 titoli    0.1%
+  2026-07-28  7 sedute indietro      3 titoli    0.0%
+  2026-07-24  9 sedute indietro      1 titoli    0.0%
+  2026-07-23  10 sedute indietro      2 titoli    0.0%
+  2026-07-21  12 sedute indietro      5 titoli    0.1%
+  2026-07-17  14 sedute indietro      1 titoli    0.0%
+  2026-07-16  15 sedute indietro      1 titoli    0.0%
+  2026-07-14  17 sedute indietro      2 titoli    0.0%
+  2026-07-13  18 sedute indietro      3 titoli    0.0%
+  2026-07-07  22 sedute indietro      1 titoli    0.0%
+  2026-07-03  24 sedute indietro      2 titoli    0.0%
+  2026-07-02  25 sedute indietro      1 titoli    0.0%
+  2026-06-30  27 sedute indietro      1 titoli    0.0%
+  2026-06-12  39 sedute indietro      1 titoli    0.0%
+  2026-06-10  41 sedute indietro      1 titoli    0.0%
+  mai scritti                       2 titoli    0.0%
+
+MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
+Europa           2126   2057     50       18     1  2026-08-05
+Stati Uniti      3000      0   2966       33     1  2026-08-04
+Canada            399      0    394        5     0  2026-08-04
+Giappone         1000      0    999        1     0  2026-08-04
+Hong Kong         500      0    500        0     0  2026-08-04
+Australia         349    344      2        3     0  2026-08-05
+Corea             400      1    397        2     0  2026-08-04
+Singapore         100      0    100        0     0  2026-08-04
+
+ESECUZIONI ultime 24h: 10
+  EU     ok=2625 falliti=1 durata=665s
+  APAC   ok=2349 falliti=0 durata=474s
+  EU     ok=2625 falliti=1 durata=647s
+  US+CA  ok=3401 falliti=0 durata=684s
+  EU     ok=2625 falliti=1 durata=751s
+  US+CA  ok=3401 falliti=0 durata=505s
+
+
+DA SISTEMARE: nessuno
+Delistati/sospesi (nessun intervento): 27
+
+Quintili precalcolati: 247 righe (aggiornati 2026-08-05)
+
+SMTP non configurato: stampo il rapporto senza inviarlo.
+ForwardAlpha ATTENZIONE - 2402/7874 titoli aggiornati (30.5%)
