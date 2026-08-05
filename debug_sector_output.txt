@@ -1,2 +1,3 @@
-HTTP: 500
-{"triggered":false,"results":[{"workflow":"daily_eu_yahoo.yml","triggered":false,"status":401},{"workflow":"daily_us_yahoo.yml","triggered":false,"status":401}],"timestamp":"2026-08-05T06:42:55.488Z"}
+=== endpoint Vercel -> GitHub ===
+HTTP: 200
+{"triggered":true,"results":[{"workflow":"daily_eu_yahoo.yml","triggered":true,"status":204},{"workflow":"daily_us_yahoo.yml","triggered":true,"status":204}],"timestamp":"2026-08-05T06:51:26.794Z"}
