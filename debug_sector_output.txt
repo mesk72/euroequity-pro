@@ -1,3 +1,2 @@
-Screener (percorso BULK) vs scheda titolo (percorso SINGOLO) — ASML
-  screener : (1434.2, '2026-07-31')
-  scheda   : (1419.6, '2026-08-03')
+  screener: (1419.6, '2026-08-03')
+  scheda  : (1419.6, '2026-08-03')
