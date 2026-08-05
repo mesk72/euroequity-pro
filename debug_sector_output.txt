@@ -1,10 +1,2 @@
-=== Il sito serve i valori della vista? ===
-  ASML  .AS    vista=(1419.6, '2026-08-03') | storico=(1419.6, '2026-08-03') | screener=(1419.6, '2026-08-03')
-  NESN  .SWX   vista=(80.66, '2026-08-04') | storico=(80.66, '2026-08-04') | screener=(80.66, '2026-08-04')
-  AAPL  .US    vista=(309.38, '2026-08-04') | storico=(309.38, '2026-08-04') | screener=(309.38, '2026-08-04')
-
-=== Perche' il recupero scrive zero: provo a riscaricare un titolo SWX mancante ===
-  esempi mancanti al 4/8: [('SIC', 'SIC.SW'), ('ROP', 'ROP.SW'), ('NREN', 'NREN.SW'), ('SIAT', 'SIAT.SW'), ('SLREFS', 'SLREFS.SW')]
-    SIC.SW       Yahoo: [('03/08', 212.0)]
-    ROP.SW       Yahoo: [('03/08', 356.0)]
-    NREN.SW      Yahoo: [('03/08', 39.8)]
+HTTP: 500
+{"triggered":false,"results":[{"workflow":"daily_eu_yahoo.yml","triggered":false,"status":401},{"workflow":"daily_us_yahoo.yml","triggered":false,"status":401}],"timestamp":"2026-08-05T06:42:55.488Z"}
