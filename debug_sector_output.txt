@@ -1,2 +1,22 @@
-  screener: (1419.6, '2026-08-03')
-  scheda  : (1419.6, '2026-08-03')
+=== STATO PREZZI (dalla vista latest_prices_mv) ===
+  Europa          2136 titoli  prevalente 2026-08-03 (2048)  altre date: {'2026-08-04': 71, '2026-07-28': 8, '2026-07-29': 3}
+  Stati Uniti     3001 titoli  prevalente 2026-08-04 (2967)  altre date: {'2026-08-03': 19, '2026-07-21': 4, '2026-07-13': 3}
+  Canada           399 titoli  prevalente 2026-08-04 (394)  altre date: {'2026-07-31': 2, '2026-07-03': 1, '2026-07-07': 1}
+  Giappone        1000 titoli  prevalente 2026-08-03 (999)  altre date: {'2026-06-12': 1}
+  Hong Kong        500 titoli  prevalente 2026-08-03 (500)  altre date: {}
+  Australia        350 titoli  prevalente 2026-08-03 (349)  altre date: {'2026-07-29': 1}
+  Corea            400 titoli  prevalente 2026-08-04 (398)  altre date: {'2026-07-14': 1, '2026-07-21': 1}
+  Singapore        100 titoli  prevalente 2026-08-04 (100)  altre date: {}
+
+  TOTALE nella vista: 7886
+
+=== Esecuzioni EU nelle ultime 18 ore ===
+  2026-08-05T03:52:36.534049+00:00
+      Prezzi Yahoo: ok=2625 fail=1
+      BLOCCO SICUREZZA: scartate 452 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima esecuzione a mercati chiusi.
+  2026-08-05T03:52:36.386562+00:00
+      Prezzi Yahoo: ok=2625 fail=1
+      BLOCCO SICUREZZA: scartate 452 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima esecuzione a mercati chiusi.
+  2026-08-05T03:52:36.239405+00:00
+      Prezzi Yahoo: ok=2625 fail=1
+      BLOCCO SICUREZZA: scartate 452 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima esecuzione a mercati chiusi.
