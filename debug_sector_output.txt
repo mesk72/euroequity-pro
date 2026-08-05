@@ -1,7 +1,22 @@
-=== endpoint EU+US ===
-HTTP: 200
-{"triggered":true,"results":[{"workflow":"daily_eu_yahoo.yml","triggered":true,"status":204},{"workflow":"daily_us_yahoo.yml","triggered":true,"status":204}],"timestamp":"2026-08-05T06:53:45.858Z"}
+=== endpoint nuovi ===
+  rapporto     HTTP 200  {"triggered":true,"status":204,"timestamp":"2026-08-05T06:59:10.410Z"}
+  Europa sera  HTTP 200  {"triggered":true,"status":204,"timestamp":"2026-08-05T06:59:11.731Z"}
 
-=== endpoint APAC ===
-HTTP: 200
-{"triggered":true,"timestamp":"2026-08-05T06:53:47.118Z"}
+=== esito fase di verifica negli script appena girati ===
+--- daily_apac_yahoo ---
+   eseguito: 2026-08-05T06:57:31
+     Prezzi Yahoo: ok=2349 fail=0
+--- daily_us_yahoo ---
+   eseguito: 2026-08-05T06:56:13
+     Prezzi Yahoo: ok=3401 fail=0
+--- daily_eu_yahoo ---
+   eseguito: 2026-08-05T06:59:02
+     Prezzi Yahoo: ok=2625 fail=1
+     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
+     nessun recupero: Yahoo non ha la seduta 2026-08-04 per questi titoli (poco scambiati o non ancora pubblicati) — nes
+     nessun recupero: Yahoo non ha la seduta 2026-08-04 per questi titoli (poco scambiati o non ancora pubblicati) — nes
+     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
+     nessun recupero: Yahoo non ha la seduta 2026-08-04 per questi titoli (poco scambiati o non ancora pubblicati) — nes
+     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
+     nessun recupero: Yahoo non ha la seduta 2026-08-03 per questi titoli (poco scambiati o non ancora pubblicati) — nes
+     Verifica seduta: 0 prezzi recuperati
