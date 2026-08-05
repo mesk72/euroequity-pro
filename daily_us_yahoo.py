@@ -851,6 +851,136 @@ log(f"  Quintili di settore: {q_ok} righe (exchange,settore) aggiornate")
 # e il grafico mostrano per forza lo stesso numero, perche' leggono la
 # stessa fonte. Prima erano due scritture separate e bastava che una
 # restasse indietro per far divergere i due valori nella stessa pagina.
+# ── VERIFICA SEDUTA: recupera cio' che il download di gruppo ha perso ──
+# FIX 5/8/2026. Problema osservato piu' volte e mai spiegato: il download
+# in blocco riesce (ok=2625, fail=1) ma NON contiene l'ultima seduta
+# chiusa, mentre lo stesso titolo interrogato singolarmente ce l'ha.
+# Risultato: l'Europa restava indietro di una seduta e nessuno se ne
+# accorgeva, perche' lo script dichiarava di aver scaricato tutto.
+# Casi reali: 4/8 ore 12:19 (nessun titolo col 3/8, disponibile da 21 ore)
+# e 5/8 ore 00:30 (71 titoli su 2136 col 4/8).
+# Questa fase non prova a spiegare il perche': verifica il risultato e
+# ripara. Stabilisce qual e' la vera ultima seduta del mercato (con
+# download SINGOLI, affidabili), controlla chi non ce l'ha e lo riscarica
+# a blocchi piccoli. Funziona quindi anche per cause che non conosciamo.
+log("\n[2b/5] Verifica ultima seduta per mercato...")
+ymap_v = {}
+for _s in all_stocks:
+    ymap_v[(_s["ticker"], _s["exchange"])] = _s.get("yahoo_ticker") or yahoo_ticker(_s["ticker"], _s["exchange"])
+
+def _ultima_seduta_reale(exchange, tickers):
+    """Ultima seduta CHIUSA realmente pubblicata da Yahoo per il mercato.
+    Interroga singolarmente alcuni titoli: il download singolo non ha mai
+    mostrato il problema del blocco."""
+    migliore = None
+    for tk in tickers[:5]:
+        yt = ymap_v.get((tk, exchange))
+        if not yt:
+            continue
+        try:
+            d1 = yf.download(yt, period="12d", interval="1d",
+                             auto_adjust=True, progress=False)
+            if d1.empty:
+                continue
+            cl1 = d1["Close"]
+            if isinstance(cl1, pd.DataFrame):
+                cl1 = cl1.iloc[:, 0]
+            cl1 = cl1.dropna()
+            for i in range(len(cl1) - 1, -1, -1):
+                ds1 = cl1.index[i].strftime("%Y-%m-%d")
+                if seduta_conclusa(ds1):
+                    if migliore is None or ds1 > migliore:
+                        migliore = ds1
+                    break
+        except Exception:
+            pass
+        time.sleep(0.4)
+    return migliore
+
+recuperati_tot = 0
+for _ex, _tickers in by_exchange.items():
+    _seduta = _ultima_seduta_reale(_ex, _tickers)
+    if not _seduta:
+        log(f"  {_ex}: impossibile stabilire l'ultima seduta, salto")
+        continue
+    _presenti = set()
+    _off = 0
+    while True:
+        _rr = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
+            params={"select": "ticker", "exchange": "eq." + _ex,
+                    "date": "eq." + _seduta, "limit": "1000", "offset": str(_off)})
+        try:
+            _b = _rr.json()
+        except Exception:
+            break
+        if not isinstance(_b, list) or not _b:
+            break
+        _presenti.update(x["ticker"] for x in _b)
+        _off += 1000
+        if len(_b) < 1000:
+            break
+    _mancanti = [t for t in _tickers if t not in _presenti]
+    if not _mancanti:
+        log(f"  {_ex}: seduta {_seduta} completa ({len(_tickers)} titoli)")
+        continue
+    log(f"  {_ex}: seduta {_seduta} — {len(_mancanti)}/{len(_tickers)} senza questa seduta, verifico su Yahoo")
+    _buf = []
+    _da = (datetime.strptime(_seduta, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d")
+    _a = (datetime.strptime(_seduta, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+    for _j in range(0, len(_mancanti), 40):
+        _sub = [t for t in _mancanti[_j:_j+40] if ymap_v.get((t, _ex))]
+        if not _sub:
+            continue
+        _yts = [ymap_v[(t, _ex)] for t in _sub]
+        _rev = {ymap_v[(t, _ex)]: t for t in _sub}
+        try:
+            _d2 = yf.download(tickers=" ".join(_yts), start=_da, end=_a, interval="1d",
+                              auto_adjust=True, progress=False, threads=True)
+            if _d2.empty:
+                continue
+            if isinstance(_d2.columns, pd.MultiIndex):
+                _cl2 = _d2["Close"]
+            else:
+                _cl2 = _d2[["Close"]].rename(columns={"Close": _yts[0]})
+            for _yt in _yts:
+                if _yt not in _cl2.columns:
+                    continue
+                _ser = _cl2[_yt].dropna()
+                for _idx, _pr in _ser.items():
+                    _ds = _idx.strftime("%Y-%m-%d")
+                    if _ds != _seduta or not seduta_conclusa(_ds):
+                        continue
+                    try:
+                        _v = float(_pr)
+                    except Exception:
+                        continue
+                    if _v <= 0:
+                        continue
+                    _buf.append({"ticker": _rev[_yt], "exchange": _ex,
+                                 "date": _ds, "adj_close": round(_v, 6)})
+        except Exception as _e:
+            log(f"    blocco di recupero fallito: {str(_e)[:80]}")
+        time.sleep(1.5)
+    _ded = {}
+    for _row in _buf:
+        _ded[(_row["ticker"], _row["exchange"], _row["date"])] = _row
+    _buf = list(_ded.values())
+    _scritte = 0
+    for _j in range(0, len(_buf), 500):
+        _rw = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date",
+                            headers=headers_up, json=_buf[_j:_j+500])
+        if _rw.status_code in (200, 201, 204):
+            _scritte += len(_buf[_j:_j+500])
+        else:
+            log(f"    ERRORE scrittura recupero: HTTP {_rw.status_code} - {_rw.text[:150]}")
+    recuperati_tot += _scritte
+    if _scritte:
+        log(f"    recuperati {_scritte} titoli")
+    else:
+        log(f"    nessun recupero: Yahoo non ha la seduta {_seduta} per questi titoli "
+            f"(poco scambiati o non ancora pubblicati) — nessuna azione necessaria")
+log(f"  Verifica seduta: {recuperati_tot} prezzi recuperati")
+
 log("\n[Vista prezzi] Aggiornamento latest_prices_mv...")
 try:
     rmv = requests.post(SUPABASE_URL + "/rest/v1/rpc/refresh_latest_prices",
