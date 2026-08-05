@@ -1,34 +1,34 @@
-import os, requests
-from collections import Counter
+import os, requests, yfinance as yf, pandas as pd, random
+from datetime import datetime
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-print("=== LOG della fase di verifica ===")
-r=requests.get(U+"/rest/v1/script_logs",headers=H,
-    params={"select":"created_at,log_text","script_name":"eq.daily_eu_yahoo","order":"created_at.desc","limit":"1"})
-d=r.json()
-if d:
-    print("eseguito:",d[0]["created_at"])
-    dentro=False
-    for riga in d[0]["log_text"].split("\n"):
-        if "[2b/5]" in riga: dentro=True
-        if dentro: print("  ",riga.strip())
-        if "Verifica seduta:" in riga: dentro=False
-    for riga in d[0]["log_text"].split("\n"):
-        if any(k in riga for k in ["Prezzi Yahoo","vista aggiornata","BLOCCO SICUREZZA"]):
-            print("  >>",riga.strip())
+print("Ora UTC:", datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
+      "— la seduta del 4/8 e' chiusa da ~15 ore")
 print()
-print("=== EUROPA: distribuzione date nella vista ===")
-EU=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]
-c=Counter()
-for ex in EU:
-    off=0
-    while True:
-        b=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-            params={"select":"price_date","exchange":"eq."+ex,"limit":"1000","offset":str(off)}).json()
-        if not isinstance(b,list) or not b: break
-        for x in b: c[x["price_date"]]+=1
-        off+=1000
-        if len(b)<1000: break
-for k,v in sorted(c.items(),reverse=True)[:5]:
-    print("   %s : %5d titoli" % (k,v))
+# titoli grandi vs titoli qualsiasi, stesso mercato
+grandi=[("ASML.AS","AS"),("MC.PA","PA"),("ISP.MI","MIL"),("SHEL.L","LSE"),("SAP.DE","XETRA")]
+r=requests.get(U+"/rest/v1/fundamentals",headers=H,
+    params={"select":"ticker,exchange,mkt_cap","exchange":"in.(AS,PA,MIL,LSE,XETRA)",
+            "order":"mkt_cap.asc","limit":"400"})
+piccoli=[x for x in r.json() if x.get("mkt_cap")][:200]
+random.seed(7); random.sample(piccoli,min(15,len(piccoli)))
+suf={"AS":".AS","PA":".PA","MIL":".MI","LSE":".L","XETRA":".DE"}
+camp=[(x["ticker"]+suf[x["exchange"]],x["exchange"]) for x in random.sample(piccoli,15)]
+
+def quanti(lista,eti):
+    ok=0;tot=0
+    for yt,ex in lista:
+        try:
+            d=yf.download(yt,period="8d",interval="1d",auto_adjust=True,progress=False)
+            if d.empty: tot+=1; continue
+            cl=d["Close"]
+            if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+            date=[i.strftime("%Y-%m-%d") for i in cl.dropna().index]
+            tot+=1
+            if "2026-08-04" in date: ok+=1
+        except Exception: tot+=1
+    print("  %-28s %2d/%2d hanno il 4 agosto" % (eti,ok,tot))
+
+quanti(grandi,"5 grandi (blue chip)")
+quanti(camp,"15 a bassa capitalizzazione")
