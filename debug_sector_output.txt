@@ -1,13 +1,17 @@
-Ora UTC: 2026-08-06 10:40
+Chi e' fermo al 4/8: Yahoo ha il 5/8 per loro?
 
-MERCATO           TOT al 05/08 al 04/08  +vecchi assenti
-Europa           2126     2061       56       18      -9
-Stati Uniti      3002     2942       43       16       1
-Canada            399      389        6        4       0
-Giappone         1000      765      234        1       0
-Hong Kong         500      385      115        0       0
-Australia         349      348        1        1      -1
-Corea             400      398        0        2       0
-Singapore         100      100        0        0       0
+=== TSE (campione di 6 su quelli fermi) ===
+   1305.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 4166.0), ('05/08', 4259.0), ('06/08', 4279.0)]
+   1377.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 4275.0), ('05/08', 4280.0), ('06/08', 4355.0)]
+   1414.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 1286.5), ('05/08', 1277.0), ('06/08', 1294.5)]
+   141A.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 3250.0), ('05/08', 3270.0), ('06/08', 3200.0)]
+   1662.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 1701.0), ('05/08', 1691.0), ('06/08', 1718.0)]
+   1663.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 1786.0), ('05/08', 1785.0), ('06/08', 1799.0)]
 
-TOTALE 7876 titoli: al 05/08 = 7388 (93.8%) | al 04/08 = 455 | piu' vecchi = 42 | assenti = -9
+=== SEHK (campione di 6 su quelli fermi) ===
+   0100.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 230.2), ('05/08', 253.8), ('06/08', 297.2)]
+   1053.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 0.9), ('05/08', 0.9), ('06/08', 0.9)]
+   1060.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 0.52), ('05/08', 0.51), ('06/08', 0.52)]
+   0107.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 4.63), ('05/08', 4.66), ('06/08', 4.64)]
+   0108.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 1.59), ('05/08', 1.58), ('06/08', 1.54)]
+   1113.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 47.9), ('05/08', 48.18), ('06/08', 46.8)]
