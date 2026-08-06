@@ -1,43 +1,28 @@
-import os, requests
-from collections import Counter
-from datetime import datetime
+import os, requests, yfinance as yf, pandas as pd, time
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-print("Ora UTC:", datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
-GRUPPI=[("Europa",["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]),
-        ("Stati Uniti",["US"]),("Canada",["TSX"]),("Giappone",["TSE"]),
-        ("Hong Kong",["SEHK"]),("Australia",["ASX"]),("Corea",["KRX"]),("Singapore",["SGX"])]
-def cnt(ex):
-    r=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
-        params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
-    return int(r.headers.get("content-range","0/0").split("/")[-1])
-def date_di(ex):
-    out=[];off=0
-    while True:
-        r=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-            params={"select":"ticker,price_date","exchange":"eq."+ex,"limit":"1000","offset":str(off)})
-        b=r.json()
-        if not isinstance(b,list) or not b: break
-        out+=b; off+=1000
-        if len(b)<1000: break
-    return out
-
-TOT=0; A5=0; A4=0; VECCHI=0; MANCA=0
-print()
-print("%-14s %6s %8s %8s %8s %7s" % ("MERCATO","TOT","al 05/08","al 04/08","+vecchi","assenti"))
-dettaglio={}
-for nome,lista in GRUPPI:
-    t=sum(cnt(e) for e in lista)
-    righe=[]
-    for e in lista: righe+=date_di(e)
-    c=Counter(x["price_date"] for x in righe)
-    a5=c.get("2026-08-05",0); a4=c.get("2026-08-04",0)
-    vecchi=sum(v for k,v in c.items() if k<"2026-08-04")
-    manca=t-len(righe)
-    TOT+=t; A5+=a5; A4+=a4; VECCHI+=vecchi; MANCA+=manca
-    dettaglio[nome]=(lista,a4)
-    print("%-14s %6d %8d %8d %8d %7d" % (nome,t,a5,a4,vecchi,manca))
-print()
-print("TOTALE %d titoli: al 05/08 = %d (%.1f%%) | al 04/08 = %d | piu' vecchi = %d | assenti = %d"
-      % (TOT,A5,A5/TOT*100,A4,VECCHI,MANCA))
+print("Chi e' fermo al 4/8: Yahoo ha il 5/8 per loro?")
+for ex in ["TSE","SEHK"]:
+    r=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
+        params={"select":"ticker","exchange":"eq."+ex,"price_date":"eq.2026-08-04","limit":"600"})
+    tk=[x["ticker"] for x in r.json()][:6]
+    print("\n=== %s (campione di %d su quelli fermi) ===" % (ex,len(tk)))
+    for t in tk:
+        y=requests.get(U+"/rest/v1/stocks",headers=H,
+            params={"select":"yahoo_ticker","ticker":"eq."+t,"exchange":"eq."+ex}).json()
+        yt=y[0].get("yahoo_ticker") if y else None
+        if not yt: print("   %-8s nessun codice Yahoo" % t); continue
+        try:
+            df=yf.download(yt,period="8d",interval="1d",auto_adjust=True,progress=False)
+            if df.empty: print("   %-10s Yahoo VUOTO" % yt); continue
+            cl=df["Close"]
+            if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+            cl=cl.dropna()
+            date=[i.strftime("%Y-%m-%d") for i in cl.index]
+            ha5="2026-08-05" in date
+            print("   %-10s Yahoo ha il 5/8: %-3s | ultime: %s" % (yt,"SI" if ha5 else "NO",
+                  [(cl.index[i].strftime("%d/%m"),round(float(cl.iloc[i]),2)) for i in range(max(0,len(cl)-3),len(cl))]))
+        except Exception as e:
+            print("   %-10s errore %s" % (yt,str(e)[:40]))
+        time.sleep(0.4)
