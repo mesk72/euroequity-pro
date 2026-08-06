@@ -1,17 +1,23 @@
-Chi e' fermo al 4/8: Yahoo ha il 5/8 per loro?
+TSE    mancavano  235 -> recuperati  234
+SEHK   mancavano  115 -> recuperati  115
+US     mancavano   60 -> recuperati   44
+MIL    mancavano    2 -> recuperati    2
+XETRA  mancavano    2 -> recuperati    0
+PA     mancavano    4 -> recuperati    3
+AS     mancavano    6 -> recuperati    6
+MC     mancavano    5 -> recuperati    5
+BR     mancavano    7 -> recuperati    5
+LS     mancavano    6 -> recuperati    6
+VI     mancavano    5 -> recuperati    5
+IR     mancavano    1 -> recuperati    1
+GR     mancavano    2 -> recuperati    2
+LSE    mancavano    7 -> recuperati    6
+SWX    mancavano   10 -> recuperati   10
+OM     mancavano    2 -> recuperati    1
+OB     mancavano    2 -> recuperati    1
+CPSE   mancavano    4 -> recuperati    1
+TSX    mancavano   10 -> recuperati    5
+ASX    mancavano    1 -> recuperati    1
+KRX    mancavano    2 -> recuperati    0
 
-=== TSE (campione di 6 su quelli fermi) ===
-   1305.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 4166.0), ('05/08', 4259.0), ('06/08', 4279.0)]
-   1377.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 4275.0), ('05/08', 4280.0), ('06/08', 4355.0)]
-   1414.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 1286.5), ('05/08', 1277.0), ('06/08', 1294.5)]
-   141A.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 3250.0), ('05/08', 3270.0), ('06/08', 3200.0)]
-   1662.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 1701.0), ('05/08', 1691.0), ('06/08', 1718.0)]
-   1663.T     Yahoo ha il 5/8: SI  | ultime: [('04/08', 1786.0), ('05/08', 1785.0), ('06/08', 1799.0)]
-
-=== SEHK (campione di 6 su quelli fermi) ===
-   0100.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 230.2), ('05/08', 253.8), ('06/08', 297.2)]
-   1053.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 0.9), ('05/08', 0.9), ('06/08', 0.9)]
-   1060.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 0.52), ('05/08', 0.51), ('06/08', 0.52)]
-   0107.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 4.63), ('05/08', 4.66), ('06/08', 4.64)]
-   0108.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 1.59), ('05/08', 1.58), ('06/08', 1.54)]
-   1113.HK    Yahoo ha il 5/8: SI  | ultime: [('04/08', 47.9), ('05/08', 48.18), ('06/08', 46.8)]
+fatto
