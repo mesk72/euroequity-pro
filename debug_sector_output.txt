@@ -1,0 +1,3 @@
+Esca nella vista: [{'ticker': '__CRONTEST__', 'price': 42.42, 'price_date': '2026-08-05'}]
+>>> pg_cron FUNZIONA: la vista si e' aggiornata da sola.
+(esca rimossa dallo storico)
