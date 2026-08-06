@@ -1,9 +1,14 @@
-=== VISTA (quello che vede il sito) vs STORICO (la verita') ===
-  TSE    vista=2026-08-05 (765 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
-  SEHK   vista=2026-08-05 (385 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
-  ASX    vista=2026-08-05 (348 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
-  KRX    vista=2026-08-05 (398 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
-  SGX    vista=2026-08-05 (100 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
-  US     vista=2026-08-05 (2942 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
-  MIL    vista=2026-08-05 (115 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
-  XETRA  vista=2026-08-05 (208 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+PROVA: scrivo un prezzo finto nello storico e verifico che la vista
+lo assorba da sola entro 10 minuti, senza che nessuno intervenga.
+
+  scritto nello storico: True
+  presente nella vista ADESSO: False (atteso: no, deve arrivare col prossimo ricalcolo)
+
+  Lascio l'esca. Ricontrollo fra qualche minuto.
+
+=== stato generale della vista ===
+  titoli nella vista: 7885
+    2026-08-05 :  7388 (93.7%)
+    2026-08-04 :   455 (5.8%)
+    2026-08-03 :     3 (0.0%)
+    2026-07-31 :     3 (0.0%)
