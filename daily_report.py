@@ -118,7 +118,13 @@ def raccogli_dati():
     for ex in TUTTI_EXCHANGE:
         universo = leggi_tutto("stocks", "ticker,company", ex,
                                {"in_universe": "eq.true"})
-        prezzi = leggi_tutto("latest_prices", "ticker,price_date", ex)
+        # FIX 6/8/2026: legge la VISTA, cioe' esattamente cio' che il sito
+        # mostra agli utenti. Prima leggeva la vecchia tabella
+        # latest_prices: il 6/8 il rapporto dichiarava 89% aggiornato
+        # mentre il sito mostrava ancora il 3 agosto per l'Asia, perche'
+        # la vista era bloccata da un timeout. Un rapporto che misura una
+        # tabella diversa da quella visualizzata da' una falsa sicurezza.
+        prezzi = leggi_tutto("latest_prices_mv", "ticker,price_date", ex)
 
         nome_per_ticker = {r["ticker"]: (r.get("company") or r["ticker"])
                            for r in universo}
