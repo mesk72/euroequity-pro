@@ -1,10 +1,50 @@
-=== Storico completo per titolo (quello che usa il GRAFICO) ===
-  ASML  .AS     1290 sedute  dal 2021-07-23 al 2026-08-05
-  SAP   .XETRA  1284 sedute  dal 2021-07-23 al 2026-08-05
-  AAPL  .US     1264 sedute  dal 2021-07-23 al 2026-08-05
-  7203  .TSE    1231 sedute  dal 2021-07-26 al 2026-08-05
-  BHP   .ASX    1274 sedute  dal 2021-07-23 al 2026-08-05
+OGGETTO: ForwardAlpha OK - 7388/7876 titoli aggiornati (93.8%)
 
-=== Cosa restituisce l'API del grafico (5 anni) ===
-  AAPL  .US   punti=0  dal - al -  | mom12m=None mom5y=None
-  ASML  .AS   punti=0  dal - al -  | mom12m=None mom5y=None
+UNIVERSO: 7876 titoli
+
+DISTRIBUZIONE PER DATA
+  2026-08-05  1 seduta indietro   7388 titoli   93.8%
+  2026-08-04  2 sedute indietro    455 titoli    5.8%
+  2026-08-03  3 sedute indietro      3 titoli    0.0%
+  2026-07-31  4 sedute indietro      3 titoli    0.0%
+  2026-07-28  7 sedute indietro      3 titoli    0.0%
+  2026-07-24  9 sedute indietro      1 titoli    0.0%
+  2026-07-23  10 sedute indietro      2 titoli    0.0%
+  2026-07-21  12 sedute indietro      5 titoli    0.1%
+  2026-07-17  14 sedute indietro      1 titoli    0.0%
+  2026-07-16  15 sedute indietro      1 titoli    0.0%
+  2026-07-14  17 sedute indietro      2 titoli    0.0%
+  2026-07-13  18 sedute indietro      3 titoli    0.0%
+  2026-07-07  22 sedute indietro      1 titoli    0.0%
+  2026-07-03  24 sedute indietro      2 titoli    0.0%
+  2026-07-02  25 sedute indietro      1 titoli    0.0%
+  2026-06-30  27 sedute indietro      1 titoli    0.0%
+  2026-06-12  39 sedute indietro      1 titoli    0.0%
+  2026-06-10  41 sedute indietro      1 titoli    0.0%
+  mai scritti                       2 titoli    0.0%
+
+MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
+Europa           2126   2061     56        8     1  2026-08-05
+Stati Uniti      3002   2942     43       16     1  2026-08-05
+Canada            399    389      6        4     0  2026-08-05
+Giappone         1000    765    234        1     0  2026-08-05
+Hong Kong         500    385    115        0     0  2026-08-05
+Australia         349    348      1        0     0  2026-08-05
+Corea             400    398      0        2     0  2026-08-05
+Singapore         100    100      0        0     0  2026-08-05
+
+ESECUZIONI ultime 24h: 5
+  APAC   ok=2349 falliti=0 durata=642s
+  US+CA  ok=3401 falliti=0 durata=592s
+  EU     ok=2625 falliti=1 durata=602s
+  EU     ok=2625 falliti=1 durata=665s
+  APAC   ok=2349 falliti=0 durata=474s
+
+
+DA SISTEMARE: nessuno
+Delistati/sospesi (nessun intervento): 27
+
+Quintili precalcolati: 247 righe (aggiornati 2026-08-06)
+
+SMTP non configurato: stampo il rapporto senza inviarlo.
+ForwardAlpha OK - 7388/7876 titoli aggiornati (93.8%)
