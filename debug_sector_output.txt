@@ -1,23 +1,13 @@
-TSE    mancavano  235 -> recuperati  234
-SEHK   mancavano  115 -> recuperati  115
-US     mancavano   60 -> recuperati   44
-MIL    mancavano    2 -> recuperati    2
-XETRA  mancavano    2 -> recuperati    0
-PA     mancavano    4 -> recuperati    3
-AS     mancavano    6 -> recuperati    6
-MC     mancavano    5 -> recuperati    5
-BR     mancavano    7 -> recuperati    5
-LS     mancavano    6 -> recuperati    6
-VI     mancavano    5 -> recuperati    5
-IR     mancavano    1 -> recuperati    1
-GR     mancavano    2 -> recuperati    2
-LSE    mancavano    7 -> recuperati    6
-SWX    mancavano   10 -> recuperati   10
-OM     mancavano    2 -> recuperati    1
-OB     mancavano    2 -> recuperati    1
-CPSE   mancavano    4 -> recuperati    1
-TSX    mancavano   10 -> recuperati    5
-ASX    mancavano    1 -> recuperati    1
-KRX    mancavano    2 -> recuperati    0
+Ora UTC: 2026-08-06 10:54
 
-fatto
+MERCATO           TOT al 05/08 al 04/08  +vecchi assenti
+Europa           2126     2115        2       18      -9
+Stati Uniti      3002     2986        0       15       1
+Canada            399      394        1        4       0
+Giappone         1000      999        0        1       0
+Hong Kong         500      500        0        0       0
+Australia         349      349        0        1      -1
+Corea             400      398        0        2       0
+Singapore         100      100        0        0       0
+
+TOTALE 7876 titoli: al 05/08 = 7841 (99.6%) | al 04/08 = 3 | piu' vecchi = 41 | assenti = -9
