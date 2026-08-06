@@ -149,8 +149,15 @@ def raccogli_dati():
             else:
                 in_ritardo.append((tk, nome_per_ticker.get(tk, tk), d))
 
+        # FIX 6/8/2026: si registra anche il conteggio AUTOREVOLE del
+        # database, non solo quello dei titoli che siamo riusciti a
+        # leggere. Se una lettura viene troncata, i titoli mancanti
+        # sparivano dal totale invece di risultare non aggiornati: la
+        # percentuale restava alta e il problema diventava invisibile.
         per_exchange[ex] = {
-            "universo": len(tickers_universo),
+            "universo_letto": len(tickers_universo),
+            "universo": conta_esatto("stocks", {"exchange": "eq." + ex,
+                                                "in_universe": "eq.true"}) or len(tickers_universo),
             "aggiornati": len(aggiornati),
             "in_ritardo": in_ritardo,
             "assenti": [(tk, nome_per_ticker.get(tk, tk)) for tk in assenti],
@@ -195,6 +202,12 @@ def distribuzione(per_exchange, exchanges, oggi):
                 conta[data] += 1
             else:
                 mai += 1
+    # titoli che il database conta ma che non siamo riusciti a leggere:
+    # vanno mostrati, non fatti sparire dal totale.
+    letti = sum(per_exchange[ex]["universo_letto"] for ex in exchanges)
+    attesi = sum(per_exchange[ex]["universo"] for ex in exchanges)
+    non_letti = max(0, attesi - letti)
+
     righe = []
     for data, n in sorted(conta.items(), reverse=True):
         try:
@@ -202,7 +215,7 @@ def distribuzione(per_exchange, exchanges, oggi):
         except Exception:
             g = None
         righe.append({"data": data, "n": n, "giorni": g})
-    return righe, mai
+    return righe, mai + non_letti
 
 
 def triage_cronici(per_exchange, oggi, giorni_soglia=7):
@@ -398,6 +411,18 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
                 "%s: siamo fermi alla seduta del %s, Yahoo ha gia' quella del %s "
                 "(%d titoli)" % (nome, seduta_nostra, reale, titoli_gruppo))
 
+    # 1b. TITOLI NON LETTI: il database ne conta piu' di quanti ne
+    # abbiamo letti. Prima finiva solo nei log dell'esecuzione, dove
+    # nessuno lo vedeva, e la percentuale in cima restava alta perche'
+    # calcolata su un totale ridotto. Deve essere ben visibile.
+    _letti = sum(d["universo_letto"] for d in per_exchange.values())
+    _attesi = sum(d["universo"] for d in per_exchange.values())
+    if _attesi > _letti:
+        allarmi.append(
+            "%d titoli non sono stati letti: il database ne conta %d, ne abbiamo "
+            "letti %d. I conteggi qui sotto potrebbero essere incompleti."
+            % (_attesi - _letti, _attesi, _letti))
+
     # 2. script non girato o con molti fallimenti
     visti = set()
     for r in esecuzioni:
@@ -464,7 +489,7 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
                  "</tr>" % (grigio, r["data"], etichetta, r["n"], pc))
     if mai_scritti:
         B.append("<tr style='color:#b00'>"
-                 "<td style='padding:2px 10px 2px 0'><b>mai scritti</b></td>"
+                 "<td style='padding:2px 10px 2px 0'><b>senza prezzo o non letti</b></td>"
                  "<td style='padding:2px 10px;text-align:right'><b>%d</b> titoli</td>"
                  "<td style='padding:2px 0;text-align:right;color:#888'>%.1f%%</td>"
                  "</tr>" % (mai_scritti, mai_scritti / tot_universo * 100 if tot_universo else 0))
