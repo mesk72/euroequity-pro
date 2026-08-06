@@ -1,3 +1,10 @@
-Esca nella vista: [{'ticker': '__CRONTEST__', 'price': 42.42, 'price_date': '2026-08-05'}]
->>> pg_cron FUNZIONA: la vista si e' aggiornata da sola.
-(esca rimossa dallo storico)
+=== Storico completo per titolo (quello che usa il GRAFICO) ===
+  ASML  .AS     1290 sedute  dal 2021-07-23 al 2026-08-05
+  SAP   .XETRA  1284 sedute  dal 2021-07-23 al 2026-08-05
+  AAPL  .US     1264 sedute  dal 2021-07-23 al 2026-08-05
+  7203  .TSE    1231 sedute  dal 2021-07-26 al 2026-08-05
+  BHP   .ASX    1274 sedute  dal 2021-07-23 al 2026-08-05
+
+=== Cosa restituisce l'API del grafico (5 anni) ===
+  AAPL  .US   punti=0  dal - al -  | mom12m=None mom5y=None
+  ASML  .AS   punti=0  dal - al -  | mom12m=None mom5y=None
