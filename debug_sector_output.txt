@@ -1,29 +1,9 @@
-APAC eseguito: 2026-08-06T05:13:51
-
-   Data piu' recente nel mercato SEHK: 2026-08-04 — uso 2026-07-25 come base (margine di sicurezza)
-   Data piu' recente nel mercato TSE: 2026-08-04 — uso 2026-07-25 come base (margine di sicurezza)
-   ATTENZIONE 2362.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   ATTENZIONE 2558.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   ATTENZIONE 2596.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   ATTENZIONE 6199.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   ATTENZIONE 71.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   ATTENZIONE 754.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   ATTENZIONE 86.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   ATTENZIONE 9677.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
-   Prezzi Yahoo: ok=2349 fail=0
-   BLOCCO SICUREZZA: scartate 2279 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima es
-   SEHK: seduta 2026-08-05 — 252/500 senza questa seduta, verifico su Yahoo
-   recuperati 137 titoli
-   TSE: seduta 2026-08-05 — 468/1000 senza questa seduta, verifico su Yahoo
-   recuperati 233 titoli
-   recuperati 1 titoli
-   nessun recupero: Yahoo non ha la seduta 2026-08-05 per questi titoli (poco scambiati o non ancora pubblicati) — nessuna azione nec
-   Verifica seduta: 371 prezzi recuperati
-   ERRORE aggiornamento vista: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement 
-
-=== stato ATTUALE per exchange asiatici ===
-  TSE   {'2026-08-03': 999, '2026-06-12': 1}
-  SEHK  {'2026-08-03': 500}
-  KRX   {'2026-08-04': 398, '2026-07-21': 1, '2026-07-14': 1}
-  SGX   {'2026-08-04': 100}
-  ASX   {'2026-08-03': 349, '2026-07-29': 1}
+=== VISTA (quello che vede il sito) vs STORICO (la verita') ===
+  TSE    vista=2026-08-05 (765 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+  SEHK   vista=2026-08-05 (385 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+  ASX    vista=2026-08-05 (348 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+  KRX    vista=2026-08-05 (398 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+  SGX    vista=2026-08-05 (100 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+  US     vista=2026-08-05 (2942 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+  MIL    vista=2026-08-05 (115 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
+  XETRA  vista=2026-08-05 (208 titoli su quella data) | storico=2026-08-05 -> ALLINEATA
