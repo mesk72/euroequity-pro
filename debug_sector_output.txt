@@ -1,52 +1,29 @@
-ATTENZIONE: letti 7874 titoli ma il database ne conta 7876. Una lettura e' stata troncata, i numeri sotto non sono affidabili.
-OGGETTO: ForwardAlpha ATTENZIONE - 2402/7874 titoli aggiornati (30.5%)
+APAC eseguito: 2026-08-06T05:13:51
 
-UNIVERSO: 7874 titoli
+   Data piu' recente nel mercato SEHK: 2026-08-04 — uso 2026-07-25 come base (margine di sicurezza)
+   Data piu' recente nel mercato TSE: 2026-08-04 — uso 2026-07-25 come base (margine di sicurezza)
+   ATTENZIONE 2362.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   ATTENZIONE 2558.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   ATTENZIONE 2596.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   ATTENZIONE 6199.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   ATTENZIONE 71.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   ATTENZIONE 754.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   ATTENZIONE 86.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   ATTENZIONE 9677.SEHK: dati Yahoo fermi al 2026-08-03 (3gg fa) dentro un chunk altrimenti riuscito
+   Prezzi Yahoo: ok=2349 fail=0
+   BLOCCO SICUREZZA: scartate 2279 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla prossima es
+   SEHK: seduta 2026-08-05 — 252/500 senza questa seduta, verifico su Yahoo
+   recuperati 137 titoli
+   TSE: seduta 2026-08-05 — 468/1000 senza questa seduta, verifico su Yahoo
+   recuperati 233 titoli
+   recuperati 1 titoli
+   nessun recupero: Yahoo non ha la seduta 2026-08-05 per questi titoli (poco scambiati o non ancora pubblicati) — nessuna azione nec
+   Verifica seduta: 371 prezzi recuperati
+   ERRORE aggiornamento vista: HTTP 500 - {"code":"57014","details":null,"hint":null,"message":"canceling statement due to statement 
 
-DISTRIBUZIONE PER DATA
-  2026-08-05  1 seduta indietro   2402 titoli   30.5%
-  2026-08-04  2 sedute indietro   5408 titoli   68.7%
-  2026-08-03  3 sedute indietro     33 titoli    0.4%
-  2026-07-31  4 sedute indietro      4 titoli    0.1%
-  2026-07-28  7 sedute indietro      3 titoli    0.0%
-  2026-07-24  9 sedute indietro      1 titoli    0.0%
-  2026-07-23  10 sedute indietro      2 titoli    0.0%
-  2026-07-21  12 sedute indietro      5 titoli    0.1%
-  2026-07-17  14 sedute indietro      1 titoli    0.0%
-  2026-07-16  15 sedute indietro      1 titoli    0.0%
-  2026-07-14  17 sedute indietro      2 titoli    0.0%
-  2026-07-13  18 sedute indietro      3 titoli    0.0%
-  2026-07-07  22 sedute indietro      1 titoli    0.0%
-  2026-07-03  24 sedute indietro      2 titoli    0.0%
-  2026-07-02  25 sedute indietro      1 titoli    0.0%
-  2026-06-30  27 sedute indietro      1 titoli    0.0%
-  2026-06-12  39 sedute indietro      1 titoli    0.0%
-  2026-06-10  41 sedute indietro      1 titoli    0.0%
-  mai scritti                       2 titoli    0.0%
-
-MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
-Europa           2126   2057     50       18     1  2026-08-05
-Stati Uniti      3000      0   2966       33     1  2026-08-04
-Canada            399      0    394        5     0  2026-08-04
-Giappone         1000      0    999        1     0  2026-08-04
-Hong Kong         500      0    500        0     0  2026-08-04
-Australia         349    344      2        3     0  2026-08-05
-Corea             400      1    397        2     0  2026-08-04
-Singapore         100      0    100        0     0  2026-08-04
-
-ESECUZIONI ultime 24h: 10
-  EU     ok=2625 falliti=1 durata=665s
-  APAC   ok=2349 falliti=0 durata=474s
-  EU     ok=2625 falliti=1 durata=647s
-  US+CA  ok=3401 falliti=0 durata=684s
-  EU     ok=2625 falliti=1 durata=751s
-  US+CA  ok=3401 falliti=0 durata=505s
-
-
-DA SISTEMARE: nessuno
-Delistati/sospesi (nessun intervento): 27
-
-Quintili precalcolati: 247 righe (aggiornati 2026-08-05)
-
-SMTP non configurato: stampo il rapporto senza inviarlo.
-ForwardAlpha ATTENZIONE - 2402/7874 titoli aggiornati (30.5%)
+=== stato ATTUALE per exchange asiatici ===
+  TSE   {'2026-08-03': 999, '2026-06-12': 1}
+  SEHK  {'2026-08-03': 500}
+  KRX   {'2026-08-04': 398, '2026-07-21': 1, '2026-07-14': 1}
+  SGX   {'2026-08-04': 100}
+  ASX   {'2026-08-03': 349, '2026-07-29': 1}
