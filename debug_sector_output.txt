@@ -1,13 +1,7 @@
-Ora UTC: 2026-08-06 10:54
+APAC eseguito: 2026-08-06T11:06:34
 
-MERCATO           TOT al 05/08 al 04/08  +vecchi assenti
-Europa           2126     2115        2       18      -9
-Stati Uniti      3002     2986        0       15       1
-Canada            399      394        1        4       0
-Giappone         1000      999        0        1       0
-Hong Kong         500      500        0        0       0
-Australia         349      349        0        1      -1
-Corea             400      398        0        2       0
-Singapore         100      100        0        0       0
-
-TOTALE 7876 titoli: al 05/08 = 7841 (99.6%) | al 04/08 = 3 | piu' vecchi = 41 | assenti = -9
+   Prezzi Yahoo: ok=2349 fail=0
+   [Completamento seduta] Verifico che ogni mercato abbia l'ultima seduta...
+   passata 1: mancavano 56, recuperati 0 [SEHK 0/7, TSE 0/2, SGX 0/2, KRX 0/45]
+   nessun progresso: i titoli rimasti Yahoo non li ha (sospesi, delistati o non ancora pubblicati). Mi fermo.
+   Completamento seduta: 2293/2349 titoli hanno l'ultima seduta (0 recuperati in questa esecuzione)
