@@ -1,13 +1,21 @@
-Ora UTC: 2026-08-07 03:19
+=== A. LA VISTA E' FERMA? Confronto storico vs vista ===
+  MIL    storico=2026-08-05 | vista=2026-08-05 (117 titoli)
+  XETRA  storico=2026-08-06 | vista=2026-08-06 (1 titoli)
+  PA     storico=2026-08-05 | vista=2026-08-05 (215 titoli)
+  SWX    storico=2026-08-06 | vista=2026-08-06 (24 titoli)
+  HE     storico=2026-08-06 | vista=2026-08-06 (16 titoli)
+  US     storico=2026-08-06 | vista=2026-08-06 (2968 titoli)
+  TSE    storico=2026-08-06 | vista=2026-08-06 (998 titoli)
 
-MERCATO           TOT   ULTIMA AGGIOR   indietro
-Europa           2126 2026-08-06     88   2026-08-05:2028 | 2026-08-04:1
-Stati Uniti      3002 2026-08-06   2968   2026-08-05:18 | 2026-07-28:1
-Canada            399 2026-08-06    393   2026-08-05:1 | 2026-08-04:1
-Giappone         1000 2026-08-06    998   2026-08-05:1 | 2026-06-12:1
-Hong Kong         500 2026-08-06    500   -
-Australia         349 2026-08-06    349   2026-07-29:1
-Corea             400 2026-08-06    398   2026-07-21:1 | 2026-07-14:1
-Singapore         100 2026-08-06    100   -
+=== B. Quanti titoli MIL hanno il 6/8 nello storico? ===
+  MIL    0 righe al 6/8
+  XETRA  1 righe al 6/8
+  PA     0 righe al 6/8
 
-TOTALE: 7876 titoli | alla loro ultima seduta: 5794 (73.6%) | indietro: 2082
+=== C. I 'non disponibili' svizzeri lo sono davvero? ===
+   ABBN.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
+   ACLN.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
+   ADEN.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
+   AERO.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
+   AEVS.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
+   ALC.SW       ultime: ['03/08', '04/08', '05/08', '06/08']
