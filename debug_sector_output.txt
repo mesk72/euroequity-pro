@@ -1,21 +1,37 @@
-=== A. LA VISTA E' FERMA? Confronto storico vs vista ===
-  MIL    storico=2026-08-05 | vista=2026-08-05 (117 titoli)
-  XETRA  storico=2026-08-06 | vista=2026-08-06 (1 titoli)
-  PA     storico=2026-08-05 | vista=2026-08-05 (215 titoli)
-  SWX    storico=2026-08-06 | vista=2026-08-06 (24 titoli)
-  HE     storico=2026-08-06 | vista=2026-08-06 (16 titoli)
-  US     storico=2026-08-06 | vista=2026-08-06 (2968 titoli)
-  TSE    storico=2026-08-06 | vista=2026-08-06 (998 titoli)
+Ora UTC: 2026-08-07 09:49
 
-=== B. Quanti titoli MIL hanno il 6/8 nello storico? ===
-  MIL    0 righe al 6/8
-  XETRA  1 righe al 6/8
-  PA     0 righe al 6/8
+=== Yahoo ha il 6/8 per Milano/Parigi/Francoforte ADESSO? ===
+  ISP.MI   [('05/08', 6.76), ('06/08', 6.8), ('07/08', 6.82)]
+  ENI.MI   [('05/08', 23.08), ('06/08', 23.4), ('07/08', 23.23)]
+  MC.PA    [('05/08', 479.7), ('06/08', 481.45), ('07/08', 479.25)]
+  OR.PA    [('05/08', 388.6), ('06/08', 390.4), ('07/08', 390.85)]
+  SAP.DE   [('05/08', 169.26), ('06/08', 170.98), ('07/08', 177.06)]
+  BMW.DE   [('05/08', 59.1), ('06/08', 58.62), ('07/08', 59.0)]
 
-=== C. I 'non disponibili' svizzeri lo sono davvero? ===
-   ABBN.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
-   ACLN.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
-   ADEN.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
-   AERO.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
-   AEVS.SW      ultime: ['31/07', '03/08', '04/08', '05/08']
-   ALC.SW       ultime: ['03/08', '04/08', '05/08', '06/08']
+=== log EU: cosa dice sul download principale ===
+eseguito: 2026-08-07T03:10:02
+   Data piu' recente nel mercato AS: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato BR: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato CPSE: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato GR: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato HE: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato IR: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato KRX: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato LS: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato LSE: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato MC: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato MIL: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato OB: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato OM: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato PA: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato SGX: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato SWX: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Data piu' recente nel mercato VI: 2026-08-05 — uso 2026-07-26 come base (margine di sicurezza)
+   Data piu' recente nel mercato XETRA: 2026-08-06 — uso 2026-07-27 come base (margine di sicurezza)
+   Prezzi Yahoo: ok=2625 fail=1
+   BLOCCO SICUREZZA: scartate 451 barre di sedute non ancora chiuse (esecuzione a mercato aperto). Verranno riprese alla pr
+   XETRA: seduta 2026-08-05 — 2 da verificare singolarmente, 0 recuperati, 2 non disponibili su Yahoo
+   PA: seduta 2026-08-05 — 1 da verificare singolarmente, 0 recuperati, 1 non disponibili su Yahoo
+   MIL: seduta 2026-08-05 — completo
+   WBAH.XETRA — ultima seduta su Yahoo: 2026-07-31
+   D6H0.XETRA — ultima seduta su Yahoo: 2026-07-31
