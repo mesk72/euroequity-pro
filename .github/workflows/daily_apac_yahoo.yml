@@ -7,7 +7,12 @@ on:
     # orari tondi il ritardo e' sistematico (misurato sul daily US:
     # oltre 3 ore ogni giorno dal 2 al 5 agosto, sempre verso le 04:00
     # invece delle 00:30). I minuti dispari riducono molto la coda.
-    - cron: '9 16 * * *'  # 18:09 CEST - backup nativo GitHub, indipendente da Vercel
+        # Distanza dal cron di Vercel: almeno 30 minuti. Se le due esecuzioni
+    # partono ravvicinate, il blocco di concorrenza fa si' che la seconda
+    # ANNULLI la prima invece di proteggerla (successo il 6/8 sull'Europa:
+    # esecuzione serale cancellata dopo 15 minuti). La riserva deve
+    # partire solo quando la principale e' gia' conclusa.
+    - cron: '40 16 * * *'  # 18:09 CEST - backup nativo GitHub, indipendente da Vercel
 
 concurrency:
   group: daily-apac-yahoo
