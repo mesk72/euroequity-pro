@@ -1,0 +1,29 @@
+name: Sorvegliante esecuzioni
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Ogni due ore, a minuto dispari per non finire nelle code di GitHub.
+    - cron: '43 */2 * * *'
+
+concurrency:
+  group: sorvegliante
+  cancel-in-progress: false
+
+jobs:
+  controlla:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Installa dipendenze
+        run: pip install requests
+      - name: Controlla ed eventualmente rilancia
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python sorvegliante.py
