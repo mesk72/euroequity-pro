@@ -9,7 +9,12 @@ on:
     # invece delle 00:30). I minuti dispari riducono molto la coda.
     # 06:00 UTC = 08:00 in Italia con l'ora legale, 07:00 con l'ora solare.
     # GitHub usa sempre UTC, non segue il cambio dell'ora italiano.
-    - cron: '17 6 * * *'
+        # Distanza dal cron di Vercel: almeno 30 minuti. Se le due esecuzioni
+    # partono ravvicinate, il blocco di concorrenza fa si' che la seconda
+    # ANNULLI la prima invece di proteggerla (successo il 6/8 sull'Europa:
+    # esecuzione serale cancellata dopo 15 minuti). La riserva deve
+    # partire solo quando la principale e' gia' conclusa.
+    - cron: '40 6 * * *'
 
 concurrency:
   group: daily-report
