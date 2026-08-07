@@ -1,7 +1,21 @@
-APAC eseguito: 2026-08-06T11:06:34
+Ora UTC: 2026-08-07 01:32
 
-   Prezzi Yahoo: ok=2349 fail=0
-   [Completamento seduta] Verifico che ogni mercato abbia l'ultima seduta...
-   passata 1: mancavano 56, recuperati 0 [SEHK 0/7, TSE 0/2, SGX 0/2, KRX 0/45]
-   nessun progresso: i titoli rimasti Yahoo non li ha (sospesi, delistati o non ancora pubblicati). Mi fermo.
-   Completamento seduta: 2293/2349 titoli hanno l'ultima seduta (0 recuperati in questa esecuzione)
+MERCATO           TOT   distribuzione date (vista = cio' che vede il sito)
+Europa           2126   2026-08-06: 88 | 2026-08-05: 2028 | 2026-08-04: 1
+Stati Uniti      3002   2026-08-06: 2943 | 2026-08-05: 43 | 2026-07-28: 1
+Canada            399   2026-08-06: 391 | 2026-08-05: 3 | 2026-08-04: 1
+Giappone         1000   2026-08-06: 998 | 2026-08-05: 1 | 2026-06-12: 1
+Hong Kong         500   2026-08-06: 493 | 2026-08-05: 7
+Australia         349   2026-08-06: 349 | 2026-07-29: 1
+Corea             400   2026-08-06: 398 | 2026-07-21: 1 | 2026-07-14: 1
+Singapore         100   2026-08-06: 100
+
+Universo totale: 7876
+
+=== ultime esecuzioni ===
+  US+CA  2026-08-07T00:44:36 ok=3401
+  EU     2026-08-07T00:42:38 ok=2625
+  APAC   2026-08-06T11:06:33 ok=2349
+  APAC   2026-08-06T05:13:50 ok=2349
+  US+CA  2026-08-06T00:40:58 ok=3401
+  EU     2026-08-06T00:40:47 ok=2625
