@@ -1,21 +1,65 @@
-Ora UTC: 2026-08-07 02:01
+Universo USA: 3002 titoli | ultima seduta presente: 2026-08-06 (2943 titoli)
+NON alla seduta 2026-08-06: 59 titoli
 
-MERCATO           TOT   distribuzione date (vista = cio' che vede il sito)
-Europa           2126   2026-08-06: 88 | 2026-08-05: 2028 | 2026-08-04: 1
-Stati Uniti      3002   2026-08-06: 2943 | 2026-08-05: 43 | 2026-07-28: 1
-Canada            399   2026-08-06: 391 | 2026-08-05: 3 | 2026-08-04: 1
-Giappone         1000   2026-08-06: 998 | 2026-08-05: 1 | 2026-06-12: 1
-Hong Kong         500   2026-08-06: 493 | 2026-08-05: 7
-Australia         349   2026-08-06: 349 | 2026-07-29: 1
-Corea             400   2026-08-06: 398 | 2026-07-21: 1 | 2026-07-14: 1
-Singapore         100   2026-08-06: 100
+=== COLPA NOSTRA: Yahoo HA la seduta 2026-08-06 ma noi no (25) ===
+  RBTK     Zhen Ding Resources Inc.               noi=2026-08-05  yahoo=6.25
+  EXCE     EXCO Resources, Inc.                   noi=2026-08-05  yahoo=23.55
+  CXII     Churchill Capital Corp XII             noi=2026-08-05  yahoo=10.71
+  ESBA     Empire State Realty OP, L.P.           noi=2026-08-05  yahoo=4.88
+  ANSC     Agriculture & Natural Solutions Acquis noi=2026-08-05  yahoo=11.45
+  ACGP     Associated Capital Group, Inc.         noi=2026-08-05  yahoo=33.42
+  MBVI     M3-Brigade Acquisition Vi Corp.        noi=2026-08-05  yahoo=10.20
+  BCSS     Bain Capital GSS Investment Corp.      noi=2026-08-05  yahoo=10.21
+  CUSI     Cuisine Solutions, Inc.                noi=2026-08-05  yahoo=20.50
+  DBIN     Dacotah Banks, Inc.                    noi=2026-08-05  yahoo=50.70
+  MCTA     Charming Medical Limited               noi=2026-08-05  yahoo=29.35
+  MDRX     Veradigm Inc.                          noi=2026-08-05  yahoo=4.80
+  FFMR     First Farmers Financial Corporation    noi=2026-08-05  yahoo=34.25
+  EVAC     EQV Ventures Acquisition Corp. II      noi=2026-08-05  yahoo=10.26
+  THVB     Thomasville Bancshares, Inc.           noi=2026-08-05  yahoo=103.00
+  FINN     First National of Nebraska, Inc.       noi=2026-08-05  yahoo=19000.00
+  EACO     EACO Corporation                       noi=2026-08-05  yahoo=105.01
+  FMBL     Farmers & Merchants Bank of Long Beach noi=2026-08-05  yahoo=9794.93
+  SKYC     Sky Constant Century Inc.              noi=2026-08-05  yahoo=4.12
+  HBNB     Hotel101 Global Holdings Corp.         noi=2026-08-05  yahoo=5.49
+  DMII     Drugs Made In America Acquisition II C noi=2026-08-05  yahoo=10.11
+  ROMA     Roma Green Finance Limited             noi=2026-08-05  yahoo=8.88
+  IEAG     Infinite Eagle Acquisition Corp.       noi=2026-08-05  yahoo=10.21
+  QMMM     QMMM Holdings Limited                  noi=2026-08-05  yahoo=119.40
+  SIM      Grupo Simec, S.A.B. de C.V.            noi=2026-08-05  yahoo=30.03
 
-Universo totale: 7876
-
-=== ultime esecuzioni ===
-  EU     2026-08-07T01:56:23 ok=2625
-  EU     2026-08-07T01:45:52 ok=2625
-  US+CA  2026-08-07T00:44:36 ok=3401
-  EU     2026-08-07T00:42:38 ok=2625
-  APAC   2026-08-06T11:06:33 ok=2349
-  APAC   2026-08-06T05:13:50 ok=2349
+=== NON COLPA NOSTRA: Yahoo non ha la seduta (34) ===
+  ZQXVW9   Meridian Fabrication Holdings          noi=None  Yahoo vuoto
+  OICT     Oicintra, Inc.                         noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  NIKA     Nika Pharmaceuticals, Inc.             noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  TMHC     Taylor Morrison Home Corporation       noi=2026-07-23  ultimo su Yahoo: 2026-07-23
+  IPEU     IPE Universal Inc.                     noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  CNGO     Cengage Learning Holdings II, Inc.     noi=2026-07-17  Yahoo vuoto
+  NUVL     Nuvalent, Inc.                         noi=2026-07-21  Yahoo vuoto
+  MALG     Microalliance Group Inc.               noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  FFPP     Fast Finance Pay Corp.                 noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  WSR      Whitestone REIT                        noi=2026-07-13  Yahoo vuoto
+  NFTN     NFiniTi Inc.                           noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  ALTB     Alpine Auto Brokers Inc.               noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  CLUS     Cluster Group Holdings Limited Co.     noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  VLNT     Vallant Financial, Inc.                noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  WBHC     Wilson Bank Holding Company            noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  ESPR     Esperion Therapeutics, Inc.            noi=2026-07-13  Yahoo vuoto
+  HCGI     Huntwicke Capital Group Inc.           noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  CPRX     Catalyst Pharmaceuticals, Inc.         noi=2026-07-21  Yahoo vuoto
+  EEX      Emerald Holding, Inc.                  noi=2026-07-14  Yahoo vuoto
+  SKYT     SkyWater Technology, Inc.              noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  NFBK     Northfield Bancorp, Inc.               noi=2026-07-28  ultimo su Yahoo: 2026-07-28
+  WFHG     World Financial Holding Group          noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  XOMA     XOMA Royalty Corporation               noi=2026-07-21  Yahoo vuoto
+  NSA      National Storage Affiliates Trust      noi=2026-07-21  Yahoo vuoto
+  BLD      TopBuild Corp.                         noi=2026-07-02  Yahoo vuoto
+  GTLS     Chart Industries, Inc.                 noi=2026-07-16  Yahoo vuoto
+  EA       Electronic Arts Inc.                   noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  STEL     Stellar Bancorp, Inc.                  noi=2026-06-30  Yahoo vuoto
+  OLPX     Olaplex Holdings, Inc.                 noi=2026-07-13  Yahoo vuoto
+  CAVG     ACC Aviation Holdings Ltd.             noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  EVOH     EvoAir Holdings Inc.                   noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  AVNS     Avanos Medical, Inc.                   noi=2026-07-24  ultimo su Yahoo: 2026-07-24
+  SVMB     Jingbo Technology, Inc.                noi=2026-08-05  ultimo su Yahoo: 2026-08-05
+  ITFY     Interfoundry, Inc.                     noi=2026-08-05  ultimo su Yahoo: 2026-08-05
