@@ -1,22 +1,35 @@
-DIAGNOSI guardia alle 03:10 del 7/8 (ricostruita):
-  seduta 06/08 accettata?  True
-  seduta 07/08 accettata?  False
+Ora UTC: 2026-08-07 10:01
 
-MIL    gia' completo
-XETRA  mancavano    2 -> scritti    0
-PA     mancavano    1 -> scritti    0
-AS     gia' completo
-MC     gia' completo
-BR     mancavano    2 -> scritti    0
-LS     gia' completo
-VI     gia' completo
-HE     gia' completo
-IR     gia' completo
-GR     gia' completo
-LSE    mancavano    1 -> scritti    0
-SWX    gia' completo
-OM     mancavano    1 -> scritti    0
-OB     mancavano    1 -> scritti    0
-CPSE   mancavano    4 -> scritti    0
+MERCATO           TOT  AGGIORN   MANCA   ultima seduta
+Europa           2126     2114      12   2026-08-06
+Stati Uniti      3002     2968      34   2026-08-06
+Canada            399      393       6   2026-08-06
+Giappone         1000      998       2   2026-08-06
+Hong Kong         500      500       0   2026-08-06
+Australia         349      349       0   2026-08-06
+Corea             400      398       2   2026-08-06
+Singapore         100      100       0   2026-08-06
 
-TOTALE scritti: 0
+TOTALE: 7876 titoli | aggiornati all'ultima seduta del loro mercato: 7820 (99.3%) | mancano 56
+
+=== cosa dicono i log della fase nuova ===
+--- daily_eu_yahoo (2026-08-07T03:10:02) ---
+    LSE: seduta 2026-08-05 — 1 da verificare singolarmente, 0 recuperati, 1 non disponibili su Yahoo
+    XETRA: seduta 2026-08-05 — 2 da verificare singolarmente, 0 recuperati, 2 non disponibili su Yahoo
+    SWX: seduta 2026-08-06 — 137 da verificare singolarmente, 0 recuperati, 137 non disponibili su Yahoo
+    KRX: seduta 2026-08-06 — 2 da verificare singolarmente, 0 recuperati, 2 non disponibili su Yahoo
+    HE: seduta 2026-08-06 — 84 da verificare singolarmente, 0 recuperati, 84 non disponibili su Yahoo
+    OM: seduta 2026-08-05 — 1 da verificare singolarmente, 0 recuperati, 1 non disponibili su Yahoo
+    CPSE: seduta 2026-08-06 — 61 da verificare singolarmente, 0 recuperati, 61 non disponibili su Yahoo
+    PA: seduta 2026-08-05 — 1 da verificare singolarmente, 0 recuperati, 1 non disponibili su Yahoo
+    BR: seduta 2026-08-05 — 2 da verificare singolarmente, 0 recuperati, 2 non disponibili su Yahoo
+    OB: seduta 2026-08-05 — 1 da verificare singolarmente, 0 recuperati, 1 non disponibili su Yahoo
+    RISULTATO: 2334/2626 titoli hanno l'ultima seduta (0 recuperati adesso)
+--- daily_us_yahoo (2026-08-07T03:03:11) ---
+    US: seduta 2026-08-06 — 34 da verificare singolarmente, 0 recuperati, 34 non disponibili su Yahoo
+    TSX: seduta 2026-08-06 — 6 da verificare singolarmente, 0 recuperati, 6 non disponibili su Yahoo
+    RISULTATO: 3361/3401 titoli hanno l'ultima seduta (0 recuperati adesso)
+--- daily_apac_yahoo (2026-08-07T02:56:21) ---
+    TSE: seduta 2026-08-06 — 2 da verificare singolarmente, 0 recuperati, 2 non disponibili su Yahoo
+    KRX: seduta 2026-08-06 — 2 da verificare singolarmente, 0 recuperati, 2 non disponibili su Yahoo
+    RISULTATO: 2345/2349 titoli hanno l'ultima seduta (0 recuperati adesso)
