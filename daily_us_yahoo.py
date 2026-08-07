@@ -868,10 +868,17 @@ for _s in all_stocks:
 
 
 def _seduta_attesa(_ex, _tickers):
-    """Ultima seduta CHIUSA che Yahoo ha per questo mercato, stabilita con
-    richieste singole su piu' titoli di riferimento (affidabili)."""
-    _best = None
-    for _tk in _tickers[:6]:
+    """Ultima seduta CHIUSA che Yahoo ha per questo mercato.
+    FIX 7/8/2026: si usa il valore PREVALENTE fra i titoli di riferimento,
+    non il massimo. Col massimo bastava un solo titolo in anticipo per far
+    risultare "mancanti" tutti gli altri: il 7/8 su Zurigo un unico titolo
+    aveva il 6 agosto mentre il resto del mercato si fermava al 5, e lo
+    script ha cercato inutilmente 137 titoli che Yahoo non aveva ancora
+    pubblicato. Si campionano piu' titoli (12 invece di 6) presi anche
+    dal centro dell'elenco, non solo dai primi in ordine alfabetico."""
+    _voti = []
+    _campione = _tickers[:6] + _tickers[len(_tickers) // 2: len(_tickers) // 2 + 6]
+    for _tk in _campione:
         _yt = _ymap.get((_tk, _ex))
         if not _yt:
             continue
@@ -886,13 +893,18 @@ def _seduta_attesa(_ex, _tickers):
             for _i in range(len(_c) - 1, -1, -1):
                 _ds = _c.index[_i].strftime("%Y-%m-%d")
                 if seduta_conclusa(_ds):
-                    if _best is None or _ds > _best:
-                        _best = _ds
+                    _voti.append(_ds)
                     break
         except Exception:
             pass
         time.sleep(0.3)
-    return _best
+    if not _voti:
+        return None
+    _conta = {}
+    for _v in _voti:
+        _conta[_v] = _conta.get(_v, 0) + 1
+    # il piu' votato; a parita' di voti si preferisce la data piu' recente
+    return sorted(_conta.items(), key=lambda x: (x[1], x[0]), reverse=True)[0][0]
 
 
 def _chi_manca(_ex, _tickers, _seduta):
