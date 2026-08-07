@@ -1,32 +1,38 @@
-import os, requests, yfinance as yf, pandas as pd, time
+import os, requests
+from collections import Counter
+from datetime import datetime
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-HU={**H,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"}
-lista=["RBTK","EXCE","CXII","ESBA","ANSC","ACGP","MBVI","BCSS","CUSI","DBIN","MCTA","MDRX",
-       "FFMR","EVAC","THVB","FINN","EACO","FMBL","SKYC","HBNB","DMII","ROMA","IEAG","QMMM","SIM"]
-SED="2026-08-06"
-buf=[]; falliti=[]
-for tk in lista:
-    y=requests.get(U+"/rest/v1/stocks",headers=H,
-        params={"select":"yahoo_ticker","ticker":"eq."+tk,"exchange":"eq.US"}).json()
-    yt=(y[0].get("yahoo_ticker") if y else None) or tk
-    try:
-        df=yf.download(yt,period="8d",interval="1d",auto_adjust=True,progress=False)
-        cl=df["Close"]
-        if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
-        cl=cl.dropna()
-        d={i.strftime("%Y-%m-%d"):float(v) for i,v in cl.items()}
-        if SED in d:
-            buf.append({"ticker":tk,"exchange":"US","date":SED,"adj_close":round(d[SED],6)})
-        else:
-            falliti.append(tk)
-    except Exception:
-        falliti.append(tk)
-    time.sleep(0.3)
-ok=0
-for i in range(0,len(buf),500):
-    w=requests.post(U+"/rest/v1/prices_eod?on_conflict=ticker,exchange,date",headers=HU,json=buf[i:i+500])
-    if w.status_code in (200,201,204): ok+=len(buf[i:i+500])
-print("scritti %d titoli sul %s" % (ok,SED))
-if falliti: print("non riusciti:",falliti)
+print("Ora UTC:", datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
+G=[("Europa",["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]),
+   ("Stati Uniti",["US"]),("Canada",["TSX"]),("Giappone",["TSE"]),("Hong Kong",["SEHK"]),
+   ("Australia",["ASX"]),("Corea",["KRX"]),("Singapore",["SGX"])]
+def uni(ex):
+    r=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
+    return int(r.headers.get("content-range","0/0").split("/")[-1])
+def vis(ex):
+    out=[];off=0
+    while True:
+        r=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
+            params={"select":"price_date","exchange":"eq."+ex,"limit":"1000","offset":str(off)})
+        b=r.json()
+        if not isinstance(b,list) or not b: break
+        out+=[x["price_date"] for x in b]; off+=1000
+        if len(b)<1000: break
+    return out
+TOT=0; AGG=0
+print()
+print("%-14s %6s %8s %9s   %s" % ("MERCATO","TOT","AGGIORN","%","dettaglio"))
+for nome,lista in G:
+    t=sum(uni(e) for e in lista); TOT+=t
+    d=[]
+    for e in lista: d+=vis(e)
+    c=Counter(d)
+    top=max(c) if c else "-"
+    n=c.get(top,0); AGG+=n
+    altri=" | ".join("%s:%d"%(k,v) for k,v in sorted(c.items(),reverse=True)[1:3])
+    print("%-14s %6d %8d %8.1f%%   %s %s" % (nome,t,n,n/t*100,top,("| "+altri) if altri else ""))
+print()
+print("TOTALE: %d aggiornati su %d (%.1f%%)" % (AGG,TOT,AGG/TOT*100))
