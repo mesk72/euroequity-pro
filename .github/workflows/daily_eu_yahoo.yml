@@ -28,7 +28,14 @@ on:
     # raccoglie cio' che Yahoo ha pubblicato durante la notte, cosi' il
     # rapporto delle 8 riflette un recupero appena fatto e non la
     # situazione di sei ore prima.
-    - cron: '0 4 * * *'     # 06:00 italiane
+    # Spostata dalle 06:00 alle 07:00 italiane (05:00 UTC). Motivo,
+    # misurato l'8/8/2026: Yahoo pubblica le chiusure dei titoli minori
+    # molte ore dopo quelle dei grandi. Alle 02:42 italiane il log
+    # registrava "ultima seduta su Yahoo: 6 agosto" per 58 titoli
+    # americani; alle 11:50 lo stesso dato c'era. Piu' tardi si chiede,
+    # piu' titoli si trovano. Le 07:00 lasciano comunque un'ora di
+    # margine prima del rapporto delle 08:00.
+    - cron: '0 5 * * *'     # 07:00 italiane
 
 concurrency:
   group: daily-eu-yahoo
