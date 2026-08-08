@@ -12,7 +12,12 @@ on:
     # ANNULLI la prima invece di proteggerla (successo il 6/8 sull'Europa:
     # esecuzione serale cancellata dopo 15 minuti). La riserva deve
     # partire solo quando la principale e' gia' conclusa.
-    - cron: '40 16 * * *'  # 18:09 CEST - backup nativo GitHub, indipendente da Vercel
+    - cron: '40 16 * * *'   # 18:40 italiane
+    # Seconda passata alle 23:00 italiane (21:00 UTC). Le borse asiatiche
+    # chiudono fra le 8 e le 11 del mattino: a quest'ora Yahoo ha avuto
+    # 12 ore per pubblicare anche i titoli meno scambiati, che sono quelli
+    # che il download delle 18:40 perde regolarmente (Tokyo e Hong Kong).
+    - cron: '0 21 * * *'    # 23:00 italiane
 
 concurrency:
   group: daily-apac-yahoo
