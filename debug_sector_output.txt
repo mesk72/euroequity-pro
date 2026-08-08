@@ -1,10 +1,4 @@
-Confronto STORICO (la verita') vs VISTA (cio' che legge il sito)
-
-  EA    .US   storico=('2026-08-07', 209.7) | vista=2026-08-07
-  MDRX  .US   storico=('2026-08-07', 4.9) | vista=2026-08-07
-  SKYT  .US   storico=('2026-08-07', 32.46) | vista=2026-08-07
-  MAN   .VI   storico=('2026-08-07', 102.0) | vista=2026-08-07
-  SIC   .SWX  storico=('2026-08-07', 212.0) | vista=2026-08-07
-  SEC   .TSX  storico=('2026-08-07', 430.0) | vista=2026-08-07
-
-Righe totali datate 7/8 nello storico: ?
+  EA [{'ticker': 'EA', 'in_universe': True, 'yahoo_ticker': 'EA'}]
+  MDRX [{'ticker': 'MDRX', 'in_universe': True, 'yahoo_ticker': 'MDRX'}]
+  SKYT [{'ticker': 'SKYT', 'in_universe': True, 'yahoo_ticker': 'SKYT'}]
+  GAMI [{'ticker': 'GAMI', 'in_universe': True, 'yahoo_ticker': 'GAMI'}]
