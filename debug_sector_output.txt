@@ -1,22 +1,158 @@
-MIL    indietro   2 -> recuperati   2
-XETRA  indietro   3 -> recuperati   0
-PA     indietro   4 -> recuperati   3
-AS     indietro   2 -> recuperati   2
-MC     indietro  14 -> recuperati  14
-BR     indietro   6 -> recuperati   4
-LS     indietro  10 -> recuperati  10
-VI     indietro   8 -> recuperati   8
-IR     indietro   1 -> recuperati   1
-GR     indietro   2 -> recuperati   2
-LSE    indietro   7 -> recuperati   5
-SWX    indietro  10 -> recuperati  10
-OM     indietro   1 -> recuperati   1
-OB     indietro   1 -> recuperati   0
-CPSE   indietro   6 -> recuperati   0
-US     indietro  57 -> recuperati  42
-TSX    indietro  11 -> recuperati   5
-TSE    indietro   2 -> recuperati   0
-ASX    indietro   4 -> recuperati   4
-KRX    indietro   2 -> recuperati   0
+Titoli ancora indietro rispetto al 7/8: 153
 
-TOTALE recuperati: 113
+=== ANCORA COLPA NOSTRA (113) ===
+  FPE        MIL    Fope S.p.A.                        noi=2026-08-06
+  YRM        MIL    Rosetti Marino SpA                 noi=2026-08-06
+  MLPLC      PA     Placoplatre SA                     noi=2026-08-06
+  ARTO       PA     Société Industrielle et Financière noi=2026-08-06
+  MLMTP      PA     Montepino LogÃ­stica, SOCIMI, S.A. noi=2026-07-28
+  QEV        AS     SPEAR Investments I B.V.           noi=2026-08-06
+  BEVER      AS     Bever Holding NV                   noi=2026-08-06
+  COL        MC     Colonial SFL, Socimi S. A.         noi=2026-07-29
+  ISUR       MC     Inmobiliaria del Sur, S.A.         noi=2026-08-06
+  GGC        MC     General de Galerías Comerciales SO noi=2026-08-06
+  ALC        MC     Altia Consultores, S.A.            noi=2026-08-06
+  YGMP       MC     GMP Property SOCIMI, S.A.          noi=2026-08-06
+  YSIL       MC     Silicius Real Estate SOCIMI, S.A.  noi=2026-08-06
+  YATO       MC     Atom Hoteles SOCIMI, S.A.          noi=2026-07-28
+  YCPS       MC     Castellana Properties Socimi, S.A. noi=2026-07-28
+  YEPSA      MC     Emperador Properties SOCIMI, S.A.  noi=2026-07-28
+  YFID       MC     Fidere Patrimonio Socimi, S.A.     noi=2026-07-28
+  YHTI       MC     Hotei Properties Group Socimi S.A. noi=2026-07-29
+  YTST       MC     Testa Residencial SOCIMI, S.A.     noi=2026-07-29
+  YVIV       MC     Vivenio Residencial SOCIMI, S.A.   noi=2026-07-28
+  YZBL       MC     Zambal Spain Socimi, S.A.          noi=2026-07-28
+  SPA        BR     Spadel SA                          noi=2026-08-06
+  SEQUA      BR     Sequana Medical NV                 noi=2026-08-06
+  IEP        BR     Iep Invest, NV                     noi=2026-08-06
+  FLSP       BR     Flowsparks NV                      noi=2026-08-06
+  ALSMB      LS     Samba Digital, SGPS, S.A.          noi=2026-08-06
+  CDU        LS     Conduril - Engenharia, S.A.        noi=2026-08-06
+  ESON       LS     Estoril Sol, SGPS, S.A.            noi=2026-08-06
+  FLEXD      LS     Flexdeal Simfe S.A.                noi=2026-08-06
+  MCP        LS     Grupo Média Capital, SGPS, S.A.    noi=2026-08-06
+  MLFMV      LS     Farminveste, S.G.P.S., S.A.        noi=2026-08-06
+  SCB        LS     Sporting Clube de Braga - Futebol, noi=2026-08-06
+  SCP        LS     Sporting Clube de Portugal - Futeb noi=2026-08-06
+  SCT        LS     Toyota Caetano Portugal, S.A.      noi=2026-08-06
+  VAF        LS     Vista Alegre Atlantis, SGPS, S.A.  noi=2026-08-06
+  FKA        VI     Frauenthal Holding AG              noi=2026-08-06
+  GAGS       VI     Gurktaler Aktiengesellschaft       noi=2026-08-06
+  HED        VI     Maschinenfabrik Heid AG            noi=2026-08-06
+  LTH        VI     Linz Textil Holding AG             noi=2026-08-06
+  MAN        VI     Josef Manner & Comp. AG            noi=2026-08-06
+  RAT        VI     RATH Aktiengesellschaft            noi=2026-08-06
+  STM        VI     Stadlauer Malzfabrik Aktiengesells noi=2026-08-06
+  WPB        VI     Wiener Privatbank SE               noi=2026-08-06
+  DQ7A       IR     Donegal Investment Group plc       noi=2026-08-06
+  LAMPS      GR     Lampsa Hellenic Hotels S.A.        noi=2026-08-06
+  DAIOS      GR     Daios Plastics S.A.                noi=2026-08-06
+  OAP3       LSE    Octopus Apollo VCT plc             noi=2026-08-06
+  MHPC       LSE    MHP SE                             noi=2026-08-06
+  HSBK       LSE    Halyk Bank of Kazakhstan Joint Sto noi=2026-08-06
+  EOT        LSE    European Opportunities Trust plc   noi=2026-08-06
+  DAR        LSE    Dar Global PLC                     noi=2026-08-06
+  SLREFS     SWX    Swiss Life REF (CH) Swiss Properti noi=2026-08-06
+  SIC        SWX    Swisscanto (CH) Real Estate Fund I noi=2026-08-06
+  SIAT       SWX    UBS (CH) Property Fund - Swiss Res noi=2026-08-06
+  PSREF      SWX    Patrimonium Property Advisors - Sw noi=2026-08-06
+  PSCF       SWX    Procimmo Swiss Commercial Fund     noi=2026-08-06
+  INT        SWX    Credit Suisse Real Estate Fund Int noi=2026-08-06
+  IMHE       SWX    Immo Helvetic                      noi=2026-08-06
+  GOOD       SWX    Good Buildings Swiss Real Estate F noi=2026-08-06
+  CSLP       SWX    UBS (CH) Property Fund - Direct Li noi=2026-08-06
+  SREA       SWX    UBS (CH) Property Fund - Swiss Com noi=2026-08-06
+  VESTUM     OM     Vestum AB (publ)                   noi=2026-08-06
+  SKYT       US     SkyWater Technology, Inc.          noi=2026-08-06
+  SBNC       US     Southern BancShares (N.C.), Inc.   noi=2026-08-06
+  RWWI       US     Rand Worldwide, Inc.               noi=2026-08-06
+  PHIG       US     PHI Group, Inc.                    noi=2026-08-06
+  KEYY       US     Keystone Acquisition Corp.         noi=2026-08-06
+  KBON       US     Karbon Capital Partners Corp.      noi=2026-08-06
+  HBIA       US     Hills Bancorporation               noi=2026-08-06
+  GAMI       US     GAMCO Investors, Inc.              noi=2026-08-06
+  FCCN       US     Spectral Capital Corporation       noi=2026-08-06
+  ACGP       US     Associated Capital Group, Inc.     noi=2026-08-06
+  CUSI       US     Cuisine Solutions, Inc.            noi=2026-08-06
+  DBIN       US     Dacotah Banks, Inc.                noi=2026-08-06
+  DMII       US     Drugs Made In America Acquisition  noi=2026-08-06
+  EXCE       US     EXCO Resources, Inc.               noi=2026-08-06
+  FFMR       US     First Farmers Financial Corporatio noi=2026-08-06
+  IEAG       US     Infinite Eagle Acquisition Corp.   noi=2026-08-06
+  MBVI       US     M3-Brigade Acquisition Vi Corp.    noi=2026-08-06
+  MCTA       US     Charming Medical Limited           noi=2026-08-06
+  MDRX       US     Veradigm Inc.                      noi=2026-08-06
+  QMMM       US     QMMM Holdings Limited              noi=2026-08-06
+  RBTK       US     Zhen Ding Resources Inc.           noi=2026-08-06
+  SKYC       US     Sky Constant Century Inc.          noi=2026-08-06
+  OICT       US     Oicintra, Inc.                     noi=2026-08-06
+  NIKA       US     Nika Pharmaceuticals, Inc.         noi=2026-08-06
+  NFTN       US     NFiniTi Inc.                       noi=2026-08-06
+  MALG       US     Microalliance Group Inc.           noi=2026-08-06
+  ITFY       US     Interfoundry, Inc.                 noi=2026-08-06
+  IPEU       US     IPE Universal Inc.                 noi=2026-08-06
+  HCGI       US     Huntwicke Capital Group Inc.       noi=2026-08-06
+  FFPP       US     Fast Finance Pay Corp.             noi=2026-08-06
+  EVOH       US     EvoAir Holdings Inc.               noi=2026-08-06
+  EA         US     Electronic Arts Inc.               noi=2026-08-06
+  CLUS       US     Cluster Group Holdings Limited Co. noi=2026-08-06
+  CAVG       US     ACC Aviation Holdings Ltd.         noi=2026-08-06
+  ALTB       US     Alpine Auto Brokers Inc.           noi=2026-08-06
+  CMRF       US     CIM Group, Inc.                    noi=2026-08-06
+  CEPF       US     Cantor Equity Partners IV, Inc.    noi=2026-08-06
+  SVMB       US     Jingbo Technology, Inc.            noi=2026-08-06
+  SWRD       US     Stewards Inc.                      noi=2026-08-06
+  VLNT       US     Vallant Financial, Inc.            noi=2026-08-06
+  WBHC       US     Wilson Bank Holding Company        noi=2026-08-06
+  WFHG       US     World Financial Holding Group      noi=2026-08-06
+  MI.UN      TSX    Minto Apartment Real Estate Invest noi=2026-08-06
+  SEC        TSX    Senvest Capital Inc.               noi=2026-08-06
+  QSP.UN     TSX    Restaurant Brands International Li noi=2026-08-06
+  CVG        TSX    Clairvest Group Inc.               noi=2026-08-06
+  TWC        TSX    TWC Enterprises Limited            noi=2026-08-06
+  G6M        ASX    Group 6 Metals Limited             noi=2026-07-29
+  LGF        ASX    L1 Gold Fund Limited               noi=2026-08-06
+  PCI        ASX    Perpetual Credit Income Trust      noi=2026-08-06
+  RF1        ASX    Regal Investment Fund              noi=2026-08-06
+
+=== Yahoo non ce l'ha (40) ===
+  NB2        XETRA  Northern Data AG                   noi=2026-08-06  yahoo si ferma a 2026-08-06
+  D6H0       XETRA  DATAGROUP SE                       noi=2026-07-31  yahoo si ferma a 2026-07-31
+  WBAH       XETRA  Wild Bunch AG                      noi=2026-07-31  yahoo si ferma a 2026-07-31
+  EIFF       PA     Société de la Tour Eiffel          noi=2026-08-03  yahoo si ferma a 2026-08-03
+  COFB       BR     Cofinimmo SA                       noi=2026-07-03  yahoo si ferma a nessuna
+  WHATS      BR     What's Cooking Group NV            noi=2026-07-28  yahoo si ferma a 2026-07-28
+  SOHO       LSE    Social Housing REIT plc            noi=2026-08-06  yahoo si ferma a 2026-08-06
+  IPF        LSE    International Personal Finance plc noi=2026-08-04  yahoo si ferma a 2026-08-04
+  EISP       OB     Eiendomsspar AS                    noi=2026-06-10  yahoo si ferma a nessuna
+  SYVFBUA    CPSE   Sydinvest - Balanceret Udb         noi=2026-08-06  yahoo si ferma a 2026-08-06
+  NDIAKTIIKL1 CPSE   Nordea Invest Aktier II            noi=2026-08-06  yahoo si ferma a 2026-08-06
+  GRIEHY     CPSE   Gudme Raaschou Eu High Yield       noi=2026-08-06  yahoo si ferma a 2026-08-06
+  NBIOFKL    CPSE   Nykredit Invest - Balance Offensiv noi=2026-08-05  yahoo si ferma a 2026-08-05
+  RLAINV     CPSE   Ress Life Investments A/S          noi=2026-08-05  yahoo si ferma a 2026-08-05
+  WEIJHO     CPSE   Investeringsforeningen Investin -  noi=2026-07-23  yahoo si ferma a nessuna
+  AVNS       US     Avanos Medical, Inc.               noi=2026-07-24  yahoo si ferma a nessuna
+  BLD        US     TopBuild Corp.                     noi=2026-07-02  yahoo si ferma a nessuna
+  CNGO       US     Cengage Learning Holdings II, Inc. noi=2026-07-17  yahoo si ferma a nessuna
+  CPRX       US     Catalyst Pharmaceuticals, Inc.     noi=2026-07-21  yahoo si ferma a nessuna
+  EEX        US     Emerald Holding, Inc.              noi=2026-07-14  yahoo si ferma a nessuna
+  ESPR       US     Esperion Therapeutics, Inc.        noi=2026-07-13  yahoo si ferma a nessuna
+  GTLS       US     Chart Industries, Inc.             noi=2026-07-16  yahoo si ferma a nessuna
+  NFBK       US     Northfield Bancorp, Inc.           noi=2026-07-28  yahoo si ferma a nessuna
+  NSA        US     National Storage Affiliates Trust  noi=2026-07-21  yahoo si ferma a nessuna
+  NUVL       US     Nuvalent, Inc.                     noi=2026-07-21  yahoo si ferma a nessuna
+  OLPX       US     Olaplex Holdings, Inc.             noi=2026-07-13  yahoo si ferma a nessuna
+  STEL       US     Stellar Bancorp, Inc.              noi=2026-06-30  yahoo si ferma a nessuna
+  TMHC       US     Taylor Morrison Home Corporation   noi=2026-07-23  yahoo si ferma a nessuna
+  WSR        US     Whitestone REIT                    noi=2026-07-13  yahoo si ferma a nessuna
+  XOMA       US     XOMA Royalty Corporation           noi=2026-07-21  yahoo si ferma a nessuna
+  AII        TSX    Almonty Industries Inc.            noi=2026-07-31  yahoo si ferma a 2026-07-31
+  BLN        TSX    Blackline Safety Corp.             noi=2026-07-03  yahoo si ferma a nessuna
+  GTWO       TSX    G2 Goldfields Inc.                 noi=2026-08-04  yahoo si ferma a 2026-07-30
+  ISC        TSX    Information Services Corporation   noi=2026-07-07  yahoo si ferma a nessuna
+  URC        TSX    Uranium Royalty Corp.              noi=2026-07-28  yahoo si ferma a 2026-07-28
+  OLA        TSX    Orla Mining Ltd.                   noi=2026-08-05  yahoo si ferma a 2026-08-05
+  4974       TSE    Takara Bio Inc.                    noi=2026-06-12  yahoo si ferma a nessuna
+  6197       TSE    Solasto Corporation                noi=2026-08-05  yahoo si ferma a 2026-08-05
+  A012510    KRX    Douzone Bizon Co., Ltd.            noi=2026-07-14  yahoo si ferma a nessuna
+  A057050    KRX    Hyundai Home Shopping Network Corp noi=2026-07-21  yahoo si ferma a nessuna
