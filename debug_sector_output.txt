@@ -1,5 +1,3 @@
-colonne: ['id', 'user_id', 'ticker', 'exchange', 'company', 'added_at', 'combined_rank', 'wallet']
-
-righe per LLY: [{'id': '1ab96b51-2ecb-472a-b19f-e6dabc69420f', 'user_id': 'fee79b7f-1481-4936-b381-4c28cf832414', 'ticker': 'LLY', 'exchange': 'US', 'company': 'Eli Lilly and Company', 'added_at': '2026-08-08T04:36:02.598169+00:00', 'combined_rank': 66, 'wallet': 0}]
-
-righe totali watchlist: 181
+inserimento in wallet 3 -> HTTP 409
+{"code":"23505","details":"Key (user_id, ticker, exchange)=(fee79b7f-1481-4936-b381-4c28cf832414, LLY, US) already exists.","hint":null,"message":"duplicate key value violates unique constraint \"watchlist_user_id_ticker_exchange_key\""}
+righe LLY ora: [{'id': '1ab96b51-2ecb-472a-b19f-e6dabc69420f', 'wallet': 0}]
