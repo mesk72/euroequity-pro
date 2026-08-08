@@ -1,112 +1,22 @@
-Titoli fermi al 6 agosto: 107
+MIL    indietro   2 -> recuperati   2
+XETRA  indietro   3 -> recuperati   0
+PA     indietro   4 -> recuperati   3
+AS     indietro   2 -> recuperati   2
+MC     indietro  14 -> recuperati  14
+BR     indietro   6 -> recuperati   4
+LS     indietro  10 -> recuperati  10
+VI     indietro   8 -> recuperati   8
+IR     indietro   1 -> recuperati   1
+GR     indietro   2 -> recuperati   2
+LSE    indietro   7 -> recuperati   5
+SWX    indietro  10 -> recuperati  10
+OM     indietro   1 -> recuperati   1
+OB     indietro   1 -> recuperati   0
+CPSE   indietro   6 -> recuperati   0
+US     indietro  57 -> recuperati  42
+TSX    indietro  11 -> recuperati   5
+TSE    indietro   2 -> recuperati   0
+ASX    indietro   4 -> recuperati   4
+KRX    indietro   2 -> recuperati   0
 
-=== COLPA NOSTRA: Yahoo ha il 7/8 e noi no (101) ===
-  FPE       MIL    Fope S.p.A.                        yahoo=56.50
-  YRM       MIL    Rosetti Marino SpA                 yahoo=250.00
-  MLPLC     PA     Placoplatre SA                     yahoo=610.00
-  ARTO      PA     Société Industrielle et Financière yahoo=9900.00
-  QEV       AS     SPEAR Investments I B.V.           yahoo=6.70
-  BEVER     AS     Bever Holding NV                   yahoo=2.90
-  ISUR      MC     Inmobiliaria del Sur, S.A.         yahoo=16.50
-  GGC       MC     General de Galerías Comerciales SO yahoo=161.00
-  ALC       MC     Altia Consultores, S.A.            yahoo=6.90
-  YGMP      MC     GMP Property SOCIMI, S.A.          yahoo=62.00
-  YSIL      MC     Silicius Real Estate SOCIMI, S.A.  yahoo=11.00
-  SPA       BR     Spadel SA                          yahoo=366.00
-  SEQUA     BR     Sequana Medical NV                 yahoo=0.61
-  IEP       BR     Iep Invest, NV                     yahoo=0.00
-  FLSP      BR     Flowsparks NV                      yahoo=25.00
-  ALSMB     LS     Samba Digital, SGPS, S.A.          yahoo=14.80
-  CDU       LS     Conduril - Engenharia, S.A.        yahoo=12.60
-  ESON      LS     Estoril Sol, SGPS, S.A.            yahoo=3.38
-  FLEXD     LS     Flexdeal Simfe S.A.                yahoo=5.15
-  MCP       LS     Grupo Média Capital, SGPS, S.A.    yahoo=1.90
-  MLFMV     LS     Farminveste, S.G.P.S., S.A.        yahoo=5.00
-  SCB       LS     Sporting Clube de Braga - Futebol, yahoo=21.00
-  SCP       LS     Sporting Clube de Portugal - Futeb yahoo=0.97
-  SCT       LS     Toyota Caetano Portugal, S.A.      yahoo=7.20
-  VAF       LS     Vista Alegre Atlantis, SGPS, S.A.  yahoo=1.08
-  FKA       VI     Frauenthal Holding AG              yahoo=21.80
-  GAGS      VI     Gurktaler Aktiengesellschaft       yahoo=16.30
-  HED       VI     Maschinenfabrik Heid AG            yahoo=1.60
-  LTH       VI     Linz Textil Holding AG             yahoo=163.00
-  MAN       VI     Josef Manner & Comp. AG            yahoo=102.00
-  RAT       VI     RATH Aktiengesellschaft            yahoo=23.60
-  STM       VI     Stadlauer Malzfabrik Aktiengesells yahoo=54.00
-  WPB       VI     Wiener Privatbank SE               yahoo=14.50
-  DQ7A      IR     Donegal Investment Group plc       yahoo=12.50
-  LAMPS     GR     Lampsa Hellenic Hotels S.A.        yahoo=47.20
-  DAIOS     GR     Daios Plastics S.A.                yahoo=8.00
-  OAP3      LSE    Octopus Apollo VCT plc             yahoo=45.70
-  MHPC      LSE    MHP SE                             yahoo=8.18
-  HSBK      LSE    Halyk Bank of Kazakhstan Joint Sto yahoo=33.45
-  EOT       LSE    European Opportunities Trust plc   yahoo=1008.80
-  DAR       LSE    Dar Global PLC                     yahoo=8.12
-  SLREFS    SWX    Swiss Life REF (CH) Swiss Properti yahoo=147.20
-  SIC       SWX    Swisscanto (CH) Real Estate Fund I yahoo=212.00
-  SIAT      SWX    UBS (CH) Property Fund - Swiss Res yahoo=246.00
-  PSREF     SWX    Patrimonium Property Advisors - Sw yahoo=182.20
-  INT       SWX    Credit Suisse Real Estate Fund Int yahoo=201.50
-  IMHE      SWX    Immo Helvetic                      yahoo=253.00
-  GOOD      SWX    Good Buildings Swiss Real Estate F yahoo=151.20
-  CSLP      SWX    UBS (CH) Property Fund - Direct Li yahoo=146.80
-  SREA      SWX    UBS (CH) Property Fund - Swiss Com yahoo=65.00
-  VESTUM    OM     Vestum AB (publ)                   yahoo=15.96
-  SKYT      US     SkyWater Technology, Inc.          yahoo=32.46
-  SBNC      US     Southern BancShares (N.C.), Inc.   yahoo=13250.00
-  RWWI      US     Rand Worldwide, Inc.               yahoo=13.25
-  PHIG      US     PHI Group, Inc.                    yahoo=30.00
-  KEYY      US     Keystone Acquisition Corp.         yahoo=9.85
-  KBON      US     Karbon Capital Partners Corp.      yahoo=10.09
-  HBIA      US     Hills Bancorporation               yahoo=47.09
-  GAMI      US     GAMCO Investors, Inc.              yahoo=25.50
-  FCCN      US     Spectral Capital Corporation       yahoo=5.23
-  ACGP      US     Associated Capital Group, Inc.     yahoo=33.42
-  CUSI      US     Cuisine Solutions, Inc.            yahoo=20.50
-  DBIN      US     Dacotah Banks, Inc.                yahoo=50.70
-  DMII      US     Drugs Made In America Acquisition  yahoo=10.11
-  EXCE      US     EXCO Resources, Inc.               yahoo=23.50
-  FFMR      US     First Farmers Financial Corporatio yahoo=34.25
-  IEAG      US     Infinite Eagle Acquisition Corp.   yahoo=10.21
-  MBVI      US     M3-Brigade Acquisition Vi Corp.    yahoo=10.20
-  MCTA      US     Charming Medical Limited           yahoo=29.35
-  MDRX      US     Veradigm Inc.                      yahoo=4.90
-  QMMM      US     QMMM Holdings Limited              yahoo=119.40
-  RBTK      US     Zhen Ding Resources Inc.           yahoo=6.25
-  SKYC      US     Sky Constant Century Inc.          yahoo=4.12
-  OICT      US     Oicintra, Inc.                     yahoo=11.25
-  NIKA      US     Nika Pharmaceuticals, Inc.         yahoo=0.51
-  NFTN      US     NFiniTi Inc.                       yahoo=6.00
-  MALG      US     Microalliance Group Inc.           yahoo=1.76
-  ITFY      US     Interfoundry, Inc.                 yahoo=3.98
-  IPEU      US     IPE Universal Inc.                 yahoo=14.00
-  HCGI      US     Huntwicke Capital Group Inc.       yahoo=6.15
-  FFPP      US     Fast Finance Pay Corp.             yahoo=19.98
-  EVOH      US     EvoAir Holdings Inc.               yahoo=23.00
-  EA        US     Electronic Arts Inc.               yahoo=209.70
-  CLUS      US     Cluster Group Holdings Limited Co. yahoo=200.00
-  CAVG      US     ACC Aviation Holdings Ltd.         yahoo=0.61
-  ALTB      US     Alpine Auto Brokers Inc.           yahoo=7.90
-  CMRF      US     CIM Group, Inc.                    yahoo=2.30
-  CEPF      US     Cantor Equity Partners IV, Inc.    yahoo=10.39
-  SVMB      US     Jingbo Technology, Inc.            yahoo=0.66
-  SWRD      US     Stewards Inc.                      yahoo=4.33
-  VLNT      US     Vallant Financial, Inc.            yahoo=23.40
-  WBHC      US     Wilson Bank Holding Company        yahoo=550.00
-  WFHG      US     World Financial Holding Group      yahoo=11.00
-  MI.UN     TSX    Minto Apartment Real Estate Invest yahoo=17.99
-  SEC       TSX    Senvest Capital Inc.               yahoo=430.00
-  QSP.UN    TSX    Restaurant Brands International Li yahoo=101.57
-  CVG       TSX    Clairvest Group Inc.               yahoo=79.00
-  TWC       TSX    TWC Enterprises Limited            yahoo=26.77
-  LGF       ASX    L1 Gold Fund Limited               yahoo=2.08
-  PCI       ASX    Perpetual Credit Income Trust      yahoo=1.10
-  RF1       ASX    Regal Investment Fund              yahoo=3.62
-
-=== Yahoo non ha il 7/8 (6) ===
-  NB2       XETRA  Northern Data AG                   ultima: 2026-08-06
-  SOHO      LSE    Social Housing REIT plc            ultima: 2026-08-06
-  PSCF      SWX    Procimmo Swiss Commercial Fund     ultima: 2026-08-06
-  SYVFBUA   CPSE   Sydinvest - Balanceret Udb         ultima: 2026-08-06
-  NDIAKTIIKL1 CPSE   Nordea Invest Aktier II            ultima: 2026-08-06
-  GRIEHY    CPSE   Gudme Raaschou Eu High Yield       ultima: 2026-08-06
+TOTALE recuperati: 113
