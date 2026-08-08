@@ -23,7 +23,12 @@ on:
     - cron: '35 19 * * *'
     # Seconda passata a notte fonda: recupera i titoli che alle 21 non
     # fossero ancora stati pubblicati da Yahoo.
-    - cron: '13 1 * * *'
+    - cron: '13 1 * * *'    # 03:13 italiane
+    # Passata delle 06:00 italiane (04:00 UTC), due ore prima del rapporto:
+    # raccoglie cio' che Yahoo ha pubblicato durante la notte, cosi' il
+    # rapporto delle 8 riflette un recupero appena fatto e non la
+    # situazione di sei ore prima.
+    - cron: '0 4 * * *'     # 06:00 italiane
 
 concurrency:
   group: daily-eu-yahoo
