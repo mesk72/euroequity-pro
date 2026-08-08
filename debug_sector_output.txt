@@ -1,2 +1,5 @@
-Nessun intervento registrato: significa che il sorvegliante ha
-controllato e ha trovato tutto regolare (scrive solo quando agisce).
+colonne: ['id', 'user_id', 'ticker', 'exchange', 'company', 'added_at', 'combined_rank', 'wallet']
+
+righe per LLY: [{'id': '1ab96b51-2ecb-472a-b19f-e6dabc69420f', 'user_id': 'fee79b7f-1481-4936-b381-4c28cf832414', 'ticker': 'LLY', 'exchange': 'US', 'company': 'Eli Lilly and Company', 'added_at': '2026-08-08T04:36:02.598169+00:00', 'combined_rank': 66, 'wallet': 0}]
+
+righe totali watchlist: 181
