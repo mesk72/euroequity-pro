@@ -1,4 +1,33 @@
-  EA [{'ticker': 'EA', 'in_universe': True, 'yahoo_ticker': 'EA'}]
-  MDRX [{'ticker': 'MDRX', 'in_universe': True, 'yahoo_ticker': 'MDRX'}]
-  SKYT [{'ticker': 'SKYT', 'in_universe': True, 'yahoo_ticker': 'SKYT'}]
-  GAMI [{'ticker': 'GAMI', 'in_universe': True, 'yahoo_ticker': 'GAMI'}]
+eseguito: 2026-08-08T00:42:16
+
+--- dalla fase di completamento in poi ---
+   [Completamento seduta] Nessun titolo indietro: verifico uno per uno...
+   US: seduta 2026-08-07 — 58 da verificare singolarmente, 0 recuperati, 58 non disponibili su Yahoo
+   TSX: seduta 2026-08-07 — 11 da verificare singolarmente, 0 recuperati, 11 non disponibili su Yahoo
+   RISULTATO: 3332/3401 titoli hanno l'ultima seduta (0 recuperati adesso)
+   69 titoli NON disponibili su Yahoo (verificati uno per uno):
+   ZQXVW9.US — Yahoo non ha dati
+   OICT.US — ultima seduta su Yahoo: 2026-08-06
+   HBIA.US — ultima seduta su Yahoo: 2026-08-06
+   NIKA.US — ultima seduta su Yahoo: 2026-08-06
+   CEPF.US — ultima seduta su Yahoo: 2026-08-06
+   EXCE.US — ultima seduta su Yahoo: 2026-08-06
+   ESPR.US — Yahoo non ha dati
+   IPEU.US — ultima seduta su Yahoo: 2026-08-06
+   CNGO.US — Yahoo non ha dati
+   GAMI.US — ultima seduta su Yahoo: 2026-08-06
+   SBNC.US — ultima seduta su Yahoo: 2026-08-06
+   MALG.US — ultima seduta su Yahoo: 2026-08-06
+   RBTK.US — ultima seduta su Yahoo: 2026-08-06
+   FFPP.US — ultima seduta su Yahoo: 2026-08-06
+   WSR.US — Yahoo non ha dati
+   NFTN.US — ultima seduta su Yahoo: 2026-08-06
+   ALTB.US — ultima seduta su Yahoo: 2026-08-06
+   CLUS.US — ultima seduta su Yahoo: 2026-08-06
+   MBVI.US — ultima seduta su Yahoo: 2026-08-06
+   CMRF.US — ultima seduta su Yahoo: 2026-08-06
+   VLNT.US — ultima seduta su Yahoo: 2026-08-06
+   CUSI.US — ultima seduta su Yahoo: 2026-08-06
+   FCCN.US — ultima seduta su Yahoo: 2026-08-06
+   TMHC.US — Yahoo non ha dati
+   WBHC.US — ultima seduta su Yahoo: 2026-08-06
