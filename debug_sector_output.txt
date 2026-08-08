@@ -1,3 +1,10 @@
-inserimento in wallet 3 -> HTTP 409
-{"code":"23505","details":"Key (user_id, ticker, exchange)=(fee79b7f-1481-4936-b381-4c28cf832414, LLY, US) already exists.","hint":null,"message":"duplicate key value violates unique constraint \"watchlist_user_id_ticker_exchange_key\""}
-righe LLY ora: [{'id': '1ab96b51-2ecb-472a-b19f-e6dabc69420f', 'wallet': 0}]
+LLY prima: [0]
+
+PROVA 1: stesso titolo in un wallet DIVERSO (deve riuscire)
+  wallet 3 -> HTTP 201 OK
+
+PROVA 2: stesso titolo nello STESSO wallet (deve essere rifiutato)
+  wallet 3 di nuovo -> HTTP 409 correttamente rifiutato
+
+LLY adesso nei wallet: [0, 3]
+(riga di prova rimossa: aggiungilo tu dal sito)
