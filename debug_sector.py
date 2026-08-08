@@ -1,44 +1,18 @@
-import os, requests, yfinance as yf, pandas as pd, time
-from collections import Counter
+import os, requests
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-EX=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE",
-    "US","TSX","TSE","SEHK","ASX","KRX","SGX"]
-SED="2026-08-07"
-resti=[]
-for ex in EX:
-    mv=[];off=0
-    while True:
-        r=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-            params={"select":"ticker,price_date","exchange":"eq."+ex,"limit":"1000","offset":str(off)})
-        b=r.json()
-        if not isinstance(b,list) or not b: break
-        mv+=b; off+=1000
-        if len(b)<1000: break
-    for x in mv:
-        if x["price_date"]<SED: resti.append((ex,x["ticker"],x["price_date"]))
-print("Titoli ancora indietro rispetto al 7/8: %d" % len(resti))
+print("Confronto STORICO (la verita') vs VISTA (cio' che legge il sito)")
 print()
-nostri=[];loro=[]
-for ex,tk,nostro in resti:
-    y=requests.get(U+"/rest/v1/stocks",headers=H,
-        params={"select":"yahoo_ticker,company","ticker":"eq."+tk,"exchange":"eq."+ex}).json()
-    yt=(y[0].get("yahoo_ticker") if y else None) or tk
-    az=(y[0].get("company") if y else "") or ""
-    try:
-        df=yf.download(yt,period="8d",interval="1d",auto_adjust=True,progress=False)
-        cl=df["Close"]
-        if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
-        cl=cl.dropna()
-        d=[i.strftime("%Y-%m-%d") for i in cl.index]
-        if SED in d: nostri.append((tk,ex,az,nostro))
-        else: loro.append((tk,ex,az,nostro,d[-1] if d else "nessuna"))
-    except Exception:
-        loro.append((tk,ex,az,nostro,"errore"))
-    time.sleep(0.25)
-print("=== ANCORA COLPA NOSTRA (%d) ===" % len(nostri))
-for tk,ex,az,n in nostri: print("  %-10s %-6s %-34s noi=%s" % (tk,ex,az[:34],n))
+for tk,ex in [("EA","US"),("MDRX","US"),("SKYT","US"),("MAN","VI"),("SIC","SWX"),("SEC","TSX")]:
+    e=requests.get(U+"/rest/v1/prices_eod",headers=H,
+        params={"select":"date,adj_close","ticker":"eq."+tk,"exchange":"eq."+ex,"order":"date.desc","limit":"1"}).json()
+    v=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
+        params={"select":"price_date","ticker":"eq."+tk,"exchange":"eq."+ex}).json()
+    print("  %-6s.%-4s storico=%s | vista=%s" % (tk,ex,
+        (e[0]["date"],e[0]["adj_close"]) if e else "-",
+        v[0]["price_date"] if v else "-"))
 print()
-print("=== Yahoo non ce l'ha (%d) ===" % len(loro))
-for tk,ex,az,n,u in loro: print("  %-10s %-6s %-34s noi=%s  yahoo si ferma a %s" % (tk,ex,az[:34],n,u))
+r=requests.get(U+"/rest/v1/prices_eod",headers={**H,"Prefer":"count=exact"},
+    params={"select":"ticker","date":"eq.2026-08-07","limit":"1"})
+print("Righe totali datate 7/8 nello storico:", r.headers.get("content-range","?").split("/")[-1])
