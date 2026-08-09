@@ -1,16 +1,1 @@
-=== Cosa dicono le pagine vere del sito ai motori di ricerca? ===
-  home         HTTP 200 | header: (nessuno)    | (nessun meta robots)
-  screens      HTTP 404 | header: (nessuno)    | <meta name="robots" content="noindex"/>
-  research     HTTP 200 | header: (nessuno)    | (nessun meta robots)
-  about        HTTP 200 | header: (nessuno)    | (nessun meta robots)
-  titolo AAPL  HTTP 200 | header: (nessuno)    | (nessun meta robots)
-  news         HTTP 200 | header: (nessuno)    | (nessun meta robots)
-
-=== quante pagine dichiara la sitemap ===
-  totale: 9
-   screens        4
-   (home)         1
-   news           1
-   research       1
-   about          1
-   legal          1
+  con chiave pubblica -> HTTP 200 righe: 0
