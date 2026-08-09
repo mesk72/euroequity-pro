@@ -23,7 +23,6 @@ type Dati = {
   mkt_cap: number | null
   pe_trailing: number | null
   pb: number | null
-  div_yield: number | null
   in_universe: boolean | null
   ha_punteggi: boolean
 }
@@ -40,7 +39,7 @@ async function leggiTitolo(ticker: string, exchange: string): Promise<Dati | nul
 
     const { data: f } = await supabase
       .from('fundamentals')
-      .select('mkt_cap,pe_trailing,pb,div_yield,value_score,growth_score')
+      .select('mkt_cap,pe_trailing,pb,value_score,growth_score')
       .eq('ticker', ticker)
       .eq('exchange', exchange)
       .maybeSingle()
@@ -62,7 +61,6 @@ async function leggiTitolo(ticker: string, exchange: string): Promise<Dati | nul
       mkt_cap: f?.mkt_cap ?? null,
       pe_trailing: f?.pe_trailing ?? null,
       pb: f?.pb ?? null,
-      div_yield: f?.div_yield ?? null,
       in_universe: s.in_universe,
       // Si registra SOLO se i punteggi esistono, mai il loro valore.
       ha_punteggi: f?.value_score != null || f?.growth_score != null,
@@ -103,7 +101,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   if (mc) pezzi.push(`Capitalizzazione ${mc}.`)
   if (d.pe_trailing != null && Math.abs(d.pe_trailing) < 500) pezzi.push(`P/E ${d.pe_trailing.toFixed(1)}x.`)
   if (d.pb != null && d.pb > 0) pezzi.push(`P/B ${d.pb.toFixed(2)}x.`)
-  if (d.div_yield != null && d.div_yield > 0 && d.div_yield < 30) pezzi.push(`Dividendo ${d.div_yield.toFixed(2)}%.`)
+  // Dividendo RIMOSSO 9/8/2026: il campo div_yield non compare in nessuna
+  // metrica del sito e non viene aggiornato dagli script giornalieri.
+  // Pubblicare un dato che non manteniamo e' peggio che non pubblicarlo:
+  // Google lo mostrerebbe nei risultati e resterebbe fermo per sempre.
 
   // I punteggi proprietari vengono NOMINATI ma mai pubblicati: la pagina
   // si posiziona per ricerche tipo "<azienda> value score" senza che il
