@@ -219,25 +219,35 @@ def distribuzione(per_exchange, exchanges, oggi):
 
 
 def triage_cronici(per_exchange, oggi, giorni_soglia=7):
-    """Per i titoli fermi da oltre una settimana chiede a Yahoo se il dato
-    esiste. Distingue due situazioni molto diverse:
+    """Per OGNI titolo che non ha l'ultima seduta del suo mercato, chiede a
+    Yahoo se il dato esiste. Distingue due situazioni molto diverse:
       - Yahoo NON ha nulla di piu' recente -> titolo delistato/sospeso:
-        va tolto dall'universo, nessuna urgenza tecnica
-      - Yahoo HA un prezzo piu' recente del nostro -> problema NOSTRO:
-        di solito il codice yahoo_ticker e' sbagliato (visto piu' volte:
-        REIT canadesi col punto invece del trattino, coreani col prefisso
-        "A", tedeschi su Xetra invece che Francoforte, Hong Kong senza lo
-        zero iniziale). Sono gli unici casi che richiedono un intervento.
-    Interroga solo poche decine di titoli, quindi non pesa sull'esecuzione.
+        nessuna urgenza tecnica, eventualmente da togliere dall'universo
+      - Yahoo HA un prezzo piu' recente del nostro -> problema NOSTRO,
+        da sistemare
+
+    FIX 9/8/2026: prima si guardavano solo i titoli fermi da oltre SETTE
+    GIORNI. Quelli indietro di UNA SOLA seduta non venivano mai verificati
+    e finivano confusi con gli aggiornati nella tabella per mercato.
+    Conseguenza reale, l'8/8: il rapporto ha scritto "nessuna anomalia"
+    mentre 101 titoli avevano il prezzo su Yahoo e non ce l'avevamo noi -
+    esattamente il caso in cui il rapporto doveva servire.
+    Ora il confronto e' con la seduta PREVALENTE di ciascun mercato:
+    chiunque sia indietro, anche di un solo giorno, viene verificato.
     """
-    limite = (oggi - timedelta(days=giorni_soglia)).strftime("%Y-%m-%d")
     candidati = []
     for ex, d in per_exchange.items():
+        date_valide = [x for x in d["date"].values() if x]
+        if not date_valide:
+            continue
+        # seduta prevalente del mercato: robusta a singoli titoli in anticipo
+        prevalente = Counter(date_valide).most_common(1)[0][0]
         for tk, data in d["date"].items():
-            if data and data < limite:
+            if data and data < prevalente:
                 candidati.append((data, tk, ex, d["nomi"].get(tk, tk)))
         for tk, azienda in d["assenti"]:
             candidati.append((None, tk, ex, azienda))
+    # i piu' vecchi per primi: se il tetto taglia, taglia i meno gravi
     candidati.sort(key=lambda x: (x[0] or ""))
 
     nostri, delistati, incerti = [], [], []
@@ -249,7 +259,7 @@ def triage_cronici(per_exchange, oggi, giorni_soglia=7):
     except Exception:
         return nostri, delistati, candidati  # senza yfinance non si distingue
 
-    for data, tk, ex, azienda in candidati[:60]:
+    for data, tk, ex, azienda in candidati[:250]:
         yt = None
         try:
             r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=HEADERS,
@@ -523,9 +533,13 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     for nome, lista in GRUPPI:
         d_mkt, mai_mkt = distribuzione(per_exchange, lista, oggi)
         u = sum(per_exchange[e]["universo"] for e in lista)
-        b1 = sum(r["n"] for r in d_mkt if r["giorni"] is not None and r["giorni"] <= 1)
-        b2 = sum(r["n"] for r in d_mkt if r["giorni"] == 2)
-        b3 = sum(r["n"] for r in d_mkt if r["giorni"] is not None and r["giorni"] >= 3)
+        # FIX 9/8/2026: la colonna "1 g." accorpava chi ha l'ULTIMA seduta
+        # e chi e' indietro di UNA: cosi' 101 titoli fermi sparivano dentro
+        # il numero degli aggiornati e la tabella sembrava perfetta.
+        # Ora la prima colonna conta SOLO chi ha l'ultima seduta.
+        b1 = sum(r["n"] for r in d_mkt if r["giorni"] == 0)
+        b2 = sum(r["n"] for r in d_mkt if r["giorni"] == 1)
+        b3 = sum(r["n"] for r in d_mkt if r["giorni"] is not None and r["giorni"] >= 2)
         prevalenti = [per_exchange[e]["ultima_seduta"] for e in lista
                       if per_exchange[e]["ultima_seduta"]]
         seduta = Counter(prevalenti).most_common(1)[0][0] if prevalenti else "-"
