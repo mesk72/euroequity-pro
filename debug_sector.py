@@ -1,16 +1,15 @@
 import requests, re
-s=requests.get("https://forwardalpha.pro/sitemap.xml",timeout=90).text
-locs=re.findall(r"<loc>(.*?)</loc>", s)
-print("Indirizzi nella sitemap: %d" % len(locs))
-tipi={}
-for l in locs:
-    p=l.replace("https://forwardalpha.pro","").strip("/").split("/")
-    k=p[0] if p and p[0] else "(home)"
-    tipi[k]=tipi.get(k,0)+1
-for k,v in sorted(tipi.items(),key=lambda x:-x[1]):
-    print("   %-12s %d" % (k,v))
+print("=== Cosa vede GOOGLE aprendo una scheda titolo? ===")
+r=requests.get("https://forwardalpha.pro/stock/AAPL-US",timeout=60,
+    headers={"User-Agent":"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"})
+h=r.text
+print("HTTP:",r.status_code,"| lunghezza HTML:",len(h))
+t=re.search(r"<title>(.*?)</title>",h,re.S)
+print("titolo:", t.group(1)[:110] if t else "ASSENTE")
+d=re.search(r'<meta[^>]*name=["\']description["\'][^>]*content=["\'](.*?)["\']',h,re.S)
+print("descrizione:", (d.group(1)[:130] if d else "ASSENTE"))
 print()
-print("Esempi di schede titolo incluse:")
-for l in [x for x in locs if "/stock/" in x][:6]: print("   ",l)
+for parola in ["Apple","AAPL","Value Score","Growth","Market Cap","P/E"]:
+    print("  contiene '%s': %s" % (parola, parola.lower() in h.lower()))
 print()
-print("Ci sono ancora indirizzi /screens rotti?", any("/screens" in x for x in locs))
+print("Dati strutturati (schema.org):", "application/ld+json" in h)
