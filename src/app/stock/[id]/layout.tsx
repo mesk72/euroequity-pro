@@ -72,12 +72,17 @@ async function leggiTitolo(ticker: string, exchange: string): Promise<Dati | nul
   }
 }
 
-function miliardi(v: number | null): string | null {
-  if (v == null) return null
-  if (v >= 1e12) return (v / 1e12).toFixed(2) + ' trilioni'
-  if (v >= 1e9) return (v / 1e9).toFixed(1) + ' miliardi'
-  if (v >= 1e6) return (v / 1e6).toFixed(0) + ' milioni'
-  return String(Math.round(v))
+// ATTENZIONE ALLE UNITA' (verificate sul database il 9/8/2026):
+// mkt_cap e' espressa in MILIONI di valuta locale (Apple = 4.562.774),
+// div_yield e' gia' in PERCENTUALE (ASML = 0.53 significa 0,53%).
+// Trattarle come unita' assolute produceva "Apple capitalizzazione 5
+// milioni" e "ASML dividendo 53%": numeri palesemente sbagliati che
+// Google avrebbe letto e mostrato nei risultati.
+function capitalizzazione(milioni: number | null): string | null {
+  if (milioni == null || milioni <= 0) return null
+  if (milioni >= 1e6) return (milioni / 1e6).toFixed(2) + ' trilioni'
+  if (milioni >= 1e3) return (milioni / 1e3).toFixed(1) + ' miliardi'
+  return milioni.toFixed(0) + ' milioni'
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
@@ -94,11 +99,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   // di proprietario da proteggere e servono a farsi trovare.
   const pezzi: string[] = []
   pezzi.push(`${nome} (${d.ticker}, ${d.exchange})${d.sector ? ' — ' + d.sector : ''}${d.country ? ', ' + d.country : ''}.`)
-  const mc = miliardi(d.mkt_cap)
+  const mc = capitalizzazione(d.mkt_cap)
   if (mc) pezzi.push(`Capitalizzazione ${mc}.`)
   if (d.pe_trailing != null && Math.abs(d.pe_trailing) < 500) pezzi.push(`P/E ${d.pe_trailing.toFixed(1)}x.`)
   if (d.pb != null && d.pb > 0) pezzi.push(`P/B ${d.pb.toFixed(2)}x.`)
-  if (d.div_yield != null && d.div_yield > 0) pezzi.push(`Dividendo ${(d.div_yield * 100).toFixed(2)}%.`)
+  if (d.div_yield != null && d.div_yield > 0 && d.div_yield < 30) pezzi.push(`Dividendo ${d.div_yield.toFixed(2)}%.`)
 
   // I punteggi proprietari vengono NOMINATI ma mai pubblicati: la pagina
   // si posiziona per ricerche tipo "<azienda> value score" senza che il
