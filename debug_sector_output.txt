@@ -7,7 +7,7 @@
 
 === https://forwardalpha.pro/stock/ASML-AS ===
   titolo: ASML Holding N.V. (ASML) — analisi fondamentale e valutazione | ForwardAlpha
-  descrizione: ASML Holding N.V. (ASML, AS) — Information Technology, NLD. Capitalizzazione 719.3 miliardi. P/E 62.8x. P/B 30.24x. Dividendo 0.53%. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sull
+  descrizione: ASML Holding N.V. (ASML, AS) — Information Technology, NLD. Capitalizzazione 719.3 miliardi. P/E 62.8x. P/B 30.24x. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla scheda.
   dati strutturati: presenti
     {"@context": "https://schema.org", "@type": "Corporation", "name": "ASML Holding N.V.", "tickerSymbol": "ASML", "url": "https://forwardalpha.pro/stock/ASML-AS", "industry": "Information Technology", "
   punteggi numerici esposti: nessuno
