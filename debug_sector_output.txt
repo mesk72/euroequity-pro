@@ -1,1 +1,17 @@
-  con chiave pubblica -> HTTP 200 righe: 0
+Indirizzi nella sitemap: 7881
+   stock        7876
+   (home)       1
+   news         1
+   research     1
+   about        1
+   legal        1
+
+Esempi di schede titolo incluse:
+    https://forwardalpha.pro/stock/ASML-AS
+    https://forwardalpha.pro/stock/ROP-SWX
+    https://forwardalpha.pro/stock/HSBA-LSE
+    https://forwardalpha.pro/stock/AZN-LSE
+    https://forwardalpha.pro/stock/NOVN-SWX
+    https://forwardalpha.pro/stock/MC-PA
+
+Ci sono ancora indirizzi /screens rotti? False
