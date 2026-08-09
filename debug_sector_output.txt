@@ -1,13 +1,14 @@
-=== Cosa vede GOOGLE aprendo una scheda titolo? ===
-HTTP: 200 | lunghezza HTML: 11280
-titolo: Apple Inc. (US) — Information Technology | ForwardAlpha
-descrizione: Apple Inc. — Information Technology USA. ForwardAlpha quantitative equity research.
+=== https://forwardalpha.pro/stock/AAPL-US ===
+  titolo: Apple Inc. (AAPL) — analisi fondamentale e valutazione | ForwardAlpha
+  descrizione: Apple Inc. (AAPL, US) — Information Technology, USA. Capitalizzazione 5 milioni. P/E 37.7x. P/B 42.79x. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla scheda.
+  dati strutturati: presenti
+    {"@context": "https://schema.org", "@type": "Corporation", "name": "Apple Inc.", "tickerSymbol": "AAPL", "url": "https://forwardalpha.pro/stock/AAPL-US", "industry": "Information Technology", "address
+  punteggi numerici esposti: nessuno
 
-  contiene 'Apple': True
-  contiene 'AAPL': True
-  contiene 'Value Score': False
-  contiene 'Growth': True
-  contiene 'Market Cap': False
-  contiene 'P/E': False
+=== https://forwardalpha.pro/stock/ASML-AS ===
+  titolo: ASML Holding N.V. (ASML) — analisi fondamentale e valutazione | ForwardAlpha
+  descrizione: ASML Holding N.V. (ASML, AS) — Information Technology, NLD. Capitalizzazione 719344. P/E 62.8x. P/B 30.24x. Dividendo 53.00%. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla sched
+  dati strutturati: presenti
+    {"@context": "https://schema.org", "@type": "Corporation", "name": "ASML Holding N.V.", "tickerSymbol": "ASML", "url": "https://forwardalpha.pro/stock/ASML-AS", "industry": "Information Technology", "
+  punteggi numerici esposti: nessuno
 
-Dati strutturati (schema.org): False
