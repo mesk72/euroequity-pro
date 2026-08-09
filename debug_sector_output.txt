@@ -1,13 +1,13 @@
 === https://forwardalpha.pro/stock/AAPL-US ===
   titolo: Apple Inc. (AAPL) — analisi fondamentale e valutazione | ForwardAlpha
-  descrizione: Apple Inc. (AAPL, US) — Information Technology, USA. Capitalizzazione 4.56 trilioni. P/E 37.7x. P/B 42.79x. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla scheda.
+  descrizione: Apple Inc. (AAPL, US) — Information Technology, USA. Capitalizzazione 4.56 trilioni. P/E storico 37.7x. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla scheda.
   dati strutturati: presenti
     {"@context": "https://schema.org", "@type": "Corporation", "name": "Apple Inc.", "tickerSymbol": "AAPL", "url": "https://forwardalpha.pro/stock/AAPL-US", "industry": "Information Technology", "address
   punteggi numerici esposti: nessuno
 
 === https://forwardalpha.pro/stock/ASML-AS ===
   titolo: ASML Holding N.V. (ASML) — analisi fondamentale e valutazione | ForwardAlpha
-  descrizione: ASML Holding N.V. (ASML, AS) — Information Technology, NLD. Capitalizzazione 719.3 miliardi. P/E 62.8x. P/B 30.24x. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla scheda.
+  descrizione: ASML Holding N.V. (ASML, AS) — Information Technology, NLD. Capitalizzazione 719.3 miliardi. P/E storico 62.8x. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla scheda.
   dati strutturati: presenti
     {"@context": "https://schema.org", "@type": "Corporation", "name": "ASML Holding N.V.", "tickerSymbol": "ASML", "url": "https://forwardalpha.pro/stock/ASML-AS", "industry": "Information Technology", "
   punteggi numerici esposti: nessuno
