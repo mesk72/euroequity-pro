@@ -1,17 +1,13 @@
-Indirizzi nella sitemap: 7881
-   stock        7876
-   (home)       1
-   news         1
-   research     1
-   about        1
-   legal        1
+=== Cosa vede GOOGLE aprendo una scheda titolo? ===
+HTTP: 200 | lunghezza HTML: 11280
+titolo: Apple Inc. (US) — Information Technology | ForwardAlpha
+descrizione: Apple Inc. — Information Technology USA. ForwardAlpha quantitative equity research.
 
-Esempi di schede titolo incluse:
-    https://forwardalpha.pro/stock/ASML-AS
-    https://forwardalpha.pro/stock/ROP-SWX
-    https://forwardalpha.pro/stock/HSBA-LSE
-    https://forwardalpha.pro/stock/AZN-LSE
-    https://forwardalpha.pro/stock/NOVN-SWX
-    https://forwardalpha.pro/stock/MC-PA
+  contiene 'Apple': True
+  contiene 'AAPL': True
+  contiene 'Value Score': False
+  contiene 'Growth': True
+  contiene 'Market Cap': False
+  contiene 'P/E': False
 
-Ci sono ancora indirizzi /screens rotti? False
+Dati strutturati (schema.org): False
