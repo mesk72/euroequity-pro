@@ -1,14 +1,4 @@
-=== https://forwardalpha.pro/stock/AAPL-US ===
-  titolo: Apple Inc. (AAPL) — analisi fondamentale e valutazione | ForwardAlpha
-  descrizione: Apple Inc. (AAPL, US) — Information Technology, USA. Capitalizzazione 5 milioni. P/E 37.7x. P/B 42.79x. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla scheda.
-  dati strutturati: presenti
-    {"@context": "https://schema.org", "@type": "Corporation", "name": "Apple Inc.", "tickerSymbol": "AAPL", "url": "https://forwardalpha.pro/stock/AAPL-US", "industry": "Information Technology", "address
-  punteggi numerici esposti: nessuno
-
-=== https://forwardalpha.pro/stock/ASML-AS ===
-  titolo: ASML Holding N.V. (ASML) — analisi fondamentale e valutazione | ForwardAlpha
-  descrizione: ASML Holding N.V. (ASML, AS) — Information Technology, NLD. Capitalizzazione 719344. P/E 62.8x. P/B 30.24x. Dividendo 53.00%. Value Score, Growth Score e Best Score proprietari ForwardAlpha, reverse earnings model e confronto di settore disponibili sulla sched
-  dati strutturati: presenti
-    {"@context": "https://schema.org", "@type": "Corporation", "name": "ASML Holding N.V.", "tickerSymbol": "ASML", "url": "https://forwardalpha.pro/stock/ASML-AS", "industry": "Information Technology", "
-  punteggi numerici esposti: nessuno
-
+AAPL   [{'mkt_cap': 4562774.01, 'div_yield': None, 'pe_trailing': 37.66}]
+ASML   [{'mkt_cap': 719344.15, 'div_yield': 0.53, 'pe_trailing': 62.78}]
+MSFT   [{'mkt_cap': 2888472.55, 'div_yield': None, 'pe_trailing': 23.16}]
+ISP    [{'mkt_cap': 123132.6, 'div_yield': 6.7, 'pe_trailing': 11.31}]
