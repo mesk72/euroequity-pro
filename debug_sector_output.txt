@@ -1,33 +1,31 @@
-eseguito: 2026-08-08T00:42:16
+--- https://forwardalpha.pro/robots.txt HTTP 200 ---
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
 
---- dalla fase di completamento in poi ---
-   [Completamento seduta] Nessun titolo indietro: verifico uno per uno...
-   US: seduta 2026-08-07 — 58 da verificare singolarmente, 0 recuperati, 58 non disponibili su Yahoo
-   TSX: seduta 2026-08-07 — 11 da verificare singolarmente, 0 recuperati, 11 non disponibili su Yahoo
-   RISULTATO: 3332/3401 titoli hanno l'ultima seduta (0 recuperati adesso)
-   69 titoli NON disponibili su Yahoo (verificati uno per uno):
-   ZQXVW9.US — Yahoo non ha dati
-   OICT.US — ultima seduta su Yahoo: 2026-08-06
-   HBIA.US — ultima seduta su Yahoo: 2026-08-06
-   NIKA.US — ultima seduta su Yahoo: 2026-08-06
-   CEPF.US — ultima seduta su Yahoo: 2026-08-06
-   EXCE.US — ultima seduta su Yahoo: 2026-08-06
-   ESPR.US — Yahoo non ha dati
-   IPEU.US — ultima seduta su Yahoo: 2026-08-06
-   CNGO.US — Yahoo non ha dati
-   GAMI.US — ultima seduta su Yahoo: 2026-08-06
-   SBNC.US — ultima seduta su Yahoo: 2026-08-06
-   MALG.US — ultima seduta su Yahoo: 2026-08-06
-   RBTK.US — ultima seduta su Yahoo: 2026-08-06
-   FFPP.US — ultima seduta su Yahoo: 2026-08-06
-   WSR.US — Yahoo non ha dati
-   NFTN.US — ultima seduta su Yahoo: 2026-08-06
-   ALTB.US — ultima seduta su Yahoo: 2026-08-06
-   CLUS.US — ultima seduta su Yahoo: 2026-08-06
-   MBVI.US — ultima seduta su Yahoo: 2026-08-06
-   CMRF.US — ultima seduta su Yahoo: 2026-08-06
-   VLNT.US — ultima seduta su Yahoo: 2026-08-06
-   CUSI.US — ultima seduta su Yahoo: 2026-08-06
-   FCCN.US — ultima seduta su Yahoo: 2026-08-06
-   TMHC.US — Yahoo non ha dati
-   WBHC.US — ultima seduta su Yahoo: 2026-08-06
+Sitemap: https://forwardalpha.pro/sitemap.xml
+
+--- https://forwardalpha.pro/sitemap.xml HTTP 200 ---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>https://forwardalpha.pro</loc>
+<lastmod>2026-08-09T08:31:33.720Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://forwardalpha.pro/news</loc>
+<lastmod>2026-08-09T08:31:33.720Z</lastmod>
+<changefreq>hourly</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://forwardalpha.pro/screens</loc>
+<lastmod>2026-08-09T08:31:33.720Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://forwardalpha.pro/scree
