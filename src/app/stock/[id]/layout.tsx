@@ -22,7 +22,6 @@ type Dati = {
   price: number | null
   mkt_cap: number | null
   pe_trailing: number | null
-  pb: number | null
   in_universe: boolean | null
   ha_punteggi: boolean
 }
@@ -39,7 +38,7 @@ async function leggiTitolo(ticker: string, exchange: string): Promise<Dati | nul
 
     const { data: f } = await supabase
       .from('fundamentals')
-      .select('mkt_cap,pe_trailing,pb,value_score,growth_score')
+      .select('mkt_cap,pe_trailing,value_score,growth_score')
       .eq('ticker', ticker)
       .eq('exchange', exchange)
       .maybeSingle()
@@ -60,7 +59,6 @@ async function leggiTitolo(ticker: string, exchange: string): Promise<Dati | nul
       price: p?.price ?? null,
       mkt_cap: f?.mkt_cap ?? null,
       pe_trailing: f?.pe_trailing ?? null,
-      pb: f?.pb ?? null,
       in_universe: s.in_universe,
       // Si registra SOLO se i punteggi esistono, mai il loro valore.
       ha_punteggi: f?.value_score != null || f?.growth_score != null,
@@ -99,8 +97,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   pezzi.push(`${nome} (${d.ticker}, ${d.exchange})${d.sector ? ' — ' + d.sector : ''}${d.country ? ', ' + d.country : ''}.`)
   const mc = capitalizzazione(d.mkt_cap)
   if (mc) pezzi.push(`Capitalizzazione ${mc}.`)
-  if (d.pe_trailing != null && Math.abs(d.pe_trailing) < 500) pezzi.push(`P/E ${d.pe_trailing.toFixed(1)}x.`)
-  if (d.pb != null && d.pb > 0) pezzi.push(`P/B ${d.pb.toFixed(2)}x.`)
+  if (d.pe_trailing != null && Math.abs(d.pe_trailing) < 500) pezzi.push(`P/E storico ${d.pe_trailing.toFixed(1)}x.`)
+  // P/B RIMOSSO 9/8/2026 su indicazione di Andrea: si pubblica il solo
+  // P/E storico. Il rapporto prezzo/patrimonio e' uno degli ingressi del
+  // Value Score, e per quanto sia un dato pubblico non c'e' motivo di
+  // offrirlo gia' accostato agli altri su ottomila pagine.
   // Dividendo RIMOSSO 9/8/2026: il campo div_yield non compare in nessuna
   // metrica del sito e non viene aggiornato dagli script giornalieri.
   // Pubblicare un dato che non manteniamo e' peggio che non pubblicarlo:
