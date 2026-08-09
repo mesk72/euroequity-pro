@@ -1,9 +1,16 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 
+// FIX 9/8/2026 — CAUSA DELLA MANCATA INDICIZZAZIONE.
+// La sitemap usava la chiave PUBBLICA. Il 3/8/2026 abbiamo chiuso
+// l'accesso pubblico alle tabelle per sicurezza: da quel momento questa
+// query restituisce ZERO righe e la sitemap pubblicava solo le 9 pagine
+// fisse, senza nessuna delle ~7.900 schede titolo. Google non ha mai
+// saputo che esistevano. La sitemap viene generata sul SERVER, quindi
+// puo' e deve usare la chiave di servizio, come fanno le API del sito.
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 // Tutti i mercati coperti — EU (16), NA (2), APAC (5). GCC escluso finche'
@@ -24,10 +31,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl,                     lastModified: new Date(), changeFrequency: 'daily',   priority: 1.0 },
     { url: `${baseUrl}/news`,           lastModified: new Date(), changeFrequency: 'hourly',  priority: 0.9 },
-    { url: `${baseUrl}/screens`,        lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
-    { url: `${baseUrl}/screens/europe`, lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
-    { url: `${baseUrl}/screens/us`,     lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
-    { url: `${baseUrl}/screens/asia`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
+    // RIMOSSI 9/8/2026: /screens e le sue tre sottopagine rispondono 404.
+    // Next.js marca automaticamente le pagine inesistenti con noindex, ed
+    // e' questa la segnalazione arrivata da Google Search Console
+    // ("Esclusa in base al tag noindex"): stavamo indicando a Google
+    // quattro indirizzi che non esistono.
     { url: `${baseUrl}/research`,       lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${baseUrl}/about`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/legal`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
