@@ -108,21 +108,18 @@ def seduta_conclusa(date_str):
     return datetime.utcnow() >= d.replace(hour=ORA_LIMITE_UTC, minute=0, second=0)
 
 
-# LOCK ANTI-DOPPIA-ESECUZIONE (solo per trigger automatici) - FIX 30/7/2026:
-# EU/US sono girati 3 volte in una notte (Vercel cron + cron nativo GitHub
-# aggiunto oggi + eventuali trigger manuali). 'concurrency' nel workflow
-# evita sovrapposizioni PARALLELE ma non esecuzioni sequenziali multiple
-# nello stesso giorno. Qui si salta SOLO se il trigger e' un cron
-# automatico (schedule) E oggi risulta gia' un'esecuzione completata per
-# questo mercato - i trigger manuali (workflow_dispatch, usati per
-# debug/riparazioni) restano SEMPRE permessi senza restrizioni.
-if os.environ.get("GITHUB_EVENT_NAME") == "schedule":
-    _lock_check = requests.get(SUPABASE_URL + "/rest/v1/daily_log", headers=headers_r,
-        params={"select": "duration_seconds", "run_date": "eq." + TODAY, "market": "eq.APAC", "limit": "1"})
-    _lock_rows = _lock_check.json()
-    if isinstance(_lock_rows, list) and _lock_rows and _lock_rows[0].get("duration_seconds"):
-        print(f"LOCK: gia' un'esecuzione completata oggi per APAC (run_date={TODAY}). Esco per evitare doppio run automatico.")
-        exit(0)
+# BLOCCO GIORNALIERO RIMOSSO 11/8/2026.
+# Era stato messo il 30/7 per evitare esecuzioni ripetute nello stesso
+# giorno. Ma nel frattempo la strategia e' cambiata: servono PIU' passate
+# al giorno, perche' Yahoo pubblica i titoli minori diverse ore dopo la
+# chiusura e una sola passata non li prende mai.
+# Effetto reale del blocco, misurato l'11/8: l'Asia era girata TRE volte
+# il giorno prima (18:00, 19:30, 23:36) e tutte e tre risultavano
+# "riuscite", ma solo la prima aveva fatto qualcosa - le altre due erano
+# uscite subito. Risultato: Giappone, Hong Kong e Singapore fermi alla
+# seduta del 7 agosto con Yahoo che aveva gia' quella del 10.
+# Le sovrapposizioni parallele restano impedite da 'concurrency' nel
+# workflow, che e' il meccanismo giusto per quello scopo.
 
 _log_buffer = []
 def log(msg):
