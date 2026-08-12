@@ -1,32 +1,21 @@
-import os, requests
-from collections import Counter
-from datetime import datetime
+import os, requests, yfinance as yf, pandas as pd, time
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-G=[("Europa",["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]),
-   ("Stati Uniti",["US"]),("Canada",["TSX"]),("Giappone",["TSE"]),("Hong Kong",["SEHK"]),
-   ("Australia",["ASX"]),("Corea",["KRX"]),("Singapore",["SGX"])]
-print("Ora UTC:", datetime.utcnow().strftime("%H:%M"))
-print("%-14s %6s  %s" % ("MERCATO","TOT","distribuzione"))
-TOT=0;AGG=0
-for nome,lista in G:
-    d=[]
-    t=0
-    for ex in lista:
-        rc=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
-            params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
-        t+=int(rc.headers.get("content-range","0/0").split("/")[-1])
-        off=0
-        while True:
-            r=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-                params={"select":"price_date","exchange":"eq."+ex,"limit":"1000","offset":str(off)})
-            b=r.json()
-            if not isinstance(b,list) or not b: break
-            d+=[x["price_date"] for x in b]; off+=1000
-            if len(b)<1000: break
-    c=Counter(d); top=max(c) if c else "-"
-    TOT+=t; AGG+=c.get(top,0)
-    print("%-14s %6d  %s : %d" % (nome,t,top,c.get(top,0)))
+print("=== La borsa di Tokyo era APERTA l'11 agosto? ===")
+for yt in ["7203.T","6758.T","9984.T","8306.T"]:
+    df=yf.download(yt,start="2026-08-06",end="2026-08-13",interval="1d",auto_adjust=True,progress=False)
+    cl=df["Close"]
+    if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+    cl=cl.dropna()
+    print("  %-8s sedute: %s" % (yt,[i.strftime("%d/%m") for i in cl.index]))
+    time.sleep(0.3)
 print()
-print("TOTALE %d | all'ultima seduta: %d (%.1f%%)" % (TOT,AGG,AGG/TOT*100))
+print("=== I 3 titoli segnalati: Yahoo ha davvero l'11 agosto? ===")
+for tk,ex,yt in [("ECT","AS","ECT.AS"),("EIOS","VI","EIOS.VI"),("ICGC","LSE","ICGC.L")]:
+    df=yf.download(yt,start="2026-08-06",end="2026-08-13",interval="1d",auto_adjust=True,progress=False)
+    cl=df["Close"]
+    if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+    cl=cl.dropna()
+    print("  %-8s %s" % (yt,[(i.strftime("%d/%m"),round(float(v),2)) for i,v in cl.items()]))
+    time.sleep(0.3)
