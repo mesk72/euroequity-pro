@@ -12,6 +12,14 @@ on:
     # ANNULLI la prima invece di proteggerla (successo il 6/8 sull'Europa:
     # esecuzione serale cancellata dopo 15 minuti). La riserva deve
     # partire solo quando la principale e' gia' conclusa.
+    # PASSATA DEL MATTINO, aggiunta 12/8/2026. Le borse asiatiche chiudono
+    # fra le 8 e le 11 italiane, ma la prima passata era alle 18:40: dalle
+    # 8 alle 18 il sito mostrava la seduta del giorno PRIMA, proprio nelle
+    # ore in cui viene guardato. Verificato il 12/8 alle 14:51: Yahoo aveva
+    # gia' la chiusura di Tokyo del 12, il nostro database si fermava al 10.
+    # Singapore chiude alle 11:00 italiane (09:00 UTC): alle 09:30 UTC tutte
+    # le piazze asiatiche hanno chiuso.
+    - cron: '30 9 * * *'    # 11:30 italiane, subito dopo la chiusura asiatica
     - cron: '40 16 * * *'   # 18:40 italiane
     # Seconda passata alle 23:00 italiane (21:00 UTC). Le borse asiatiche
     # chiudono fra le 8 e le 11 del mattino: a quest'ora Yahoo ha avuto
