@@ -1,23 +1,67 @@
-Ora UTC: 2026-08-12 13:07
+MIL    indietro   2 -> recuperati   2
+XETRA  indietro   3 -> recuperati   0
+PA     indietro   5 -> recuperati   4
+AS     indietro   4 -> recuperati   4
+MC     indietro  13 -> recuperati  13
+BR     indietro   7 -> recuperati   5
+LS     indietro   9 -> recuperati   9
+VI     indietro   9 -> recuperati   9
+IR     indietro   1 -> recuperati   1
+GR     indietro   1 -> recuperati   1
+LSE    indietro   7 -> recuperati   4
+SWX    indietro  10 -> recuperati   0
+OM     indietro   1 -> recuperati   1
+OB     indietro   1 -> recuperati   0
+CPSE   indietro   3 -> recuperati   1
+US     indietro  37 -> recuperati  20
+TSX    indietro   7 -> recuperati   0
+TSE    indietro   4 -> recuperati   0
+SEHK   indietro   9 -> recuperati   0
+ASX    indietro   1 -> recuperati   1
+KRX    indietro  46 -> recuperati   0
+SGX    indietro   3 -> recuperati   0
 
-MERCATO           TOT  ALLINEATI  INDIETRO      %  ULTIMA SEDUTA
-Europa           2126       2059        67  96.8%  2026-08-11
-Stati Uniti      3002       2964        38  98.7%  2026-08-11
-Canada            399        392         7  98.2%  2026-08-11
-Giappone         1000        996         4  99.6%  2026-08-12
-Hong Kong         500        491         9  98.2%  2026-08-12
-Australia         349        349         0 100.0%  2026-08-11
-Corea             400        398         2  99.5%  2026-08-11
-Singapore         100        100         0 100.0%  2026-08-11
+TOTALE RECUPERATI: 75
 
-TOTALE 7876 | allineati 7749 (98.4%)
-
-=== esecuzioni ultime 12 ore ===
-  APAC   2026-08-12T13:05:40
-  US+CA  2026-08-12T06:27:07
-  EU     2026-08-12T06:17:39
-  US+CA  2026-08-12T03:41:35
-  EU     2026-08-12T03:39:46
-  US+CA  2026-08-12T00:45:41
-  EU     2026-08-12T00:41:26
-  APAC   2026-08-11T21:50:06
+=== NON recuperabili: Yahoo non ha la seduta (108) ===
+  NB2        XETRA  Northern Data AG                 yahoo si ferma a 2026-08-06
+  D6H0       XETRA  DATAGROUP SE                     yahoo si ferma a 2026-07-30
+  WBAH       XETRA  Wild Bunch AG                    yahoo si ferma a 2026-07-31
+  EIFF       PA     Société de la Tour Eiffel        yahoo si ferma a 2026-08-03
+  COFB       BR     Cofinimmo SA                     yahoo si ferma a nessuna
+  WHATS      BR     What's Cooking Group NV          yahoo si ferma a nessuna
+  EOT        LSE    European Opportunities Trust plc yahoo si ferma a 2026-08-07
+  SOHO       LSE    Social Housing REIT plc          yahoo si ferma a 2026-08-06
+  IPF        LSE    International Personal Finance p yahoo si ferma a 2026-08-04
+  CSLP       SWX    UBS (CH) Property Fund - Direct  yahoo si ferma a 2026-08-10
+  GOOD       SWX    Good Buildings Swiss Real Estate yahoo si ferma a 2026-08-10
+  IMHE       SWX    Immo Helvetic                    yahoo si ferma a 2026-08-10
+  INT        SWX    Credit Suisse Real Estate Fund I yahoo si ferma a 2026-08-10
+  PSCF       SWX    Procimmo Swiss Commercial Fund   yahoo si ferma a 2026-08-10
+  PSREF      SWX    Patrimonium Property Advisors -  yahoo si ferma a 2026-08-10
+  SIC        SWX    Swisscanto (CH) Real Estate Fund yahoo si ferma a 2026-08-10
+  SLREFS     SWX    Swiss Life REF (CH) Swiss Proper yahoo si ferma a 2026-08-10
+  SREA       SWX    UBS (CH) Property Fund - Swiss C yahoo si ferma a 2026-08-10
+  SIAT       SWX    UBS (CH) Property Fund - Swiss R yahoo si ferma a 2026-08-10
+  EISP       OB     Eiendomsspar AS                  yahoo si ferma a nessuna
+  WEIJHO     CPSE   Investeringsforeningen Investin  yahoo si ferma a nessuna
+  RLAINV     CPSE   Ress Life Investments A/S        yahoo si ferma a 2026-08-10
+  SKYT       US     SkyWater Technology, Inc.        yahoo si ferma a 2026-08-07
+  AVNS       US     Avanos Medical, Inc.             yahoo si ferma a nessuna
+  BLD        US     TopBuild Corp.                   yahoo si ferma a nessuna
+  CNGO       US     Cengage Learning Holdings II, In yahoo si ferma a nessuna
+  CPRX       US     Catalyst Pharmaceuticals, Inc.   yahoo si ferma a nessuna
+  EEX        US     Emerald Holding, Inc.            yahoo si ferma a nessuna
+  ESPR       US     Esperion Therapeutics, Inc.      yahoo si ferma a nessuna
+  GTLS       US     Chart Industries, Inc.           yahoo si ferma a nessuna
+  EA         US     Electronic Arts Inc.             yahoo si ferma a 2026-08-10
+  NFBK       US     Northfield Bancorp, Inc.         yahoo si ferma a nessuna
+  NSA        US     National Storage Affiliates Trus yahoo si ferma a nessuna
+  NUVL       US     Nuvalent, Inc.                   yahoo si ferma a nessuna
+  OLPX       US     Olaplex Holdings, Inc.           yahoo si ferma a nessuna
+  STEL       US     Stellar Bancorp, Inc.            yahoo si ferma a nessuna
+  TMHC       US     Taylor Morrison Home Corporation yahoo si ferma a nessuna
+  WSR        US     Whitestone REIT                  yahoo si ferma a nessuna
+  XOMA       US     XOMA Royalty Corporation         yahoo si ferma a nessuna
+  MI.UN      TSX    Minto Apartment Real Estate Inve yahoo si ferma a 2026-08-07
+  ...e altri 68
