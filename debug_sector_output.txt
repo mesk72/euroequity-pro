@@ -1,10 +1,119 @@
-=== La borsa di Tokyo era APERTA l'11 agosto? ===
-  7203.T   sedute: ['06/08', '07/08', '10/08', '12/08']
-  6758.T   sedute: ['06/08', '07/08', '10/08', '12/08']
-  9984.T   sedute: ['06/08', '07/08', '10/08', '12/08']
-  8306.T   sedute: ['06/08', '07/08', '10/08', '12/08']
+OGGETTO: ForwardAlpha ATTENZIONE - 6762/7876 titoli aggiornati (85.9%)
 
-=== I 3 titoli segnalati: Yahoo ha davvero l'11 agosto? ===
-  ECT.AS   [('06/08', 11.5), ('07/08', 13.9), ('10/08', 13.9), ('11/08', 13.9), ('12/08', 13.7)]
-  EIOS.VI  [('06/08', 85.0), ('07/08', 85.5), ('10/08', 85.0), ('11/08', 85.0), ('12/08', 85.5)]
-  ICGC.L   [('06/08', 675.0), ('07/08', 665.0), ('10/08', 665.0), ('11/08', 665.0), ('12/08', 670.0)]
+UNIVERSO: 7876 titoli
+
+DISTRIBUZIONE PER DATA
+  2026-08-11  1 seduta indietro   6762 titoli   85.9%
+  2026-08-10  2 sedute indietro   1074 titoli   13.6%
+  2026-08-07  3 sedute indietro      3 titoli    0.0%
+  2026-08-06  4 sedute indietro      2 titoli    0.0%
+  2026-08-05  5 sedute indietro      2 titoli    0.0%
+  2026-08-04  6 sedute indietro      2 titoli    0.0%
+  2026-08-03  7 sedute indietro      1 titoli    0.0%
+  2026-07-31  8 sedute indietro      3 titoli    0.0%
+  2026-07-28  11 sedute indietro      3 titoli    0.0%
+  2026-07-24  13 sedute indietro      1 titoli    0.0%
+  2026-07-23  14 sedute indietro      2 titoli    0.0%
+  2026-07-21  16 sedute indietro      5 titoli    0.1%
+  2026-07-17  18 sedute indietro      1 titoli    0.0%
+  2026-07-16  19 sedute indietro      1 titoli    0.0%
+  2026-07-14  21 sedute indietro      2 titoli    0.0%
+  2026-07-13  22 sedute indietro      3 titoli    0.0%
+  2026-07-07  26 sedute indietro      1 titoli    0.0%
+  2026-07-03  28 sedute indietro      2 titoli    0.0%
+  2026-07-02  29 sedute indietro      1 titoli    0.0%
+  2026-06-30  31 sedute indietro      1 titoli    0.0%
+  2026-06-12  43 sedute indietro      1 titoli    0.0%
+  2026-06-10  45 sedute indietro      1 titoli    0.0%
+  mai scritti                       2 titoli    0.0%
+
+MERCATO           TOT     1g     2g  +VECCHI   MAI  PREVALENTE
+Europa           2126   2059     55       11     1  2026-08-11
+Stati Uniti      3002   2964     21       16     1  2026-08-11
+Canada            399    392      0        7     0  2026-08-11
+Giappone         1000      0    998        2     0  2026-08-10
+Hong Kong         500    500      0        0     0  2026-08-11
+Australia         349    349      0        0     0  2026-08-11
+Corea             400    398      0        2     0  2026-08-11
+Singapore         100    100      0        0     0  2026-08-11
+
+ESECUZIONI ultime 24h: 14
+  US+CA  ok=3401 falliti=0 durata=782s
+  EU     ok=2625 falliti=1 durata=593s
+  US+CA  ok=3401 falliti=0 durata=596s
+  EU     ok=2625 falliti=1 durata=640s
+  US+CA  ok=3401 falliti=0 durata=788s
+  EU     ok=2625 falliti=1 durata=605s
+
+
+DA SISTEMARE (Yahoo ha il dato, noi no): 64
+  YRM       MIL   codice=YRM.MI       nostro=2026-08-10 yahoo=2026-08-11
+  RWY       MIL   codice=RWY.MI       nostro=2026-08-10 yahoo=2026-08-11
+  ARTO      PA    codice=ARTO.PA      nostro=2026-08-10 yahoo=2026-08-11
+  MLCFM     PA    codice=MLCFM.PA     nostro=2026-08-10 yahoo=2026-08-12
+  MALT      PA    codice=MALT.PA      nostro=2026-08-10 yahoo=2026-08-12
+  QEV       AS    codice=QEV.AS       nostro=2026-08-10 yahoo=2026-08-11
+  BEVER     AS    codice=BEVER.AS     nostro=2026-08-10 yahoo=2026-08-11
+  PORF      AS    codice=PORF.AS      nostro=2026-08-10 yahoo=2026-08-11
+  ECT       AS    codice=ECT.AS       nostro=2026-08-10 yahoo=2026-08-12
+  GGC       MC    codice=GGC.MC       nostro=2026-08-10 yahoo=2026-08-11
+  ARM       MC    codice=ARM.MC       nostro=2026-08-10 yahoo=2026-08-11
+  YGMP      MC    codice=YGMP.MC      nostro=2026-08-10 yahoo=2026-08-11
+  YSIL      MC    codice=YSIL.MC      nostro=2026-08-10 yahoo=2026-08-11
+  SEQUA     BR    codice=SEQUA.BR     nostro=2026-08-10 yahoo=2026-08-11
+  IEP       BR    codice=IEP.BR       nostro=2026-08-10 yahoo=2026-08-11
+  FLSP      BR    codice=FLSP.BR      nostro=2026-08-10 yahoo=2026-08-11
+  NEWT      BR    codice=NEWT.BR      nostro=2026-08-10 yahoo=2026-08-11
+  COBH      BR    codice=COBH.BR      nostro=2026-08-10 yahoo=2026-08-12
+  ALSMB     LS    codice=ALSMB.LS     nostro=2026-08-10 yahoo=2026-08-11
+  CDU       LS    codice=CDU.LS       nostro=2026-08-10 yahoo=2026-08-11
+  ESON      LS    codice=ESON.LS      nostro=2026-08-10 yahoo=2026-08-11
+  FLEXD     LS    codice=FLEXD.LS     nostro=2026-08-10 yahoo=2026-08-11
+  MCP       LS    codice=MCP.LS       nostro=2026-08-10 yahoo=2026-08-11
+  SCB       LS    codice=SCB.LS       nostro=2026-08-10 yahoo=2026-08-11
+  SCP       LS    codice=SCP.LS       nostro=2026-08-10 yahoo=2026-08-12
+  SCT       LS    codice=SCT.LS       nostro=2026-08-10 yahoo=2026-08-12
+  VAF       LS    codice=VAF.LS       nostro=2026-08-10 yahoo=2026-08-12
+  BHD       VI    codice=BHD.VI       nostro=2026-08-10 yahoo=2026-08-11
+  EIOS      VI    codice=EIOS.VI      nostro=2026-08-10 yahoo=2026-08-12
+  GAGS      VI    codice=GAGS.VI      nostro=2026-08-10 yahoo=2026-08-11
+  HED       VI    codice=HED.VI       nostro=2026-08-10 yahoo=2026-08-12
+  LTH       VI    codice=LTH.VI       nostro=2026-08-10 yahoo=2026-08-12
+  MAN       VI    codice=MAN.VI       nostro=2026-08-10 yahoo=2026-08-12
+  RAT       VI    codice=RAT.VI       nostro=2026-08-10 yahoo=2026-08-11
+  STM       VI    codice=STM.VI       nostro=2026-08-10 yahoo=2026-08-11
+  WXF       VI    codice=WXF.VI       nostro=2026-08-10 yahoo=2026-08-11
+  DQ7A      IR    codice=DQ7A.IR      nostro=2026-08-10 yahoo=2026-08-11
+  LAMPS     GR    codice=LAMPS.AT     nostro=2026-08-10 yahoo=2026-08-11
+  HSBK      LSE   codice=HSBK.L       nostro=2026-08-10 yahoo=2026-08-11
+  MHPC      LSE   codice=MHPC.L       nostro=2026-08-10 yahoo=2026-08-11
+  ICGC      LSE   codice=ICGC.L       nostro=2026-08-10 yahoo=2026-08-12
+  DAR       LSE   codice=DAR.L        nostro=2026-08-10 yahoo=2026-08-11
+  VESTUM    OM    codice=VESTUM.ST    nostro=2026-08-10 yahoo=2026-08-11
+  PRIMOF    CPSE  codice=PRIMOF.CO    nostro=2026-08-10 yahoo=2026-08-11
+  SWRD      US    codice=SWRD         nostro=2026-08-10 yahoo=2026-08-11
+  SVMB      US    codice=SVMB         nostro=2026-08-10 yahoo=2026-08-11
+  ITFY      US    codice=ITFY         nostro=2026-08-10 yahoo=2026-08-11
+  EVOH      US    codice=EVOH         nostro=2026-08-10 yahoo=2026-08-11
+  CAVG      US    codice=CAVG         nostro=2026-08-10 yahoo=2026-08-11
+  ALTB      US    codice=ALTB         nostro=2026-08-10 yahoo=2026-08-11
+  CLUS      US    codice=CLUS         nostro=2026-08-10 yahoo=2026-08-11
+  CMRF      US    codice=CMRF         nostro=2026-08-10 yahoo=2026-08-11
+  FFPP      US    codice=FFPP         nostro=2026-08-10 yahoo=2026-08-11
+  HCGI      US    codice=HCGI         nostro=2026-08-10 yahoo=2026-08-11
+  IPEU      US    codice=IPEU         nostro=2026-08-10 yahoo=2026-08-11
+  MALG      US    codice=MALG         nostro=2026-08-10 yahoo=2026-08-11
+  NFTN      US    codice=NFTN         nostro=2026-08-10 yahoo=2026-08-11
+  NIKA      US    codice=NIKA         nostro=2026-08-10 yahoo=2026-08-11
+  OICT      US    codice=OICT         nostro=2026-08-10 yahoo=2026-08-11
+  PHIG      US    codice=PHIG         nostro=2026-08-10 yahoo=2026-08-11
+  SBNC      US    codice=SBNC         nostro=2026-08-10 yahoo=2026-08-11
+  VLNT      US    codice=VLNT         nostro=2026-08-10 yahoo=2026-08-11
+  WBHC      US    codice=WBHC         nostro=2026-08-10 yahoo=2026-08-11
+  WFHG      US    codice=WFHG         nostro=2026-08-10 yahoo=2026-08-11
+Delistati/sospesi (nessun intervento): 52
+
+Quintili precalcolati: 247 righe (aggiornati 2026-08-12)
+
+SMTP non configurato: stampo il rapporto senza inviarlo.
+ForwardAlpha ATTENZIONE - 6762/7876 titoli aggiornati (85.9%)
