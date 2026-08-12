@@ -390,6 +390,22 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     tot_assenti = sum(len(d["assenti"]) for d in per_exchange.values())
     perc = (tot_aggiornati / tot_universo * 100) if tot_universo else 0
     dist, mai_scritti = distribuzione(per_exchange, TUTTI_EXCHANGE, oggi)
+    # Titoli allineati alla PROPRIA ultima seduta di mercato.
+    def _conta_allineati():
+        n = 0
+        for _nome, _lista in GRUPPI:
+            _tutte = []
+            for _e in _lista:
+                _tutte += [x for x in per_exchange[_e]["date"].values() if x]
+            if not _tutte:
+                continue
+            _sed = Counter(_tutte).most_common(1)[0][0]
+            n += sum(1 for x in _tutte if x >= _sed)
+        return n
+    allineati = _conta_allineati()
+    perc_allineati = allineati / tot_universo * 100 if tot_universo else 0
+
+
     nostri, delistati, incerti = triage
 
     # --- segnalazioni: solo cose che meritano davvero attenzione ---
@@ -459,10 +475,13 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
         allarmi.append("tabella quintili vuota: il sito usa il calcolo lento di riserva")
 
     stato = "ATTENZIONE" if allarmi else "OK"
-    recenti = sum(r["n"] for r in dist if r["giorni"] is not None and r["giorni"] <= 1)
-    oggetto = "ForwardAlpha %s - %d/%d titoli aggiornati (%.1f%%)" % (
-        stato, recenti, tot_universo,
-        recenti / tot_universo * 100 if tot_universo else 0)
+    # FIX 12/8/2026: l'oggetto contava i titoli per data di CALENDARIO,
+    # quindi un mercato chiuso per festivita' risultava indietro. Il 12/8
+    # Tokyo era chiusa l'11 (Giorno della Montagna) e mille titoli
+    # giapponesi corretti facevano scendere l'oggetto da 98,6% a 85,9%.
+    # Ora si contano i titoli allineati alla seduta del PROPRIO mercato.
+    oggetto = "ForwardAlpha %s - %d/%d titoli allineati (%.1f%%)" % (
+        stato, allineati, tot_universo, perc_allineati)
 
     # ---------------- corpo HTML ----------------
     B = []
@@ -475,19 +494,27 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     colore = "#b00" if allarmi else "#0a7"
     B.append("<div style='border-left:4px solid %s;padding:10px 14px;"
              "background:#f7f7f7;margin-bottom:18px'>" % colore)
-    B.append("<div style='font-size:15px;font-weight:700;margin-bottom:8px'>"
-             "Universo: %d titoli</div>" % tot_universo)
+    # Titoli allineati alla PROPRIA ultima seduta di mercato: e' il numero
+    # che conta davvero. Prima il riquadro mostrava solo la distribuzione
+    # per data di calendario, dove un mercato chiuso per festivita' (Tokyo
+    # l'11/8, Giorno della Montagna) sembrava indietro pur essendo corretto.
+    B.append("<div style='font-size:22px;font-weight:700'>%d su %d allineati "
+             "<span style='color:#666;font-size:15px'>(%.1f%%)</span></div>"
+             % (allineati, tot_universo, perc_allineati))
+    B.append("<div style='font-size:12px;color:#555;margin:4px 0 10px'>"
+             "Titoli che hanno l'ultima seduta del proprio mercato. "
+             "Sotto, il dettaglio per data.</div>")
     B.append("<table style='border-collapse:collapse;font-size:14px;width:100%'>")
     for r in dist:
         g = r["giorni"]
         if g == 0:
             etichetta = "ultima seduta"
         elif g == 1:
-            etichetta = "una seduta indietro"
+            etichetta = "seduta precedente"
         elif g is None:
             etichetta = ""
         else:
-            etichetta = "%d sedute indietro" % g
+            etichetta = "%d sedute fa" % g
         pc = r["n"] / tot_universo * 100 if tot_universo else 0
         grigio = "#666" if (g or 0) >= 3 else "#111"
         B.append("<tr style='color:%s'>"
@@ -521,38 +548,43 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
 
     # tabella per mercato
     B.append("<h3 style='margin:0 0 6px;font-size:15px'>Per mercato</h3>")
+    B.append("<div style='font-size:12px;color:#666;margin-bottom:6px'>"
+             "Ogni mercato e' confrontato con la PROPRIA ultima seduta: le borse "
+             "hanno calendari e festivita' diverse, quindi date diverse non sono "
+             "un errore.</div>")
     B.append("<table style='border-collapse:collapse;width:100%;font-size:13px'>")
     B.append("<tr style='background:#f0f0f0;text-align:left'>"
              "<th style='padding:6px'>Mercato</th>"
-             "<th style='padding:6px;text-align:right'>Tot.</th>"
-             "<th style='padding:6px;text-align:right'>1 g.</th>"
-             "<th style='padding:6px;text-align:right'>2 g.</th>"
-             "<th style='padding:6px;text-align:right'>+vecchi</th>"
-             "<th style='padding:6px;text-align:right'>mai</th>"
-             "<th style='padding:6px'>data prevalente</th></tr>")
+             "<th style='padding:6px;text-align:right'>Titoli</th>"
+             "<th style='padding:6px;text-align:right'>Aggiornati</th>"
+             "<th style='padding:6px;text-align:right'>Indietro</th>"
+             "<th style='padding:6px;text-align:right'>%</th>"
+             "<th style='padding:6px'>Ultima seduta</th></tr>")
     for nome, lista in GRUPPI:
-        d_mkt, mai_mkt = distribuzione(per_exchange, lista, oggi)
-        u = sum(per_exchange[e]["universo"] for e in lista)
-        # FIX 9/8/2026: la colonna "1 g." accorpava chi ha l'ULTIMA seduta
-        # e chi e' indietro di UNA: cosi' 101 titoli fermi sparivano dentro
-        # il numero degli aggiornati e la tabella sembrava perfetta.
-        # Ora la prima colonna conta SOLO chi ha l'ultima seduta.
-        b1 = sum(r["n"] for r in d_mkt if r["giorni"] == 0)
-        b2 = sum(r["n"] for r in d_mkt if r["giorni"] == 1)
-        b3 = sum(r["n"] for r in d_mkt if r["giorni"] is not None and r["giorni"] >= 2)
-        prevalenti = [per_exchange[e]["ultima_seduta"] for e in lista
-                      if per_exchange[e]["ultima_seduta"]]
-        seduta = Counter(prevalenti).most_common(1)[0][0] if prevalenti else "-"
-        col = "#b00" if (b3 + mai_mkt) > u * 0.05 else "#111"
+        tot_m = sum(per_exchange[e]["universo"] for e in lista)
+        if not tot_m:
+            continue
+        # seduta prevalente del mercato = la sua ultima seduta reale
+        tutte = []
+        for e in lista:
+            tutte += [x for x in per_exchange[e]["date"].values() if x]
+        if not tutte:
+            B.append("<tr><td style='padding:6px'>%s</td><td colspan='5' "
+                     "style='padding:6px;color:#b00'>nessun prezzo</td></tr>" % nome)
+            continue
+        seduta_m = Counter(tutte).most_common(1)[0][0]
+        agg = sum(1 for x in tutte if x >= seduta_m)
+        indietro = tot_m - agg
+        perc = agg / tot_m * 100
+        col = "#b00" if perc < 97 else "#111"
         B.append("<tr style='border-bottom:1px solid #eee;color:%s'>"
                  "<td style='padding:6px'>%s</td>"
                  "<td style='padding:6px;text-align:right'>%d</td>"
                  "<td style='padding:6px;text-align:right'><b>%d</b></td>"
                  "<td style='padding:6px;text-align:right'>%d</td>"
-                 "<td style='padding:6px;text-align:right'>%d</td>"
-                 "<td style='padding:6px;text-align:right'>%d</td>"
+                 "<td style='padding:6px;text-align:right'>%.1f%%</td>"
                  "<td style='padding:6px'>%s</td></tr>"
-                 % (col, nome, u, b1, b2, b3, mai_mkt, seduta))
+                 % (col, nome, tot_m, agg, indietro, perc, seduta_m))
     B.append("</table>")
 
     # esecuzioni
@@ -704,7 +736,15 @@ def riepilogo_testuale(per_exchange, esecuzioni, quintili, triage):
     tot_x = sum(len(d["assenti"]) for d in per_exchange.values())
     oggi = datetime.now(timezone.utc) + timedelta(hours=2)
     dist, mai = distribuzione(per_exchange, TUTTI_EXCHANGE, oggi)
-    R.append("UNIVERSO: %d titoli" % tot_u)
+    _all = 0
+    for _n,_l in GRUPPI:
+        _t=[]
+        for _e in _l: _t += [x for x in per_exchange[_e]["date"].values() if x]
+        if not _t: continue
+        _sd = Counter(_t).most_common(1)[0][0]
+        _all += sum(1 for x in _t if x >= _sd)
+    R.append("UNIVERSO: %d titoli | ALLINEATI alla seduta del proprio mercato: %d (%.1f%%)"
+             % (tot_u, _all, _all/tot_u*100 if tot_u else 0))
     R.append("")
     R.append("DISTRIBUZIONE PER DATA")
     for r in dist:
