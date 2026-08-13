@@ -3,28 +3,28 @@
 import { useEffect, useRef } from 'react'
 
 const AMERICAS = [
-  { name: 'S&P 500',   url: 'https://finance.yahoo.com/quote/%5EGSPC/' },
-  { name: 'Nasdaq',    url: 'https://finance.yahoo.com/quote/%5EIXIC/' },
-  { name: 'Dow Jones', url: 'https://finance.yahoo.com/quote/%5EDJI/'  },
-  { name: 'TSX',       url: 'https://finance.yahoo.com/quote/%5EGSPTSE/'},
+  { name: 'S&P 500',   url: 'https://finance.yahoo.com/quote/%5EGSPC/?hl=en-US&guccounter=1' },
+  { name: 'Nasdaq',    url: 'https://finance.yahoo.com/quote/%5EIXIC/?hl=en-US&guccounter=1' },
+  { name: 'Dow Jones', url: 'https://finance.yahoo.com/quote/%5EDJI/?hl=en-US&guccounter=1'  },
+  { name: 'TSX',       url: 'https://finance.yahoo.com/quote/%5EGSPTSE/?hl=en-US&guccounter=1'},
 ]
 
 const EUROPE = [
-  { name: 'DAX',        url: 'https://finance.yahoo.com/quote/%5EGDAXI/'    },
-  { name: 'CAC 40',     url: 'https://finance.yahoo.com/quote/%5EFCHI/'     },
-  { name: 'FTSE MIB',   url: 'https://finance.yahoo.com/quote/FTSEMIB.MI/'  },
-  { name: 'FTSE 100',   url: 'https://finance.yahoo.com/quote/%5EFTSE/'     },
-  { name: 'Euro Stoxx', url: 'https://finance.yahoo.com/quote/%5ESTOXX50E/' },
-  { name: 'SMI',        url: 'https://finance.yahoo.com/quote/%5ESSMI/'     },
-  { name: 'IBEX 35',    url: 'https://finance.yahoo.com/quote/%5EIBEX/'     },
+  { name: 'DAX',        url: 'https://finance.yahoo.com/quote/%5EGDAXI/?hl=en-US&guccounter=1'    },
+  { name: 'CAC 40',     url: 'https://finance.yahoo.com/quote/%5EFCHI/?hl=en-US&guccounter=1'     },
+  { name: 'FTSE MIB',   url: 'https://finance.yahoo.com/quote/FTSEMIB.MI/?hl=en-US&guccounter=1'  },
+  { name: 'FTSE 100',   url: 'https://finance.yahoo.com/quote/%5EFTSE/?hl=en-US&guccounter=1'     },
+  { name: 'Euro Stoxx', url: 'https://finance.yahoo.com/quote/%5ESTOXX50E/?hl=en-US&guccounter=1' },
+  { name: 'SMI',        url: 'https://finance.yahoo.com/quote/%5ESSMI/?hl=en-US&guccounter=1'     },
+  { name: 'IBEX 35',    url: 'https://finance.yahoo.com/quote/%5EIBEX/?hl=en-US&guccounter=1'     },
 ]
 
 const ASIA = [
-  { name: 'Nikkei 225', url: 'https://finance.yahoo.com/quote/%5EN225/' },
-  { name: 'Hang Seng',  url: 'https://finance.yahoo.com/quote/%5EHSI/'  },
-  { name: 'ASX 200',    url: 'https://finance.yahoo.com/quote/%5EAXJO/' },
-  { name: 'KOSPI',      url: 'https://finance.yahoo.com/quote/%5EKS11/' },
-  { name: 'STI',        url: 'https://finance.yahoo.com/quote/%5ESTI/'  },
+  { name: 'Nikkei 225', url: 'https://finance.yahoo.com/quote/%5EN225/?hl=en-US&guccounter=1' },
+  { name: 'Hang Seng',  url: 'https://finance.yahoo.com/quote/%5EHSI/?hl=en-US&guccounter=1'  },
+  { name: 'ASX 200',    url: 'https://finance.yahoo.com/quote/%5EAXJO/?hl=en-US&guccounter=1' },
+  { name: 'KOSPI',      url: 'https://finance.yahoo.com/quote/%5EKS11/?hl=en-US&guccounter=1' },
+  { name: 'STI',        url: 'https://finance.yahoo.com/quote/%5ESTI/?hl=en-US&guccounter=1'  },
 ]
 
 function IndexBar({ label, indices }: { label: string; indices: { name: string; url: string }[] }) {
