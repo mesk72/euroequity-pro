@@ -1,8 +1,3 @@
-=== I link nel sito puntano alla versione inglese? ===
-  SBUX-US   link non trovato nell'HTML iniziale
-  MAR-US    link non trovato nell'HTML iniziale
-  AAPL-US   link non trovato nell'HTML iniziale
+=== Link a Yahoo nella pagina Starbucks in produzione ===
 
-=== Yahoo risponde in inglese con hl=en-US? ===
-  SBUX/analysis/?p=SBUX& -> HTTP 404 | segnali inglese: 0 | italiano: 0
-  MAR/analysis/?p=MAR&hl -> HTTP 404 | segnali inglese: 0 | italiano: 0
+Il link Estimates forza l'inglese: False
