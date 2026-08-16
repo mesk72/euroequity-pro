@@ -1,43 +1,19 @@
-HTTP: 200
-utenti registrati: 8
+Titoli italiani nel nostro universo: 117
+con capitalizzazione disponibile: 117
 
-  email: galco@iol.it
-    registrato:       2026-08-12T16:35:05.779183Z
-    ultimo accesso:   2026-08-12T16:37:42.988913Z
-    email confermata: 2026-08-12T16:36:47.128511Z
+mkt_cap e' in MILIONI di euro
+SOMMA: 1323808 milioni = 1323.81 miliardi di euro
+        = 1.324 trilioni di euro
+        = 1.549 trilioni di dollari (cambio 1.17)
 
-  email: nicola.ambrosini01@gmail.com
-    registrato:       2026-08-02T18:46:10.061554Z
-    ultimo accesso:   2026-08-02T18:49:09.248116Z
-    email confermata: 2026-08-02T18:46:25.023546Z
-
-  email: infocasualestyle03@gmail.com
-    registrato:       2026-07-20T23:54:13.625188Z
-    ultimo accesso:   2026-08-14T15:37:44.49652Z
-    email confermata: 2026-07-20T23:55:44.73744Z
-
-  email: hawkeyeboy05@icloud.com
-    registrato:       2026-06-29T01:25:17.765214Z
-    ultimo accesso:   2026-06-29T01:26:00.687468Z
-    email confermata: 2026-06-29T01:26:00.672234Z
-
-  email: ilovenokialumia635@gmail.com
-    registrato:       2026-06-17T17:48:54.853582Z
-    ultimo accesso:   2026-06-17T17:49:23.606769Z
-    email confermata: 2026-06-17T17:49:23.601076Z
-
-  email: moritzalexanderschaefer@gmail.com
-    registrato:       2026-06-04T21:47:17.972584Z
-    ultimo accesso:   None
-    email confermata: None
-
-  email: langskltdlondon@gmail.com
-    registrato:       2026-05-28T17:04:30.610476Z
-    ultimo accesso:   None
-    email confermata: None
-
-  email: andreameschini19@gmail.com
-    registrato:       2026-05-17T22:36:51.001091Z
-    ultimo accesso:   2026-08-15T12:38:29.460664Z
-    email confermata: 2026-05-17T22:37:37.527204Z
-
+Prime 10 per capitalizzazione (milioni di euro):
+   UCG      UniCredit S.p.A.                       140454
+   ISP      Intesa Sanpaolo S.p.A.                 123133
+   ENEL     Enel SpA                               117740
+   G        Assicurazioni Generali S.p.A.           73387
+   ENI      Eni S.p.A.                              68757
+   RACE     Ferrari N.V.                            66681
+   PRY      Prysmian S.p.A.                         47993
+   PST      Poste Italiane S.p.A.                   43117
+   BMPS     Banca Monte dei Paschi di Siena S.      38725
+   LDO      Leonardo S.p.a.                         34664
