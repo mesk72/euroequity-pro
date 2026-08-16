@@ -1,3 +1,4 @@
-Link 'analysis' trovati nel codice pubblicato:
+=== tabella profiles: chi si e' registrato di recente ===
+[]
 
-Contengono hl=en-US: nessun link trovato
+=== esistono tabelle che registrano gli accessi? ===
