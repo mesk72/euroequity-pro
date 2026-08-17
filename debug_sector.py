@@ -2,36 +2,31 @@ import os, requests
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-uni=[];off=0
-while True:
-    r=requests.get(U+"/rest/v1/stocks",headers=H,
-        params={"select":"ticker,company","exchange":"eq.MIL","in_universe":"eq.true","limit":"1000","offset":str(off)})
-    b=r.json()
-    if not isinstance(b,list) or not b: break
-    uni+=b; off+=1000
-    if len(b)<1000: break
-print("Titoli italiani nel nostro universo:", len(uni))
-
-f=[];off=0
-while True:
-    r=requests.get(U+"/rest/v1/fundamentals",headers=H,
-        params={"select":"ticker,mkt_cap","exchange":"eq.MIL","limit":"1000","offset":str(off)})
-    b=r.json()
-    if not isinstance(b,list) or not b: break
-    f+=b; off+=1000
-    if len(b)<1000: break
-mc={x["ticker"]:x.get("mkt_cap") for x in f}
-tick={x["ticker"] for x in uni}
-val=[(t,mc[t]) for t in tick if mc.get(t)]
-tot=sum(v for _,v in val)
-print("con capitalizzazione disponibile:", len(val))
+def n(params):
+    r=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
+        params={**params,"select":"ticker","limit":"1"})
+    return int(r.headers.get("content-range","0/0").split("/")[-1])
+print("=== CONTEGGI GLOBALI tabella stocks ===")
+print("  in_universe = true :", n({"in_universe":"eq.true"}))
+print("  in_universe = false:", n({"in_universe":"eq.false"}))
+print("  in_universe NULL   :", n({"in_universe":"is.null"}))
+print("  TOTALE righe       :", n({}))
 print()
-print("mkt_cap e' in MILIONI di euro")
-print("SOMMA: %.0f milioni = %.2f miliardi di euro" % (tot, tot/1000))
-print("        = %.3f trilioni di euro" % (tot/1e6))
-print("        = %.3f trilioni di dollari (cambio 1.17)" % (tot/1e6*1.17))
+EX=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE",
+    "US","TSX","TSE","SEHK","ASX","KRX","SGX"]
+print("=== per exchange (in universo) ===")
+tot=0
+for ex in EX:
+    v=n({"exchange":"eq."+ex,"in_universe":"eq.true"}); tot+=v
+    print("  %-6s %5d" % (ex,v))
+print("  SOMMA dei 23 exchange conosciuti: %d" % tot)
 print()
-print("Prime 10 per capitalizzazione (milioni di euro):")
-nome={x["ticker"]:(x.get("company") or "") for x in uni}
-for t,v in sorted(val,key=lambda x:-x[1])[:10]:
-    print("   %-8s %-34s %10.0f" % (t,nome[t][:34],v))
+print("=== esistono exchange NON nella nostra lista? ===")
+r=requests.get(U+"/rest/v1/stocks",headers=H,
+    params={"select":"exchange","in_universe":"eq.true","limit":"10000"})
+d=r.json()
+from collections import Counter
+c=Counter(x["exchange"] for x in d if isinstance(x,dict))
+altri={k:v for k,v in c.items() if k not in EX}
+print("  righe lette:",len(d))
+print("  exchange fuori lista:", altri if altri else "nessuno")
