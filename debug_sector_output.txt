@@ -1,19 +1,35 @@
-Titoli italiani nel nostro universo: 117
-con capitalizzazione disponibile: 117
+=== CONTEGGI GLOBALI tabella stocks ===
+  in_universe = true : 7876
+  in_universe = false: 2341
+  in_universe NULL   : 0
+  TOTALE righe       : 10217
 
-mkt_cap e' in MILIONI di euro
-SOMMA: 1323808 milioni = 1323.81 miliardi di euro
-        = 1.324 trilioni di euro
-        = 1.549 trilioni di dollari (cambio 1.17)
+=== per exchange (in universo) ===
+  MIL      117
+  XETRA    210
+  PA       216
+  AS        98
+  MC        91
+  BR       100
+  LS        35
+  VI        53
+  HE       100
+  IR        15
+  GR       100
+  LSE      423
+  SWX      161
+  OM       206
+  OB       100
+  CPSE     101
+  US      3002
+  TSX      399
+  TSE     1000
+  SEHK     500
+  ASX      349
+  KRX      400
+  SGX      100
+  SOMMA dei 23 exchange conosciuti: 7876
 
-Prime 10 per capitalizzazione (milioni di euro):
-   UCG      UniCredit S.p.A.                       140454
-   ISP      Intesa Sanpaolo S.p.A.                 123133
-   ENEL     Enel SpA                               117740
-   G        Assicurazioni Generali S.p.A.           73387
-   ENI      Eni S.p.A.                              68757
-   RACE     Ferrari N.V.                            66681
-   PRY      Prysmian S.p.A.                         47993
-   PST      Poste Italiane S.p.A.                   43117
-   BMPS     Banca Monte dei Paschi di Siena S.      38725
-   LDO      Leonardo S.p.a.                         34664
+=== esistono exchange NON nella nostra lista? ===
+  righe lette: 1000
+  exchange fuori lista: nessuno
