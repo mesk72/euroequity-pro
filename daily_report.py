@@ -259,7 +259,14 @@ def triage_cronici(per_exchange, oggi, giorni_soglia=7):
     except Exception:
         return nostri, delistati, candidati  # senza yfinance non si distingue
 
-    for data, tk, ex, azienda in candidati[:250]:
+    # FIX 18/8/2026: RIMOSSO il tetto di 250 candidati. Il rapporto del
+    # 18/8 dichiarava 131 titoli non allineati mentre erano 197: quelli
+    # oltre il tetto non venivano verificati e sparivano dal conteggio.
+    # Un rapporto che tronca i numeri e' peggio di nessun rapporto, perche'
+    # fa credere che la situazione sia migliore di quella reale.
+    # Il costo e' solo tempo di esecuzione: una richiesta a Yahoo per
+    # titolo, e i titoli indietro sono tipicamente poche centinaia.
+    for data, tk, ex, azienda in candidati:
         yt = None
         try:
             r = requests.get(SUPABASE_URL + "/rest/v1/stocks", headers=HEADERS,
