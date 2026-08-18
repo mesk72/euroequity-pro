@@ -1,34 +1,18 @@
-fundamentals: 12191
+TIKR EU: 3369 titoli con capitalizzazione
 
-=== per exchange: quanti hanno mkt_cap < 1 (sospetto miliardi) ===
-EX         TOT       <1       % <1  MEDIANA
-OM         525      297      56.6%          0.24
-PA         522      293      56.1%          0.20
-AIM        300      262      87.3%          0.10
-XETRA      366      139      38.0%        791.10
-MIL        255      131      51.4%          0.26
-LSE        521       85      16.3%       1213.02
-NGM         86       85      98.8%          0.01
-AT         100       75      75.0%          0.18
-SWX        203       37      18.2%       2220.56
-OB         307        2       0.7%        381.57
-BR         166        1       0.6%        544.69
-TSE       1187        0       0.0%       1465.89
-US        3964        0       0.0%       2155.87
-VI          72        0       0.0%        349.44
-TSX        506        0       0.0%       1147.76
-ATSE       141        0       0.0%          0.00
-ASX        407        0       0.0%       1128.31
-AS         109        0       0.0%       1088.10
-IR          16        0       0.0%       1493.53
-KRX        449        0       0.0%       1204.19
-CPSE       218        0       0.0%        438.84
-SEHK       568        0       0.0%       2464.00
-MC         743        0       0.0%        510.24
-SGX        109        0       0.0%       2074.95
-HE         182        0       0.0%        200.67
-GR         102        0       0.0%        271.23
-LS          47        0       0.0%        180.46
-BDM          6        0       0.0%          0.00
-.LSE        13        0       0.0%          0.00
-.AIM         1        0       0.0%          0.00
+=== confronto: nostro valore vs TIKR (mercati sospetti) ===
+  corrispondono (stessa unita'):      1313
+  differenza di 1000x (miliardi!):    25
+  altra differenza:                   176
+
+  esempi con fattore 1000:
+    FLEXO     AT    nostro=0.1000  TIKR=109.76 MM
+    DAIOS     AT    nostro=0.1500  TIKR=162.64 MM
+    CREDIA    AT    nostro=2.5900  TIKR=2674.37 MM
+    KYLO      AT    nostro=0.0700  TIKR=72.67 MM
+    DATA      MIL   nostro=0.0300  TIKR=27.20 MM
+    CENTR     AT    nostro=0.0300  TIKR=32.80 MM
+    QLCO      AT    nostro=0.4200  TIKR=448.55 MM
+    EVR       AT    nostro=0.3000  TIKR=321.37 MM
+    QUEST     AT    nostro=0.8100  TIKR=875.11 MM
+    SIDMA     AT    nostro=0.0300  TIKR=30.37 MM
