@@ -1,10 +1,11 @@
-=== cerco NSKOG nella tabella stocks ===
-   {'ticker': 'NSKOG', 'exchange': 'OB', 'company': 'Norske Skog ASA', 'yahoo_ticker': 'NSKOG.OL', 'in_universe': False}
+1) rimetto NSKOG in universo
+   HTTP 204
+2) scarico 5 anni di storico
+   scritte 1261 righe (2021-08-09 -> 2026-08-17), saltate 1 (seduta aperta)
+3) verifica
+   righe storico: 1261
+   ultime: [{'date': '2026-08-17', 'adj_close': 47.25}, {'date': '2026-08-14', 'adj_close': 49.75}]
 
-=== quante righe di storico ha? ===
-  righe in prices_eod: 0
-  nella vista: []
-
-=== cosa ha Yahoo? ===
-  NSKOG.OL   [('13/08', 48.85), ('14/08', 49.75), ('17/08', 47.25), ('18/08', 45.05)]
-  NSKOG.OB   VUOTO
+4) ALTRI titoli esclusi che Yahoo ha ancora: quanti sono?
+   titoli fuori universo in totale: 2340
+   di cui con un codice Yahoo impostato: 1886
