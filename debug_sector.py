@@ -1,21 +1,33 @@
-import os, requests
+import os, requests, yfinance as yf, pandas as pd
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-print("Titoli che avevo recuperato stamattina — cosa c'e' ADESSO nel database?")
+print("=== cerco NSKOG nella tabella stocks ===")
+for f in ["ticker=ilike.*NSKOG*","company=ilike.*Norske Skog*","ticker=eq.NSKOG"]:
+    k,v=f.split("=",1)
+    r=requests.get(U+"/rest/v1/stocks",headers=H,params={"select":"ticker,exchange,company,yahoo_ticker,in_universe",k:v})
+    d=r.json()
+    if isinstance(d,list) and d:
+        for x in d: print("  ",x)
+        break
 print()
-for tk,ex in [("TYA","MIL"),("YRM","MIL"),("RWY","MIL"),("MALT","PA"),("CDU","LS"),("HED","VI")]:
-    eod=requests.get(U+"/rest/v1/prices_eod",headers=H,
-        params={"select":"date,adj_close","ticker":"eq."+tk,"exchange":"eq."+ex,"order":"date.desc","limit":"3"}).json()
+print("=== quante righe di storico ha? ===")
+for tk,ex in [("NSKOG","OB")]:
+    rc=requests.get(U+"/rest/v1/prices_eod",headers={**H,"Prefer":"count=exact"},
+        params={"select":"date","ticker":"eq."+tk,"exchange":"eq."+ex,"limit":"1"})
+    print("  righe in prices_eod:", rc.headers.get("content-range","?").split("/")[-1])
     mv=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-        params={"select":"price_date","ticker":"eq."+tk,"exchange":"eq."+ex}).json()
-    print("  %-7s.%-4s storico: %s" % (tk,ex,[(x["date"],x["adj_close"]) for x in eod] if eod else "-"))
-    print("               vista  : %s" % (mv[0]["price_date"] if mv else "-"))
+        params={"select":"price,price_date","ticker":"eq."+tk,"exchange":"eq."+ex}).json()
+    print("  nella vista:", mv)
 print()
-print("=== la vista si sta aggiornando? ===")
-r=requests.get(U+"/rest/v1/prices_eod",headers={**H,"Prefer":"count=exact"},
-    params={"select":"ticker","exchange":"eq.MIL","date":"eq.2026-08-17","limit":"1"})
-print("  righe MIL al 17/08 nello storico:", r.headers.get("content-range","?").split("/")[-1])
-r2=requests.get(U+"/rest/v1/latest_prices_mv",headers={**H,"Prefer":"count=exact"},
-    params={"select":"ticker","exchange":"eq.MIL","price_date":"eq.2026-08-17","limit":"1"})
-print("  righe MIL al 17/08 nella vista:", r2.headers.get("content-range","?").split("/")[-1])
+print("=== cosa ha Yahoo? ===")
+for yt in ["NSKOG.OL","NSKOG.OB"]:
+    try:
+        df=yf.download(yt,period="10d",interval="1d",auto_adjust=True,progress=False)
+        if df.empty: print("  %-10s VUOTO" % yt); continue
+        cl=df["Close"]
+        if isinstance(cl,pd.DataFrame): cl=cl.iloc[:,0]
+        cl=cl.dropna()
+        print("  %-10s %s" % (yt,[(i.strftime("%d/%m"),round(float(v),2)) for i,v in list(cl.items())[-4:]]))
+    except Exception as e:
+        print("  %-10s errore %s" % (yt,str(e)[:40]))
