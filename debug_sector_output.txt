@@ -1,35 +1,78 @@
-=== CONTEGGI GLOBALI tabella stocks ===
-  in_universe = true : 7876
-  in_universe = false: 2341
-  in_universe NULL   : 0
-  TOTALE righe       : 10217
+TOTALE non allineati: 197
 
-=== per exchange (in universo) ===
-  MIL      117
-  XETRA    210
-  PA       216
-  AS        98
-  MC        91
-  BR       100
-  LS        35
-  VI        53
-  HE       100
-  IR        15
-  GR       100
-  LSE      423
-  SWX      161
-  OM       206
-  OB       100
-  CPSE     101
-  US      3002
-  TSX      399
-  TSE     1000
-  SEHK     500
-  ASX      349
-  KRX      400
-  SGX      100
-  SOMMA dei 23 exchange conosciuti: 7876
+=== COLPA NOSTRA (Yahoo ha il dato): 71 ===
+  TYA        MIL    Toscana Aeroporti S.p.A.      
+  YRM        MIL    Rosetti Marino SpA            
+  RWY        MIL    Reway Group S.p.A.            
+  MLMTP      PA     Montepino LogÃ­stica, SOCIMI, 
+  MLPLC      PA     Placoplatre SA                
+  MALT       PA     Malteries Franco-Belges Sociét
+  ARTO       PA     Société Industrielle et Financ
+  MLCFM      PA     CFM Indosuez Wealth Management
+  HWK        AS     Hawick Data N.V.              
+  QEV        AS     SPEAR Investments I B.V.      
+  AMUND      AS     Almunda Professionals N.V.    
+  COL        MC     Colonial SFL, Socimi S. A.    
+  YATO       MC     Atom Hoteles SOCIMI, S.A.     
+  YCPS       MC     Castellana Properties Socimi, 
+  YEPSA      MC     Emperador Properties SOCIMI, S
+  YFID       MC     Fidere Patrimonio Socimi, S.A.
+  YHTI       MC     Hotei Properties Group Socimi 
+  YTST       MC     Testa Residencial SOCIMI, S.A.
+  YVIV       MC     Vivenio Residencial SOCIMI, S.
+  YZBL       MC     Zambal Spain Socimi, S.A.     
+  GGC        MC     General de Galerías Comerciale
+  CMO        MC     Cementos Molins, S.A.         
+  YSIL       MC     Silicius Real Estate SOCIMI, S
+  MOP        BR     Palmboomen Cultuur Maatschappi
+  IEP        BR     Iep Invest, NV                
+  FLSP       BR     Flowsparks NV                 
+  SEQUA      BR     Sequana Medical NV            
+  NEWT       BR     Newtree S.A.                  
+  ALSMB      LS     Samba Digital, SGPS, S.A.     
+  CDU        LS     Conduril - Engenharia, S.A.   
+  ESON       LS     Estoril Sol, SGPS, S.A.       
+  FLEXD      LS     Flexdeal Simfe S.A.           
+  MCP        LS     Grupo Média Capital, SGPS, S.A
+  SCB        LS     Sporting Clube de Braga - Fute
+  GAGS       VI     Gurktaler Aktiengesellschaft  
+  HED        VI     Maschinenfabrik Heid AG       
+  RAT        VI     RATH Aktiengesellschaft       
+  WXF        VI     Warimpex Finanz- und Beteiligu
+  MLC        IR     Malin Corporation plc         
+  FLEXO      GR     Flexopack SociÃ©tÃ© Anonyme Co
+  ATRUST     GR     Alpha Trust Holdings S.A.     
+  MERKO      GR     Mermeren Kombinat AD          
+  OAP3       LSE    Octopus Apollo VCT plc        
+  MHPC       LSE    MHP SE                        
+  IIG        LSE    Intuitive Investments Group Pl
+  HSBK       LSE    Halyk Bank of Kazakhstan Joint
+  NBS        LSE    Nationwide Building Society   
+  COPN       SWX    Cosmo N.V.                    
+  VESTUM     OM     Vestum AB (publ)              
+  SBNC       US     Southern BancShares (N.C.), In
+  SWRD       US     Stewards Inc.                 
+  SVMB       US     Jingbo Technology, Inc.       
+  ALTB       US     Alpine Auto Brokers Inc.      
+  PHIG       US     PHI Group, Inc.               
+  OICT       US     Oicintra, Inc.                
+  NIKA       US     Nika Pharmaceuticals, Inc.    
+  NFTN       US     NFiniTi Inc.                  
+  MALG       US     Microalliance Group Inc.      
+  ITFY       US     Interfoundry, Inc.            
+  IPEU       US     IPE Universal Inc.            
+  HCGI       US     Huntwicke Capital Group Inc.  
+  FFPP       US     Fast Finance Pay Corp.        
+  EVOH       US     EvoAir Holdings Inc.          
+  CMRF       US     CIM Group, Inc.               
+  CLUS       US     Cluster Group Holdings Limited
+  CAVG       US     ACC Aviation Holdings Ltd.    
+  VLNT       US     Vallant Financial, Inc.       
+  ANSC       US     Agriculture & Natural Solution
+  WBHC       US     Wilson Bank Holding Company   
+  WFHG       US     World Financial Holding Group 
+  G6M        ASX    Group 6 Metals Limited        
+  -> RECUPERATI: 71
 
-=== esistono exchange NON nella nostra lista? ===
-  righe lette: 1000
-  exchange fuori lista: nessuno
+=== Yahoo NON ha il dato: 126 ===
+  per mercato: {'XETRA': 4, 'PA': 1, 'BR': 2, 'LSE': 3, 'SWX': 8, 'OB': 1, 'CPSE': 2, 'US': 33, 'TSX': 10, 'TSE': 3, 'SEHK': 11, 'KRX': 46, 'SGX': 2}
