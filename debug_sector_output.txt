@@ -1,47 +1,37 @@
-TIKR: 7042 titoli
+=== SITUAZIONE ATTUALE nell'universo ===
+MERCATO        COD     IN UNIV   criterio che sembra applicato
+Milano         MIL         117   TUTTI sopra soglia
+Francoforte    XETRA       210   TUTTI sopra soglia
+Parigi         PA          216   TUTTI sopra soglia
+Amsterdam      AS           98   tutti quelli disponibili
+Madrid         MC           91   tutti quelli disponibili
+Bruxelles      BR          100   primi 100 (esatto)
+Lisbona        LS           35   tutti quelli disponibili
+Vienna         VI           53   tutti quelli disponibili
+Helsinki       HE          100   primi 100 (esatto)
+Dublino        IR           15   tutti quelli disponibili
+Atene          GR          100   primi 100 (esatto)
+Londra         LSE         423   TUTTI sopra soglia
+Zurigo         SWX         161   TUTTI sopra soglia
+Stoccolma      OM          208   TUTTI sopra soglia
+Oslo           OB          101   TUTTI sopra soglia
+Copenaghen     CPSE        101   TUTTI sopra soglia
 
-=== TITOLI FUORI UNIVERSO che rientrerebbero con il valore TIKR corretto ===
-  AIM      45 titoli con valore letto 1000x troppo piccolo
-       MRK       Merck KGaA                     nostro=0.060  vero=318262 MM
-       TMO       Time Out Group plc             nostro=0.040  vero=191987 MM
-       STX       Shield Therapeutics plc        nostro=0.070  vero=187255 MM
-       PWR       POWER PROBE PLC ORD 0.1P       nostro=0.060  vero=98558 MM
-  LSE      15 titoli con valore letto 1000x troppo piccolo
-       BRK       Brooks Macdonald Group plc     nostro=0.240  vero=1087055 MM
-       GLE       Société Générale Société anony nostro=0.160  vero=64578 MM
-       NVT       Northern Venture Trust Ord     nostro=0.170  vero=24772 MM
-       FTV       Foresight VCT Ord              nostro=0.270  vero=19069 MM
-  MIL      34 titoli con valore letto 1000x troppo piccolo
-       GE        Gefran S.p.A.                  nostro=0.160  vero=382884 MM
-       ABT       Abitare In S.p.A.              nostro=0.070  vero=166935 MM
-       GM        Gentili Mosconi S.p.A.         nostro=0.060  vero=68554 MM
-       D         Directa Sim S.p.A.             nostro=0.130  vero=61416 MM
-  NGM       4 titoli con valore letto 1000x troppo piccolo
-       PRLD      PRLD.ST,0P0001A2BV,4129895     nostro=0.020  vero=493 MM
-       NGS       NGS Group AB (publ)            nostro=0.010  vero=488 MM
-       SDS       Seamless Distribution Systems  nostro=0.020  vero=384 MM
-       REAL      Realco SA                      nostro=0.030  vero=267 MM
-  OM       26 titoli con valore letto 1000x troppo piccolo
-       META      Metacon AB (publ)              nostro=0.030  vero=1562603 MM
-       KBC       KBC Group NV                   nostro=0.220  vero=54741 MM
-       HUM       Humana AB (publ)               nostro=0.240  vero=47379 MM
-       SNX       Premium Snacks Nordic AB (publ nostro=0.040  vero=18844 MM
-  PA       15 titoli con valore letto 1000x troppo piccolo
-       CVX       CARVOLIX                       nostro=0.200  vero=344093 MM
-       LIN       Linedata Services S.A.         nostro=0.210  vero=248849 MM
-       INF       Informa plc                    nostro=0.290  vero=15430 MM
-       AVT       Avenir Telecom S.A.            nostro=0.010  vero=6683 MM
-  SWX       2 titoli con valore letto 1000x troppo piccolo
-       LMN       lastminute.com N.V.            nostro=0.160  vero=4014 MM
-       BBN       Bellevue Group AG              nostro=0.110  vero=989 MM
-  XETRA    19 titoli con valore letto 1000x troppo piccolo
-       DIE       D'Ieteren Group SA             nostro=0.030  vero=10851 MM
-       BEZ       Beazley plc                    nostro=0.030  vero=10160 MM
-       DAR       Dar Global PLC                 nostro=0.040  vero=9254 MM
-       OBS       Oberbank AG                    nostro=0.050  vero=6670 MM
-
-TOTALE candidati al rientro: 160
-
-=== quanti supererebbero una soglia di 300 MM ===
-  sopra 300 MM: 153
-  sotto  300 MM: 7 (resterebbero fuori a ragione)
+=== quanti titoli avrebbe ogni mercato con soglia 300 MM USD (dati attuali) ===
+MERCATO         IN UNIV  sopra 300
+Milano              117        117
+Francoforte         210        222
+Parigi              216        224
+Amsterdam            98         72
+Madrid               91        103
+Bruxelles           100         73
+Lisbona              35         17
+Vienna               53         36
+Helsinki            100         64
+Dublino              15         13
+Atene               100         46
+Londra              423        427
+Zurigo              161        164
+Stoccolma           208        224
+Oslo                101        113
+Copenaghen          101         76
