@@ -1,37 +1,6 @@
-=== SITUAZIONE ATTUALE nell'universo ===
-MERCATO        COD     IN UNIV   criterio che sembra applicato
-Milano         MIL         117   TUTTI sopra soglia
-Francoforte    XETRA       210   TUTTI sopra soglia
-Parigi         PA          216   TUTTI sopra soglia
-Amsterdam      AS           98   tutti quelli disponibili
-Madrid         MC           91   tutti quelli disponibili
-Bruxelles      BR          100   primi 100 (esatto)
-Lisbona        LS           35   tutti quelli disponibili
-Vienna         VI           53   tutti quelli disponibili
-Helsinki       HE          100   primi 100 (esatto)
-Dublino        IR           15   tutti quelli disponibili
-Atene          GR          100   primi 100 (esatto)
-Londra         LSE         423   TUTTI sopra soglia
-Zurigo         SWX         161   TUTTI sopra soglia
-Stoccolma      OM          208   TUTTI sopra soglia
-Oslo           OB          101   TUTTI sopra soglia
-Copenaghen     CPSE        101   TUTTI sopra soglia
+TIKR abbinato per (ticker, mercato): 7062
+  corretti: 3878 | da correggere: 0 | non in TIKR: 8251
 
-=== quanti titoli avrebbe ogni mercato con soglia 300 MM USD (dati attuali) ===
-MERCATO         IN UNIV  sopra 300
-Milano              117        117
-Francoforte         210        222
-Parigi              216        224
-Amsterdam            98         72
-Madrid               91        103
-Bruxelles           100         73
-Lisbona              35         17
-Vienna               53         36
-Helsinki            100         64
-Dublino              15         13
-Atene               100         46
-Londra              423        427
-Zurigo              161        164
-Stoccolma           208        224
-Oslo                101        113
-Copenaghen          101         76
+=== esempi di correzione (abbinamento per ticker E mercato) ===
+
+salvati 0 titoli da correggere
