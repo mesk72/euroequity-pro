@@ -1,29 +1,29 @@
-=== universo attuale per exchange ===
-  MIL      117
-  XETRA    210
-  PA       216
-  AS        98
-  MC        91
-  BR       100
-  LS        35
-  VI        53
-  HE       100
-  IR        15
-  GR       100
-  LSE      423
-  SWX      161
-  OM       208
-  OB       101
-  CPSE     101
-  US      3002
-  TSX      399
-  TSE     1000
-  SEHK     500
-  ASX      349
-  KRX      400
-  SGX      100
-  TOTALE 7879
+Carico stocks e fundamentals...
+  stocks: 10217 | fundamentals: 12191
 
-=== titoli FUORI universo che hanno prezzi recenti (quindi lavoravano) ===
-  fuori universo totali: 2338
-  di cui con prezzi da luglio in poi (campione di 400): 0
+IN UNIVERSO: 7879 | FUORI: 2338
+
+=== DISTRIBUZIONE della capitalizzazione, DENTRO vs FUORI ===
+  DENTRO universo:
+     <1               2
+     1-10             6
+     10-100          85
+     100-500        633
+     500-5.000     4706
+     >5.000        2447
+  FUORI universo:
+     assente        204
+     <1            1330
+     1-10            12
+     10-100         168
+     100-500        366
+     500-5.000      223
+     >5.000          35
+
+Se il campo fosse coerente, i titoli DENTRO dovrebbero stare tutti
+sopra la soglia (500 milioni per l'Europa). Vediamo se e' cosi'.
+
+=== titoli DENTRO con capitalizzazione sotto 1 (implausibile) ===
+  quanti: 2
+    NEOBO      OM    Neobo Fastigheter AB (publ)    0.23
+    NIVI B     OM    Nivika Fastigheter AB (publ)   0.34
