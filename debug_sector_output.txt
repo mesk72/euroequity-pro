@@ -1,19 +1,34 @@
-=== tikr_eu_latest.csv ===
-  righe: 3924
-  colonne rilevanti: ['Ticker', 'Company Name', 'Last Mkt Cap']
+fundamentals: 12191
 
-  ESEMPI (societa' note, per capire l'unita'):
-   LVMH Moët Hennessy - Louis Vuitton Last Mkt Cap = $281,437.75MM
-   Nestlé S.A.                        Last Mkt Cap = $270,549.99MM
-   SAP SE                             Last Mkt Cap = $186,478.26MM
-   ASML Holding N.V.                  Last Mkt Cap = $719,344.15MM
-   Norske Skog ASA                    Last Mkt Cap = $370.14MM
-
-
-=== tikr_na_latest.csv ===
-  righe: 4000
-  colonne rilevanti: ['Ticker', 'Company Name', 'Last Mkt Cap']
-
-  ESEMPI (societa' note, per capire l'unita'):
-
-
+=== per exchange: quanti hanno mkt_cap < 1 (sospetto miliardi) ===
+EX         TOT       <1       % <1  MEDIANA
+OM         525      297      56.6%          0.24
+PA         522      293      56.1%          0.20
+AIM        300      262      87.3%          0.10
+XETRA      366      139      38.0%        791.10
+MIL        255      131      51.4%          0.26
+LSE        521       85      16.3%       1213.02
+NGM         86       85      98.8%          0.01
+AT         100       75      75.0%          0.18
+SWX        203       37      18.2%       2220.56
+OB         307        2       0.7%        381.57
+BR         166        1       0.6%        544.69
+TSE       1187        0       0.0%       1465.89
+US        3964        0       0.0%       2155.87
+VI          72        0       0.0%        349.44
+TSX        506        0       0.0%       1147.76
+ATSE       141        0       0.0%          0.00
+ASX        407        0       0.0%       1128.31
+AS         109        0       0.0%       1088.10
+IR          16        0       0.0%       1493.53
+KRX        449        0       0.0%       1204.19
+CPSE       218        0       0.0%        438.84
+SEHK       568        0       0.0%       2464.00
+MC         743        0       0.0%        510.24
+SGX        109        0       0.0%       2074.95
+HE         182        0       0.0%        200.67
+GR         102        0       0.0%        271.23
+LS          47        0       0.0%        180.46
+BDM          6        0       0.0%          0.00
+.LSE        13        0       0.0%          0.00
+.AIM         1        0       0.0%          0.00
