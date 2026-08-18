@@ -1,20 +1,29 @@
-=== NSKOG e' nella tua watchlist? ===
-   {'id': '37e40f10-0d7e-470c-8c4d-8713e7199e99', 'user_id': 'fee79b7f-1481-4936-b381-4c28cf832414', 'ticker': 'NSKOG', 'exchange': 'OB', 'company': 'Norske Skog ASA', 'added_at': '2026-06-22T13:00:17.869249+00:00', 'combined_rank': 96, 'wallet': 0}
+=== universo attuale per exchange ===
+  MIL      117
+  XETRA    210
+  PA       216
+  AS        98
+  MC        91
+  BR       100
+  LS        35
+  VI        53
+  HE       100
+  IR        15
+  GR       100
+  LSE      423
+  SWX      161
+  OM       208
+  OB       101
+  CPSE     101
+  US      3002
+  TSX      399
+  TSE     1000
+  SEHK     500
+  ASX      349
+  KRX      400
+  SGX      100
+  TOTALE 7879
 
-=== aveva prezzi PRIMA di oggi? (le righe che ho scritto io sono di oggi) ===
-  righe totali ora: 1261
-  ultime righe con data di scrittura:
-    {'date': '2026-08-17', 'scritto_il': '2026-08-18T15:48:47.094869+00:00'}
-    {'date': '2026-08-14', 'scritto_il': '2026-08-18T15:48:47.094869+00:00'}
-    {'date': '2026-08-13', 'scritto_il': '2026-08-18T15:48:47.094869+00:00'}
-    {'date': '2026-08-12', 'scritto_il': '2026-08-18T15:48:47.094869+00:00'}
-    {'date': '2026-08-11', 'scritto_il': '2026-08-18T15:48:47.094869+00:00'}
-
-=== quando e' stata scritta la PIU' VECCHIA riga? ===
-    {'date': '2023-07-31', 'scritto_il': '2026-08-18T15:48:46.361714+00:00'}
-    {'date': '2023-07-28', 'scritto_il': '2026-08-18T15:48:46.361714+00:00'}
-    {'date': '2023-07-27', 'scritto_il': '2026-08-18T15:48:46.361714+00:00'}
-
-=== altri titoli OB: quanti sono in universo? ===
-  in_universe=true: 101
-  in_universe=false: 126
+=== titoli FUORI universo che hanno prezzi recenti (quindi lavoravano) ===
+  fuori universo totali: 2338
+  di cui con prezzi da luglio in poi (campione di 400): 0
