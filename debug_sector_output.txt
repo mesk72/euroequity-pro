@@ -1,11 +1,12 @@
-1) rimetto NSKOG in universo
-   HTTP 204
-2) scarico 5 anni di storico
-   scritte 1261 righe (2021-08-09 -> 2026-08-17), saltate 1 (seduta aperta)
-3) verifica
-   righe storico: 1261
-   ultime: [{'date': '2026-08-17', 'adj_close': 47.25}, {'date': '2026-08-14', 'adj_close': 49.75}]
+=== cerco Neobo ===
+   {'ticker': 'NEOBO', 'exchange': 'OM', 'company': 'Neobo Fastigheter AB (publ)', 'yahoo_ticker': 'NEOBO.ST', 'in_universe': False, 'sector': 'Financials'}
+    storico: 0 righe | vista: []
+    fondamentali: [{'value_score': 60, 'growth_score': None, 'combined_rank': None, 'eps_growth': None, 'rev_growth': None, 'mom6m': -0.1226, 'mom12m': -0.0508, 'pe_trailing': 23.22, 'pb': 0.39, 'mkt_cap': 0.23}]
+    yahoo NEOBO.ST: [('14/08', 19.87), ('17/08', 19.66), ('18/08', 19.74)]
 
-4) ALTRI titoli esclusi che Yahoo ha ancora: quanti sono?
-   titoli fuori universo in totale: 2340
-   di cui con un codice Yahoo impostato: 1886
+=== cerco NIVI ===
+   {'ticker': 'NIVI B', 'exchange': 'OM', 'company': 'Nivika Fastigheter AB (publ)', 'yahoo_ticker': 'NIVI-B.ST', 'in_universe': False, 'sector': 'Financials'}
+    storico: 0 righe | vista: []
+    fondamentali: [{'value_score': 98, 'growth_score': 49.62, 'combined_rank': 87.55, 'eps_growth': 0.0086, 'rev_growth': 0.0918, 'mom6m': -0.1141, 'mom12m': -0.0175, 'pe_trailing': 11.78, 'pb': 0.64, 'mkt_cap': 0.34}]
+    yahoo NIVI-B.ST: [('14/08', 38.2), ('17/08', 38.05), ('18/08', 38.0)]
+
