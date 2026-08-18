@@ -1,29 +1,19 @@
-Carico stocks e fundamentals...
-  stocks: 10217 | fundamentals: 12191
+=== tikr_eu_latest.csv ===
+  righe: 3924
+  colonne rilevanti: ['Ticker', 'Company Name', 'Last Mkt Cap']
 
-IN UNIVERSO: 7879 | FUORI: 2338
+  ESEMPI (societa' note, per capire l'unita'):
+   LVMH Moët Hennessy - Louis Vuitton Last Mkt Cap = $281,437.75MM
+   Nestlé S.A.                        Last Mkt Cap = $270,549.99MM
+   SAP SE                             Last Mkt Cap = $186,478.26MM
+   ASML Holding N.V.                  Last Mkt Cap = $719,344.15MM
+   Norske Skog ASA                    Last Mkt Cap = $370.14MM
 
-=== DISTRIBUZIONE della capitalizzazione, DENTRO vs FUORI ===
-  DENTRO universo:
-     <1               2
-     1-10             6
-     10-100          85
-     100-500        633
-     500-5.000     4706
-     >5.000        2447
-  FUORI universo:
-     assente        204
-     <1            1330
-     1-10            12
-     10-100         168
-     100-500        366
-     500-5.000      223
-     >5.000          35
 
-Se il campo fosse coerente, i titoli DENTRO dovrebbero stare tutti
-sopra la soglia (500 milioni per l'Europa). Vediamo se e' cosi'.
+=== tikr_na_latest.csv ===
+  righe: 4000
+  colonne rilevanti: ['Ticker', 'Company Name', 'Last Mkt Cap']
 
-=== titoli DENTRO con capitalizzazione sotto 1 (implausibile) ===
-  quanti: 2
-    NEOBO      OM    Neobo Fastigheter AB (publ)    0.23
-    NIVI B     OM    Nivika Fastigheter AB (publ)   0.34
+  ESEMPI (societa' note, per capire l'unita'):
+
+
