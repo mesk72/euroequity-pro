@@ -1,63 +1,32 @@
-import os, requests, csv, io
-from collections import defaultdict
+import os, requests
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-def pn(v):
-    s=str(v).replace('$','').replace('MM','').replace(',','').strip()
-    try: return float(s)
-    except: return None
-
-# TIKR: fonte autorevole
-tikr={}
-for f in ["tikr_eu_latest.csv","tikr_na_latest.csv"]:
-    r=requests.get(U+"/storage/v1/object/tikr-uploads/"+f,headers=H,timeout=150)
-    if r.status_code!=200: continue
-    for row in csv.DictReader(io.StringIO(r.content.decode("utf-8",errors="replace"))):
-        t=(row.get("Ticker") or "").strip()
-        v=pn(row.get("Last Mkt Cap",""))
-        if t and v:
-            base=t.split(".")[0]
-            tikr[base]=v
-print("TIKR: %d titoli" % len(tikr))
-
-def tutte(tab,campi):
-    o=[];off=0
+EU=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]
+NOMI={"MIL":"Milano","XETRA":"Francoforte","PA":"Parigi","AS":"Amsterdam","MC":"Madrid",
+      "BR":"Bruxelles","LS":"Lisbona","VI":"Vienna","HE":"Helsinki","IR":"Dublino",
+      "GR":"Atene","LSE":"Londra","SWX":"Zurigo","OM":"Stoccolma","OB":"Oslo","CPSE":"Copenaghen"}
+print("=== SITUAZIONE ATTUALE nell'universo ===")
+print("%-14s %-6s %8s   %s" % ("MERCATO","COD","IN UNIV","criterio che sembra applicato"))
+for ex in EU:
+    r=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
+    n=int(r.headers.get("content-range","0/0").split("/")[-1])
+    crit = "TUTTI sopra soglia" if n>100 else ("primi 100 (esatto)" if n==100 else "tutti quelli disponibili")
+    print("%-14s %-6s %8d   %s" % (NOMI[ex],ex,n,crit))
+print()
+print("=== quanti titoli avrebbe ogni mercato con soglia 300 MM USD (dati attuali) ===")
+print("%-14s %8s %10s" % ("MERCATO","IN UNIV","sopra 300"))
+for ex in EU:
+    fu=[];off=0
     while True:
-        b=requests.get(U+"/rest/v1/"+tab,headers=H,params={"select":campi,"limit":"1000","offset":str(off)},timeout=90).json()
+        b=requests.get(U+"/rest/v1/fundamentals",headers=H,
+            params={"select":"ticker,mkt_cap","exchange":"eq."+ex,"limit":"1000","offset":str(off)}).json()
         if not isinstance(b,list) or not b: break
-        o+=b; off+=1000
+        fu+=b; off+=1000
         if len(b)<1000: break
-    return o
-st=tutte("stocks","ticker,exchange,company,in_universe")
-fu=tutte("fundamentals","ticker,exchange,mkt_cap")
-mc={(x["ticker"],x["exchange"]):x.get("mkt_cap") for x in fu}
-
-SOSPETTI=["OM","PA","MIL","XETRA","LSE","SWX","AT","AIM","NGM"]
-print()
-print("=== TITOLI FUORI UNIVERSO che rientrerebbero con il valore TIKR corretto ===")
-# soglie indicative attuali
-SOGLIA={"OM":300,"PA":300,"MIL":300,"XETRA":300,"LSE":300,"SWX":300}
-rientro=defaultdict(list)
-for x in st:
-    if x.get("in_universe"): continue
-    ex=x["exchange"]
-    if ex not in SOSPETTI: continue
-    nostro=mc.get((x["ticker"],x["exchange"]))
-    vero=tikr.get(x["ticker"])
-    if vero is None: continue
-    if nostro is not None and vero/max(nostro,0.0001)>500:
-        rientro[ex].append((x["ticker"],(x.get("company") or "")[:30],nostro,vero))
-tot=0
-for ex in sorted(rientro):
-    lst=rientro[ex]; tot+=len(lst)
-    print("  %-6s %4d titoli con valore letto 1000x troppo piccolo" % (ex,len(lst)))
-    for t in sorted(lst,key=lambda x:-x[3])[:4]:
-        print("       %-9s %-30s nostro=%.3f  vero=%.0f MM" % t)
-print()
-print("TOTALE candidati al rientro: %d" % tot)
-print()
-print("=== quanti supererebbero una soglia di 300 MM ===")
-sopra=sum(1 for ex in rientro for t in rientro[ex] if t[3]>=300)
-print("  sopra 300 MM: %d" % sopra)
-print("  sotto  300 MM: %d (resterebbero fuori a ragione)" % (tot-sopra))
+    sopra=sum(1 for x in fu if x.get("mkt_cap") and x["mkt_cap"]>=300)
+    r=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
+    n=int(r.headers.get("content-range","0/0").split("/")[-1])
+    print("%-14s %8d %10d" % (NOMI[ex],n,sopra))
