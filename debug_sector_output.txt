@@ -1,26 +1,29 @@
-=== valori di 'Primary Exchange' nel file ===
-   BME              797
-   CPSE             608
-   LSE              432
-   OB               289
-   ENXTPA           226
-   OM               205
-   XTRA             195
-   ENXTBR           181
-   HLSE             181
-   SWX              164
-   ATSE             142
-   BIT              123
-   ENXTAM           118
-   WBAG             74
-   ENXTLS           47
-   AIM              38
-   OTCNO            24
-   DB               23
-   HMSE             21
-   ISE              18
-   MUN              6
-   BDM              6
-   DUSE             2
-   BRSE             2
-   XSAT             1
+TIKR abbinato correttamente: 3312 titoli
+
+=== A) titoli FUORI universo che dovrebbero RIENTRARE ===
+  CPSE    15 titoli
+      MAERSK B   A.P. Møller - Mærsk A/S               36227 MM
+      NSIS B     Novozymes A/S                         30405 MM
+      CARL B     Carlsberg A/S                         19537 MM
+      COLO B     Coloplast A/S                         13605 MM
+      ALK B      ALK-Abelló A/S                         8272 MM
+  OB      13 titoli
+      SNM        ShaMaran Petroleum Ltd.                 388 MM
+      AKAST      Akastor ASA                             366 MM
+      ANDF       Andfjord Salmon Group AS                360 MM
+      CAMBI      Cambi ASA                               343 MM
+      MORLD      Moreld ASA                              343 MM
+  PA       4 titoli
+      MLMTP      Montepino Logística, SOCIMI, S.A.       964 MM
+      MLSPI      Student Property Income SOCIMI, S.      483 MM
+      MLSAG      Sagax Real Estate Socimi, S.A.          424 MM
+      ALPG       PREATONI Group                          423 MM
+  SWX      2 titoli
+      CHAM       Cham Swiss Properties AG               1423 MM
+      ABTC       21Shares Bitcoin ETP                    505 MM
+  LSE      1 titoli
+      MAY        Mayflower Acquisition Limited           463 MM
+  TOTALE da reintegrare: 35
+
+=== B) titoli DENTRO che NON dovrebbero esserci (sotto soglia) ===
+   {'CPSE': 41} -> totale 41
