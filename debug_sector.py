@@ -1,39 +1,50 @@
-import os, requests
-from collections import defaultdict
+import os, requests, csv, io
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-def tutte(tab,campi,filtro=None):
-    o=[];off=0
-    while True:
-        p={"select":campi,"limit":"1000","offset":str(off)}
-        if filtro: p.update(filtro)
-        b=requests.get(U+"/rest/v1/"+tab,headers=H,params=p,timeout=90).json()
-        if not isinstance(b,list) or not b: break
-        o+=b; off+=1000
-        if len(b)<1000: break
-    return o
+def pn(v):
+    s=str(v).replace('$','').replace('MM','').replace(',','').strip()
+    try: return float(s)
+    except: return None
+SUF={".ST":"OM",".OL":"OB",".CO":"CPSE",".HE":"HE"}
+tikr={}
+r=requests.get(U+"/storage/v1/object/tikr-uploads/tikr_eu_latest.csv",headers=H,timeout=150)
+righe=list(csv.DictReader(io.StringIO(r.content.decode("utf-8",errors="replace"))))
+for row in righe:
+    t=(row.get("Ticker") or "").strip(); v=pn(row.get("Last Mkt Cap",""))
+    if not t or not v: continue
+    for suf,ex in SUF.items():
+        if t.endswith(suf): tikr[(t[:-len(suf)],ex)]=(v,(row.get("Company Name") or "")); break
+print("TIKR nordici: %d titoli" % len(tikr))
+print()
+ESCL=["ETF","FUND","TRUST","UCITS","ISHARES","VANGUARD","XTRACKERS","LYXOR","INVESCO",
+      "SPDR","WISDOMTREE","VANECK","BLACKROCK","SICAV","ICAV","MSCI","INDEX","AMUNDI"]
+def e_fondo(nome):
+    n=(nome or "").upper()
+    return any(k in n for k in ESCL)
 
-print("Carico universo e vista prezzi...")
-st=tutte("stocks","ticker,exchange,company,in_universe")
-mv=tutte("latest_prices_mv","ticker,exchange")
-hanno=set((x["ticker"],x["exchange"]) for x in mv)
-print("  stocks: %d | con prezzo: %d" % (len(st),len(hanno)))
+fuori=[];off=0
+while True:
+    b=requests.get(U+"/rest/v1/stocks",headers=H,
+        params={"select":"ticker,exchange,company,sector","in_universe":"eq.false",
+                "exchange":"in.(OM,OB,CPSE,HE)","limit":"1000","offset":str(off)}).json()
+    if not isinstance(b,list) or not b: break
+    fuori+=b; off+=1000
+    if len(b)<1000: break
+print("esclusi nordici: %d" % len(fuori))
 print()
-print("=== TITOLI IN UNIVERSO SENZA PREZZO (il problema che vedi nella ricerca) ===")
-dentro=[x for x in st if x.get("in_universe")]
-senza=[x for x in dentro if (x["ticker"],x["exchange"]) not in hanno]
-print("  in universo: %d | SENZA PREZZO: %d" % (len(dentro),len(senza)))
-per_ex=defaultdict(list)
-for x in senza: per_ex[x["exchange"]].append(x)
-for ex in sorted(per_ex,key=lambda e:-len(per_ex[e])):
-    print("    %-6s %4d" % (ex,len(per_ex[ex])))
-    for x in per_ex[ex][:6]:
-        print("        %-10s %s" % (x["ticker"],(x.get("company") or "")[:40]))
+cand=[]; fondi=0; non_tikr=0
+for x in fuori:
+    k=(x["ticker"],x["exchange"])
+    if k not in tikr: non_tikr+=1; continue
+    v,nome=tikr[k]
+    if e_fondo(nome) or e_fondo(x.get("company")): fondi+=1; continue
+    if v>=300: cand.append((x["ticker"],x["exchange"],nome[:36],v))
+print("  non presenti nel TIKR attuale: %d  (esclusi a monte dalla fonte)" % non_tikr)
+print("  riconosciuti come fondi/ETF:   %d" % fondi)
+print("  CANDIDATI al rientro (>=300 MM USD, non fondi): %d" % len(cand))
 print()
-print("=== TITOLI FUORI UNIVERSO su OM e OB (Svezia/Norvegia) ===")
-for ex in ["OM","OB"]:
-    fuori=[x for x in st if not x.get("in_universe") and x["exchange"]==ex]
-    print("  %-4s fuori universo: %d" % (ex,len(fuori)))
-    for x in fuori[:12]:
-        print("      %-10s %s" % (x["ticker"],(x.get("company") or "")[:42]))
+for t in sorted(cand,key=lambda x:-x[3]):
+    print("   %-10s %-5s %-36s %8.0f MM" % t)
+import json
+open("/tmp/cand_nord.json","w").write(json.dumps(cand))
