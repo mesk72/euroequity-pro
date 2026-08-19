@@ -1,29 +1,26 @@
-righe TIKR EU: 3924
-colonne: ['Ticker', 'Company Name', 'Primary Exchange', 'Country', 'Sector', 'Last Price', 'Last Mkt Cap', 'LTM P/E LTM', 'LTM P/BVPS LTM', 'EPS Normalized (FY 2025)', 'Mean EPS Normalized (FY 2026)', 'Mean EPS Normalized (FY 2027)']
-
-=== come sono scritti i ticker? primi 15 ===
-   Ticker=ROP                 Exchange=?             Roche Holding AG
-   Ticker=HSBA                Exchange=?             HSBC Holdings plc
-   Ticker=AZN                 Exchange=?             AstraZeneca PLC
-   Ticker=NOVN                Exchange=?             Novartis AG
-   Ticker=MC                  Exchange=?             LVMH Moët Hennessy - Louis Vuitton
-   Ticker=NESN                Exchange=?             Nestlé S.A.
-   Ticker=SIE                 Exchange=?             Siemens Aktiengesellschaft
-   Ticker=OR                  Exchange=?             L'Oréal S.A.
-   Ticker=SHEL                Exchange=?             Shell plc
-   Ticker=ABBN                Exchange=?             ABB Ltd
-   Ticker=RMS                 Exchange=?             Hermès International Société en co
-   Ticker=SAP                 Exchange=?             SAP SE
-   Ticker=AIR                 Exchange=?             Airbus SE
-   Ticker=ALV                 Exchange=?             Allianz SE
-   Ticker=SU                  Exchange=?             Schneider Electric S.E.
-
-=== esempi nordici ===
-   NSKOG                Norske Skog ASA                    $370.14MM
-   HEX                  Hexagon Composites ASA             $277.85MM
-   ZAL                  Zalaris ASA                        $220.53MM
-
-=== suffissi presenti ===
-   senza punto 3911
-   .          12
-   .A         1
+=== valori di 'Primary Exchange' nel file ===
+   BME              797
+   CPSE             608
+   LSE              432
+   OB               289
+   ENXTPA           226
+   OM               205
+   XTRA             195
+   ENXTBR           181
+   HLSE             181
+   SWX              164
+   ATSE             142
+   BIT              123
+   ENXTAM           118
+   WBAG             74
+   ENXTLS           47
+   AIM              38
+   OTCNO            24
+   DB               23
+   HMSE             21
+   ISE              18
+   MUN              6
+   BDM              6
+   DUSE             2
+   BRSE             2
+   XSAT             1
