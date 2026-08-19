@@ -1,40 +1,39 @@
-import os, requests, csv, io
+import os, requests
+from collections import defaultdict
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-def pn(v):
-    s=str(v).replace('$','').replace('MM','').replace(',','').strip()
-    try: return float(s)
-    except: return None
-SUF={".MI":"MIL",".DE":"XETRA",".PA":"PA",".AS":"AS",".MC":"MC",".BR":"BR",".LS":"LS",
-     ".VI":"VI",".HE":"HE",".IR":"IR",".AT":"GR",".L":"LSE",".SW":"SWX",".ST":"OM",
-     ".OL":"OB",".CO":"CPSE"}
-tikr={}
-r=requests.get(U+"/storage/v1/object/tikr-uploads/tikr_eu_latest.csv",headers=H,timeout=150)
-for row in csv.DictReader(io.StringIO(r.content.decode("utf-8",errors="replace"))):
-    t=(row.get("Ticker") or "").strip(); v=pn(row.get("Last Mkt Cap",""))
-    if not t or not v: continue
-    for suf,ex in SUF.items():
-        if t.endswith(suf): tikr[(t[:-len(suf)],ex)]=v; break
+def tutte(tab,campi,filtro=None):
+    o=[];off=0
+    while True:
+        p={"select":campi,"limit":"1000","offset":str(off)}
+        if filtro: p.update(filtro)
+        b=requests.get(U+"/rest/v1/"+tab,headers=H,params=p,timeout=90).json()
+        if not isinstance(b,list) or not b: break
+        o+=b; off+=1000
+        if len(b)<1000: break
+    return o
 
-print("=== i titoli con valore assurdo: sono in TIKR? ===")
-for tk,ex in [("NEOBO","OM"),("NIVI B","OM"),("FLEXO","GR"),("QUEST","GR"),("DATA","MIL"),("GE","MIL")]:
-    f=requests.get(U+"/rest/v1/fundamentals",headers=H,
-        params={"select":"mkt_cap","ticker":"eq."+tk,"exchange":"eq."+ex}).json()
-    nostro=f[0].get("mkt_cap") if f else None
-    in_tikr=tikr.get((tk,ex))
-    print("  %-8s %-5s nostro=%-10s TIKR=%s" % (tk,ex,nostro,in_tikr if in_tikr else "NON PRESENTE"))
+print("Carico universo e vista prezzi...")
+st=tutte("stocks","ticker,exchange,company,in_universe")
+mv=tutte("latest_prices_mv","ticker,exchange")
+hanno=set((x["ticker"],x["exchange"]) for x in mv)
+print("  stocks: %d | con prezzo: %d" % (len(st),len(hanno)))
 print()
-print("=== quanti titoli con mkt_cap<1 sono ASSENTI da TIKR? ===")
-fu=[];off=0
-while True:
-    b=requests.get(U+"/rest/v1/fundamentals",headers=H,
-        params={"select":"ticker,exchange,mkt_cap","limit":"1000","offset":str(off)},timeout=90).json()
-    if not isinstance(b,list) or not b: break
-    fu+=b; off+=1000
-    if len(b)<1000: break
-piccoli=[x for x in fu if x.get("mkt_cap") is not None and x["mkt_cap"]<1]
-in_t=sum(1 for x in piccoli if (x["ticker"],x["exchange"]) in tikr)
-print("  titoli con mkt_cap<1: %d" % len(piccoli))
-print("  di cui presenti in TIKR: %d" % in_t)
-print("  di cui ASSENTI da TIKR:  %d" % (len(piccoli)-in_t))
+print("=== TITOLI IN UNIVERSO SENZA PREZZO (il problema che vedi nella ricerca) ===")
+dentro=[x for x in st if x.get("in_universe")]
+senza=[x for x in dentro if (x["ticker"],x["exchange"]) not in hanno]
+print("  in universo: %d | SENZA PREZZO: %d" % (len(dentro),len(senza)))
+per_ex=defaultdict(list)
+for x in senza: per_ex[x["exchange"]].append(x)
+for ex in sorted(per_ex,key=lambda e:-len(per_ex[e])):
+    print("    %-6s %4d" % (ex,len(per_ex[ex])))
+    for x in per_ex[ex][:6]:
+        print("        %-10s %s" % (x["ticker"],(x.get("company") or "")[:40]))
+print()
+print("=== TITOLI FUORI UNIVERSO su OM e OB (Svezia/Norvegia) ===")
+for ex in ["OM","OB"]:
+    fuori=[x for x in st if not x.get("in_universe") and x["exchange"]==ex]
+    print("  %-4s fuori universo: %d" % (ex,len(fuori)))
+    for x in fuori[:12]:
+        print("      %-10s %s" % (x["ticker"],(x.get("company") or "")[:42]))
