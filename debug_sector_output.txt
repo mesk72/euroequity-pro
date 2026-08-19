@@ -1,37 +1,8 @@
-Carico universo e vista prezzi...
-  stocks: 10217 | con prezzo: 7888
+TIKR nordici: 0 titoli
 
-=== TITOLI IN UNIVERSO SENZA PREZZO (il problema che vedi nella ricerca) ===
-  in universo: 7879 | SENZA PREZZO: 2
-    US        1
-        ZQXVW9     Meridian Fabrication Holdings
-    OM        1
-        TANGEN B   TÃ¥ngen Industrikapital AB (publ)
+esclusi nordici: 537
 
-=== TITOLI FUORI UNIVERSO su OM e OB (Svezia/Norvegia) ===
-  OM   fuori universo: 318
-      VQT        Envirotainer AG
-      HOC        HolidayCheck Group AG
-      PRFO       Profoto Holding AB (publ)
-      TRAD       TradeDoubler AB (publ)
-      CEV        Centrotec SE
-      CALVIK     Calviks AB (publ)
-      B40        Metro AG
-      COP        CompuGroup Medical SE & Co. KGaA
-      GIB        GSW Immobilien AG
-      QBEN       Qben Infra AB (publ)
-      KLAR       Klaria Pharma Holding AB (publ.)
-      XBRANE     Xbrane Biopharma AB (publ)
-  OB   fuori universo: 126
-      KLDVK      Kaldvik AS
-      OBXD       DNB OBX
-      HEX        Hexagon Composites ASA
-      NKR        Nekkar ASA
-      POL        Polaris Media ASA
-      STECH      Soiltech ASA
-      ETMA       Etman International ASA
-      GLEX       Glex AS
-      TEKNA      Tekna Holding ASA
-      ZAL        Zalaris ASA
-      SAGA       Saga Pure ASA
-      AGLX       Agilyx ASA
+  non presenti nel TIKR attuale: 537  (esclusi a monte dalla fonte)
+  riconosciuti come fondi/ETF:   0
+  CANDIDATI al rientro (>=300 MM USD, non fondi): 0
+
