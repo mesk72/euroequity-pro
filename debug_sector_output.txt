@@ -1,6 +1,12 @@
-TIKR abbinato per (ticker, mercato): 7062
-  corretti: 3878 | da correggere: 0 | non in TIKR: 8251
+=== i titoli con valore assurdo: sono in TIKR? ===
+  NEOBO    OM    nostro=0.23       TIKR=NON PRESENTE
+  NIVI B   OM    nostro=0.34       TIKR=NON PRESENTE
+  FLEXO    GR    nostro=109.76     TIKR=NON PRESENTE
+  QUEST    GR    nostro=875.11     TIKR=NON PRESENTE
+  DATA     MIL   nostro=0.03       TIKR=NON PRESENTE
+  GE       MIL   nostro=0.16       TIKR=NON PRESENTE
 
-=== esempi di correzione (abbinamento per ticker E mercato) ===
-
-salvati 0 titoli da correggere
+=== quanti titoli con mkt_cap<1 sono ASSENTI da TIKR? ===
+  titoli con mkt_cap<1: 1407
+  di cui presenti in TIKR: 0
+  di cui ASSENTI da TIKR:  1407
