@@ -1,32 +1,17 @@
-Da reintegrare: 28
+=== i 28 reintegrati hanno i fondamentali? ===
+TICKER     EX    PE_TRAIL  PE_FWD    PB        EPS_GR    VALUE   GROWTH 
+MAERSK B   CPSE  22.12     35.54     0.65      -0.9835   53      54     
+NSIS B     CPSE  41.97     24.42     2.28      0.0524    19      40     
+CARL B     CPSE  18.76     13.16     4.14      0.2641    49      52     
+COLO B     CPSE  40.25     15.06     6.59      0.2453    20      24     
+ROCK B     CPSE  -1645.48  15.42     2.12      -0.0712   30      10     
+ALK B      CPSE  42.77     36.2      8.34      0.176     1       76     
+GSF        OB    -2637.0   1656.0    72.0      0.737     7       14     
+PEN        OB    -681.0    456.0     137.0     2.4646    2       72     
+AKAST      OB    -2325.0   4756.0    67.0      -0.9082   5       23     
 
-  AMBU B     CPSE  Ambu A/S                            2691 MM  codice=AMBU-B.CO    1257 sedute
-  COLO B     CPSE  Coloplast A/S                      13605 MM  codice=COLO-B.CO    1257 sedute
-  HLUN B     CPSE  H. Lundbeck A/S                     6351 MM  codice=HLUN-B.CO    1048 sedute
-  NSIS B     CPSE  Novozymes A/S                      30405 MM  codice=NSIS-B.CO    1257 sedute
-  BIAEJD     CPSE  BI Erhvervsejendomme A/S             534 MM  codice=BIAEJD.CO    1073 sedute
-  PAAL B     CPSE  Per Aarsleff Holding A/S            2388 MM  codice=PAAL-B.CO    1257 sedute
-  ACACIGDKK  CPSE  Kapitalforeningen Accunia Invest     350 MM  codice=ACACIGDKK.CO 1081 sedute
-  GSF        OB    Grieg Seafood ASA                    320 MM  codice=GSF.OL       1262 sedute
-  PEN        OB    Panoro Energy ASA                    330 MM  codice=PEN.OL       1262 sedute
-  ROGS       OB    Rogaland Sparebank                   343 MM  codice=ROGS.OL      1264 sedute
-  AKAST      OB    Akastor ASA                          366 MM  codice=AKAST.OL     1262 sedute
-  MORLD      OB    Moreld ASA                           343 MM  codice=MORLD.OL      411 sedute
-  AOJ B      CPSE  Brødrene A & O Johansen A/S          375 MM  codice=AOJ-B.CO     1259 sedute
-  ARAOPT     CPSE  Investeringsselskabet Artha Opti     496 MM  codice=ARAOPT.CO     186 sedute
-  CARL B     CPSE  Carlsberg A/S                      19537 MM  codice=CARL-B.CO    1259 sedute
-  IG         CPSE  InstallatørGruppen A/S               601 MM  codice=IG.CO          50 sedute
-  SNM        OB    ShaMaran Petroleum Ltd.              388 MM  codice=SNM.OL         52 sedute
-  ANDF       OB    Andfjord Salmon Group AS             360 MM  codice=ANDF.OL      1262 sedute
-  APR        OB    Appear ASA                           304 MM  codice=APR.OL        194 sedute
-  BRUT       OB    Bruton Limited                       329 MM  codice=BRUT.OL       396 sedute
-  VTURA      OB    Ventura Offshore Holding Ltd.        303 MM  codice=VTURA.OL      552 sedute
-  ROCK B     CPSE  Rockwool A/S                        6922 MM  codice=ROCK-B.CO    1257 sedute
-  ALK B      CPSE  ALK-Abelló A/S                      8272 MM  codice=ALK-B.CO     1257 sedute
-  MAERSK B   CPSE  A.P. Møller - Mærsk A/S            36227 MM  codice=MAERSK-B.CO  1257 sedute
-  CAMBI      OB    Cambi ASA                            343 MM  codice=CAMBI.OL     1262 sedute
-  OKEA       OB    OKEA ASA                             314 MM  codice=OKEA.OL      1264 sedute
-  TRMD A     CPSE  TORM plc                            2844 MM  codice=TRMD-A.CO    1259 sedute
-  SBO        OB    Selvaag Bolig ASA                    321 MM  codice=SBO.OL       1262 sedute
+=== quanti dei 28 hanno una riga in fundamentals? ===
+  righe fundamentals per CPSE+OB: 525
+  titoli in universo CPSE+OB: 230
 
-REINTEGRATI: 28
+=== dove si calcola combined_rank? ===
