@@ -1,7 +1,98 @@
-universo:            7852
-con riga fondamentali: 7852   -> SENZA: 0
-con prezzo nella vista: 7849   -> SENZA: 3
+=== PROVA DEL FILTRO: cosa escluderebbe, mercato per mercato ===
+(solo titoli attualmente IN universo)
 
-=== titoli in universo SENZA fondamentali: 0 ===
+  US      61
+       BLW          BlackRock Limited Duration Income Trust
+       RQI          Cohen & Steers Quality Income Realty Fund, Inc
+       STEW         SRH Total Return Fund, Inc.
+       IQI          Invesco Quality Municipal Income Trust
+       GUG          Guggenheim Active Allocation Fund
+       TNGY         Tortoise Capital Series Trust - Energy Fund
+       BTX          BlackRock Innovation and Growth Term Trust
+       BMEZ         BlackRock Health Sciences Term Trust
+       BSTZ         BlackRock Science and Technology Term Trust
+       ECAT         BlackRock ESG Capital Allocation Term Trust
+       ...e altri 51
+  LSE     15
+       BIPS         Invesco Bond Income Plus Limited
+       BRSC         BlackRock Smaller Companies Trust plc
+       SDP          Schroder Investment Trust - Schroder AsiaPacif
+       GRID         Gresham House Energy Storage Fund plc
+       NAVF         Nippon Active Value Fund plc
+       FSFL         Foresight Solar Fund Limited
+       PRIJ         Amundi Index Solutions - Amundi Prime Japan
+       MNTN         The Schiehallion Fund Limited
+       BRFI         BlackRock Frontiers Investment Trust plc
+       GIL5         Multi Units Luxembourg - Amundi UK Government 
+       ...e altri 5
+  SWX     14
+       GREEN        Credit Suisse Real Estate Fund Green Property
+       SIC          Swisscanto (CH) Real Estate Fund Ifca
+       SIAT         UBS (CH) Property Fund - Swiss Residential "Si
+       SLREFS       Swiss Life REF (CH) Swiss Properties Fund
+       CSLP         UBS (CH) Property Fund - Direct LivingPlus
+       GOOD         Good Buildings Swiss Real Estate Fund
+       PSCF         Procimmo Swiss Commercial Fund
+       INT          Credit Suisse Real Estate Fund Interswiss
+       SREA         UBS (CH) Property Fund - Swiss Commercial Â«Sw
+       SREF         Swissinvest Real Estate Investment Fund
+       ...e altri 4
+  TSE      9
+       3226         Mitsui Fudosan Accommodations Fund Inc.
+       8951         Nippon Building Fund Inc.
+       8953         Japan Metropolitan Fund Investment Corporation
+       8967         Japan Logistics Fund, Inc.
+       1599         iFreeETF JPX-Nikkei400
+       3462         Nomura Real Estate Master Fund, Inc.
+       1305         iFreeETF TOPIX (Yearly Dividend Type)
+       1320         iFreeETF Nikkei225 (Yearly Dividend Type)
+       3249         Industrial & Infrastructure Fund Investment Co
+  ASX      9
+       FPR          FleetPartners Group Limited
+       LSF          L1 Long Short Fund Limited
+       HBRD         BetaShares Active Australian Hybrids Fund
+       GLS          L1 Global Long Short Fund Limited
+       LGF          L1 Gold Fund Limited
+       RFF          Rural Funds Group
+       RF1          Regal Investment Fund
+       VETH         Vanguard Investments Australia Ltd. - Vanguard
+       OPH          Ophir Asset Management Pty Ltd - Ophir High Co
+  TSX      7
+       FGEP         Fidelity Global Equity+ Fund
+       PFIA         PICTON Long Short Income Alternative Fund
+       U.UN         Sprott Physical Uranium Trust Fund
+       CIAI         CI Global Artificial Intelligence Fund
+       ZWB          BMO Covered Call Canadian Banks Fund
+       ZWU          BMO Covered Call Utilities Fund
+       PFMN         PICTON Market Neutral Equity Alternative Fund
+  PA       6
+       AMUN         Amundi S.A.
+       AFRN         Amundi Index Solutions - Amundi EUR Floating R
+       RS2K         Amundi Index Solutions - Amundi Russell 2000
+       EGRI         Amundi Index Solutions - Amundi Euro Aggregate
+       AHYE         AMUNDI EURO HIGH YIELD BOND ESG
+       ANX          Amundi Index Solutions - Amundi NASDAQ-100
+  MC       6
+       YSIL         Silicius Real Estate SOCIMI, S.A.
+       YVIT         Vitruvio Real Estate SOCIMI, S.A.
+       GGC          General de Galerías Comerciales SOCIMI, S.A.
+       ARM          Árima Real Estate SOCIMI, S.A.
+       YGMP         GMP Property SOCIMI, S.A.
+       MRL          MERLIN Properties SOCIMI, S.A.
+  CPSE     5
+       DKIKO        Danske Invest - Danske Korte Obligationer
+       JYINYAKL     Jyske Invest Nye Aktiemarkeder KL
+       NYIGFA       Multi Manager Invest - USA Akk.
+       MMIGAA       Multi Manager Invest - Globale Aktier Akk.
+       DKIGI        Danske Invest - Global Indeks KL
+  XETRA    3
+       VBTC         VanEck Vectors Bitcoin ETN
+       PRAM         Amundi Index Solutions - Amundi Prime Emerging
+       PRAB         Amundi Index Solutions - Amundi Prime Euro Gov
+  KRX      2
+       A415640      KB Balhae Infrastructure Fund
+       A088980      Macquarie Korea Infrastructure Fund
+  HE       1
+       LINDEX       Lindex Group Oyj
 
-  esempi: []
+  TOTALE che verrebbero esclusi: 138
