@@ -1,35 +1,28 @@
-=== confronto P/B: nostro vs TIKR, per mercato ===
-EX        CONFR   UGUALI      x100     x1000     ALTRO
-OB          253       96       146         0        11
-        es. KRAB      nostro=107.0 TIKR=1.06
-        es. AQUA      nostro=130.0 TIKR=1.32
-        es. ROMER     nostro=19.0 TIKR=0.19
-MC          191      100        86         0         5
-        es. YIRG      nostro=95.0 TIKR=0.95
-        es. YAI1      nostro=84.0 TIKR=0.85
-        es. ALQ       nostro=156.0 TIKR=1.66
-HE          169      105        58         0         6
-        es. FOAMIT    nostro=65.0 TIKR=0.66
-        es. TOIVO     nostro=73.0 TIKR=0.72
-        es. ESENSE    nostro=120.0 TIKR=1.23
-CPSE        127       76        49         0         2
-        es. KLEE B    nostro=168.0 TIKR=1.66
-        es. WMA       nostro=386.0 TIKR=4.08
-        es. RBLN B    nostro=120.0 TIKR=1.19
-BR          112      102        10         0         0
-        es. 094244893 nostro=117.0 TIKR=1.17
-        es. 005767759 nostro=151.0 TIKR=1.51
-        es. FOU       nostro=174.0 TIKR=1.87
-AS           99       97         2         0         0
-        es. AGIL      nostro=101.0 TIKR=0.99
-        es. ERC       nostro=84.0 TIKR=0.93
-XETRA       186      186         0         0         0
-MIL         113      113         0         0         0
-GR          101      101         0         0         0
-LSE         405      405         0         0         0
-IR           15       15         0         0         0
-PA          207      207         0         0         0
-OM          202      202         0         0         0
-VI           49       49         0         0         0
-SWX         143      143         0         0         0
-LS           39       38         0         0         1
+=== tikr_eu_latest.csv : 3924 righe ===
+   0  Ticker
+   1  Company Name
+   2  Primary Exchange
+   3  Country
+   4  Sector
+   5  Last Price
+   6  Last Mkt Cap
+   7  LTM P/E LTM
+   8  LTM P/BVPS LTM
+   9  EPS Normalized (FY 2025)
+  10  Mean EPS Normalized (FY 2026)
+  11  Mean EPS Normalized (FY 2027)
+  12  Mean EPS Normalized (FY 2028)
+  13  EPS (GAAP) (FY 2025)
+  14  Mean EPS (GAAP) (FY 2026)
+  15  Mean EPS (GAAP) (FY 2027)
+  16  Mean EPS (GAAP) (FY 2028)
+  17  Rev (FY 2025)
+  18  Mean Rev (FY 2026)
+  19  Mean Rev (FY 2027)
+  20  Mean Rev (FY 2028)
+  21  Mean EPS Normalized (FY 2030)
+  22  Mean EPS (GAAP) (FY 2029)
+  23  Mean EPS (GAAP) (FY 2030)
+  24  Mean Fwd P/E NTM
+  25  ECS Total Shares Outstanding on Filing Date LTM
+
