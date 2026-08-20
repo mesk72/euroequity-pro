@@ -2993,3 +2993,250 @@ Dopo aver trovato lo stesso identico tipo di bug (scala ×100/÷100) in MOLTI pu
 5. `src/app/page.tsx` (Screener/Sector Heatmap) — questo file aveva GIA' la moltiplicazione corretta ovunque quando controllato, nessun fix necessario li'.
 
 **Se in futuro un altro punto mostra percentuali palesemente sbagliate (troppo piccole = manca ×100 o c'e' una divisione di troppo; troppo grandi = doppia moltiplicazione), controllare PRIMA la funzione di formattazione usata in quel punto specifico, poi il valore passato, seguendo questa stessa checklist — non serve piu' scoprire il pattern da zero.**
+
+---
+
+## SESSIONE 17-20/8/2026 — Universo, fondamentali e indicizzazione
+
+### 1. Universo: titoli validi esclusi per errore (RISOLTO)
+
+**Sintomo**: Andrea trova titoli senza prezzo ne' grafico ne' punteggi — Norske
+Skog (NSKOG.OB, che aveva in portafoglio dal 22 giugno con rank 96), Neobo e
+Nivika (Stoccolma). Poi segnala che l'universo era "quasi 8000" e ora 7876.
+
+**Cosa NON era**: gli script giornalieri non modificano mai `in_universe` —
+verificato, tutte le occorrenze sono letture (`in_universe=eq.true` come
+filtro). L'ultima esecuzione di un workflow che modifica l'universo risale
+all'**8 luglio 2026**: nel periodo successivo l'universo e' cambiato solo per
+26 esclusioni documentate e approvate (lista ALWAYS_EXCLUDE, Covestro,
+InterRent REIT — quest'ultima acquisita il 9/7 e delistata da TSX il 10/7).
+
+**Causa reale**: il codice di borsa delle azioni di classe B. In `stocks` sono
+scritte con lo SPAZIO (`MAERSK B`, `CARL B`, `NSIS B`), mentre Yahoo vuole il
+TRATTINO (`MAERSK-B.CO`). Stesso schema gia' visto su REIT canadesi (`.UN` ->
+`-UN`), coreani (prefisso `A` da togliere), tedeschi (`.DE` -> `.F`), Hong Kong
+(zero iniziale). Senza codice valido non arrivano prezzi, senza prezzi il
+titolo esce dai criteri.
+
+**Correzione**: reintegrati 28 titoli (15 Copenaghen, 13 Oslo) con 5 anni di
+storico ciascuno, fra cui Maersk (36 mld USD), Novozymes (30), Carlsberg
+(19,5), Coloplast (13,6), Rockwool, ALK-Abello, Lundbeck, TORM. Piu' Norske
+Skog, Neobo e Nivika ripristinati singolarmente.
+
+**Universo dopo**: 7879 titoli (era 7876).
+
+**REGOLA**: prima di dichiarare un titolo "delistato", provare SEMPRE le
+varianti del codice Yahoo — spazio->trattino, con e senza prefissi, suffisso di
+borsa alternativo. La stragrande maggioranza dei "titoli spariti" sono codici
+sbagliati, non societa' sparite.
+
+### 2. Fondamentali: valori ×100 rispetto a TIKR (RISOLTO)
+
+**Sintomo**: titoli norvegesi con P/B 72, 137, 339 — valori impossibili.
+
+**Diagnosi**: confronto a tre vie fra database, TIKR e Yahoo. Grieg Seafood:
+noi 72, TIKR 0,7, Yahoo 0,73. Akastor: noi 67, TIKR 0,67, Yahoo 0,71. Le due
+fonti indipendenti concordano fra loro: il fattore e' esattamente 100.
+
+**Estensione misurata**: 351 titoli con P/B ×100, in sei mercati — Oslo 146 su
+253, Madrid 86, Helsinki 58, Copenaghen 49, Bruxelles 10, Amsterdam 2. Undici
+mercati perfetti al 100%: Francoforte 186/186, Londra 405/405, Parigi 207/207,
+Stoccolma 202/202, Milano 113/113.
+
+**NON e' un problema di valuta**: Stoccolma e Londra hanno valute non-euro e
+sono corrette; Madrid, Helsinki, Amsterdam e Bruxelles sono in euro e hanno il
+difetto. Il valore era scritto in percentuale invece che come multiplo.
+
+**Secondo difetto trovato**: dove TIKR dice esplicitamente "non significativo"
+(utili negativi), il database aveva P/E negativi calcolati internamente —
+Syensqo -127, Outokumpu -18,96, Kinnevik -1,77. Un multiplo privo di senso non
+deve entrare nei percentili.
+
+**Correzione**: ricaricati 7800 titoli (3800 EU + 4000 NA) prendendo
+pe_trailing, pe_forward, pb DIRETTAMENTE da TIKR senza trasformazioni, ed
+eps_growth/rev_growth ricalcolati con la funzione `calendarize()` di
+weekly_eu.py copiata identica. 3209 titoli restano senza P/E perche' TIKR lo
+considera non significativo — comportamento corretto.
+
+**REGOLA IMPOSTA DA ANDREA**: tutti i dati fondamentali vengono da TIKR. Se
+TIKR non ha il dato, si usa la formula prevista per quella situazione. Non si
+inventano valori. I momentum restano da Yahoo.
+
+**Trappola nel file fiscal_year_end.csv**: la colonna si chiama `fiscal_month`
+(non `fy_end_month` ne' `month`). Se si sbaglia il nome, il file viene letto
+come vuoto e la calendarizzazione usa dicembre per tutti — la crescita di utili
+e ricavi risulta calcolata sul ciclo sbagliato per le societa' con esercizio
+non solare. 18099 righe nel file.
+
+### 3. Formato del file TIKR (RIFERIMENTO)
+
+I ticker nel CSV TIKR sono NUDI, senza suffisso di borsa. Il mercato sta nella
+colonna separata **"Primary Exchange"**. Abbinare per solo ticker produce
+accostamenti falsi (lo stesso simbolo esiste su piu' borse: `MRK` e' sia Merck
+KGaA sia altro). Mappa corretta:
+
+    BIT->MIL  XTRA->XETRA  ENXTPA->PA  ENXTAM->AS  BME->MC  ENXTBR->BR
+    ENXTLS->LS  WBAG->VI  HLSE->HE  ISE->IR  ATSE->GR  LSE->LSE
+    SWX->SWX  OM->OM  OB->OB  CPSE->CPSE
+
+La capitalizzazione e' scritta come `$370.14MM` — in MILIONI di dollari, con
+simbolo valuta, sigla MM e virgole delle migliaia. `parse_num()` le gestisce.
+
+### 4. Criteri dell'universo europeo (CONFERMATI 19/8/2026)
+
+**Soglia 300 milioni USD** (mercati con oltre 100 titoli): Milano, Francoforte,
+Parigi, Londra, Zurigo, Stoccolma, Oslo, Copenaghen.
+
+**Primi 100 titoli**: Bruxelles, Helsinki, Atene (tutti e tre esattamente a
+100). Amsterdam 98, Madrid 91, Vienna 53, Lisbona 35, Dublino 15 prendono tutti
+i titoli disponibili perche' ne hanno meno di cento.
+
+AIM e NGM sono stati esclusi deliberatamente dal progetto.
+
+### 5. Formule dei punteggi (RIFERIMENTO — NON MODIFICARE)
+
+**Value Score** = percentile della SOMMA di tre percentili:
+rendimento utili corrente (1/PE trailing), prospettico (1/PE forward),
+rendimento patrimonio (1/PB). Minimo 2 input su 3.
+
+**Growth Score** = percentile della SOMMA di quattro percentili:
+crescita utili, crescita ricavi, momentum 6m depurato (mom6m - mom1w),
+momentum 12m depurato (mom12m - mom1m). Minimo 3 input su 4.
+
+Il confronto avviene per GRUPPO DI PAESE (RANK_GROUPS): aggiungere o togliere
+titoli da un mercato ricalcola i punteggi di tutti i titoli di quel gruppo.
+
+La capitalizzazione NON entra nei punteggi: serve solo come peso negli
+aggregati di settore (`sector_quintile_partials`).
+
+### 6. Indicizzazione Google: sitemap muta per sei giorni (RISOLTO)
+
+**Sintomo**: Search Console segnala "Esclusa in base al tag noindex".
+
+**Causa vera, molto piu' grave del sintomo**: `src/app/sitemap.ts` usava la
+chiave PUBBLICA di Supabase. Il 3/8/2026 abbiamo chiuso l'accesso pubblico alle
+tabelle per sicurezza (giusto), ma da quel momento la query dei titoli
+restituiva ZERO righe SENZA DARE ERRORE. La sitemap pubblicava 9 indirizzi
+invece di 7881: Google non ha mai saputo che esistessero le schede titolo.
+
+**Correzione**: sitemap passata a `SUPABASE_SERVICE_ROLE_KEY` (viene generata
+sul server, puo' e deve usarla). Rimossi i 4 indirizzi `/screens` che
+rispondono 404 — Next.js marca automaticamente le pagine inesistenti con
+noindex, ed era quella la segnalazione di Google.
+
+**REGOLA**: quando si chiude un accesso per sicurezza, verificare SEMPRE cosa
+dipendeva da quella chiave. Una query che restituisce zero righe senza errore
+e' il tipo di guasto che resta invisibile per settimane.
+
+### 7. SEO schede titolo (FATTO)
+
+Descrizioni con capitalizzazione, P/E storico, settore, paese. Dati strutturati
+schema.org (`Corporation` + `tickerSymbol`). Verificato che NESSUN punteggio
+proprietario compaia nel codice della pagina: Value/Growth/Best Score sono solo
+NOMINATI (per posizionarsi su ricerche tipo "<societa'> value score") ma mai
+pubblicati come valore.
+
+Esclusi su decisione di Andrea: P/B (input del Value Score) e dividend yield
+(campo non aggiornato dagli script — pubblicare un dato non mantenuto e' peggio
+che non pubblicarlo).
+
+**Unita' da ricordare**: `mkt_cap` in fundamentals e' in MILIONI, `div_yield` e'
+gia' in PERCENTUALE. Trattarle come unita' assolute produceva "Apple
+capitalizzazione 5 milioni" e "ASML dividendo 53%".
+
+### 8. Link Yahoo in italiano (RISOLTO)
+
+Il link "Estimates" mancava del parametro che forza l'inglese, e Yahoo
+reindirizzava alla versione italiana, molto piu' povera di dati. Il link al
+profilo aziendale lo aveva gia' (`?hl=en-US&guccounter=1`) e infatti
+funzionava. Aggiunto al link Estimates e ai 16 link degli indici in
+MarketStrip.tsx.
+
+### 9. Blocchi che si annullavano a vicenda (RISOLTO)
+
+**Difetto strutturale, causa di giorni di malfunzionamenti apparentemente
+diversi**: erano stati messi TRE meccanismi di protezione che si combattevano.
+
+1. **Due cron a 7 minuti di distanza** (Vercel 19:00 + GitHub 19:07) con
+   `concurrency`: la seconda esecuzione ANNULLAVA la prima invece di
+   proteggerla. Il 6/8 l'esecuzione serale europea e' stata cancellata dopo 15
+   minuti e l'Europa e' rimasta indietro di un giorno. Corretto distanziando
+   tutti i cron di riserva ad almeno 30 minuti.
+
+2. **Blocco giornaliero** (introdotto il 30/7): impediva a uno script
+   programmato di girare se ne era gia' andato a buon fine uno quel giorno.
+   Rendeva INUTILI tutte le passate aggiuntive: il 10/8 l'Asia e' girata tre
+   volte (18:00, 19:30, 23:36), tutte "riuscite", ma solo la prima aveva fatto
+   qualcosa. Giappone e Hong Kong erano fermi a tre sedute prima. RIMOSSO.
+
+3. **Secondo blocco** in cima agli script: usciva dichiarando SUCCESSO quando
+   trovava un'altra esecuzione in corso — nei log sembrava tutto regolare
+   mentre non aveva fatto nulla. RIMOSSO (ridondante: `concurrency` nel
+   workflow gia' impedisce le sovrapposizioni, e lo fa nel modo giusto,
+   mettendo in coda invece di uccidere).
+
+**REGOLA**: un meccanismo di protezione che esce dichiarando successo senza
+fare il lavoro e' peggio di nessuna protezione, perche' nasconde il problema.
+Se uno script si ferma, deve dirlo.
+
+### 10. Rapporto giornaliero: difetti di misura corretti
+
+- **Tetto di 250 candidati** nella verifica: il rapporto dichiarava 131 titoli
+  non allineati mentre erano 197. RIMOSSO, timeout del workflow alzato a 60 min.
+- **Confronto per data di calendario** invece che per mercato: Tokyo chiusa
+  l'11/8 (Giorno della Montagna) faceva risultare 1000 titoli corretti come
+  "indietro", e l'oggetto scendeva da 98,6% a 85,9%. Ora ogni mercato e'
+  confrontato con la PROPRIA ultima seduta.
+- **Colonna che accorpava** chi ha l'ultima seduta e chi e' indietro di una:
+  101 titoli fermi sparivano dentro il numero degli aggiornati.
+- **Verifica estesa a tutti i titoli indietro**, anche di una sola seduta (prima
+  guardava solo quelli fermi da oltre 7 giorni).
+
+### 11. Sorvegliante delle esecuzioni (NUOVO)
+
+`sorvegliante.py` + `.github/workflows/sorvegliante.yml`, ogni 2 ore: rileva
+esecuzioni fallite o annullate e le rilancia da solo, tramite gli endpoint
+Vercel (il token automatico delle Azioni non puo' far partire altri workflow).
+Rilancia anche se un mercato resta 20 ore senza esecuzioni riuscite. Quando
+interviene lascia traccia in `script_logs` con `script_name='sorvegliante'`.
+
+### 12. Fonte unica dei prezzi (RISOLTO 5-6/8)
+
+Il prezzo esisteva in QUATTRO copie: `prices_eod` (grafico), `latest_prices`
+(screener), `fundamentals`, `stocks` (quest'ultima ferma al 23 giugno, sbagliata
+del 10%). Piu' `fetchLatestPrices` troncata a 1000 righe su 7886: 6886 titoli
+mostravano prezzi vecchi, e QUALI cambiava a ogni chiamata — da qui i valori
+che sembravano cambiare a caso.
+
+**Soluzione**: `latest_prices_mv`, vista materializzata calcolata su
+`prices_eod`, finestra di 150 giorni. Non puo' divergere dal grafico per
+costruzione. Aggiornata da **pg_cron ogni 10 minuti** (lavoro
+`aggiorna-prezzi-correnti`), non piu' da chiamata HTTP che andava sempre in
+timeout (errore 57014: Supabase chiude le richieste HTTP dopo circa un minuto).
+
+Serve l'indice `idx_prices_eod_ticker_exchange_date` su
+`prices_eod (ticker, exchange, date desc)`.
+
+### 13. Blocco di sicurezza sulle sedute aperte (ATTIVO)
+
+yfinance interrogato a mercato APERTO restituisce una barra PARZIALE del giorno
+in corso, col prezzo dell'istante invece della chiusura. Scritta in
+`prices_eod` diventa indistinguibile da una chiusura vera.
+
+Orari limite (UTC), volutamente generosi per coprire anche l'ora solare:
+Europa 17:00, USA/Canada 22:00, Asia-Pacifico 10:00.
+
+Verificato sul campo: lanciato con Tokyo aperta, ha scartato 2274 barre.
+
+### 14. Sicurezza (5-6/8)
+
+Tolta la lettura pubblica a `stocks`, `fundamentals`, `prices_eod`,
+`latest_prices`, `top500_universe`, `sector_quintile_partials`. Prima chiunque
+estraesse la chiave pubblica dal browser poteva scaricare 10217 anagrafiche,
+12191 righe di fondamentali e 5 anni di storico su tutti i mercati.
+
+Le policy si chiamano `public read <tabella>` (con SPAZI, non trattini bassi):
+uno script che cercava `public_read` non trovava nulla e falliva in silenzio.
+
+Le viste materializzate NON sono coperte da RLS: l'accesso va tolto
+esplicitamente con `revoke all on latest_prices_mv from anon, authenticated`.
