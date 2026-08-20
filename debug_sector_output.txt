@@ -1,17 +1,1 @@
-HOMEPAGE — testo visibile a Google: 3224 caratteri (prima: 60)
-
-H1: ForwardAlpha — ricerca azionaria quantitativa su oltre 7.900 titoli globali
-H2 presenti: 6
-   - Mercati coperti
-   - Metodo di analisi
-   - Reverse earnings model
-   - Cosa offre la piattaforma
-   - Accesso
-   - Avvertenza
-
---- primi 400 caratteri che legge Google ---
-ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked ForwardAlpha — ricerca azionaria quantitativa su oltre 7.900 titoli globali ForwardAlpha e&#x27; una piattaforma di ricerca azionaria quantitativa che analizza ogni giorno oltre 7.900 titoli quotati sui principali mercati mondiali, attribuendo a ciascuno punteggi proprietari di valutazione e di crescita costruiti con metodo istituzionale
-
---- controllo protezione punteggi ---
-  valori numerici di Value Score nell'HTML: NESSUNO
-  la parola 'classifica'/'ranking' con elenchi: no
+HTTP: 400
