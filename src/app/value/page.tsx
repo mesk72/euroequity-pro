@@ -30,7 +30,12 @@ function ScoreBar({value,label}:{value:number|null|undefined,label:string}) {
   )
 }
 
-type Tab = 'value' | 'growth' | 'combined' | 'dividend'
+// Scheda 'dividend' RIMOSSA 20/8/2026: div_yield e' valorizzato solo su
+// 2257 righe su 12720 (18%), residuo di caricamenti vecchi. TIKR non
+// fornisce il dato e nessuno script lo aggiorna. Una classifica per
+// rendimento da dividendo costruita su dati parziali e fermi e' proprio
+// il tipo di errore che un utente riconosce subito.
+type Tab = 'value' | 'growth' | 'combined'
 
 export default function ValuePage() {
   const [stocks,  setStocks]  = useState<any[]>([])
@@ -59,13 +64,11 @@ export default function ValuePage() {
     if (tab==='value')    return s.valueScore!=null
     if (tab==='growth')   return s.growthScore!=null
     if (tab==='combined') return s.valueScore!=null && s.growthScore!=null
-    if (tab==='dividend') return s.divYield!=null && s.divYield>0
     return true
   }).sort((a:any,b:any) => {
     if (tab==='value')    return (b.valueScore||0)-(a.valueScore||0)
     if (tab==='growth')   return (b.growthScore||0)-(a.growthScore||0)
     if (tab==='combined') return ((b.valueScore||0)+(b.growthScore||0))-((a.valueScore||0)+(a.growthScore||0))
-    if (tab==='dividend') return (b.divYield||0)-(a.divYield||0)
     return 0
   }).slice(0, 100)
 
@@ -73,7 +76,6 @@ export default function ValuePage() {
     {id:'combined', label:'⭐ Best Combined'},
     {id:'value',    label:'💎 Best Value'},
     {id:'growth',   label:'🚀 Best Growth'},
-    {id:'dividend', label:'💰 Best Dividend'},
   ]
 
   return (
@@ -127,7 +129,6 @@ export default function ValuePage() {
               <th>Ticker</th><th>Company</th><th>Sector</th><th>Exchange</th>
               <th>Price</th><th>1D %</th><th>Mkt Cap B</th>
               <th>P/E</th><th>P/B</th>
-              {tab==='dividend'&&<th>Div Yield</th>}
               <th style={{minWidth:120}}>Value Score</th>
               <th style={{minWidth:120}}>Growth Score</th>
             </tr></thead>
@@ -144,7 +145,6 @@ export default function ValuePage() {
                   <td style={{ fontFamily:'IBM Plex Mono',color:'#94a3b8' }}>{fv(s.mktCap,1)}</td>
                   <td style={{ fontFamily:'IBM Plex Mono',color:'#94a3b8' }}>{fv(s.peTrail,1)}</td>
                   <td style={{ fontFamily:'IBM Plex Mono',color:'#94a3b8' }}>{fv(s.pb,2)}</td>
-                  {tab==='dividend'&&<td style={{ fontFamily:'IBM Plex Mono',color:'#22c55e',fontWeight:700 }}>{fv(s.divYield,2)}%</td>}
                   <td style={{ minWidth:120,paddingRight:16 }}>
                     <ScoreBar value={s.valueScore} label="Value"/>
                   </td>
