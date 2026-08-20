@@ -1,1 +1,17 @@
-HTTP: 400
+HTTP: 200
+  fiscal_year_end.csv                        241796 byte  2026-07-10T06:33:59
+  fiscal_year_global.csv                     418865 byte  2026-06-15T08:39:25
+  tikr_apac_latest.csv                       688744 byte  2026-07-01T13:34:43
+  tikr_eu_latest.csv                         607870 byte  2026-07-04T16:10:14
+  tikr_gcc_latest.csv                         85908 byte  2026-07-09T10:36:25
+  tikr_na_latest.csv                         763616 byte  2026-07-08T16:05:47
+  Untitled folder                                 ? byte  ?
+
+=== quali nomi rispondono davvero? ===
+   tikr_eu_latest.csv           HTTP 200
+   tikr_na_latest.csv           HTTP 200
+   tikr_apac_latest.csv         HTTP 200
+   tikr_upload_na.csv           HTTP 400
+   tikr_prod_europa.csv         HTTP 400
+   tikr_asia_pacific.csv        HTTP 400
+   fiscal_year_end.csv          HTTP 200
