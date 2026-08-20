@@ -1,28 +1,33 @@
-=== tikr_eu_latest.csv : 3924 righe ===
-   0  Ticker
-   1  Company Name
-   2  Primary Exchange
-   3  Country
-   4  Sector
-   5  Last Price
-   6  Last Mkt Cap
-   7  LTM P/E LTM
-   8  LTM P/BVPS LTM
-   9  EPS Normalized (FY 2025)
-  10  Mean EPS Normalized (FY 2026)
-  11  Mean EPS Normalized (FY 2027)
-  12  Mean EPS Normalized (FY 2028)
-  13  EPS (GAAP) (FY 2025)
-  14  Mean EPS (GAAP) (FY 2026)
-  15  Mean EPS (GAAP) (FY 2027)
-  16  Mean EPS (GAAP) (FY 2028)
-  17  Rev (FY 2025)
-  18  Mean Rev (FY 2026)
-  19  Mean Rev (FY 2027)
-  20  Mean Rev (FY 2028)
-  21  Mean EPS Normalized (FY 2030)
-  22  Mean EPS (GAAP) (FY 2029)
-  23  Mean EPS (GAAP) (FY 2030)
-  24  Mean Fwd P/E NTM
-  25  ECS Total Shares Outstanding on Filing Date LTM
+Titoli confrontabili con TIKR EU: 3270
+Titoli che CAMBIEREBBERO: 756
 
+   OB      182
+   MC      116
+   HE       88
+   CPSE     76
+   LSE      60
+   PA       40
+   AS       38
+   BR       36
+   XETRA    34
+   OM       21
+   SWX      18
+   GR       14
+   VI       13
+   MIL       9
+   LS        8
+   IR        3
+
+=== esempi (nostro -> TIKR), formato PE/PEfwd/PB ===
+  SYENS      BR    (-127.23, 18.15, 1.08)       -> (None, 18.15, 1.08)
+  FOAMIT     HE    (3926.0, 2594.0, 65.0)       -> (39.62, 26.18, 0.66)
+  OUT1V      HE    (-18.96, 14.47, 0.73)        -> (None, 14.47, 0.73)
+  IG         CPSE  (-1.94, None, 1.13)          -> (None, None, 1.19)
+  KRAB       OB    (843.0, None, 107.0)         -> (8.36, 8.72, 1.06)
+  KINV B     OM    (-1.77, 10.08, 0.54)         -> (None, 10.08, 0.54)
+  SFER       MIL   (-34.19, 229.57, 2.94)       -> (None, 229.57, 2.94)
+  OLE        MC    (1511.0, 1924.0, 67.0)       -> (17.2, 21.89, 0.76)
+  YIRG       MC    (2301.0, None, 95.0)         -> (23.11, None, 0.95)
+  YAI1       MC    (490.0, None, 84.0)          -> (4.92, None, 0.85)
+  ALQ        MC    (1357.0, 1053.0, 156.0)      -> (14.39, 11.17, 1.66)
+  SDIP B     OM    (-95.54, 17.33, 2.34)        -> (None, 17.33, 2.34)
