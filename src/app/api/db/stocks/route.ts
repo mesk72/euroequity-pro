@@ -271,7 +271,14 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
   // sempre 12 pagine (fino a 4 delle quali inutili per un Global con
   // ~7.889 righe di fundamentals, che ne servono 8).
   const PAGE = 1000
-  const MAX_PAGES = 12
+  // FIX 20/8/2026: era 12, cioe' 12.000 righe. La tabella fundamentals e'
+  // cresciuta a 14.003 righe dopo il ricarico da TIKR (che copre anche
+  // titoli fuori universo), e la lettura si troncava: essendo ordinata per
+  // codice alfabetico, sparivano i titoli in fondo all'alfabeto. Global
+  // mostrava 7.010 titoli invece di 7.852.
+  // Alzato con margine e con un avviso nei log se il tetto venisse ancora
+  // raggiunto, cosi' il problema non puo' ripresentarsi in silenzio.
+  const MAX_PAGES = 24
   const buildQuery = (page: number) =>
     supabase.from(table).select(select).in('exchange', exchangeList)
       .order('ticker', { ascending: true }).range(page * PAGE, page * PAGE + PAGE - 1).limit(PAGE)
@@ -283,9 +290,15 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
 
   const remainingPages = Array.from({ length: MAX_PAGES - 1 }, (_, i) => buildQuery(i + 1))
   const results = await Promise.all(remainingPages)
+  let ultimaPiena = false
   for (const { data, error } of results as any[]) {
     if (error || !data) continue
     all = all.concat(data)
+    if (data.length === PAGE) ultimaPiena = true
+  }
+  if (ultimaPiena && all.length >= MAX_PAGES * PAGE) {
+    console.warn(`[ATTENZIONE] ${table}: raggiunto il tetto di ${MAX_PAGES * PAGE} righe. ` +
+                 `Alcuni titoli potrebbero non essere stati letti — alzare MAX_PAGES.`)
   }
   return all
 }
