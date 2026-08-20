@@ -1,15 +1,16 @@
-UNIVERSO: 7907 titoli
-  con Value Score : 7036 (89.0%)
-  con Growth Score: 6628 (83.8%)
-  con Best Score  : 6694 (84.7%)
+HTML totale: 13561 byte
+TESTO visibile a Google: 101 caratteri
 
-=== verifica: i titoli corretti hanno ora punteggi sensati? ===
-TICKER     EX          PE     PB   VALUE  GROWTH
-KRAB       OB        8.36   1.06      57    None
-GSF        OB        None    0.7      48      17
-FOAMIT     HE       39.62   0.66      45      50
-OLE        MC        17.2   0.76      98    50.0
-MAERSK B   CPSE     23.27   0.69      72      54
-CARL B     CPSE     19.86   4.36      35      56
-NSKOG      OB       10.53    0.6      87      97
-NEOBO      OM       23.22   0.39      47    None
+--- cosa legge Google (primi 700 caratteri) ---
+Apple Inc. (AAPL) — analisi fondamentale e valutazione | ForwardAlpha Back Stock not found: AAPL . US
+
+--- contiene i dati che rendono la pagina utile? ---
+   Value Score            SI
+   Growth Score           SI
+   P/E                    SI
+   Capitalizzazione       SI
+   dividend               no
+   settore                SI
+   Information Technology SI
+
+--- intestazioni H1/H2 (contano molto per Google) ---
