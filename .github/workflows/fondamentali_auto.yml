@@ -1,0 +1,37 @@
+name: Aggiornamento fondamentali TIKR
+
+on:
+  workflow_dispatch:
+    inputs:
+      forza:
+        description: "Elabora anche se i file non sono cambiati (1 = si)"
+        required: false
+        default: "0"
+  schedule:
+    # Ogni ora a minuto dispari: controlla se i file TIKR sono stati
+    # ricaricati. Se non lo sono, esce subito senza fare nulla.
+    - cron: '27 * * * *'
+
+concurrency:
+  group: fondamentali-auto
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Installa dipendenze
+        run: pip install requests
+      - name: Aggiorna fondamentali
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          REPORT_TO: ${{ secrets.REPORT_TO }}
+          FORZA: ${{ github.event.inputs.forza }}
+        run: python fondamentali_auto.py
