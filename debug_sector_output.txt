@@ -1,12 +1,4 @@
-/value       HTTP 200 | testo   231 car | H1: ASSENTE
-             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
-/dividends   HTTP 200 | testo   276 car | H1: ASSENTE
-             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
-/sectors     HTTP 200 | testo   198 car | H1: ASSENTE
-             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
-/research    HTTP 200 | testo  1202 car | H1: Research Hub
-             titolo: Global Equity Research | ForwardAlpha
-/about       HTTP 200 | testo  5934 car | H1: About ForwardAlpha
-             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
-home         HTTP 200 | testo    60 car | H1: ASSENTE
-             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
+righe con div_yield valorizzato: 2257
+righe totali fundamentals    : 12720
+
+esempi: [{'ticker': 'EQL', 'exchange': 'OM', 'div_yield': 0.0}, {'ticker': 'KRX', 'exchange': 'IR', 'div_yield': 0.71}, {'ticker': 'ITD', 'exchange': 'MIL', 'div_yield': 1.15}, {'ticker': 'HWG', 'exchange': 'LSE', 'div_yield': 1.17}, {'ticker': 'FCT', 'exchange': 'MIL', 'div_yield': 0.18}, {'ticker': 'INTRUM', 'exchange': 'OM', 'div_yield': 0.0}, {'ticker': 'SAAB B', 'exchange': 'OM', 'div_yield': 5.41}, {'ticker': 'XPS', 'exchange': 'LSE', 'div_yield': 3.24}]
