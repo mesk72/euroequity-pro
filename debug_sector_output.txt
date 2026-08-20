@@ -1,9 +1,18 @@
-HTTP: 200 | byte: 241796
-righe: 18099
-colonne: ['ticker', 'exchange', 'fiscal_month']
+Date di chiusura esercizio caricate: 18099
 
-   {'ticker': '80M', 'exchange': 'AIM', 'fiscal_month': '12'}
-   {'ticker': 'AAU', 'exchange': 'AIM', 'fiscal_month': '12'}
-   {'ticker': 'AAZ', 'exchange': 'AIM', 'fiscal_month': '12'}
-   {'ticker': 'ABDP', 'exchange': 'AIM', 'fiscal_month': '8'}
-   {'ticker': 'ABDX', 'exchange': 'AIM', 'fiscal_month': '6'}
+Lettura file TIKR...
+  tikr_eu_latest.csv: 3800 righe utilizzabili
+  tikr_na_latest.csv: 4000 righe utilizzabili
+Totale: 7800
+
+Righe da scrivere: 7800 (di cui 3209 senza P/E perche' TIKR lo considera non significativo)
+
+SCRITTI: 7800 titoli
+
+=== verifica su titoli noti ===
+  KRAB      OB    {'pe_trailing': 8.36, 'pe_forward': 8.72, 'pb': 1.06, 'eps_growth': None, 'rev_growth': None}
+  FOAMIT    HE    {'pe_trailing': 39.62, 'pe_forward': 26.18, 'pb': 0.66, 'eps_growth': 0.6797, 'rev_growth': 0.1233}
+  OLE       MC    {'pe_trailing': 17.2, 'pe_forward': 21.89, 'pb': 0.76, 'eps_growth': -0.5, 'rev_growth': 0.07}
+  CARL B    CPSE  {'pe_trailing': 19.86, 'pe_forward': 13.81, 'pb': 4.36, 'eps_growth': 0.2288, 'rev_growth': 0.0216}
+  ASML      AS    {'pe_trailing': 62.78, 'pe_forward': 47.28, 'pb': 30.24, 'eps_growth': 0.2965, 'rev_growth': 0.1976}
+  ISP       MIL   {'pe_trailing': 11.31, 'pe_forward': 10.44, 'pb': 1.55, 'eps_growth': 0.0774, 'rev_growth': 0.0182}
