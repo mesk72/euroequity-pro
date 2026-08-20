@@ -1,9 +1,35 @@
-colonne P/E in TIKR: ['LTM P/E LTM', 'Mean Fwd P/E NTM']
-colonne P/B in TIKR: ['LTM P/BVPS LTM']
-
-TICKER    SOCIETA'                       NOSTRO DB              TIKR                   YAHOO
-GSF       Grieg Seafood ASA              PE=-2637.0 PB=72.0     PE=None PB=0.7         PE=None PB=0.73
-PEN       Panoro Energy ASA              PE=-681.0 PB=137.0     PE=None PB=1.31        PE=None PB=1.6
-AKAST     Akastor ASA                    PE=-2325.0 PB=67.0     PE=None PB=0.67        PE=29.57 PB=0.71
-OKEA      OKEA ASA                       PE=-798.0 PB=339.0     PE=None PB=3.3         PE=None PB=3.96
-CARL B    Carlsberg A/S                  PE=18.76 PB=4.14       PE=19.86 PB=4.36       PE=19.82 PB=4.23
+=== confronto P/B: nostro vs TIKR, per mercato ===
+EX        CONFR   UGUALI      x100     x1000     ALTRO
+OB          253       96       146         0        11
+        es. KRAB      nostro=107.0 TIKR=1.06
+        es. AQUA      nostro=130.0 TIKR=1.32
+        es. ROMER     nostro=19.0 TIKR=0.19
+MC          191      100        86         0         5
+        es. YIRG      nostro=95.0 TIKR=0.95
+        es. YAI1      nostro=84.0 TIKR=0.85
+        es. ALQ       nostro=156.0 TIKR=1.66
+HE          169      105        58         0         6
+        es. FOAMIT    nostro=65.0 TIKR=0.66
+        es. TOIVO     nostro=73.0 TIKR=0.72
+        es. ESENSE    nostro=120.0 TIKR=1.23
+CPSE        127       76        49         0         2
+        es. KLEE B    nostro=168.0 TIKR=1.66
+        es. WMA       nostro=386.0 TIKR=4.08
+        es. RBLN B    nostro=120.0 TIKR=1.19
+BR          112      102        10         0         0
+        es. 094244893 nostro=117.0 TIKR=1.17
+        es. 005767759 nostro=151.0 TIKR=1.51
+        es. FOU       nostro=174.0 TIKR=1.87
+AS           99       97         2         0         0
+        es. AGIL      nostro=101.0 TIKR=0.99
+        es. ERC       nostro=84.0 TIKR=0.93
+XETRA       186      186         0         0         0
+MIL         113      113         0         0         0
+GR          101      101         0         0         0
+LSE         405      405         0         0         0
+IR           15       15         0         0         0
+PA          207      207         0         0         0
+OM          202      202         0         0         0
+VI           49       49         0         0         0
+SWX         143      143         0         0         0
+LS           39       38         0         0         1
