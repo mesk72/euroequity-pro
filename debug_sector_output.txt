@@ -1,52 +1,24 @@
-=== A) Danimarca e Norvegia: riporto ai primi 100 per capitalizzazione ===
-  Danimarca  in universo 116 -> tengo i primi 100, escono 16
-      esce LOLB       Lollands Bank A/S                  141.79 MM
-      esce BAIVOIGA   BankInvest - Virksomhedsobligation 138.12 MM
-      esce NDIEMMAENKL1 Investeringsforeningen Nordea Inve 130.56 MM
-      esce FFARMS     FirstFarms A/S                     129.14 MM
-      esce NDIDAFKL1  Nordea Invest Danske Aktier Fokus  128.29 MM
-      esce LSIGAA     LÃ¥n & Spar Invest - Globale Aktie 126.83 MM
-      esce NORTHM     North Media A/S                    124.66 MM
-      esce SYIEUVADKK Sydinvest Europa LigevÃ¦gt & Value 123.99 MM
-      esce NBIOFKL    Nykredit Invest - Balance Offensiv 121.33 MM
-      esce PRIMOF     Prime Office A/S                   118.99 MM
-      esce MNBA       Møns Bank A/S                      116.9 MM
-      esce RTX        RTX A/S                            114.91 MM
-      esce TCM        TCM Group A/S                      110.66 MM
-      esce NDIEUENHKL1 Nordea Invest Europe Enhanced      109.85 MM
-      esce HUSCO      HusCompagniet A/S                  108.54 MM
-      esce SPIVEMKLA  Sparinvest Value Emerging Markets  93.48 MM
-  Norvegia   in universo 114 -> tengo i primi 100, escono 14
-      esce ABG        ABG Sundal Collier Holding ASA     381.57 MM
-      esce NSKOG      Norske Skog ASA                    370.14 MM
-      esce AKAST      Akastor ASA                        365.95 MM
-      esce ANDF       Andfjord Salmon Group AS           359.9 MM
-      esce CAMBI      Cambi ASA                          343.39 MM
-      esce MORLD      Moreld ASA                         343.3 MM
-      esce ROGS       Rogaland Sparebank                 342.67 MM
-      esce PEN        Panoro Energy ASA                  330.38 MM
-      esce BRUT       Bruton Limited                     328.74 MM
-      esce SBO        Selvaag Bolig ASA                  321.12 MM
-      esce GSF        Grieg Seafood ASA                  320.08 MM
-      esce OKEA       OKEA ASA                           314.39 MM
-      esce APR        Appear ASA                         303.86 MM
-      esce VTURA      Ventura Offshore Holding Ltd.      302.74 MM
+=== soglia 300 MM per Danimarca e Norvegia ===
+  Danimarca  in universo ora:  61  (entrati 0, usciti 39 di cui 21 fondi)
+  Norvegia   in universo ora: 114  (entrati 15, usciti 1 di cui 1 fondi)
 
-=== B) azzero gli score dei titoli FUORI universo ===
-  titoli fuori universo con punteggi: 2627
-  azzerati: 2627
+=== i titoli danesi importanti ci sono? ===
+  MAERSK B   A.P. Møller - Mærsk A/S          universo=True   36227.07 MM
+  NSIS B     Novozymes A/S                    universo=True   30404.98 MM
+  CARL B     Carlsberg A/S                    universo=True   19537.24 MM
+  COLO B     Coloplast A/S                    universo=True   13605.4 MM
+  ROCK B     Rockwool A/S                     universo=True   6922.28 MM
+  ALK B      ALK-Abelló A/S                   universo=True   8271.92 MM
+  DANSKE     Danske Bank A/S                  universo=True   44880.97 MM
+  NOVO B     Novo Nordisk A/S                 universo=True   221536.81 MM
+  ORSTED     Ørsted A/S                       universo=True   32048.55 MM
+  TRYG       Tryg A/S                         universo=True   13534.48 MM
+  DEMANT     Demant A/S                       universo=True   9093.57 MM
+  GMAB       Genmab A/S                       universo=True   17552.33 MM
+  VWS        Vestas Wind Systems A/S          universo=True   28212.71 MM
+  PNDORA     Pandora A/S                      universo=True   8152.45 MM
 
-=== VERIFICA ===
-  MIL     117
-  XETRA   210
-  PA      216
-  LSE     423
-  SWX     161
-  OM      208
-  OB      100
-  CPSE    100
-  BR      100
-  HE      100
-  GR      100
-
-  UNIVERSO TOTALE: 7877
+=== conteggio finale ===
+  OB      114
+  CPSE     61
+  UNIVERSO TOTALE: 7852
