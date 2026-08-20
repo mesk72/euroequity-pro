@@ -1,17 +1,9 @@
-=== i 28 reintegrati hanno i fondamentali? ===
-TICKER     EX    PE_TRAIL  PE_FWD    PB        EPS_GR    VALUE   GROWTH 
-MAERSK B   CPSE  22.12     35.54     0.65      -0.9835   53      54     
-NSIS B     CPSE  41.97     24.42     2.28      0.0524    19      40     
-CARL B     CPSE  18.76     13.16     4.14      0.2641    49      52     
-COLO B     CPSE  40.25     15.06     6.59      0.2453    20      24     
-ROCK B     CPSE  -1645.48  15.42     2.12      -0.0712   30      10     
-ALK B      CPSE  42.77     36.2      8.34      0.176     1       76     
-GSF        OB    -2637.0   1656.0    72.0      0.737     7       14     
-PEN        OB    -681.0    456.0     137.0     2.4646    2       72     
-AKAST      OB    -2325.0   4756.0    67.0      -0.9082   5       23     
+colonne P/E in TIKR: ['LTM P/E LTM', 'Mean Fwd P/E NTM']
+colonne P/B in TIKR: ['LTM P/BVPS LTM']
 
-=== quanti dei 28 hanno una riga in fundamentals? ===
-  righe fundamentals per CPSE+OB: 525
-  titoli in universo CPSE+OB: 230
-
-=== dove si calcola combined_rank? ===
+TICKER    SOCIETA'                       NOSTRO DB              TIKR                   YAHOO
+GSF       Grieg Seafood ASA              PE=-2637.0 PB=72.0     PE=None PB=0.7         PE=None PB=0.73
+PEN       Panoro Energy ASA              PE=-681.0 PB=137.0     PE=None PB=1.31        PE=None PB=1.6
+AKAST     Akastor ASA                    PE=-2325.0 PB=67.0     PE=None PB=0.67        PE=29.57 PB=0.71
+OKEA      OKEA ASA                       PE=-798.0 PB=339.0     PE=None PB=3.3         PE=None PB=3.96
+CARL B    Carlsberg A/S                  PE=18.76 PB=4.14       PE=19.86 PB=4.36       PE=19.82 PB=4.23
