@@ -2,35 +2,36 @@ import os, requests
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-def tutte(tab,campi,extra=None):
-    o=[];off=0
-    while True:
-        p={"select":campi,"limit":"1000","offset":str(off)}
-        if extra: p.update(extra)
-        b=requests.get(U+"/rest/v1/"+tab,headers=H,params=p,timeout=90).json()
-        if not isinstance(b,list) or not b: break
-        o+=b; off+=1000
-        if len(b)<1000: break
-    return o
-fu=tutte("fundamentals","ticker,exchange,mkt_cap","")
-mc={(x["ticker"],x["exchange"]):x.get("mkt_cap") for x in fu}
-st=tutte("stocks","ticker,exchange,company,sector,in_universe",{"exchange":"eq.CPSE"})
-print("Titoli danesi in anagrafica: %d" % len(st))
+EX=["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE",
+    "US","TSX","TSE","SEHK","ASX","KRX","SGX"]
+print("=== universo per exchange ===")
+tot=0
+for ex in EX:
+    r=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
+    n=int(r.headers.get("content-range","0/0").split("/")[-1]); tot+=n
+print("  totale universo:",tot)
 print()
-righe=[]
-for x in st:
-    v=mc.get((x["ticker"],"CPSE"))
-    righe.append((x["ticker"],(x.get("company") or ""),(x.get("sector") or ""),v,bool(x.get("in_universe"))))
-righe.sort(key=lambda z:-(z[3] or 0))
-print("=== TUTTI i danesi, ordinati per capitalizzazione ===")
-print("%-12s %-40s %-22s %11s %s" % ("TICKER","SOCIETA'","SETTORE","MKT CAP","IN UNIV"))
-for tk,az,se,v,u in righe:
-    print("%-12s %-40s %-22s %11s %s" % (tk,az[:40],se[:22],
-        ("%.1f"%v) if v is not None else "-", "SI" if u else "no"))
+print("=== quanti ne restituisce l'API Global? ===")
+r=requests.get("https://forwardalpha.pro/api/db/stocks?exchanges="+",".join(EX),timeout=180)
+d=r.json(); serviti=d.get("stocks",[])
+print("  API Global:",len(serviti))
 print()
-esclusi=[r for r in righe if not r[4]]
-print("=== ESCLUSI: %d ===" % len(esclusi))
-sotto=[r for r in esclusi if r[3] is not None and r[3]<300]
-senza=[r for r in esclusi if r[3] is None]
-print("  sotto i 300 MM: %d" % len(sotto))
-print("  senza capitalizzazione: %d" % len(senza))
+print("=== dove si perdono? confronto per exchange ===")
+from collections import Counter
+c=Counter(x.get("exchange") for x in serviti)
+print("%-7s %8s %8s %8s" % ("EX","UNIVERSO","SERVITI","MANCANO"))
+for ex in EX:
+    r2=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
+    u=int(r2.headers.get("content-range","0/0").split("/")[-1])
+    s=c.get(ex,0)
+    if u!=s: print("%-7s %8d %8d %8d" % (ex,u,s,u-s))
+print()
+print("=== quanti hanno un prezzo nella vista? ===")
+mv=0
+for ex in EX:
+    r3=requests.get(U+"/rest/v1/latest_prices_mv",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker","exchange":"eq."+ex,"limit":"1"})
+    mv+=int(r3.headers.get("content-range","0/0").split("/")[-1])
+print("  righe nella vista prezzi:",mv)
