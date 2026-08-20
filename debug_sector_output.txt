@@ -1,20 +1,12 @@
-HTML totale: 20827 byte
-TESTO visibile a Google: 3047 caratteri
-
---- cosa legge Google (primi 700 caratteri) ---
-Apple Inc. (AAPL) — analisi fondamentale e valutazione | ForwardAlpha Apple Inc. ( AAPL ) — analisi fondamentale e valutazione Apple Inc. e&#x27; una societa&#x27; quotata del settore Information Technology , USA , con codice di borsa AAPL su US . Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company offers iPhone, a line of smartphones; Mac, a line of personal computers; iPad, a line of multi-purpose tablets; and wearables, home, and accessories comprising AirPods, Apple Vision Pro, Apple TV, Apple Watch, Beats products, and HomePod, as well as Apple branded and third-party accessories. It also provides Appl
-
---- contiene i dati che rendono la pagina utile? ---
-   Value Score            SI
-   Growth Score           SI
-   P/E                    SI
-   Capitalizzazione       SI
-   dividend               no
-   settore                SI
-   Information Technology SI
-
---- intestazioni H1/H2 (contano molto per Google) ---
-    Apple Inc. (AAPL) — analisi fondamentale e valutazione
-    Dati di mercato
-    Analisi quantitativa ForwardAlpha
-    Cosa trovi nella scheda
+/value       HTTP 200 | testo   231 car | H1: ASSENTE
+             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
+/dividends   HTTP 200 | testo   276 car | H1: ASSENTE
+             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
+/sectors     HTTP 200 | testo   198 car | H1: ASSENTE
+             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
+/research    HTTP 200 | testo  1202 car | H1: Research Hub
+             titolo: Global Equity Research | ForwardAlpha
+/about       HTTP 200 | testo  5934 car | H1: About ForwardAlpha
+             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
+home         HTTP 200 | testo    60 car | H1: ASSENTE
+             titolo: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
