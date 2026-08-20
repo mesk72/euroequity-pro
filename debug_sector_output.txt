@@ -1,30 +1,52 @@
-=== quanti titoli per mercato europeo ADESSO ===
+=== A) Danimarca e Norvegia: riporto ai primi 100 per capitalizzazione ===
+  Danimarca  in universo 116 -> tengo i primi 100, escono 16
+      esce LOLB       Lollands Bank A/S                  141.79 MM
+      esce BAIVOIGA   BankInvest - Virksomhedsobligation 138.12 MM
+      esce NDIEMMAENKL1 Investeringsforeningen Nordea Inve 130.56 MM
+      esce FFARMS     FirstFarms A/S                     129.14 MM
+      esce NDIDAFKL1  Nordea Invest Danske Aktier Fokus  128.29 MM
+      esce LSIGAA     LÃ¥n & Spar Invest - Globale Aktie 126.83 MM
+      esce NORTHM     North Media A/S                    124.66 MM
+      esce SYIEUVADKK Sydinvest Europa LigevÃ¦gt & Value 123.99 MM
+      esce NBIOFKL    Nykredit Invest - Balance Offensiv 121.33 MM
+      esce PRIMOF     Prime Office A/S                   118.99 MM
+      esce MNBA       Møns Bank A/S                      116.9 MM
+      esce RTX        RTX A/S                            114.91 MM
+      esce TCM        TCM Group A/S                      110.66 MM
+      esce NDIEUENHKL1 Nordea Invest Europe Enhanced      109.85 MM
+      esce HUSCO      HusCompagniet A/S                  108.54 MM
+      esce SPIVEMKLA  Sparinvest Value Emerging Markets  93.48 MM
+  Norvegia   in universo 114 -> tengo i primi 100, escono 14
+      esce ABG        ABG Sundal Collier Holding ASA     381.57 MM
+      esce NSKOG      Norske Skog ASA                    370.14 MM
+      esce AKAST      Akastor ASA                        365.95 MM
+      esce ANDF       Andfjord Salmon Group AS           359.9 MM
+      esce CAMBI      Cambi ASA                          343.39 MM
+      esce MORLD      Moreld ASA                         343.3 MM
+      esce ROGS       Rogaland Sparebank                 342.67 MM
+      esce PEN        Panoro Energy ASA                  330.38 MM
+      esce BRUT       Bruton Limited                     328.74 MM
+      esce SBO        Selvaag Bolig ASA                  321.12 MM
+      esce GSF        Grieg Seafood ASA                  320.08 MM
+      esce OKEA       OKEA ASA                           314.39 MM
+      esce APR        Appear ASA                         303.86 MM
+      esce VTURA      Ventura Offshore Holding Ltd.      302.74 MM
+
+=== B) azzero gli score dei titoli FUORI universo ===
+  titoli fuori universo con punteggi: 2627
+  azzerati: 2627
+
+=== VERIFICA ===
   MIL     117
   XETRA   210
   PA      216
   LSE     423
   SWX     161
   OM      208
-  OB      114
-  CPSE    116
-  AS       98
-  MC       91
+  OB      100
+  CPSE    100
   BR      100
-  LS       35
-  VI       53
   HE      100
-  IR       15
   GR      100
 
-=== gli score sono calcolati solo sui titoli in universo? ===
-  righe fundamentals totali : 14003
-  con Value Score           : 9378
-  di cui FUORI universo     : 2541 <-- non dovrebbero averlo
-      EQL        OM
-      FAG        OM
-      ITD        MIL
-      INTRUM     OM
-      VTVT       US
-      DMRE       XETRA
-      IMMU       OM
-      ATIC       OM
+  UNIVERSO TOTALE: 7877
