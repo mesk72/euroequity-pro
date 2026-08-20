@@ -1,8 +1,21 @@
 import os, requests
-from collections import Counter
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
+
+# Riconosce fondi e veicoli, non solo dal nome inglese ma dalle forme
+# usate nei paesi nordici e latini.
+PAROLE=["ETF","ETP","UCITS","ISHARES","VANGUARD","XTRACKERS","LYXOR","INVESCO","SPDR",
+        "WISDOMTREE","VANECK","BLACKROCK","SICAV","ICAV","INDEX","INDEKS","AMUNDI",
+        "KAPITALFORENING","INVESTERINGSFORENING","INVESTERINGSSELSKAB","VERDIPAPIRFOND",
+        "BANKINVEST","NORDEA INVEST","SYDINVEST","SPARINVEST","SPARINDEX","NYKREDIT INVEST",
+        "DANSKE INVEST","JYSKE INVEST","MULTI MANAGER INVEST","FORMUEPLEJE","GUDME RAASCHOU",
+        "MAJ INVEST","LÅN & SPAR INVEST","LAN & SPAR INVEST","EGNSINVEST",
+        " FUND","FUND ","FONDS","FONDEN","SOCIMI","REIT ETF"]
+def fondo(nome):
+    n=(nome or "").upper()
+    return any(p in n for p in PAROLE)
+
 def tutte(tab,campi,extra=None):
     o=[];off=0
     while True:
@@ -13,19 +26,19 @@ def tutte(tab,campi,extra=None):
         o+=b; off+=1000
         if len(b)<1000: break
     return o
-st=tutte("stocks","ticker,exchange,in_universe")
-fu=tutte("fundamentals","ticker,exchange,value_score,mkt_cap")
-mv=tutte("latest_prices_mv","ticker,exchange")
-uni=[(x["ticker"],x["exchange"]) for x in st if x.get("in_universe")]
-setf=set((x["ticker"],x["exchange"]) for x in fu)
-setm=set((x["ticker"],x["exchange"]) for x in mv)
-print("universo:            %d" % len(uni))
-print("con riga fondamentali: %d   -> SENZA: %d" % (sum(1 for k in uni if k in setf), sum(1 for k in uni if k not in setf)))
-print("con prezzo nella vista: %d   -> SENZA: %d" % (sum(1 for k in uni if k in setm), sum(1 for k in uni if k not in setm)))
-print()
-senza_f=[k for k in uni if k not in setf]
-print("=== titoli in universo SENZA fondamentali: %d ===" % len(senza_f))
-c=Counter(k[1] for k in senza_f)
-for ex,n in c.most_common(): print("   %-6s %4d" % (ex,n))
-print()
-print("  esempi:", senza_f[:12])
+st=tutte("stocks","ticker,exchange,company,in_universe")
+print("=== PROVA DEL FILTRO: cosa escluderebbe, mercato per mercato ===")
+print("(solo titoli attualmente IN universo)\n")
+from collections import defaultdict
+tolti=defaultdict(list)
+for x in st:
+    if not x.get("in_universe"): continue
+    if fondo(x.get("company")):
+        tolti[x["exchange"]].append((x["ticker"],(x.get("company") or "")[:46]))
+tot=0
+for ex in sorted(tolti,key=lambda e:-len(tolti[e])):
+    print("  %-6s %3d" % (ex,len(tolti[ex]))); tot+=len(tolti[ex])
+    for t,n in tolti[ex][:10]:
+        print("       %-12s %s" % (t,n))
+    if len(tolti[ex])>10: print("       ...e altri %d" % (len(tolti[ex])-10))
+print("\n  TOTALE che verrebbero esclusi: %d" % tot)
