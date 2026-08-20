@@ -1,10 +1,30 @@
-Controllo file TIKR — 2026-08-20 11:44
-  firma attuale:   tikr_apac_latest.csv=2026-07-01T13:34:43|tikr_eu_latest.csv=2026-07-04T16:10:14|tikr_na_latest.csv=2026-07-08T16:05:47
-  ultima elaborata: (mai)
+=== quanti titoli per mercato europeo ADESSO ===
+  MIL     117
+  XETRA   210
+  PA      216
+  LSE     423
+  SWX     161
+  OM      208
+  OB      114
+  CPSE    116
+  AS       98
+  MC       91
+  BR      100
+  LS       35
+  VI       53
+  HE      100
+  IR       15
+  GR      100
 
-Esecuzione forzata.
-
-Lettura file TIKR...
-  tikr_eu_latest.csv        3800 righe
-  tikr_na_latest.csv        4000 righe
-  tikr_apac_latest.csv      3992 righe
+=== gli score sono calcolati solo sui titoli in universo? ===
+  righe fundamentals totali : 14003
+  con Value Score           : 9378
+  di cui FUORI universo     : 2541 <-- non dovrebbero averlo
+      EQL        OM
+      FAG        OM
+      ITD        MIL
+      INTRUM     OM
+      VTVT       US
+      DMRE       XETRA
+      IMMU       OM
+      ATIC       OM
