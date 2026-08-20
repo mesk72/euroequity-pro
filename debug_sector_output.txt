@@ -1,34 +1,7 @@
-=== universo per exchange ===
-  totale universo: 7852
+universo:            7852
+con riga fondamentali: 7852   -> SENZA: 0
+con prezzo nella vista: 7849   -> SENZA: 3
 
-=== quanti ne restituisce l'API Global? ===
-  API Global: 444
+=== titoli in universo SENZA fondamentali: 0 ===
 
-=== dove si perdono? confronto per exchange ===
-EX      UNIVERSO  SERVITI  MANCANO
-MIL          117        6      111
-XETRA        210       20      190
-PA           216       21      195
-AS            98        7       91
-MC            91        8       83
-BR           100        3       97
-LS            35        0       35
-VI            53        1       52
-HE           100        1       99
-IR            15        0       15
-GR           100        0      100
-LSE          423       21      402
-SWX          161        9      152
-OM           208        3      205
-OB           114        2      112
-CPSE          61        3       58
-US          3002      239     2763
-TSX          399       20      379
-TSE         1000       39      961
-SEHK         500       26      474
-ASX          349        5      344
-KRX          400        8      392
-SGX          100        2       98
-
-=== quanti hanno un prezzo nella vista? ===
-  righe nella vista prezzi: 7916
+  esempi: []
