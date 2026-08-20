@@ -1,147 +1,34 @@
-Titoli danesi in anagrafica: 139
+=== universo per exchange ===
+  totale universo: 7852
 
-=== TUTTI i danesi, ordinati per capitalizzazione ===
-TICKER       SOCIETA'                                 SETTORE                    MKT CAP IN UNIV
-NOVO B       Novo Nordisk A/S                         Healthcare                221536.8 SI
-DSV          DSV A/S                                  Industrials                60642.4 SI
-DANSKE       Danske Bank A/S                          Financials                 44881.0 SI
-MAERSK B     A.P. Møller - Mærsk A/S                  Industrials                36227.1 SI
-ORSTED       Ørsted A/S                               Utilities                  32048.5 SI
-NSIS B       Novozymes A/S                            Materials                  30405.0 SI
-VWS          Vestas Wind Systems A/S                  Industrials                28212.7 SI
-CARL B       Carlsberg A/S                            Consumer Staples           19537.2 SI
-GMAB         Genmab A/S                               Healthcare                 17552.3 SI
-COLO B       Coloplast A/S                            Healthcare                 13605.4 SI
-TRYG         Tryg A/S                                 Financials                 13534.5 SI
-DEMANT       Demant A/S                               Healthcare                  9093.6 SI
-JYSK         Jyske Bank A/S                           Financials                  8455.1 SI
-ALK B        ALK-Abelló A/S                           Healthcare                  8271.9 SI
-PNDORA       Pandora A/S                              Consumer Discretionary      8152.4 SI
-NKT          NKT A/S                                  Industrials                 8027.1 SI
-ALSYDB       AL Sydbank A/S                           Financials                  7843.5 SI
-ISS          ISS A/S                                  Industrials                 6931.1 SI
-ROCK B       Rockwool A/S                             Industrials                 6922.3 SI
-KBHL         Københavns Lufthavne A/S                 Industrials                 6820.7 SI
-HLUN B       H. Lundbeck A/S                          Healthcare                  6350.7 SI
-RILBA        Ringkjøbing Landbobank A/S               Financials                  6069.7 SI
-DKIGI        Danske Invest - Global Indeks KL         Financials                  5115.2 SI
-FLS          FLSmidth & Co. A/S                       Industrials                 4073.5 SI
-ALMB         Alm. Brand A/S                           Financials                  3439.6 SI
-RBREW        Royal Unibrew A/S                        Consumer Staples            3390.2 SI
-ZEAL         Zealand Pharma A/S                       Healthcare                  3245.7 SI
-TRMD A       TORM plc                                 Energy                      2843.9 SI
-AMBU B       Ambu A/S                                 Healthcare                  2690.7 SI
-SPVIGAKL     Sparinvest INDEX - Globale Aktier KL     Financials                  2604.2 no
-PAAL B       Per Aarsleff Holding A/S                 Industrials                 2388.0 SI
-BAVA         Bavarian Nordic A/S                      Healthcare                  2229.5 SI
-NETC         Netcompany Group A/S                     Information Technology      2156.8 SI
-SCHO         Aktieselskabet Schouw & Co.              Consumer Staples            2101.1 SI
-GN           GN Store Nord A/S                        Consumer Discretionary      2027.5 SI
-JDAN         Jeudan A/S                               Financials                  1762.8 SI
-EMBLA        Embla Medical hf.                        Healthcare                  1754.7 SI
-UIE          UIE Plc                                  Consumer Staples            1687.2 SI
-BIOMAR       BioMar Group A/S                         Consumer Staples            1679.2 SI
-DNORD        Dampskibsselskabet Norden A/S            Industrials                 1327.1 SI
-DKIDMOBL     Investeringsforeningen Danske Invest - D Financials                  1203.0 no
-CHEMM        ChemoMetec A/S                           Healthcare                  1084.8 SI
-SYVFBUA      Sydinvest - Balanceret Udb               Financials                  1047.4 no
-DFDS         DFDS A/S                                 Industrials                 1025.7 SI
-SJF          SJF Bank A/S                             Financials                   956.5 SI
-JYINYAKL     Jyske Invest Nye Aktiemarkeder KL        Financials                   872.5 SI
-GUBRA        Gubra A/S                                Healthcare                   819.7 SI
-STG          Scandinavian Tobacco Group A/S           Consumer Staples             810.9 SI
-NYILOKLA     Nykredit Invest Lange Obligationer       Financials                   792.8 no
-BAIGAA       Investeringsforeningen Bankinvest Global Financials                   784.9 no
-SPG          SP Group A/S                             Materials                    763.2 SI
-NTG          NTG Nordic Transport Group A/S           Industrials                  721.4 SI
-NDI4KL1      Nordea Invest Basis 4                    Financials                   709.9 no
-DKIKO        Danske Invest - Danske Korte Obligatione Financials                   697.9 SI
-LASP         Lån & Spar Bank A/S                      Financials                   690.3 SI
-NYILOAKLA    Nykredit Invest - Lange Obligationer Akk Financials                   646.1 no
-SPIC25KL     Sparindex INDEX OMX C25 KL               Financials                   639.9 no
-SPIC25L      Sparindex INDEX OMX C25 KL               Financials                   605.0 no
-NYIGLA       Nykredit Invest - Globale Fokusaktier    Financials                   603.4 no
-IG           InstallatÃ¸rGruppen A/S                  Industrials                  601.3 SI
-DAB          Danske Andelskassers Bank A/S            Financials                   561.0 SI
-TIV          Tivoli A/S                               Consumer Discretionary       559.8 SI
-BIAEJD       BI Erhvervsejendomme A/S                 Financials                   534.0 SI
-MATAS        Matas A/S                                Consumer Discretionary       510.3 SI
-SPIEMIKL     Sparindex INDEX Emerging Markets KL      Financials                   499.5 no
-ARAOPT       Investeringsselskabet Artha Optimum A/S  Financials                   495.7 no
-SKJE         Skjern Bank A/S                          Financials                   483.0 SI
-BAIDKAA      BankInvest - Danske Aktier KL            Financials                   478.3 no
-NYIGFA       Multi Manager Invest - USA Akk.          Financials                   438.8 SI
-DJUR         Djurslands Bank A/S                      Financials                   413.9 SI
-MMIGAA       Multi Manager Invest - Globale Aktier Ak Financials                   394.6 SI
-FOBANK       Føroya Banki                             Financials                   385.3 SI
-AOJ B        Brødrene A & O Johansen A/S              Industrials                  375.1 SI
-ACACIGDKK    Kapitalforeningen Accunia Invest Europea Financials                   349.6 no
-NBIMOKL      Nykredit Invest Balance Moderat          Financials                   342.5 no
-MTHH         MT Højgaard Holding A/S                  Industrials                  341.4 SI
-BAIKDOBA     BankInvest Korte Danske Obligationer     Financials                   293.7 no
-PARKEN       PARKEN Sport & Entertainment A/S         Consumer Discretionary       292.8 no
-TRIFOR       Trifork Group AG                         Information Technology       286.9 no
-GRLA         GrønlandsBANKEN A/S                      Financials                   285.1 no
-RLAINV       Ress Life Investments A/S                Financials                   283.0 no
-DKIGMI       Danske Invest - Globale Mellemlange Inde Financials                   268.3 no
-GRIEHY       Gudme Raaschou Eu High Yield             Financials                   265.6 no
-HH           H+H International A/S                    Materials                    255.0 no
-DKIM50       Danske Invest Mix Offensiv - Akkumuleren Financials                   240.2 no
-SOLAR B      Solar A/S                                Industrials                  239.0 no
-DKIFJIX      Danske Invest FjernÃ¸sten Indeks         Financials                   225.4 no
-NDIAKTIIKL1  Nordea Invest Aktier II                  Financials                   224.9 no
-FYNBK        Fynske Bank A/S                          Financials                   222.1 no
-KRE          Kreditbanken A/S                         Financials                   212.2 no
-NDIEHYKL1    Nordea Invest - European High Yield Bond Financials                   206.6 no
-BO           Bang & Olufsen A/S                       Consumer Discretionary       203.6 no
-WEIJHO       Investeringsforeningen Investin - K Inve Financials                   202.3 no
-COLUM        Columbus A/S                             Information Technology       199.2 no
-FLUG B       Flügger group A/S                        Materials                    179.7 no
-SYIKVAADKK   Investeringsforeningen Sydinvest Baeredy Financials                   162.5 no
-NDIKMKL1     Nordea Invest - Klima og MiljÃ¸          Financials                   158.1 no
-FPILIMA      Formuepleje Limittellus                  Financials                   156.6 no
-SPIVEUKLA    Sparinvest Value Europa KL               Financials                   156.0 no
-GYLD B       Gyldendal A/S                            Communication Services       153.6 no
-DKIDKLOBL    Danske Invest - Danske Lange Obligatione Financials                   152.7 no
-FPILIM       Formuepleje Limittellus                  Financials                   151.6 no
-CBRAIN       cBrain A/S                               Information Technology       149.3 no
-NNIT         NNIT A/S                                 Healthcare                   147.7 no
-DKIM20       Danske Invest Mix Defensiv - Akkumuleren Financials                   144.0 no
-LOLB         Lollands Bank A/S                        Financials                   141.8 no
-BAIVOIGA     BankInvest - Virksomhedsobligationer IG  Financials                   138.1 no
-NDIEMMAENKL1 Investeringsforeningen Nordea Invest - E Financials                   130.6 no
-FFARMS       FirstFarms A/S                           Consumer Staples             129.1 no
-NDIDAFKL1    Nordea Invest Danske Aktier Fokus        Financials                   128.3 no
-LSIGAA       LÃ¥n & Spar Invest - Globale Aktier Basi Financials                   126.8 no
-NORTHM       North Media A/S                          Communication Services       124.7 no
-SYIEUVADKK   Sydinvest Europa LigevÃ¦gt & Value KL    Financials                   124.0 no
-NBIOFKL      Nykredit Invest - Balance Offensiv       Financials                   121.3 no
-PRIMOF       Prime Office A/S                         Financials                   119.0 no
-MNBA         Møns Bank A/S                            Financials                   116.9 no
-RTX          RTX A/S                                  Information Technology       114.9 no
-TCM          TCM Group A/S                            Consumer Discretionary       110.7 no
-NDIEUENHKL1  Nordea Invest Europe Enhanced            Financials                   109.8 no
-HUSCO        HusCompagniet A/S                        Consumer Discretionary       108.5 no
-LUXOR B      Investeringsselskabet Luxor A/S          Financials                   104.8 no
-AGF B        AGF A/S                                  Consumer Discretionary       101.2 no
-PARKST A     Park Street A/S                          Financials                    99.6 no
-SPIVEMKLA    Sparinvest Value Emerging Markets KL     Financials                    93.5 no
-FPIBWGOA     Investeringsforeningen Formuepleje - Bet Financials                    93.3 no
-NDIDKKL1     Nordea Invest Danmark                    Financials                    89.9 no
-FED          Fast Ejendom Danmark A/S                 Financials                    87.8 no
-BIOPOR       BioPorto A/S                             Healthcare                    85.6 no
-GABR         Gabriel Holding A/S                      Consumer Discretionary        78.0 no
-GREENM       GreenMobility A/S                        Industrials                   73.2 no
-HARB B       Harboes Bryggeri A/S                     Consumer Staples              71.6 no
-TGAMES       TROPHY GAMES Development A/S             Communication Services        60.0 no
-CPHCAP ST    Copenhagen Capital A/S                   Financials                    54.8 no
-EGNETY       EgnsINVEST Ejendomme Tyskland A/S        Financials                    52.6 no
-BIF          Brøndbyernes IF Fodbold A/S              Communication Services        49.0 no
-DONKEY       DonkeyRepublic Holding A/S               Industrials                   48.7 no
-HVID         Hvidbjerg Bank A/S                       Financials                    46.0 no
-PFINV        Papirfabrikken Invest A/S                Financials                    45.9 no
-STRINV       Strategic Investments A/S                Financials                    45.8 no
+=== quanti ne restituisce l'API Global? ===
+  API Global: 444
 
-=== ESCLUSI: 78 ===
-  sotto i 300 MM: 63
-  senza capitalizzazione: 0
+=== dove si perdono? confronto per exchange ===
+EX      UNIVERSO  SERVITI  MANCANO
+MIL          117        6      111
+XETRA        210       20      190
+PA           216       21      195
+AS            98        7       91
+MC            91        8       83
+BR           100        3       97
+LS            35        0       35
+VI            53        1       52
+HE           100        1       99
+IR            15        0       15
+GR           100        0      100
+LSE          423       21      402
+SWX          161        9      152
+OM           208        3      205
+OB           114        2      112
+CPSE          61        3       58
+US          3002      239     2763
+TSX          399       20      379
+TSE         1000       39      961
+SEHK         500       26      474
+ASX          349        5      344
+KRX          400        8      392
+SGX          100        2       98
+
+=== quanti hanno un prezzo nella vista? ===
+  righe nella vista prezzi: 7916
