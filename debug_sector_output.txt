@@ -1,18 +1,15 @@
-Date di chiusura esercizio caricate: 18099
+UNIVERSO: 7907 titoli
+  con Value Score : 7036 (89.0%)
+  con Growth Score: 6628 (83.8%)
+  con Best Score  : 6694 (84.7%)
 
-Lettura file TIKR...
-  tikr_eu_latest.csv: 3800 righe utilizzabili
-  tikr_na_latest.csv: 4000 righe utilizzabili
-Totale: 7800
-
-Righe da scrivere: 7800 (di cui 3209 senza P/E perche' TIKR lo considera non significativo)
-
-SCRITTI: 7800 titoli
-
-=== verifica su titoli noti ===
-  KRAB      OB    {'pe_trailing': 8.36, 'pe_forward': 8.72, 'pb': 1.06, 'eps_growth': None, 'rev_growth': None}
-  FOAMIT    HE    {'pe_trailing': 39.62, 'pe_forward': 26.18, 'pb': 0.66, 'eps_growth': 0.6797, 'rev_growth': 0.1233}
-  OLE       MC    {'pe_trailing': 17.2, 'pe_forward': 21.89, 'pb': 0.76, 'eps_growth': -0.5, 'rev_growth': 0.07}
-  CARL B    CPSE  {'pe_trailing': 19.86, 'pe_forward': 13.81, 'pb': 4.36, 'eps_growth': 0.2288, 'rev_growth': 0.0216}
-  ASML      AS    {'pe_trailing': 62.78, 'pe_forward': 47.28, 'pb': 30.24, 'eps_growth': 0.2965, 'rev_growth': 0.1976}
-  ISP       MIL   {'pe_trailing': 11.31, 'pe_forward': 10.44, 'pb': 1.55, 'eps_growth': 0.0774, 'rev_growth': 0.0182}
+=== verifica: i titoli corretti hanno ora punteggi sensati? ===
+TICKER     EX          PE     PB   VALUE  GROWTH
+KRAB       OB        8.36   1.06      57    None
+GSF        OB        None    0.7      48      17
+FOAMIT     HE       39.62   0.66      45      50
+OLE        MC        17.2   0.76      98    50.0
+MAERSK B   CPSE     23.27   0.69      72      54
+CARL B     CPSE     19.86   4.36      35      56
+NSKOG      OB       10.53    0.6      87      97
+NEOBO      OM       23.22   0.39      47    None
