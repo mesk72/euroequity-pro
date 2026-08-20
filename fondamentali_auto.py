@@ -145,7 +145,11 @@ try:
         t = (row.get("ticker") or "").strip()
         e = (row.get("exchange") or "").strip()
         try:
-            fy_map[(t, e)] = int(float(str(row.get("fiscal_month")).strip()))
+            _m = int(float(str(row.get("fiscal_month")).strip()))
+            # Un mese fuori da 1-12 farebbe fallire datetime() e fermerebbe
+            # l'intera elaborazione. Si scarta: calendarize usera' dicembre.
+            if 1 <= _m <= 12:
+                fy_map[(t, e)] = _m
         except Exception:
             pass
 except Exception:
@@ -156,6 +160,8 @@ def calendarize(ticker, exchange, v2025, v2026, v2027, v2028, oggi):
     if v2025 is None and v2026 is None:
         return None, None
     fm = fy_map.get((ticker, exchange), 12)
+    if not isinstance(fm, int) or not (1 <= fm <= 12):
+        fm = 12
     last_day = 28 if fm == 2 else 30 if fm in (4, 6, 9, 11) else 31
     fy_end = datetime(oggi.year, fm, last_day)
     if fy_end > oggi:
@@ -197,6 +203,34 @@ def leggi_file(nome):
     return out
 
 
+def _riga(ticker, exchange, row, oggi):
+    """Calcola i fondamentali di un singolo titolo dai dati TIKR.
+    Estratta in funzione a se' perche' un titolo con dati malformati non
+    deve interrompere l'elaborazione degli altri undicimila."""
+    eps = [parse_num(row.get("EPS Normalized (FY 2025)")),
+           parse_num(row.get("Mean EPS Normalized (FY 2026)")),
+           parse_num(row.get("Mean EPS Normalized (FY 2027)")),
+           parse_num(row.get("Mean EPS Normalized (FY 2028)"))]
+    rev = [parse_num(row.get("Rev (FY 2025)")),
+           parse_num(row.get("Mean Rev (FY 2026)")),
+           parse_num(row.get("Mean Rev (FY 2027)")),
+           parse_num(row.get("Mean Rev (FY 2028)"))]
+    eps_ltm, eps_ntm = calendarize(ticker, exchange, eps[0], eps[1], eps[2], eps[3], oggi)
+    rev_ltm, rev_ntm = calendarize(ticker, exchange, rev[0], rev[1], rev[2], rev[3], oggi)
+    return {
+        "ticker": ticker,
+        "exchange": exchange,
+        "pe_trailing": parse_num(row.get("LTM P/E LTM")),
+        "pe_forward": parse_num(row.get("Mean Fwd P/E NTM")),
+        "pb": parse_num(row.get("LTM P/BVPS LTM")),
+        "eps_growth": round(eps_ntm / abs(eps_ltm) - 1, 6)
+                      if eps_ntm is not None and eps_ltm else None,
+        "rev_growth": round(rev_ntm / abs(rev_ltm) - 1, 6)
+                      if rev_ntm is not None and rev_ltm else None,
+        "mkt_cap": parse_num(row.get("Last Mkt Cap")),
+    }
+
+
 def elabora():
     oggi = datetime.now()
     print("Lettura file TIKR...")
@@ -211,27 +245,19 @@ def elabora():
         return None
 
     aggiornamenti = []
+    errori = []
     for ticker, exchange, row in tutte:
-        eps = [parse_num(row.get("EPS Normalized (FY %d)" % y)) if y == 2025
-               else parse_num(row.get("Mean EPS Normalized (FY %d)" % y))
-               for y in (2025, 2026, 2027, 2028)]
-        rev = [parse_num(row.get("Rev (FY %d)" % y)) if y == 2025
-               else parse_num(row.get("Mean Rev (FY %d)" % y))
-               for y in (2025, 2026, 2027, 2028)]
-        eps_ltm, eps_ntm = calendarize(ticker, exchange, *eps, oggi)
-        rev_ltm, rev_ntm = calendarize(ticker, exchange, *rev, oggi)
-        aggiornamenti.append({
-            "ticker": ticker,
-            "exchange": exchange,
-            "pe_trailing": parse_num(row.get("LTM P/E LTM")),
-            "pe_forward": parse_num(row.get("Mean Fwd P/E NTM")),
-            "pb": parse_num(row.get("LTM P/BVPS LTM")),
-            "eps_growth": round(eps_ntm / abs(eps_ltm) - 1, 6)
-                          if eps_ntm is not None and eps_ltm else None,
-            "rev_growth": round(rev_ntm / abs(rev_ltm) - 1, 6)
-                          if rev_ntm is not None and rev_ltm else None,
-            "mkt_cap": parse_num(row.get("Last Mkt Cap")),
-        })
+        try:
+            aggiornamenti.append(_riga(ticker, exchange, row, oggi))
+        except Exception as e:
+            # Un singolo titolo con dati malformati non deve fermare
+            # l'elaborazione degli altri undicimila.
+            errori.append("%s.%s: %s" % (ticker, exchange, str(e)[:80]))
+
+    if errori:
+        print("Titoli scartati per dati malformati: %d" % len(errori))
+        for e in errori[:10]:
+            print("   ", e)
 
     print("Scrittura fondamentali: %d titoli" % len(aggiornamenti))
     scritti = 0
@@ -282,6 +308,7 @@ def elabora():
         "entrano": sorted(entrano, key=lambda z: -z[3]),
         "escono": sorted(escono, key=lambda z: z[3]),
         "senza_pe": sum(1 for a in aggiornamenti if a["pe_trailing"] is None),
+        "errori": errori,
     }
 
 
