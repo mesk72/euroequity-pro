@@ -1,17 +1,29 @@
-HTTP: 200
-  fiscal_year_end.csv                        241796 byte  2026-07-10T06:33:59
-  fiscal_year_global.csv                     418865 byte  2026-06-15T08:39:25
-  tikr_apac_latest.csv                       688744 byte  2026-07-01T13:34:43
-  tikr_eu_latest.csv                         607870 byte  2026-07-04T16:10:14
-  tikr_gcc_latest.csv                         85908 byte  2026-07-09T10:36:25
-  tikr_na_latest.csv                         763616 byte  2026-07-08T16:05:47
-  Untitled folder                                 ? byte  ?
+tikr_apac_latest.csv: 4000 righe
+colonne: ['Ticker', 'Company Name', 'Primary Exchange', 'Country', 'Sector', 'Last Price', 'Last Mkt Cap', 'LTM P/E LTM', 'LTM P/BVPS LTM', 'EPS Normalized (FY 2025)']
 
-=== quali nomi rispondono davvero? ===
-   tikr_eu_latest.csv           HTTP 200
-   tikr_na_latest.csv           HTTP 200
-   tikr_apac_latest.csv         HTTP 200
-   tikr_upload_na.csv           HTTP 400
-   tikr_prod_europa.csv         HTTP 400
-   tikr_asia_pacific.csv        HTTP 400
-   fiscal_year_end.csv          HTTP 200
+=== valori di Primary Exchange ===
+   TSE          1494
+   SEHK         1000
+   ASX          499
+   SGX          344
+   KOSE         314
+   KOSDAQ       185
+   Catalist     156
+   NSE          5
+   SPSE         1
+   NSX          1
+   XKON         1
+
+=== esempi ===
+   285A         Kioxia Holdings Corporation      $300,948.29MM
+   8306         Mitsubishi UFJ Financial Group,  $221,821.76MM
+   8035         Tokyo Electron Limited           $215,644.75MM
+   9984         SoftBank Group Corp.             $208,829.91MM
+
+=== l'Asia ha lo stesso difetto di scala? ===
+EX        NORMALE  QUASI ZERO   OLTRE 50    SENZA
+ASX           364           3          3       37
+KRX           384           0          5       60
+SEHK          526          20         15        7
+SGX           106           1          1        1
+TSE          1168           1          0       18
