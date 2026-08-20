@@ -1,16 +1,17 @@
-=== 1. PAGINE: rispondono e non sono rotte? ===
-  home                     HTTP 200 |    60 car
-  /value                   HTTP 200 |   947 car
-  /sectors                 HTTP 200 |   892 car
-  /research                HTTP 200 |  1202 car
-  /about                   HTTP 200 |  5934 car
-  /news                    HTTP 200 |   481 car
-  scheda AAPL              HTTP 200 |  3244 car
-  /dividends (eliminata)   HTTP 404 |   351 car
+HOMEPAGE — testo visibile a Google: 3224 caratteri (prima: 60)
 
-=== 2. API: funziona ancora senza div_yield? ===
-  singolo titolo   HTTP 200 | titoli: 1 | divYield presente: False
-  screener US      HTTP 200 | titoli: 281 | divYield presente: False
+H1: ForwardAlpha — ricerca azionaria quantitativa su oltre 7.900 titoli globali
+H2 presenti: 6
+   - Mercati coperti
+   - Metodo di analisi
+   - Reverse earnings model
+   - Cosa offre la piattaforma
+   - Accesso
+   - Avvertenza
 
-=== 3. la sitemap e' ancora integra? ===
-  indirizzi: 7912 | contiene /dividends: False
+--- primi 400 caratteri che legge Google ---
+ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked ForwardAlpha — ricerca azionaria quantitativa su oltre 7.900 titoli globali ForwardAlpha e&#x27; una piattaforma di ricerca azionaria quantitativa che analizza ogni giorno oltre 7.900 titoli quotati sui principali mercati mondiali, attribuendo a ciascuno punteggi proprietari di valutazione e di crescita costruiti con metodo istituzionale
+
+--- controllo protezione punteggi ---
+  valori numerici di Value Score nell'HTML: NESSUNO
+  la parola 'classifica'/'ranking' con elenchi: no
