@@ -60,6 +60,7 @@ function useGoToStock() {
   }, [ugsRouter])
 }
 
+import HomeSeoContent from '@/components/seo/HomeSeoContent'
 import MyScreen from '@/components/watchlist/MyScreen'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
@@ -3071,8 +3072,14 @@ function AppContent() {
 
 export default function App() {
   return (
-    <Suspense fallback={null}>
-      <AppContent />
-    </Suspense>
+    <>
+      {/* FUORI dal Suspense di proposito: e' presente nell'HTML fin dal
+          primo byte, quindi Googlebot lo legge anche prima che i dati
+          siano caricati. Prima la homepage aveva 60 caratteri di testo. */}
+      <HomeSeoContent />
+      <Suspense fallback={null}>
+        <AppContent />
+      </Suspense>
+    </>
   )
 }
