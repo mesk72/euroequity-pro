@@ -1,4 +1,4 @@
-import os, requests
+import os, requests, json
 from collections import defaultdict
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
@@ -19,20 +19,25 @@ def tutte():
     o=[];off=0
     while True:
         b=requests.get(U+"/rest/v1/stocks",headers=H,
-            params={"select":"ticker,exchange,company,in_universe","in_universe":"eq.false",
+            params={"select":"ticker,exchange,company,sector","in_universe":"eq.false",
                     "limit":"1000","offset":str(off)},timeout=120).json()
         if not isinstance(b,list) or not b: break
         o+=b; off+=1000
         if len(b)<1000: break
     return o
-fuori=tutte()
-dal_filtro=[x for x in fuori if colpito(x.get("company"))]
-per_ex=defaultdict(list)
-for x in dal_filtro: per_ex[x["exchange"]].append((x["ticker"],(x.get("company") or "")))
-print("TOTALE ESCLUSI DAL FILTRO CHE HO APPLICATO: %d" % len(dal_filtro))
-print()
-for ex in sorted(per_ex,key=lambda e:-len(per_ex[e])):
-    print("=== %s (%d) ===" % (ex,len(per_ex[ex])))
-    for tk,az in sorted(per_ex[ex]):
-        print("  %-12s %s" % (tk,az[:58]))
-    print()
+fu=[];off=0
+while True:
+    b=requests.get(U+"/rest/v1/fundamentals",headers=H,
+        params={"select":"ticker,exchange,mkt_cap","limit":"1000","offset":str(off)},timeout=120).json()
+    if not isinstance(b,list) or not b: break
+    fu+=b; off+=1000
+    if len(b)<1000: break
+mc={(x["ticker"],x["exchange"]):x.get("mkt_cap") for x in fu}
+esclusi=[x for x in tutte() if colpito(x.get("company"))]
+righe=[]
+for x in esclusi:
+    righe.append({"ticker":x["ticker"],"exchange":x["exchange"],
+                  "company":(x.get("company") or ""),"sector":(x.get("sector") or ""),
+                  "mkt_cap":mc.get((x["ticker"],x["exchange"]))})
+righe.sort(key=lambda z:(z["exchange"],-(z["mkt_cap"] or 0)))
+print(json.dumps(righe,ensure_ascii=False))
