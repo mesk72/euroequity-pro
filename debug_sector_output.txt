@@ -1,13 +1,242 @@
-=== RIENTRANO: societa' operative e REIT esclusi per errore ===
-  NFLX   US   Netflix — 'etf' dentro N-ETF-lix                     -> OK
-  BLK    US   BlackRock Inc., la societa' di gestione quotata      -> OK
-  WT     US   WisdomTree Inc., emittente quotato                   -> OK
-  JUP    LSE  Jupiter Fund Management, gestore quotato             -> OK
-  VEIL   LSE  Vietnam Enterprise — 'etn' dentro Ent-ERPRISE        -> OK
-  FRT    US   Federal Realty Investment Trust, REIT                -> OK
-  PMT    US   PennyMac Mortgage Investment Trust, REIT             -> OK
-  UHT    US   Universal Health Realty Income Trust, REIT           -> OK
-  SREI   LSE  Schroder Real Estate Investment Trust, REIT          -> OK
-  SWDR   US   Starwood Real Estate Income Trust, REIT              -> OK
+TOTALE ESCLUSI DAL FILTRO CHE HO APPLICATO: 210
 
-UNIVERSO: 7751 titoli
+=== US (54) ===
+  ACP          Abrdn Income Credit Strategies Fund
+  AMJB         Alerian MLP Index ETNs due January 28, 2044
+  ATMP         iPath Select MLP ETN
+  BBN          BlackRock Taxable Municipal Bond Trust
+  BCAT         BlackRock Capital Allocation Term Trust
+  BCX          Blackrock Resources & Commodities Strategy Trust
+  BDJ          BlackRock Enhanced Equity Dividend Trust
+  BGY          BlackRock Enhanced International Dividend Trust
+  BHK          BlackRock Core Bond Trust
+  BIT          BlackRock Multi-Sector Income Trust
+  BLW          BlackRock Limited Duration Income Trust
+  BME          BlackRock Health Sciences Trust
+  BMEZ         BlackRock Health Sciences Term Trust
+  BOE          BlackRock Enhanced Global Dividend Trust
+  BST          BlackRock Science and Technology Trust
+  BSTZ         BlackRock Science and Technology Term Trust
+  BTT          Blackrock Municipal 2030 Target Term Trust
+  BTX          BlackRock Innovation and Growth Term Trust
+  BTZ          BlackRock Credit Allocation Income Trust
+  BUI          BlackRock Utilities, Infrastructure & Power Opportunities 
+  CLM          Cornerstone Strategic Investment Fund, Inc.
+  CRF          Cornerstone Total Return Fund, Inc.
+  CSQ          Calamos Strategic Total Return Fund
+  DJP          iPath Bloomberg Commodity Index Total Return ETN
+  DSL          DoubleLine Income Solutions Fund
+  DSU          BlackRock Debt Strategies Fund, Inc.
+  ECAT         BlackRock ESG Capital Allocation Term Trust
+  EMD          Western Asset Emerging Markets Debt Fund Inc.
+  EVN          Eaton Vance Municipal Income Trust
+  FETH         Fidelity Ethereum Fund
+  FINS         Angel Oak Financial Strategies Income Term Trust
+  FNGS         MicroSectors FANG+ ETNs due January 8, 2038
+  GDV          The Gabelli Dividend & Income Trust
+  GGN          GAMCO Global Gold, Natural Resources & Income Trust
+  GUG          Guggenheim Active Allocation Fund
+  IFN          Aberdeen India Fund, Inc.
+  IIM          Invesco Value Municipal Income Trust
+  IQI          Invesco Quality Municipal Income Trust
+  MFSV         Mfs Active Exchange Traded Funds Trust
+  MHD          BlackRock MuniHoldings Fund, Inc.
+  MMU          Western Asset Managed Municipals Fund Inc.
+  NBXG         Neuberger Berman Income Funds - Neuberger Next Generation 
+  NFJ          Virtus Dividend, Interest & Premium Strategy Fund
+  PEO          Adams Natural Resources Fund, Inc.
+  QQQX         Nuveen Nasdaq 100 Dynamic Overwrite Fund
+  RQI          Cohen & Steers Quality Income Realty Fund, Inc.
+  SPXX         Nuveen S&P 500 Dynamic Overwrite Fund
+  STEW         SRH Total Return Fund, Inc.
+  TNGY         Tortoise Capital Series Trust - Energy Fund
+  TWN          The Taiwan Fund, Inc.
+  VCV          Invesco California Value Municipal Income Trust
+  VCX          Fundrise Growth Tech Fund, LLC
+  VVR          Invesco Senior Income Trust
+  VXX          iPath Series B S&P 500 VIX Short-Term Futures ETN
+
+=== LSE (48) ===
+  0E2          Multi Units Luxembourg - Amundi Smart Overnight Return
+  0E2B         Multi Units Luxembourg - Amundi Smart Overnight Return
+  AEI          Aberdeen Equity Income Trust plc
+  AIE          Ashoka India Equity Investment Trust plc
+  ANII         Aberdeen New India Investment Trust
+  ATR          Schroders Investment Trusts - Schroder Asian Total Return 
+  BNKR         The Bankers Investment Trust PLC
+  BRFI         BlackRock Frontiers Investment Trust plc
+  BRGE         BlackRock Greater Europe Investment Trust plc
+  BRSC         BlackRock Smaller Companies Trust plc
+  BRWM         BlackRock World Mining Trust plc
+  BUT          The Brunner Investment Trust PLC
+  CTUK         CT UK Capital And Income Investment Trust Plc
+  CTY          The City of London Investment Trust plc
+  DIG          Dunedin Income Growth Investment Trust PLC
+  EDIN         The Edinburgh Investment Trust plc
+  EWI          Edinburgh Worldwide Investment Trust plc
+  FCIT         F&C Investment Trust PLC
+  FGT          Finsbury Growth & Income Trust PLC
+  FSFL         Foresight Solar Fund Limited
+  FSV          Fidelity Investment Trust - Fidelity Special Values PLC
+  GIL5         Multi Units Luxembourg - Amundi UK Government Bond 0-5Y
+  GRID         Gresham House Energy Storage Fund plc
+  HHI          Henderson High Income Trust plc
+  HRI          Herald Investment Trust PLC
+  HSL          The Henderson Smaller Companies Investment Trust plc
+  JAM          JPMorgan American Investment Trust plc
+  JCH          JPMorgan Claverhouse Investment Trust plc
+  JFJ          JPMorgan Japanese Investment Trust plc
+  MNKS         The Monks Investment Trust PLC
+  MNL          Manchester & London Investment Trust plc
+  MNTN         The Schiehallion Fund Limited
+  MRC          The Mercantile Investment Trust plc
+  MUT          Murray Income Trust PLC
+  NAIT         The North American Income Trust plc
+  NAS          North Atlantic Smaller Companies Investment Trust PLC
+  NAVF         Nippon Active Value Fund plc
+  OIT          Odyssean Investment Trust Ord
+  PHI          Pacific Horizon Investment Trust PLC
+  PRIJ         Amundi Index Solutions - Amundi Prime Japan
+  SDP          Schroder Investment Trust - Schroder AsiaPacific Fund plc
+  SEIT         SDCL Efficiency Income Trust Plc
+  SMT          Scottish Mortgage Investment Trust PLC
+  SSIT         Seraphim Space Investment Trust Plc
+  TEM          Templeton Emerging Markets Investment Trust plc
+  TMPL         Temple Bar Investment Trust PLC
+  TRY          TR Property Investment Trust plc
+  UZNF         Joint Stock Company National Investment Fund Of The Republ
+
+=== CPSE (45) ===
+  ACACIGDKK    Kapitalforeningen Accunia Invest European Investment Grade
+  ARAOPT       Investeringsselskabet Artha Optimum A/S
+  BAIDKAA      BankInvest - Danske Aktier KL
+  BAIGAA       Investeringsforeningen Bankinvest Globale Aktier Baeredygt
+  BAIKDOBA     BankInvest Korte Danske Obligationer
+  BAIVOIGA     BankInvest - Virksomhedsobligationer IG KL
+  DKIDKLOBL    Danske Invest - Danske Lange Obligationer
+  DKIDMOBL     Investeringsforeningen Danske Invest - Dannebrog Mellemlan
+  DKIFJIX      Danske Invest FjernÃ¸sten Indeks
+  DKIGI        Danske Invest - Global Indeks KL
+  DKIGMI       Danske Invest - Globale Mellemlange Indeksobligationer KL
+  DKIKO        Danske Invest - Danske Korte Obligationer
+  DKIM20       Danske Invest Mix Defensiv - Akkumulerende
+  DKIM50       Danske Invest Mix Offensiv - Akkumulerende
+  FPIBWGOA     Investeringsforeningen Formuepleje - Better World Global O
+  FPILIM       Formuepleje Limittellus
+  FPILIMA      Formuepleje Limittellus
+  GRIEHY       Gudme Raaschou Eu High Yield
+  JYINYAKL     Jyske Invest Nye Aktiemarkeder KL
+  LUXOR B      Investeringsselskabet Luxor A/S
+  MMIGAA       Multi Manager Invest - Globale Aktier Akk.
+  NBIMOKL      Nykredit Invest Balance Moderat
+  NBIOFKL      Nykredit Invest - Balance Offensiv
+  NDI4KL1      Nordea Invest Basis 4
+  NDIAKTIIKL1  Nordea Invest Aktier II
+  NDIDAFKL1    Nordea Invest Danske Aktier Fokus
+  NDIDKKL1     Nordea Invest Danmark
+  NDIEHYKL1    Nordea Invest - European High Yield Bonds
+  NDIEMMAENKL1 Investeringsforeningen Nordea Invest - Emerging Markets En
+  NDIEUENHKL1  Nordea Invest Europe Enhanced
+  NDIKMKL1     Nordea Invest - Klima og MiljÃ¸
+  NYIGFA       Multi Manager Invest - USA Akk.
+  NYIGLA       Nykredit Invest - Globale Fokusaktier
+  NYILOAKLA    Nykredit Invest - Lange Obligationer Akk
+  NYILOKLA     Nykredit Invest Lange Obligationer
+  SPIC25KL     Sparindex INDEX OMX C25 KL
+  SPIC25L      Sparindex INDEX OMX C25 KL
+  SPIEMIKL     Sparindex INDEX Emerging Markets KL
+  SPIVEMKLA    Sparinvest Value Emerging Markets KL
+  SPIVEUKLA    Sparinvest Value Europa KL
+  SPVIGAKL     Sparinvest INDEX - Globale Aktier KL
+  SYIEUVADKK   Sydinvest Europa LigevÃ¦gt & Value KL
+  SYIKVAADKK   Investeringsforeningen Sydinvest Baeredygtige Aktier A Dkk
+  SYVFBUA      Sydinvest - Balanceret Udb
+  WEIJHO       Investeringsforeningen Investin - K Invest High Yield Obli
+
+=== ASX (13) ===
+  GCI          Gryphon Capital Income Trust
+  GLS          L1 Global Long Short Fund Limited
+  HBRD         BetaShares Active Australian Hybrids Fund
+  LGF          L1 Gold Fund Limited
+  LSF          L1 Long Short Fund Limited
+  MA1          Ma Credit Income Trust
+  MXT          Metrics Master Income Trust
+  OPH          Ophir Asset Management Pty Ltd - Ophir High Conviction Fun
+  PCI          Perpetual Credit Income Trust
+  REV          Revolution Private Credit Income Trust
+  RF1          Regal Investment Fund
+  RFF          Rural Funds Group
+  VETH         Vanguard Investments Australia Ltd. - Vanguard Ethically C
+
+=== TSX (11) ===
+  AD.UN        Alaris Equity Partners Income Trust
+  CIAI         CI Global Artificial Intelligence Fund
+  EVT          Economic Investment Trust Limited
+  FGEP         Fidelity Global Equity+ Fund
+  IIP.UN       InterRent Real Estate Investment Trust
+  MHC.UN       Flagship Communities Real Estate Investment Trust
+  PFIA         PICTON Long Short Income Alternative Fund
+  PFMN         PICTON Market Neutral Equity Alternative Fund
+  U.UN         Sprott Physical Uranium Trust Fund
+  ZWB          BMO Covered Call Canadian Banks Fund
+  ZWU          BMO Covered Call Utilities Fund
+
+=== XETRA (10) ===
+  6VK0         BNP Paribas Funds - Global Enhanced Bond 36M
+  DEDE         Deka Nachhaltigkeit Renten CF Fund
+  FHQQ         Robeco Capital Growth Funds - Robeco Sustainable Global St
+  MEUR         Ossiam MSCI Europe ETF 1C EUR
+  NF4          Netfonds AG
+  PEH          Invesco FTSE RAFI Emerging Markets UCITS ETF
+  PRAB         Amundi Index Solutions - Amundi Prime Euro Government Bond
+  PRAM         Amundi Index Solutions - Amundi Prime Emerging Markets
+  VBTC         VanEck Vectors Bitcoin ETN
+  Z750         PTR - Atlas Fund
+
+=== PA (8) ===
+  AFRN         Amundi Index Solutions - Amundi EUR Floating Rate Corporat
+  AHYE         AMUNDI EURO HIGH YIELD BOND ESG
+  ANX          Amundi Index Solutions - Amundi NASDAQ-100
+  CBSM         Franklin ClearBridge US Smaller Companies UCITS ETF USD Ac
+  EGRI         Amundi Index Solutions - Amundi Euro Aggregate Bond ESG
+  IQEC         IndexIQ Factors Sustainable Corporate Euro Bond UCITS ETF 
+  RS2          Amundi Index Solutions - Amundi Russell 2000
+  RS2K         Amundi Index Solutions - Amundi Russell 2000
+
+=== TSE (7) ===
+  1305         iFreeETF TOPIX (Yearly Dividend Type)
+  1320         iFreeETF Nikkei225 (Yearly Dividend Type)
+  1479         iFreeETF MSCI Japan Human and Physical Investment Index
+  1488         iFreeETF Tokyo Stock Exchange REIT Index
+  1599         iFreeETF JPX-Nikkei400
+  1651         iFreeETF TOPIX High Dividend Yield 40 Index
+  2625         iFreeETF-TOPIX(Quarterly Dividend Type)
+
+=== SWX (6) ===
+  ABTC         21Shares Bitcoin ETP
+  CSLP         UBS (CH) Property Fund - Direct LivingPlus
+  MFSP         Mobifonds Swiss Property Fund
+  PSCF         Procimmo Swiss Commercial Fund
+  SIAT         UBS (CH) Property Fund - Swiss Residential "Siat"
+  SREA         UBS (CH) Property Fund - Swiss Commercial Â«SwissrealÂ»
+
+=== LS (2) ===
+  MLCVI        Urbana Coimbra Viva I - Fundo Especial de Investimento Imo
+  MLRP         Retail Properties - Fundo Especial De Investimento Imobili
+
+=== AS (2) ===
+  ALLFG        Allfunds Group plc
+  ARCPF        Arcona Property Fund N.V.
+
+=== SGX (1) ===
+  UIBU         UI Boustead Real Estate Investment Trust
+
+=== GR (1) ===
+  ANDRO        Alpha Trust Andromeda Investment Trust S.A.
+
+=== OM (1) ===
+  GREEN        Credit Suisse Real Estate Fund Green Property
+
+=== AIM (1) ===
+  CRS          Crystal Amber Fund Limited
+
