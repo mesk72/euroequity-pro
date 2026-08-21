@@ -3240,3 +3240,81 @@ uno script che cercava `public_read` non trovava nulla e falliva in silenzio.
 
 Le viste materializzate NON sono coperte da RLS: l'accesso va tolto
 esplicitamente con `revoke all on latest_prices_mv from anon, authenticated`.
+
+---
+
+## REGOLA FONDAMENTALE — AUTORIZZAZIONE PREVENTIVA (20/8/2026)
+
+**Nessuna modifica all'universo investibile senza autorizzazione esplicita
+e specifica di Andrea, caso per caso.**
+
+Questo vale per: `in_universe`, cancellazioni di prezzi o fondamentali,
+esclusioni di massa, riapplicazioni di criteri. Vale anche quando la
+modifica sembra ovviamente giusta.
+
+### Perche' questa regola esiste
+
+Il 20/8/2026 ho mostrato ad Andrea un elenco di titoli che il filtro fondi
+avrebbe escluso, chiedendo conferma **sul trattamento dei REIT**. Lui ha
+risposto "si non escluderne troppi". Ho interpretato quella frase come
+autorizzazione ad **applicare** 210 esclusioni. Non lo era: era
+un'indicazione di criterio, non un permesso a procedere.
+
+Conseguenze: sono usciti dall'universo **Netflix** (il filtro cercava "ETF"
+come sottostringa e lo trovava dentro N-**ETF**-lix), **BlackRock Inc.**,
+**WisdomTree Inc.**, **Jupiter Fund Management**, **Vietnam Enterprise**
+(sottostringa "ETN" dentro Ent**ERP**rise... in realta' ENT-erprise), piu'
+tre REIT americani. Tutte societa' operative quotate, alcune da decine di
+miliardi.
+
+Nella stessa giornata avevo gia' commesso un errore dello stesso tipo:
+**dedurre** che Danimarca e Norvegia avessero la soglia dei 300 milioni,
+invece di attenermi ai mercati che Andrea aveva elencato (Italia, Francia,
+Germania, Svezia, Svizzera). Risultato: 39 societa' danesi operative uscite
+dall'universo — Bang & Olufsen, Solar, cBrain, NNIT, Trifork — mentre
+restavano dentro fondi indicizzati da miliardi.
+
+### Come comportarsi
+
+1. **Proporre, non applicare.** Mostrare l'elenco completo, con il motivo
+   per ciascun titolo, e fermarsi.
+2. **Una risposta a una domanda diversa non e' un'autorizzazione.** Se
+   Andrea risponde su un criterio, quella non e' l'approvazione ad agire.
+3. **In caso di dubbio, chiedere.** Il costo di una domanda in piu' e'
+   trascurabile; il costo di un'esclusione sbagliata e' un titolo che
+   sparisce dal prodotto e nessuno se ne accorge per settimane (e' successo
+   con Norske Skog, che Andrea aveva in portafoglio reale).
+4. **Mai dedurre le regole dai dati.** Se un criterio non e' stato
+   dichiarato esplicitamente, va chiesto — non ricavato dai numeri.
+
+### Trappole tecniche verificate
+
+- **Sottostringhe nei filtri sui nomi**: cercare sigle brevi ("ETF", "ETN",
+  "ETP") dentro il testo produce falsi positivi devastanti. Vanno cercate
+  come PAROLE INTERE (`re.findall(r"[A-Z0-9&]+", testo)`).
+- **Societa' di gestione quotate** (BlackRock Inc., WisdomTree Inc.,
+  Jupiter Fund Management, Amundi S.A., Allfunds Group) sono aziende
+  operative, non veicoli. Vanno in una lista di eccezioni esplicita.
+- **I REIT restano nell'universo** per decisione di Andrea: sono veicoli
+  immobiliari ma anche societa' operative, e molti indici li includono
+  (MERLIN Properties e' nell'IBEX 35).
+- Attenzione a `MORTGAGE` come parola chiave per i REIT: escluderebbe
+  Scottish Mortgage Investment Trust, che e' un fondo di investimento.
+
+### Criteri dell'universo europeo — CONFERMATI da Andrea
+
+- **Soglia 300 milioni USD**: solo Milano, Francoforte, Parigi, Londra,
+  Zurigo, Stoccolma.
+- **Tutti gli altri mercati europei**: nessuna soglia, si prendono tutte le
+  societa' operative disponibili. Piu' titoli e' un vantaggio, non un
+  problema. Danimarca e Norvegia INCLUSE in questo gruppo.
+- AIM e NGM esclusi deliberatamente dal progetto.
+
+### Altro difetto trovato lo stesso giorno
+
+`fetchAllByExchange` in `src/app/api/db/stocks/route.ts` aveva `MAX_PAGES = 12`,
+cioe' 12.000 righe. Dopo il ricarico dei fondamentali da TIKR (che copre anche
+titoli fuori universo) la tabella e' arrivata a 14.003 righe e la lettura si
+troncava: essendo ordinata per codice alfabetico, sparivano i titoli in fondo
+all'alfabeto. **Global mostrava 7.010 titoli invece di 7.852.** Alzato a 24
+pagine con avviso nei log se il tetto venisse raggiunto.
