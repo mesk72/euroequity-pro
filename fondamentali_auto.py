@@ -69,19 +69,92 @@ MAP_EX = {
 # Nord America: TIKR usa NasdaqGS, NYSE, TSX ecc. Si distingue solo USA/Canada.
 MAP_NA = {"TSX": "TSX", "TSXV": "TSX"}
 
-# Soglia in milioni di dollari, per i mercati che ne hanno una.
-# Gli altri prendono i primi 100 titoli per capitalizzazione.
-SOGLIA_300 = ["MIL", "XETRA", "PA", "LSE", "SWX", "OM", "OB", "CPSE"]
-PRIMI_100 = ["BR", "HE", "GR"]
+# CRITERI DELL'UNIVERSO — confermati da Andrea il 20/8/2026.
+#
+# Soglia di 300 milioni di dollari SOLO per i sei mercati europei grandi.
+# Attenzione: NON includere Danimarca e Norvegia. Il 20/8 le avevo aggiunte
+# deducendo la regola dal numero di titoli invece di attenermi a quanto
+# indicato, e il risultato e' stato che 39 societa' danesi operative sono
+# uscite dall'universo (Bang & Olufsen, Solar, cBrain, NNIT, Trifork...)
+# mentre restavano dentro dei fondi indicizzati da miliardi.
+SOGLIA_300 = ["MIL", "XETRA", "PA", "LSE", "SWX", "OM"]
+# Tutti gli altri mercati europei: nessuna soglia, si prendono tutte le
+# societa' operative disponibili. Piu' titoli e' un vantaggio, non un
+# problema.
 
-PAROLE_FONDI = ["ETF", "ETP", "FUND", "TRUST", "UCITS", "ISHARES", "VANGUARD",
-                "XTRACKERS", "LYXOR", "INVESCO", "SPDR", "WISDOMTREE", "VANECK",
-                "BLACKROCK", "SICAV", "ICAV", "MSCI", "INDEX", "AMUNDI",
-                "KAPITALFORENINGEN", "INVESTERINGSSELSKABET", "SOCIMI"]
+# ── riconoscimento di fondi ed ETF ───────────────────────────
+# Volutamente PRUDENTE: meglio tenere per errore un veicolo che perdere
+# una societa' operativa.
+#
+# ORDINE DEI CONTROLLI (non invertirlo, ogni passo corregge il precedente):
+#   1. societa' di gestione quotate  -> restano DENTRO
+#   2. REIT                          -> restano DENTRO (decisione di Andrea)
+#   3. sigle brevi come PAROLA INTERA-> fuori
+#   4. nomi lunghi inequivocabili    -> fuori
+#
+# ATTENZIONE ALLE SOTTOSTRINGHE: cercare "ETF" dentro il testo escludeva
+# NETFLIX (N-ETF-lix) e "ETN" escludeva Vietnam ENTerprise. Verificato il
+# 20/8/2026 dopo che Netflix era sparita dall'universo.
+
+# Societa' di gestione QUOTATE: sono aziende operative, non veicoli.
+GESTORI_QUOTATI = {
+    "BLACKROCK, INC.", "WISDOMTREE, INC.", "JUPITER FUND MANAGEMENT PLC",
+    "AMUNDI S.A.", "NETFLIX, INC.", "FRANKLIN RESOURCES, INC.",
+    "T. ROWE PRICE GROUP, INC.", "INVESCO LTD.", "JANUS HENDERSON GROUP PLC",
+    "ABRDN PLC", "SCHRODERS PLC", "LINDEX GROUP OYJ",
+    "VIETNAM ENTERPRISE INVESTMENTS LIMITED", "FLEETPARTNERS GROUP LIMITED",
+}
+
+# I REIT restano DENTRO: sono veicoli immobiliari ma anche societa'
+# operative, e molti indici li includono (MERLIN Properties e' nell'IBEX 35).
+# NB: "MORTGAGE" da solo NO — escluderebbe Scottish Mortgage Investment
+# Trust, che e' un fondo di investimento e non un REIT.
+PAROLE_REIT = ["SOCIMI", "REAL ESTATE", "REIT", "PROPERTIES", "REALTY",
+               "MORTGAGE INVESTMENT TRUST", "BUILDING FUND", "LOGISTICS FUND",
+               "METROPOLITAN FUND", "INFRASTRUKTUR"]
+
+# Sigle brevi: cercate come PAROLA INTERA.
+SIGLE_FONDI = {"ETF", "ETN", "ETP", "UCITS", "SICAV", "ICAV"}
+
+# Nomi lunghi: la sottostringa e' sicura.
+PAROLE_FONDI_LUNGHE = [
+    "ISHARES", "VANGUARD", "XTRACKERS", "LYXOR", "SPDR", "VANECK", "BETASHARES",
+    "IFREEETF", "BLACKROCK ", "WISDOMTREE ",
+    "INVESTMENT TRUST", "INCOME TRUST", "TERM TRUST", "BOND TRUST",
+    "EQUITY TRUST", "MINING TRUST", "SCIENCES TRUST", "TECHNOLOGY TRUST",
+    "DIVIDEND TRUST", "ALLOCATION TRUST", "STRATEGIES TRUST", "STRATEGY TRUST",
+    "MUNICIPAL", "CLOSED-END", "COVERED CALL", "ACTIVE ALLOCATION",
+    "NORDEA INVEST", "DANSKE INVEST", "JYSKE INVEST", "SYDINVEST", "SPARINVEST",
+    "SPARINDEX", "BANKINVEST", "NYKREDIT INVEST", "MULTI MANAGER INVEST",
+    "FORMUEPLEJE", "GUDME RAASCHOU", "MAJ INVEST", "EGNSINVEST",
+    "KAPITALFORENING", "INVESTERINGSFORENING", "INVESTERINGSSELSKAB",
+    "VERDIPAPIRFOND", "MULTI UNITS", "AMUNDI INDEX", "AMUNDI PRIME",
+    "AMUNDI EURO", " FUND,", " FUND ", "FUNDS ",
+]
+
+# Falsi positivi aggiuntivi, per coppia ticker+mercato.
+MAI_ESCLUDERE = {("AMUN", "PA"), ("LINDEX", "HE"), ("FPR", "ASX")}
 
 
-def e_fondo(*nomi):
-    return any(any(p in (n or "").upper() for p in PAROLE_FONDI) for n in nomi)
+def e_fondo(ticker, exchange, *nomi):
+    if (ticker, exchange) in MAI_ESCLUDERE:
+        return False
+    for n in nomi:
+        testo = (n or "").upper().strip()
+        if not testo:
+            continue
+        if testo in GESTORI_QUOTATI:
+            return False
+        if any(p in testo for p in PAROLE_REIT):
+            return False
+        parole = set(re.findall(r"[A-Z0-9&]+", testo))
+        if parole & SIGLE_FONDI:
+            return True
+        if any(p in testo for p in PAROLE_FONDI_LUNGHE):
+            return True
+        if testo.endswith(" FUND") or testo.endswith(" FUND, INC.") or testo.endswith(" FUND PLC"):
+            return True
+    return False
 
 
 def parse_num(v):
@@ -293,7 +366,7 @@ def elabora():
         v = mc.get(k)
         if v is None or x["exchange"] not in SOGLIA_300:
             continue
-        if e_fondo(nomi.get(k), x.get("company")):
+        if e_fondo(x["ticker"], x["exchange"], nomi.get(k), x.get("company")):
             continue
         dentro = bool(x.get("in_universe"))
         if v >= 300 and not dentro:
