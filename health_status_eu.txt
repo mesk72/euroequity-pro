@@ -1,15 +1,15 @@
 ======================================================================
-HEALTH CHECK — 2026-08-21 04:25 UTC
+HEALTH CHECK — 2026-08-22 04:22 UTC
 ======================================================================
 US       count= 2949/3000   campione_fresco=19/20  eta_max_campione=1gg  [OK]
-TSX      count=  390/400    campione_fresco=19/20  eta_max_campione=21gg  [OK]
+TSX      count=  390/400    campione_fresco=19/20  eta_max_campione=22gg  [OK]
 LSE      count=  380/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 XETRA    count=  207/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 PA       count=  211/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 OM       count=  208/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 SWX      count=  156/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 MIL      count=  117/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
-AS       count=   97/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
+AS       count=   97/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
 MC       count=   91/100    campione_fresco=20/20  eta_max_campione=2gg  [PROBLEMA]
 BR       count=  100/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
 HE       count=  100/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
