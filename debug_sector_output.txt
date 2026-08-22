@@ -1,0 +1,36 @@
+=== titoli chiave ===
+  NFLX       US   Netflix, Inc.                                dentro  (atteso dentro) OK
+  BLK        US   BlackRock, Inc.                              dentro  (atteso dentro) OK
+  WT         US   WisdomTree, Inc.                             dentro  (atteso dentro) OK
+  SMT        LSE  Scottish Mortgage Investment Trust PLC       FUORI   (atteso dentro) DA CONTROLLARE
+  ALLFG      AS   Allfunds Group plc                           FUORI   (atteso dentro) DA CONTROLLARE
+  BST        US   BlackRock Science and Technology Trust       FUORI   (atteso dentro) DA CONTROLLARE
+  1305       TSE  iFreeETF TOPIX (Yearly Dividend Type)        FUORI   (atteso FUORI) OK
+  DKIGI      CPSE Danske Invest - Global Indeks KL             FUORI   (atteso FUORI) OK
+  NDI4KL1    CPSE Nordea Invest Basis 4                        FUORI   (atteso FUORI) OK
+
+  MIL     117
+  XETRA   207
+  PA      211
+  AS       97
+  MC       91
+  BR      100
+  LS       35
+  VI       53
+  HE      100
+  IR       15
+  GR      100
+  LSE     380
+  SWX     156
+  OM      208
+  OB      114
+  CPSE     94
+  US     2949
+  TSX     390
+  TSE     997
+  SEHK    500
+  ASX     337
+  KRX     400
+  SGX     100
+
+UNIVERSO TOTALE: 7751
