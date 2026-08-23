@@ -71,29 +71,79 @@ def data_estesa(d):
     return "%s %d %s %d" % (GIORNI[d.weekday()], d.day, MESI[d.month - 1], d.year)
 
 
+# Registro delle letture che non hanno restituito tutte le righe attese:
+# se non e' vuoto, il rapporto lo dichiara in cima all'email.
+LETTURE_INCOMPLETE = []
+
+
 def leggi_tutto(tabella, select, exchange, filtri=None):
-    """Legge tutte le righe di un exchange, paginando (PostgREST limita a 1000)."""
+    """Legge TUTTE le righe di un exchange, paginando (PostgREST limita a 1000).
+
+    FIX 23/8/2026 — LETTURA PARZIALE SILENZIOSA.
+    La versione precedente, se una pagina falliva (timeout, errore
+    momentaneo), usciva dal ciclo senza dire nulla e restituiva i dati
+    parziali come se fossero completi. Il 23/8 il rapporto ha lavorato su
+    2309 titoli americani invece di 2953 e ha dichiarato il 77,6% di
+    copertura per gli Stati Uniti, quando i dati nel database erano
+    completi al 99%.
+
+    Ora: ogni pagina viene ritentata fino a 3 volte, e al termine il
+    numero di righe lette viene confrontato con il conteggio autorevole
+    del server. Se non coincidono, la funzione LO DICHIARA invece di
+    restituire in silenzio un dato incompleto.
+    """
     righe = []
     offset = 0
+    fallita = False
     while True:
         params = {"select": select, "exchange": "eq." + exchange,
                   "limit": "1000", "offset": str(offset)}
         if filtri:
             params.update(filtri)
-        try:
-            r = requests.get(SUPABASE_URL + "/rest/v1/" + tabella,
-                             headers=HEADERS, params=params, timeout=60)
-            blocco = r.json()
-        except Exception:
+        blocco = None
+        for tentativo in range(3):
+            try:
+                r = requests.get(SUPABASE_URL + "/rest/v1/" + tabella,
+                                 headers=HEADERS, params=params, timeout=120)
+                if r.status_code == 200:
+                    b = r.json()
+                    if isinstance(b, list):
+                        blocco = b
+                        break
+            except Exception:
+                pass
+            time.sleep(2 * (tentativo + 1))
+        if blocco is None:
+            print("  ATTENZIONE: %s/%s offset %d non leggibile dopo 3 tentativi"
+                  % (tabella, exchange, offset))
+            fallita = True
             break
-        if not isinstance(blocco, list) or not blocco:
+        if not blocco:
             break
         righe.extend(blocco)
         if len(blocco) < 1000:
             break
         offset += 1000
-        if offset > 50000:      # salvagente contro cicli infiniti
+        if offset > 50000:
             break
+
+    # Verifica contro il conteggio autorevole del server.
+    try:
+        p = {"select": "ticker", "exchange": "eq." + exchange, "limit": "1"}
+        if filtri:
+            p.update(filtri)
+        rc = requests.get(SUPABASE_URL + "/rest/v1/" + tabella,
+                          headers={**HEADERS, "Prefer": "count=exact"},
+                          params=p, timeout=60)
+        atteso = int(rc.headers.get("content-range", "0/0").split("/")[-1])
+        if atteso and len(righe) != atteso:
+            print("  ATTENZIONE: %s/%s letti %d su %d attesi"
+                  % (tabella, exchange, len(righe), atteso))
+            LETTURE_INCOMPLETE.append((tabella, exchange, len(righe), atteso))
+    except Exception:
+        pass
+    if fallita:
+        LETTURE_INCOMPLETE.append((tabella, exchange, len(righe), None))
     return righe
 
 
@@ -448,6 +498,17 @@ def costruisci_email(per_exchange, esecuzioni, quintili, triage):
     # abbiamo letti. Prima finiva solo nei log dell'esecuzione, dove
     # nessuno lo vedeva, e la percentuale in cima restava alta perche'
     # calcolata su un totale ridotto. Deve essere ben visibile.
+    # Letture incomplete: se anche una sola pagina non e' arrivata, il
+    # rapporto lo dice per nome invece di presentare numeri parziali come
+    # se fossero completi (23/8/2026: dichiarava 77,6% per gli USA mentre
+    # i dati erano completi al 99%).
+    if LETTURE_INCOMPLETE:
+        _righe = ", ".join("%s/%s (%d su %s)" % (t, e, n, a if a else "?")
+                           for t, e, n, a in LETTURE_INCOMPLETE[:6])
+        allarmi.append(
+            "LETTURA INCOMPLETA del database: %s. I numeri di questo rapporto "
+            "sono parziali e non riflettono lo stato reale." % _righe)
+
     _letti = sum(d["universo_letto"] for d in per_exchange.values())
     _attesi = sum(d["universo"] for d in per_exchange.values())
     if _attesi > _letti:
