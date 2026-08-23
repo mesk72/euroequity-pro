@@ -25,7 +25,21 @@ const ALL_EXCHANGES = [
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://forwardalpha.pro'
+  // DOMINIO CANONICO: www.forwardalpha.pro
+  // FIX 23/8/2026 — CAUSA DI 2.925 PAGINE NON INDICIZZATE.
+  // Il sito e' servito da www.forwardalpha.pro; l'indirizzo senza www
+  // risponde 308 e rimanda li'. La sitemap pero' dichiarava gli indirizzi
+  // SENZA www: Google visitava ogni pagina indicata, veniva rimbalzato, e
+  // la archiviava come "pagina con reindirizzamento" invece di
+  // indicizzarla. Sitemap, canonical e robots.txt devono indicare il
+  // dominio che serve davvero, non quello che rimanda.
+  const baseUrl = 'https://www.forwardalpha.pro'
+
+  // I ticker possono contenere spazi (NOVO B, COLO B) e punti (BRK.A,
+  // IIP.UN): 190 indirizzi finivano nella sitemap con lo spazio grezzo,
+  // che non e' un URL valido. Vanno codificati.
+  const url = (ticker: string, exchange: string) =>
+    `${baseUrl}/stock/${encodeURIComponent(ticker)}-${exchange}`
 
   // Pagine statiche
   const staticPages: MetadataRoute.Sitemap = [
@@ -86,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   const TOP_TICKERS: MetadataRoute.Sitemap = topByMktCap.map((t: any) => ({
-    url: `${baseUrl}/stock/${t.ticker}-${t.exchange}`,
+    url: url(t.ticker, t.exchange),
     lastModified: new Date(),
     changeFrequency: 'daily' as const,
     priority: 1.0,
@@ -95,7 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const stockPages: MetadataRoute.Sitemap = stocks
     .filter((s: any) => !topTickerKeys.has(`${s.ticker}-${s.exchange}`))
     .map((s: any) => ({
-      url: `${baseUrl}/stock/${s.ticker}-${s.exchange}`,
+      url: url(s.ticker, s.exchange),
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 0.6,
