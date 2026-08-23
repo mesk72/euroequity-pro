@@ -148,7 +148,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'ForwardAlpha',
-    url: 'https://forwardalpha.pro',
+    url: 'https://www.forwardalpha.pro',
     description: 'Institutional-grade quantitative equity research covering 7,000+ global stocks.',
     author: {
       '@type': 'Person',
