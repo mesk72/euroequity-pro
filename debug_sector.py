@@ -1,21 +1,26 @@
-import requests
+import requests, re
 UA={"User-Agent":"Mozilla/5.0 (compatible; Googlebot/2.1)"}
-print("=== quale dominio serve davvero? ===")
-for u in ["https://www.forwardalpha.pro/stock/AAPL-US",
-          "https://www.forwardalpha.pro/",
-          "https://forwardalpha.pro/stock/AAPL-US"]:
+print("=== 1. la sitemap ora indica il dominio giusto? ===")
+s=requests.get("https://www.forwardalpha.pro/sitemap.xml",timeout=120).text
+locs=re.findall(r"<loc>(.*?)</loc>", s)
+print("  indirizzi totali: %d" % len(locs))
+print("  con www:     %d" % sum(1 for l in locs if l.startswith("https://www.")))
+print("  senza www:   %d" % sum(1 for l in locs if not l.startswith("https://www.")))
+spazi=[l for l in locs if " " in l]
+print("  con spazi grezzi (non validi): %d" % len(spazi))
+print("  esempi ticker particolari:")
+for l in [x for x in locs if "%20" in x or "%2E" in x][:5]: print("     ",l)
+print()
+print("=== 2. gli indirizzi della sitemap rispondono 200 senza rimbalzi? ===")
+for u in locs[:3]+[l for l in locs if "%20" in l][:2]:
     r=requests.get(u,timeout=60,headers=UA,allow_redirects=False)
-    print("  %-46s HTTP %s %s" % (u[:46],r.status_code,r.headers.get("location","")[:50]))
+    print("  HTTP %s  %s" % (r.status_code,u[:66]))
 print()
-print("=== seguendo i reindirizzamenti ===")
-r=requests.get("https://forwardalpha.pro/stock/AAPL-US",timeout=60,headers=UA)
-print("  finale:",r.url,"HTTP",r.status_code,"| lunghezza:",len(r.text))
-print()
-print("=== il canonical della pagina che punta a cosa? ===")
-import re
+print("=== 3. il canonical punta al dominio che serve? ===")
+r=requests.get("https://www.forwardalpha.pro/stock/AAPL-US",timeout=60,headers=UA)
 m=re.search(r'<link rel="canonical" href="([^"]+)"',r.text)
-print("  canonical:", m.group(1) if m else "ASSENTE")
+print("  canonical:", m.group(1) if m else "assente")
+print("  HTTP:",r.status_code,"| testo leggibile:",len(re.sub(r'<[^>]+>',' ',re.sub(r'<script.*?</script>','',r.text,flags=re.S))))
 print()
-print("=== robots.txt ===")
-rb=requests.get("https://forwardalpha.pro/robots.txt",timeout=30)
-print(rb.text[:400])
+print("=== 4. robots.txt ===")
+print(requests.get("https://www.forwardalpha.pro/robots.txt",timeout=30).text)
