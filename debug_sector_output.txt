@@ -1,25 +1,19 @@
-=== come si comportano gli indirizzi delle schede titolo ===
-  normale              HTTP 308 -> https://www.forwardalpha.pro/stock/AAPL-US
-  con barra finale     HTTP 308 -> https://www.forwardalpha.pro/stock/AAPL-US/
-  minuscolo            HTTP 308 -> https://www.forwardalpha.pro/stock/aapl-us
-  ticker con spazio    HTTP 308 -> https://www.forwardalpha.pro/stock/MAERSK%20B-CPSE
-  spazio codificato    HTTP 308 -> https://www.forwardalpha.pro/stock/MAERSK%20B-CPSE
-  ticker con punto     HTTP 308 -> https://www.forwardalpha.pro/stock/IIP.UN-TSX
-  europeo              HTTP 308 -> https://www.forwardalpha.pro/stock/ASML-AS
-  giapponese           HTTP 308 -> https://www.forwardalpha.pro/stock/7203-TSE
-  coreano              HTTP 308 -> https://www.forwardalpha.pro/stock/A005930-KRX
+=== quale dominio serve davvero? ===
+  https://www.forwardalpha.pro/stock/AAPL-US     HTTP 200 
+  https://www.forwardalpha.pro/                  HTTP 200 
+  https://forwardalpha.pro/stock/AAPL-US         HTTP 308 https://www.forwardalpha.pro/stock/AAPL-US
 
-=== quali indirizzi mette la sitemap per i ticker particolari? ===
-  indirizzi con spazi o punti: 190
-    https://forwardalpha.pro/stock/NOVO B-CPSE
-    https://forwardalpha.pro/stock/BRK.A-US
-    https://forwardalpha.pro/stock/AMBU B-CPSE
-    https://forwardalpha.pro/stock/COLO B-CPSE
-    https://forwardalpha.pro/stock/HLUN B-CPSE
-    https://forwardalpha.pro/stock/NXR.UN-TSX
-    https://forwardalpha.pro/stock/NSIS B-CPSE
-    https://forwardalpha.pro/stock/FOI B-OM
-    https://forwardalpha.pro/stock/PAAL B-CPSE
-    https://forwardalpha.pro/stock/TW.-LSE
+=== seguendo i reindirizzamenti ===
+  finale: https://www.forwardalpha.pro/stock/AAPL-US HTTP 200 | lunghezza: 20827
 
-  totale indirizzi in sitemap: 7846
+=== il canonical della pagina che punta a cosa? ===
+  canonical: https://forwardalpha.pro/stock/AAPL-US
+
+=== robots.txt ===
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+Sitemap: https://forwardalpha.pro/sitemap.xml
+
