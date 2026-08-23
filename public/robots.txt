@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /admin/
 
-Sitemap: https://forwardalpha.pro/sitemap.xml
+Sitemap: https://www.forwardalpha.pro/sitemap.xml
