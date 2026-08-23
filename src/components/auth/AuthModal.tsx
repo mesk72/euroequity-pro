@@ -56,7 +56,7 @@ export default function AuthModal({ onClose, onSuccess, initialMode = 'login' }:
       email,
       password,
       options: {
-        emailRedirectTo: 'https://forwardalpha.pro',
+        emailRedirectTo: 'https://www.forwardalpha.pro',
         data: { name, country, newsletter }
       }
     })
@@ -82,7 +82,7 @@ export default function AuthModal({ onClose, onSuccess, initialMode = 'login' }:
     if (!email) { toast.error('Please enter your email first.'); return }
     setLoading(true)
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://forwardalpha.pro',
+      redirectTo: 'https://www.forwardalpha.pro',
     })
     setLoading(false)
     if (error) { toast.error(error.message) }
