@@ -1,32 +1,20 @@
-PAESE          COD    TITOLI
-Italia         MIL       117
-Germania       XETRA     208
-Francia        PA        212
-Paesi Bassi    AS         98
-Spagna         MC         91
-Belgio         BR        100
-Portogallo     LS         37
-Austria        VI         53
-Finlandia      HE        100
-Irlanda        IR         15
-Grecia         GR        101
-Regno Unito    LSE       421
-Svizzera       SWX       156
-Svezia         OM        208
-Norvegia       OB        114
-Danimarca      CPSE      100
-Stati Uniti    US       2976
-Canada         TSX       394
-Giappone       TSE       997
-Hong Kong      SEHK      500
-Australia      ASX       342
-Corea          KRX       400
-Singapore      SGX       101
+=== quante righe US ci sono davvero nella vista? ===
+  conteggio server: 3001
 
-  Europa            2131
-  Nord America      3370
-  Asia Pacifico     2340
-  ---------------------
-  GLOBAL            7841
+=== lettura paginata, pagina per pagina ===
+  offset     0 -> 1000 righe  (0.2s)
+  offset  1000 -> 1000 righe  (0.2s)
+  offset  2000 -> 1000 righe  (0.4s)
+  offset  3000 ->    1 righe  (0.2s)
+  TOTALE letto: 3001
 
-  righe nella vista prezzi: 7945
+=== distribuzione date US nella vista ===
+   2026-08-21 : 2953
+   2026-08-20 : 2
+   2026-08-19 : 27
+   2026-08-18 : 1
+   2026-08-11 : 1
+
+=== quanti titoli US in universo hanno una riga nella vista? ===
+  universo US: 2976 | nella vista: 3001 | SENZA riga: 2
+  esempi senza riga: ['SWDR', 'ZQXVW9']
