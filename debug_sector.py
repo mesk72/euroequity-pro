@@ -1,54 +1,30 @@
-import os, requests, time
-U="https://mlqkisnizgyvvqajdvbh.supabase.co"
-K=os.environ.get("SUPABASE_SERVICE_KEY","")
-H={"apikey":K,"Authorization":"Bearer "+K}
-print("=== quante righe US ci sono davvero nella vista? ===")
-r=requests.get(U+"/rest/v1/latest_prices_mv",headers={**H,"Prefer":"count=exact"},
-    params={"select":"ticker","exchange":"eq.US","limit":"1"})
-print("  conteggio server:", r.headers.get("content-range","?").split("/")[-1])
+import requests, re
+UA={"User-Agent":"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
+print("=== come si comportano gli indirizzi delle schede titolo ===")
+prove=[
+ ("normale","https://forwardalpha.pro/stock/AAPL-US"),
+ ("con barra finale","https://forwardalpha.pro/stock/AAPL-US/"),
+ ("minuscolo","https://forwardalpha.pro/stock/aapl-us"),
+ ("ticker con spazio","https://forwardalpha.pro/stock/MAERSK B-CPSE"),
+ ("spazio codificato","https://forwardalpha.pro/stock/MAERSK%20B-CPSE"),
+ ("ticker con punto","https://forwardalpha.pro/stock/IIP.UN-TSX"),
+ ("europeo","https://forwardalpha.pro/stock/ASML-AS"),
+ ("giapponese","https://forwardalpha.pro/stock/7203-TSE"),
+ ("coreano","https://forwardalpha.pro/stock/A005930-KRX"),
+]
+for nome,u in prove:
+    try:
+        r=requests.get(u,timeout=45,headers=UA,allow_redirects=False)
+        loc=r.headers.get("location","")
+        print("  %-20s HTTP %s %s" % (nome,r.status_code,("-> "+loc[:60]) if loc else ""))
+    except Exception as e:
+        print("  %-20s errore %s" % (nome,str(e)[:40]))
 print()
-print("=== lettura paginata, pagina per pagina ===")
-tot=0; off=0
-while True:
-    t0=time.time()
-    rr=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-        params={"select":"ticker,price_date","exchange":"eq.US","limit":"1000","offset":str(off)},timeout=120)
-    if rr.status_code!=200:
-        print("  offset %5d -> HTTP %s  %s" % (off,rr.status_code,rr.text[:120])); break
-    b=rr.json()
-    if not isinstance(b,list):
-        print("  offset %5d -> risposta anomala: %s" % (off,str(b)[:150])); break
-    print("  offset %5d -> %4d righe  (%.1fs)" % (off,len(b),time.time()-t0))
-    tot+=len(b); off+=1000
-    if len(b)<1000: break
-print("  TOTALE letto:",tot)
+print("=== quali indirizzi mette la sitemap per i ticker particolari? ===")
+s=requests.get("https://forwardalpha.pro/sitemap.xml",timeout=90).text
+locs=re.findall(r"<loc>(.*?)</loc>", s)
+strani=[l for l in locs if "%20" in l or " " in l or "." in l.split("/stock/")[-1] if "/stock/" in l]
+print("  indirizzi con spazi o punti: %d" % len(strani))
+for l in strani[:10]: print("   ",l)
 print()
-print("=== distribuzione date US nella vista ===")
-from collections import Counter
-d=[];off=0
-while True:
-    b=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-        params={"select":"price_date","exchange":"eq.US","limit":"1000","offset":str(off)},timeout=120).json()
-    if not isinstance(b,list) or not b: break
-    d+=[x["price_date"] for x in b]; off+=1000
-    if len(b)<1000: break
-c=Counter(d)
-for k,v in sorted(c.items(),reverse=True)[:5]: print("   %s : %d" % (k,v))
-print()
-print("=== quanti titoli US in universo hanno una riga nella vista? ===")
-uni=set();off=0
-while True:
-    b=requests.get(U+"/rest/v1/stocks",headers=H,
-        params={"select":"ticker","exchange":"eq.US","in_universe":"eq.true","limit":"1000","offset":str(off)}).json()
-    if not isinstance(b,list) or not b: break
-    uni.update(x["ticker"] for x in b); off+=1000
-    if len(b)<1000: break
-inview=set();off=0
-while True:
-    b=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
-        params={"select":"ticker","exchange":"eq.US","limit":"1000","offset":str(off)}).json()
-    if not isinstance(b,list) or not b: break
-    inview.update(x["ticker"] for x in b); off+=1000
-    if len(b)<1000: break
-print("  universo US: %d | nella vista: %d | SENZA riga: %d" % (len(uni),len(inview),len(uni-inview)))
-print("  esempi senza riga:", sorted(uni-inview)[:12])
+print("  totale indirizzi in sitemap:", len(locs))
