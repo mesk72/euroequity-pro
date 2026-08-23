@@ -1,13 +1,32 @@
-candidati: 210
-da reintegrare: 90
-reintegrati: 90 | falliti: 0
+PAESE          COD    TITOLI
+Italia         MIL       117
+Germania       XETRA     208
+Francia        PA        212
+Paesi Bassi    AS         98
+Spagna         MC         91
+Belgio         BR        100
+Portogallo     LS         37
+Austria        VI         53
+Finlandia      HE        100
+Irlanda        IR         15
+Grecia         GR        101
+Regno Unito    LSE       421
+Svizzera       SWX       156
+Svezia         OM        208
+Norvegia       OB        114
+Danimarca      CPSE      100
+Stati Uniti    US       2976
+Canada         TSX       394
+Giappone       TSE       997
+Hong Kong      SEHK      500
+Australia      ASX       342
+Corea          KRX       400
+Singapore      SGX       101
 
-=== verifica ===
-  SMT       Scottish Mortgage Investment Trust PLC       dentro
-  ALLFG     Allfunds Group plc                           dentro
-  BST       BlackRock Science and Technology Trust       dentro
-  NFLX      Netflix, Inc.                                dentro
-  1305      iFreeETF TOPIX (Yearly Dividend Type)        FUORI
-  DKIGI     Danske Invest - Global Indeks KL             FUORI
+  Europa            2131
+  Nord America      3370
+  Asia Pacifico     2340
+  ---------------------
+  GLOBAL            7841
 
-UNIVERSO TOTALE: 7841
+  righe nella vista prezzi: 7945
