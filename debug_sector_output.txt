@@ -1,20 +1,25 @@
-=== quante righe US ci sono davvero nella vista? ===
-  conteggio server: 3001
+=== come si comportano gli indirizzi delle schede titolo ===
+  normale              HTTP 308 -> https://www.forwardalpha.pro/stock/AAPL-US
+  con barra finale     HTTP 308 -> https://www.forwardalpha.pro/stock/AAPL-US/
+  minuscolo            HTTP 308 -> https://www.forwardalpha.pro/stock/aapl-us
+  ticker con spazio    HTTP 308 -> https://www.forwardalpha.pro/stock/MAERSK%20B-CPSE
+  spazio codificato    HTTP 308 -> https://www.forwardalpha.pro/stock/MAERSK%20B-CPSE
+  ticker con punto     HTTP 308 -> https://www.forwardalpha.pro/stock/IIP.UN-TSX
+  europeo              HTTP 308 -> https://www.forwardalpha.pro/stock/ASML-AS
+  giapponese           HTTP 308 -> https://www.forwardalpha.pro/stock/7203-TSE
+  coreano              HTTP 308 -> https://www.forwardalpha.pro/stock/A005930-KRX
 
-=== lettura paginata, pagina per pagina ===
-  offset     0 -> 1000 righe  (0.2s)
-  offset  1000 -> 1000 righe  (0.2s)
-  offset  2000 -> 1000 righe  (0.4s)
-  offset  3000 ->    1 righe  (0.2s)
-  TOTALE letto: 3001
+=== quali indirizzi mette la sitemap per i ticker particolari? ===
+  indirizzi con spazi o punti: 190
+    https://forwardalpha.pro/stock/NOVO B-CPSE
+    https://forwardalpha.pro/stock/BRK.A-US
+    https://forwardalpha.pro/stock/AMBU B-CPSE
+    https://forwardalpha.pro/stock/COLO B-CPSE
+    https://forwardalpha.pro/stock/HLUN B-CPSE
+    https://forwardalpha.pro/stock/NXR.UN-TSX
+    https://forwardalpha.pro/stock/NSIS B-CPSE
+    https://forwardalpha.pro/stock/FOI B-OM
+    https://forwardalpha.pro/stock/PAAL B-CPSE
+    https://forwardalpha.pro/stock/TW.-LSE
 
-=== distribuzione date US nella vista ===
-   2026-08-21 : 2953
-   2026-08-20 : 2
-   2026-08-19 : 27
-   2026-08-18 : 1
-   2026-08-11 : 1
-
-=== quanti titoli US in universo hanno una riga nella vista? ===
-  universo US: 2976 | nella vista: 3001 | SENZA riga: 2
-  esempi senza riga: ['SWDR', 'ZQXVW9']
+  totale indirizzi in sitemap: 7846
