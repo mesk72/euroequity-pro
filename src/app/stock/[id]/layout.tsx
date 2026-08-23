@@ -130,11 +130,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     title,
     description: desc,
     robots,
-    alternates: { canonical: `https://forwardalpha.pro/stock/${params.id}` },
+    alternates: { canonical: `https://www.forwardalpha.pro/stock/${params.id}` },
     openGraph: {
       title,
       description: desc,
-      url: `https://forwardalpha.pro/stock/${params.id}`,
+      url: `https://www.forwardalpha.pro/stock/${params.id}`,
       siteName: 'ForwardAlpha',
       type: 'website',
     },
@@ -161,7 +161,7 @@ export default async function StockLayout({
         '@type': 'Corporation',
         name: d.company || d.ticker,
         tickerSymbol: d.ticker,
-        url: `https://forwardalpha.pro/stock/${params.id}`,
+        url: `https://www.forwardalpha.pro/stock/${params.id}`,
         ...(d.sector ? { industry: d.sector } : {}),
         ...(d.country ? { address: { '@type': 'PostalAddress', addressCountry: d.country } } : {}),
       }
