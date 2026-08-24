@@ -1,3 +1,18 @@
-Titoli Health Care USA in universo: 0
-con rev_growth e mkt_cap: 0
+=== settori nel database, mercato USA ===
+   Financials                          655
+   Healthcare                          480
+   Industrials                         431
+   Information Technology              373
+   Consumer Discretionary              320
+   Energy                              150
+   Materials                           137
+   Real Estate                         128
+   Communication Services              119
+   Consumer Staples                    112
+   Utilities                            71
 
+=== come si chiama la tabella dei quintili di settore? ===
+  colonne: ['exchange', 'sector', 'sum_eps_weighted', 'sum_eps_weight', 'sum_rev_weighted', 'sum_rev_weight', 'n_stocks', 'updated_at']
+    {'exchange': 'TSX', 'sector': 'Industrials', 'sum_eps_weighted': 17158863.060000002, 'sum_eps_weight': 367756.03000000014, 'sum_rev_weighted': 13757077.479999999, 'sum_rev_weight': 367756.03000000014, 'n_stocks': 42, 'updated_at': '2026-08-24T05:45:40.858024+00:00'}
+    {'exchange': 'TSX', 'sector': 'Consumer Discretionary', 'sum_eps_weighted': 5039276.210000001, 'sum_eps_weight': 102139.63, 'sum_rev_weighted': 4821391.239999999, 'sum_rev_weight': 102477.19, 'n_stocks': 22, 'updated_at': '2026-08-24T05:45:40.858045+00:00'}
+    {'exchange': 'TSX', 'sector': 'Healthcare', 'sum_eps_weighted': 750549.4500000001, 'sum_eps_weight': 16251.79, 'sum_rev_weighted': 1170396.0599999998, 'sum_rev_weight': 22106.840000000004, 'n_stocks': 13, 'updated_at': '2026-08-24T05:45:40.858049+00:00'}
