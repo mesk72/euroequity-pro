@@ -1,31 +1,3 @@
-=== 1. la sitemap ora indica il dominio giusto? ===
-  indirizzi totali: 7846
-  con www:     7846
-  senza www:   0
-  con spazi grezzi (non validi): 0
-  esempi ticker particolari:
-      https://www.forwardalpha.pro/stock/NOVO%20B-CPSE
-      https://www.forwardalpha.pro/stock/AMBU%20B-CPSE
-      https://www.forwardalpha.pro/stock/COLO%20B-CPSE
-      https://www.forwardalpha.pro/stock/HLUN%20B-CPSE
-      https://www.forwardalpha.pro/stock/NSIS%20B-CPSE
-
-=== 2. gli indirizzi della sitemap rispondono 200 senza rimbalzi? ===
-  HTTP 200  https://www.forwardalpha.pro
-  HTTP 200  https://www.forwardalpha.pro/news
-  HTTP 200  https://www.forwardalpha.pro/research
-  HTTP 200  https://www.forwardalpha.pro/stock/NOVO%20B-CPSE
-  HTTP 200  https://www.forwardalpha.pro/stock/AMBU%20B-CPSE
-
-=== 3. il canonical punta al dominio che serve? ===
-  canonical: https://www.forwardalpha.pro/stock/AAPL-US
-  HTTP: 200 | testo leggibile: 3322
-
-=== 4. robots.txt ===
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /admin/
-
-Sitemap: https://www.forwardalpha.pro/sitemap.xml
+Titoli Health Care USA in universo: 0
+con rev_growth e mkt_cap: 0
 
