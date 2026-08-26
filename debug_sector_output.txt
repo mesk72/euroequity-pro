@@ -1,12 +1,36 @@
-titoli con crescita implicita: 2081
+============================================================
+REVERSE EARNINGS MODEL — US
+============================================================
 
-TITOLO   IMPLICITA  A 10 ANNI   AGGIORNATO
-AAPL         15.0%      14.7%   2026-06-07T08:58
-AMZN         15.9%      16.1%   2026-06-07T08:58
-AVGO         14.8%      12.9%   2026-06-07T08:58
-GOOGL        12.8%      11.9%   2026-06-07T08:58
-LLY           5.9%       6.6%   2026-06-07T08:58
-META          9.2%       6.6%   2026-06-07T08:58
-MSFT          8.6%      11.2%   2026-06-07T08:58
-NVDA         18.3%      17.8%   2026-06-07T08:58
-TSLA         46.8%      44.9%   2026-06-07T08:58
+[1/4] Lettura risk-free rate US da macro_rates...
+  Risk-free US (Treasury 10Y): 4.6400%
+
+[2/4] Lettura fiscal_year_end.csv...
+  Fiscal year end caricati: 15093
+
+[3/4] Lettura TIKR NA (EPS FY2025-FY2030)...
+  Titoli con dati EPS: 3939
+
+[4/4] Calcolo per ogni titolo US in universo...
+  Titoli US in universo: 2976
+  Carico price+beta in blocco da fundamentals...
+  Price+beta disponibili per 3964 titoli
+    ... 300/2976 processati
+    ... 600/2976 processati
+    ... 900/2976 processati
+    ... 1200/2976 processati
+    ... 1800/2976 processati
+    ... 2100/2976 processati
+    ... 2400/2976 processati
+    ... 2700/2976 processati
+
+  Calcolati: ok=2512  skip_no_eps=283  skip_no_price_beta=181  bisection_fallita=348
+
+============================================================
+ESEMPI (primi 10 con dati completi)
+============================================================
+Ticker     Prezzo  EPS_NTM   Beta      Ke  Implied G   CAGR 2y
+
+============================================================
+COMPLETATO
+============================================================
