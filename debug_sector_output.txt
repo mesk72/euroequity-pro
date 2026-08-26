@@ -1,7 +1,15 @@
-Ora UTC: 2026-08-26 13:34
+Ora UTC: 2026-08-26 13:37
 
-=== A) NEWS: quanto sono fresche? ===
-  righe in cache: 35289
-   {'code': '42703', 'details': None, 'hint': None, 'message': 'column news_cache.published_at does not exist'}
+=== NEWS ===
+  colonne: ['id', 'ticker', 'exchange', 'region', 'company', 'yahoo_ticker', 'title', 'link', 'pub_date', 'source', 'value_score', 'growth_score', 'best_score', 'mkt_cap', 'fetched_at']
+  campi temporali: ['pub_date']
+   579       Wed, 31 Mar 2021  Beijing Jingneng Clean Energy Co., Ltd. Class H Fi
+   8111      Wed, 31 Jul 2024  From our President and CEO - Goldwin Inc.
+   9678      Wed, 31 Jan 2018  Technical Analysis of Kanamoto Co., Ltd. (TSE:9678
+   TUB       Wed, 31 Jan 2018  Technical Analysis of Tubacex, S.A. (BME:TUB) - Tr
+   ENO       Wed, 31 Jan 2018  Technical Analysis of Elecnor S.A. (BME:ENO) - Tra
+  nelle ultime 24 ore: 35289
 
-=== B) REVERSE EARNINGS MODEL ===
+=== REVERSE EARNINGS: dove sta il dato? ===
+  colonne in fundamentals: ['implied_growth', 'implied_growth_10y']
+  tutte le colonne: ['ticker', 'exchange', 'updated_at', 'mkt_cap', 'pe_trailing', 'pe_forward', 'pb', 'ev_ebitda', 'roe', 'roa', 'roic', 'gross_margin', 'net_margin', 'eps_growth', 'rev_growth', 'div_yield', 'div_payout', 'beta', 'eps_current', 'eps_next', 'eps_30d_ago', 'value_score', 'growth_score', 'fiscal_month', 'last_report_date', 'eps_ntm', 'eps_ltm', 'rev_ntm', 'rev_ltm', 'eps_mom_30d']
