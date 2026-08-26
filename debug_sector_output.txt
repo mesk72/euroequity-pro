@@ -1,6 +1,7 @@
-=== il filtro e' arrivato in produzione? ===
-  filtro notizie presente nel codice pubblicato: False
+Ora UTC: 2026-08-26 13:34
 
-=== il sito risponde correttamente? ===
-  https://www.forwardalpha.pro/                  HTTP 200 (12985 byte)
-  https://www.forwardalpha.pro/stock/AAPL-US     HTTP 200 (20849 byte)
+=== A) NEWS: quanto sono fresche? ===
+  righe in cache: 35289
+   {'code': '42703', 'details': None, 'hint': None, 'message': 'column news_cache.published_at does not exist'}
+
+=== B) REVERSE EARNINGS MODEL ===
