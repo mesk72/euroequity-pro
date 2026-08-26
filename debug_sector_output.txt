@@ -1,24 +1,5 @@
-=== NEWS: fetched_at e' una data vera? ===
-   NAT      fetch=2026-08-26T12:58  pub=Tue, 07 Oct 2025 07:00 MRL Stock Price and Chart — BME:MRL - 
-   NAT      fetch=2026-08-26T12:58  pub=Sat, 17 Dec 2022 22:37 YEPSA Stock Price and Chart — BME:YEPS
-   TRIFOR   fetch=2026-08-26T12:58  pub=Wed, 19 Aug 2026 15:01 Trifork Group (CPSE:TRIFOR) Stock Reve
-   TRIFOR   fetch=2026-08-26T12:58  pub=Fri, 21 Aug 2026 00:12 Trifork Group AG Earnings Missed Analy
-   NAT      fetch=2026-08-26T12:58  pub=Thu, 16 Jul 2020 07:00 COL Stock Price and Chart — BME:COL - 
-   NAT      fetch=2026-08-26T12:58  pub=Thu, 26 Jul 2018 10:20 YTST Stock Price and Chart — BME:YTST 
-  scaricate nelle ultime 24h: 35289
-
-=== REVERSE EARNINGS MODEL ===
-  implied_growth       valorizzato su 2081 righe
-  implied_growth_10y   valorizzato su 2165 righe
-
-  esempi (maggiori capitalizzazioni):
-   NVDA     US   implicita=0.183055 a10a=0.1778   aggiornato=2026-06-07T08:58
-   AAPL     US   implicita=0.149782 a10a=0.1468   aggiornato=2026-06-07T08:58
-   GOOGL    US   implicita=0.127947 a10a=0.1191   aggiornato=2026-06-07T08:58
-   MSFT     US   implicita=0.086485 a10a=0.1125   aggiornato=2026-06-07T08:58
-   AMZN     US   implicita=0.159368 a10a=0.1614   aggiornato=2026-06-07T08:58
-   AVGO     US   implicita=0.148302 a10a=0.1294   aggiornato=2026-06-07T08:58
-   META     US   implicita=0.092013 a10a=0.0663   aggiornato=2026-06-07T08:58
-   TSLA     US   implicita=0.468011 a10a=0.4494   aggiornato=2026-06-07T08:58
-
-=== chi calcola implied_growth? cerco nel repository ===
+=== i dati che servono al modello sono aggiornati? ===
+  macro_rates (tasso Treasury):
+    {'code': '42703', 'details': None, 'hint': None, 'message': 'column macro_rates.date does not exist'}
+  titoli USA con beta: 2729
+  titoli USA totali: 3964
