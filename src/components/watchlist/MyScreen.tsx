@@ -258,6 +258,10 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
   // solo sui ticker presenti in questo specifico wallet.
   const [walletNews, setWalletNews] = useState<any[]>([])
   const [newsLoading, setNewsLoading] = useState(false)
+  // Filtro per titolo sulle notizie del wallet: con decine di titoli in
+  // portafoglio, scorrere l'elenco completo per trovare le notizie di una
+  // singola societa' richiede troppo tempo.
+  const [newsTicker, setNewsTicker] = useState<string | null>(null)
   // FIX 1/8/2026: le dipendenze erano [activeWallet, stocks.length] — la
   // sola LUNGHEZZA della lista. Cambiando wallet con lo stesso numero di
   // titoli (es. due wallet da 12) nessuna delle due dipendenze cambiava e
@@ -268,6 +272,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
   // lista non mostravano mai nulla.
   const tickersParam = stocks.map(s => `${s.ticker}.${s.exchange}`).join(',')
   useEffect(() => {
+    setNewsTicker(null)   // il filtro non deve sopravvivere al cambio di wallet
     if (!tickersParam) { setWalletNews([]); return }
     let annullato = false
     setNewsLoading(true)
@@ -618,13 +623,50 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
           letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--orange)', marginBottom:8 }}>
           📰 News — last 24h for {WALLET_NAMES[activeWallet]}
         </div>
+
+        {/* Filtro per titolo: un pulsante per societa', con il numero di
+            notizie. Compare solo se ci sono almeno due societa' con
+            notizie, altrimenti sarebbe inutile. */}
+        {!newsLoading && walletNews.length > 0 && (() => {
+          const conteggi = new Map<string, number>()
+          walletNews.forEach((n: any) => {
+            if (n.ticker) conteggi.set(n.ticker, (conteggi.get(n.ticker) || 0) + 1)
+          })
+          if (conteggi.size < 2) return null
+          const ordinati = Array.from(conteggi.entries()).sort((a, b) => b[1] - a[1])
+          return (
+            <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:10 }}>
+              <button onClick={() => setNewsTicker(null)} style={{
+                fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                letterSpacing:'0.04em', padding:'4px 9px', borderRadius:3, cursor:'pointer',
+                border:'1px solid ' + (newsTicker === null ? 'var(--orange)' : 'var(--border)'),
+                background: newsTicker === null ? 'var(--orange)' : 'transparent',
+                color: newsTicker === null ? '#fff' : 'var(--text3)' }}>
+                ALL ({walletNews.length})
+              </button>
+              {ordinati.map(([tk, n]) => (
+                <button key={tk} onClick={() => setNewsTicker(newsTicker === tk ? null : tk)} style={{
+                  fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                  letterSpacing:'0.04em', padding:'4px 9px', borderRadius:3, cursor:'pointer',
+                  border:'1px solid ' + (newsTicker === tk ? 'var(--orange)' : 'var(--border)'),
+                  background: newsTicker === tk ? 'var(--orange)' : 'transparent',
+                  color: newsTicker === tk ? '#fff' : 'var(--text3)' }}>
+                  {tk} ({n})
+                </button>
+              ))}
+            </div>
+          )
+        })()}
+
         {newsLoading ? (
           <div style={{ fontSize:12, color:'var(--text4)' }}>Loading news...</div>
         ) : walletNews.length === 0 ? (
           <div style={{ fontSize:12, color:'var(--text4)' }}>No news in the last 24 hours for these tickers.</div>
         ) : (
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-            {walletNews.map((n: any, i: number) => (
+            {walletNews
+              .filter((n: any) => !newsTicker || n.ticker === newsTicker)
+              .map((n: any, i: number) => (
               <a key={i} href={n.link} target="_blank" rel="noopener noreferrer" style={{
                 display:'block', padding:'8px 10px', border:'1px solid var(--border)',
                 borderRadius:4, textDecoration:'none', color:'inherit' }}>
