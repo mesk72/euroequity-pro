@@ -148,7 +148,7 @@ function ScoreBar({ value, label }: { value: number | null | undefined; label: s
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'ForwardAlpha',
-    url: 'https://www.forwardalpha.pro',
+    url: 'https://forwardalpha.pro',
     description: 'Institutional-grade quantitative equity research covering 7,000+ global stocks.',
     author: {
       '@type': 'Person',
@@ -1168,7 +1168,20 @@ function SectorScreen({ onSectorClick }: { onSectorClick: (s: string) => void })
   }
 
   const mcw = (list: any[], field: string) => {
-    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    // SOGLIA SULLE CRESCITE ESTREME (500%) — 24/8/2026.
+    // Le medie di settore erano distorte da poche societa' con ricavi
+    // attuali quasi nulli: biotech in fase clinica, minerarie esplorative,
+    // tecnologiche pre-fatturato. Con una base vicina a zero il rapporto
+    // fra atteso e attuale esplode e perde significato economico.
+    // Misurato: Allogene Therapeutics +129.709%, Mau Capital +39.741%,
+    // European Lithium +34.300%. Il solo Allogene portava Healthcare
+    // nordamericano da una mediana del 10% a una media del 57,2%, mentre
+    // Eli Lilly - la maggiore del settore - contribuiva 3,2 punti su 57,2.
+    // I titoli esclusi restano visibili nelle proprie schede: la soglia
+    // agisce SOLO sugli aggregati di settore e di continente.
+    const estremo = field === 'revGrowth' || field === 'epsGrowth'
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0
+      && (!estremo || Math.abs(s[field]) <= 5.0))
     const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
     return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
   }
@@ -1323,7 +1336,20 @@ function SectorScreenUS({ onSectorClick }: { onSectorClick: (s: string) => void 
   }
 
   const mcw = (list: any[], field: string) => {
-    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    // SOGLIA SULLE CRESCITE ESTREME (500%) — 24/8/2026.
+    // Le medie di settore erano distorte da poche societa' con ricavi
+    // attuali quasi nulli: biotech in fase clinica, minerarie esplorative,
+    // tecnologiche pre-fatturato. Con una base vicina a zero il rapporto
+    // fra atteso e attuale esplode e perde significato economico.
+    // Misurato: Allogene Therapeutics +129.709%, Mau Capital +39.741%,
+    // European Lithium +34.300%. Il solo Allogene portava Healthcare
+    // nordamericano da una mediana del 10% a una media del 57,2%, mentre
+    // Eli Lilly - la maggiore del settore - contribuiva 3,2 punti su 57,2.
+    // I titoli esclusi restano visibili nelle proprie schede: la soglia
+    // agisce SOLO sugli aggregati di settore e di continente.
+    const estremo = field === 'revGrowth' || field === 'epsGrowth'
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0
+      && (!estremo || Math.abs(s[field]) <= 5.0))
     const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
     return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
   }
@@ -2234,7 +2260,20 @@ function SectorScreenAP({ onSectorClick }: { onSectorClick: (s: string) => void 
     sectorMap[sec].push(s)
   }
   const mcw = (list: any[], field: string) => {
-    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0)
+    // SOGLIA SULLE CRESCITE ESTREME (500%) — 24/8/2026.
+    // Le medie di settore erano distorte da poche societa' con ricavi
+    // attuali quasi nulli: biotech in fase clinica, minerarie esplorative,
+    // tecnologiche pre-fatturato. Con una base vicina a zero il rapporto
+    // fra atteso e attuale esplode e perde significato economico.
+    // Misurato: Allogene Therapeutics +129.709%, Mau Capital +39.741%,
+    // European Lithium +34.300%. Il solo Allogene portava Healthcare
+    // nordamericano da una mediana del 10% a una media del 57,2%, mentre
+    // Eli Lilly - la maggiore del settore - contribuiva 3,2 punti su 57,2.
+    // I titoli esclusi restano visibili nelle proprie schede: la soglia
+    // agisce SOLO sugli aggregati di settore e di continente.
+    const estremo = field === 'revGrowth' || field === 'epsGrowth'
+    const v = list.filter((s:any) => s[field] != null && s.mktCap != null && s.mktCap > 0
+      && (!estremo || Math.abs(s[field]) <= 5.0))
     const tw = v.reduce((a:number, s:any) => a + (s.mktCap || 0), 0)
     return tw > 0 ? v.reduce((a:number, s:any) => a + (s[field] || 0) * (s.mktCap || 0), 0) / tw : null
   }
