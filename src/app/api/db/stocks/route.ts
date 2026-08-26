@@ -38,10 +38,20 @@ const rateLimitMap = new Map<string, { count: number; windowStart: number }>()
 // di righe (Global/ALL), quindi il solo conteggio delle richieste non
 // basta a impedire di scaricare l'intero database in poche chiamate.
 const ROWS_WINDOW_MS = 60 * 60_000 // 1 ora
-const ROWS_MAX = 15_000 // righe totali massime servite per IP all'ora
+// Alzato da 15.000 a 60.000 il 24/8/2026: con un universo di quasi 8.000
+// titoli, 15.000 righe si esauriscono in due caricamenti di Global. Un
+// utente che consulta normalmente il sito non deve essere bloccato.
+const ROWS_MAX = 60_000 // righe totali massime servite per IP all'ora
 const rowsServedMap = new Map<string, { rows: number; windowStart: number }>()
 
-function isRowVolumeLimited(ip: string, rowsInThisResponse: number): boolean {
+// FIX 24/8/2026 — IL PROPRIETARIO NON VA LIMITATO.
+// Il tetto di 15.000 righe all'ora serve contro chi vuole scaricare il
+// database, ma era tarato su un universo piu' piccolo: con Global a 7.841
+// titoli bastano DUE caricamenti per superarlo. Andrea, che usa il sito
+// tutto il giorno, veniva bloccato dopo pochi minuti e vedeva "no data
+// available" finche' non passava l'ora.
+function isRowVolumeLimited(ip: string, rowsInThisResponse: number, isOwner = false): boolean {
+  if (isOwner) return false
   const now = Date.now()
   const entry = rowsServedMap.get(ip)
   if (!entry || now - entry.windowStart > ROWS_WINDOW_MS) {
@@ -288,13 +298,30 @@ async function fetchAll(table: string, select: string, exchangeList: string[]) {
   if (!firstErr && firstData) all = all.concat(firstData)
   if (!firstData || firstData.length < PAGE) return all
 
+  // FIX 24/8/2026 — LE PAGINE FALLITE VENIVANO SALTATE IN SILENZIO.
+  // Con 24 richieste in parallelo, sotto carico qualcuna cade: il codice
+  // la ignorava e restituiva dati parziali, da cui gli score mancanti e
+  // il "no data available" che si sistemava ricaricando. Ora ogni pagina
+  // caduta viene RITENTATA una volta prima di rinunciare.
   const remainingPages = Array.from({ length: MAX_PAGES - 1 }, (_, i) => buildQuery(i + 1))
   const results = await Promise.all(remainingPages)
   let ultimaPiena = false
-  for (const { data, error } of results as any[]) {
-    if (error || !data) continue
-    all = all.concat(data)
-    if (data.length === PAGE) ultimaPiena = true
+  const daRitentare: number[] = []
+  results.forEach((r: any, i: number) => {
+    if (r.error || !r.data) { daRitentare.push(i + 1); return }
+    all = all.concat(r.data)
+    if (r.data.length === PAGE) ultimaPiena = true
+  })
+  if (daRitentare.length) {
+    console.warn(`[${table}] ${daRitentare.length} pagine fallite, ritento`)
+    const ritentate = await Promise.all(daRitentare.map(p => buildQuery(p)))
+    for (const { data, error } of ritentate as any[]) {
+      if (error || !data) {
+        console.error(`[${table}] pagina persa anche al secondo tentativo: dati INCOMPLETI`)
+        continue
+      }
+      all = all.concat(data)
+    }
   }
   if (ultimaPiena && all.length >= MAX_PAGES * PAGE) {
     console.warn(`[ATTENZIONE] ${table}: raggiunto il tetto di ${MAX_PAGES * PAGE} righe. ` +
@@ -734,7 +761,7 @@ export async function GET(req: NextRequest) {
       stocks = stocks.map((s: any) => redactRawData(s))
     }
 
-    if (isRowVolumeLimited(ip, stocks.length)) {
+    if (isRowVolumeLimited(ip, stocks.length, isOwner)) {
       return jsonNoCache({ error: 'Hourly data volume limit reached. Please try again later.' }, { status: 429 })
     }
 
