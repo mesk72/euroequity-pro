@@ -1,7 +1,3 @@
-=== come fa lo script (senza chiave di conflitto) ===
-  HTTP 200 | 
-
-=== con la chiave di conflitto ===
-  HTTP 200 | 
-
-  valore ora: [{'implied_growth_10y': 0.9999, 'ke': 0.095, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
+  NVDA   fundamentals.price=213.05     | vista={'price': 213.05, 'price_date': '2026-08-25'}
+  AAPL   fundamentals.price=309.9      | vista={'price': 309.9, 'price_date': '2026-08-25'}
+  MSFT   fundamentals.price=491.71     | vista={'price': 491.71, 'price_date': '2026-08-25'}
