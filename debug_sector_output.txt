@@ -1,5 +1,3 @@
-=== i dati che servono al modello sono aggiornati? ===
-  macro_rates (tasso Treasury):
-    {'code': '42703', 'details': None, 'hint': None, 'message': 'column macro_rates.date does not exist'}
-  titoli USA con beta: 2729
-  titoli USA totali: 3964
+HTTP 200
+colonne: ['region', 'rate_10y', 'updated_at']
+   {'region': 'US', 'rate_10y': 4.64, 'updated_at': '2026-08-26T05:47:58+00:00'}
