@@ -1,3 +1,7 @@
-righe totali fundamentals: 14003
-righe per NVDA.US: 1
-   {'ticker': 'NVDA', 'exchange': 'US', 'implied_growth_10y': 0.1778, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}
+=== come fa lo script (senza chiave di conflitto) ===
+  HTTP 200 | 
+
+=== con la chiave di conflitto ===
+  HTTP 200 | 
+
+  valore ora: [{'implied_growth_10y': 0.9999, 'ke': 0.095, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}]
