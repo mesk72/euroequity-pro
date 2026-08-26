@@ -1,40 +1,73 @@
 name: Reverse Earnings Model US
 
+# RISCRITTO 26/8/2026 — il file precedente era YAML NON VALIDO.
+# Nell'ultimo passaggio c'era del codice Python incollato senza rientro
+# dentro un blocco `run: |`. In YAML una riga meno indentata della prima
+# chiude il blocco, quindi il resto veniva letto come configurazione e la
+# lettura falliva. Conseguenze: ogni esecuzione moriva prima di creare un
+# lavoro (nessun log, nessun errore leggibile) e GitHub rifiutava anche
+# l'avvio manuale con un errore 422.
+# Risultato: il reverse earnings model era fermo dal 7 giugno 2026, e il
+# sito mostrava tassi impliciti vecchi di ottanta giorni (Nvidia 18,3%,
+# Apple 15,0%) mentre i prezzi erano cambiati parecchio.
+
 on:
   workflow_dispatch:
+  # Dopo il calcolo dei beta, che e' il dato di partenza del modello.
   workflow_run:
     workflows: ["Fetch Beta US (Yahoo Finance)"]
-    types:
-      - completed
+    types: [completed]
+  # Rete di sicurezza: una volta al giorno alle 08:40 italiane, cosi' il
+  # modello non resta fermo se la catena a monte non parte.
+  schedule:
+    - cron: '40 6 * * *'
+
+concurrency:
+  group: reverse-dcf-us
+  cancel-in-progress: false
 
 jobs:
   compute:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install requests pandas
-      - name: Compute
+      - name: Installa dipendenze
+        run: pip install requests pandas
+      - name: Calcola il modello
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python reverse_dcf_us.py | tee reverse_dcf_us_last_output.txt
-      - name: Commit log via API (evita conflitti git tra script paralleli)
-        continue-on-error: true
+        run: python reverse_dcf_us.py 2>&1 | tee reverse_dcf_us_last_output.txt
+      - name: Salva il log
         if: always()
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          CONTENT=$(base64 -w0 reverse_dcf_us_last_output.txt)
-          SHA=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/${{ github.repository }}/contents/reverse_dcf_us_last_output.txt" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))")
-          python3 -c "
-import json
-payload = {'message': 'log reverse earnings model output', 'content': '''$CONTENT'''}
-if '$SHA':
-    payload['sha'] = '$SHA'
-print(json.dumps(payload))
-" > /tmp/payload.json
-          curl -s -X PUT -H "Authorization: token $GH_TOKEN" -H "Content-Type: application/json" --data @/tmp/payload.json "https://api.github.com/repos/${{ github.repository }}/contents/reverse_dcf_us_last_output.txt"
+          python3 - <<'FINE'
+          import base64, json, os, subprocess
+          testo = open('reverse_dcf_us_last_output.txt','rb').read()
+          repo = os.environ['REPO']
+          token = os.environ['GH_TOKEN']
+          url = f'https://api.github.com/repos/{repo}/contents/reverse_dcf_us_last_output.txt'
+          sha = subprocess.run(
+              ['curl','-s','-H',f'Authorization: token {token}',url],
+              capture_output=True, text=True).stdout
+          try:
+              sha = json.loads(sha).get('sha','')
+          except Exception:
+              sha = ''
+          corpo = {'message':'log reverse earnings model',
+                   'content': base64.b64encode(testo).decode()}
+          if sha:
+              corpo['sha'] = sha
+          open('/tmp/payload.json','w').write(json.dumps(corpo))
+          subprocess.run(['curl','-s','-X','PUT','-H',f'Authorization: token {token}',
+                          '-H','Content-Type: application/json',
+                          '--data','@/tmp/payload.json',url], capture_output=True)
+          FINE
