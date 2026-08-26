@@ -262,6 +262,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
   // portafoglio, scorrere l'elenco completo per trovare le notizie di una
   // singola societa' richiede troppo tempo.
   const [newsTicker, setNewsTicker] = useState<string | null>(null)
+  const [newsSearch, setNewsSearch] = useState('')
   // FIX 1/8/2026: le dipendenze erano [activeWallet, stocks.length] — la
   // sola LUNGHEZZA della lista. Cambiando wallet con lo stesso numero di
   // titoli (es. due wallet da 12) nessuna delle due dipendenze cambiava e
@@ -273,6 +274,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
   const tickersParam = stocks.map(s => `${s.ticker}.${s.exchange}`).join(',')
   useEffect(() => {
     setNewsTicker(null)   // il filtro non deve sopravvivere al cambio di wallet
+    setNewsTicker(null); setNewsSearch('')
     if (!tickersParam) { setWalletNews([]); return }
     let annullato = false
     setNewsLoading(true)
@@ -627,57 +629,117 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
         {/* Filtro per titolo: un pulsante per societa', con il numero di
             notizie. Compare solo se ci sono almeno due societa' con
             notizie, altrimenti sarebbe inutile. */}
-        {!newsLoading && walletNews.length > 0 && (() => {
+        {/* FILTRO NOTIZIE — riscritto il 26/8/2026.
+            Prima erano pulsanti in fila: con molti titoli in portafoglio
+            occupavano diverse righe e diventavano scomodi. Ora un menu a
+            tendina con ricerca, piu' un campo per cercare nel testo delle
+            notizie.
+
+            DATE: pub_date arriva dal database come TESTO in formato
+            RFC-822 ("Wed, 07 Oct 2025 07:00"), non come data. Ordinarlo
+            come stringa produce un ordine alfabetico, non cronologico:
+            nella cache convivono notizie dal 2018 al 2026 e le "piu'
+            recenti" risultavano del 2021. Qui il testo viene convertito
+            in data vera, cosi' l'ordinamento e il filtro funzionano. */}
+        {(() => {
+          const quando = (n: any): number => {
+            const t = Date.parse(n?.pub_date || '')
+            return isNaN(t) ? 0 : t
+          }
+          const dataLeggibile = (n: any): string => {
+            const t = quando(n)
+            if (!t) return ''
+            const d = new Date(t)
+            const ore = (Date.now() - t) / 3_600_000
+            if (ore < 24) return ore < 1 ? 'less than 1h ago' : `${Math.floor(ore)}h ago`
+            if (ore < 24 * 7) return `${Math.floor(ore / 24)}d ago`
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+          }
+
           const conteggi = new Map<string, number>()
           walletNews.forEach((n: any) => {
             if (n.ticker) conteggi.set(n.ticker, (conteggi.get(n.ticker) || 0) + 1)
           })
-          if (conteggi.size < 2) return null
-          const ordinati = Array.from(conteggi.entries()).sort((a, b) => b[1] - a[1])
+          const perTendina = Array.from(conteggi.entries()).sort((a, b) => a[0].localeCompare(b[0]))
+
+          const cerca = newsSearch.trim().toLowerCase()
+          const filtrate = walletNews
+            .filter((n: any) => !newsTicker || n.ticker === newsTicker)
+            .filter((n: any) => !cerca
+              || (n.title || '').toLowerCase().includes(cerca)
+              || (n.company || '').toLowerCase().includes(cerca)
+              || (n.ticker || '').toLowerCase().includes(cerca))
+            .sort((a: any, b: any) => quando(b) - quando(a))
+
           return (
-            <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:10 }}>
-              <button onClick={() => setNewsTicker(null)} style={{
-                fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                letterSpacing:'0.04em', padding:'4px 9px', borderRadius:3, cursor:'pointer',
-                border:'1px solid ' + (newsTicker === null ? 'var(--orange)' : 'var(--border)'),
-                background: newsTicker === null ? 'var(--orange)' : 'transparent',
-                color: newsTicker === null ? '#fff' : 'var(--text3)' }}>
-                ALL ({walletNews.length})
-              </button>
-              {ordinati.map(([tk, n]) => (
-                <button key={tk} onClick={() => setNewsTicker(newsTicker === tk ? null : tk)} style={{
-                  fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
-                  letterSpacing:'0.04em', padding:'4px 9px', borderRadius:3, cursor:'pointer',
-                  border:'1px solid ' + (newsTicker === tk ? 'var(--orange)' : 'var(--border)'),
-                  background: newsTicker === tk ? 'var(--orange)' : 'transparent',
-                  color: newsTicker === tk ? '#fff' : 'var(--text3)' }}>
-                  {tk} ({n})
-                </button>
-              ))}
-            </div>
+            <>
+              {!newsLoading && walletNews.length > 0 && (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:10, alignItems:'center' }}>
+                  <select
+                    value={newsTicker || ''}
+                    onChange={e => setNewsTicker(e.target.value || null)}
+                    style={{ fontSize:11, fontFamily:'IBM Plex Sans Condensed', fontWeight:600,
+                      padding:'5px 8px', borderRadius:3, minWidth:190,
+                      border:'1px solid var(--border)', background:'var(--bg2, transparent)',
+                      color:'var(--text)', cursor:'pointer' }}>
+                    <option value="">All companies ({walletNews.length})</option>
+                    {perTendina.map(([tk, n]) => (
+                      <option key={tk} value={tk}>{tk} ({n})</option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="search"
+                    value={newsSearch}
+                    onChange={e => setNewsSearch(e.target.value)}
+                    placeholder="Search headlines..."
+                    style={{ fontSize:11, fontFamily:'IBM Plex Sans Condensed',
+                      padding:'5px 9px', borderRadius:3, flex:'1 1 200px', minWidth:160,
+                      border:'1px solid var(--border)', background:'transparent',
+                      color:'var(--text)' }} />
+
+                  {(newsTicker || cerca) && (
+                    <button
+                      onClick={() => { setNewsTicker(null); setNewsSearch('') }}
+                      style={{ fontSize:10, fontFamily:'IBM Plex Sans Condensed', fontWeight:700,
+                        letterSpacing:'0.04em', padding:'5px 10px', borderRadius:3, cursor:'pointer',
+                        border:'1px solid var(--border)', background:'transparent', color:'var(--text3)' }}>
+                      CLEAR
+                    </button>
+                  )}
+
+                  <span style={{ fontSize:10, color:'var(--text4)', fontFamily:'IBM Plex Sans Condensed' }}>
+                    {filtrate.length} of {walletNews.length}
+                  </span>
+                </div>
+              )}
+
+              {newsLoading ? (
+                <div style={{ fontSize:12, color:'var(--text4)' }}>Loading news...</div>
+              ) : walletNews.length === 0 ? (
+                <div style={{ fontSize:12, color:'var(--text4)' }}>No news available for these tickers.</div>
+              ) : filtrate.length === 0 ? (
+                <div style={{ fontSize:12, color:'var(--text4)' }}>No headline matches the current filter.</div>
+              ) : (
+                <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                  {filtrate.map((n: any, i: number) => (
+                    <a key={i} href={n.link} target="_blank" rel="noopener noreferrer" style={{
+                      display:'block', padding:'8px 10px', border:'1px solid var(--border)',
+                      borderRadius:4, textDecoration:'none', color:'inherit' }}>
+                      <div style={{ fontSize:12, color:'var(--text)', marginBottom:2 }}>
+                        <span style={{ color:'var(--orange)', fontWeight:700 }}>[{n.ticker}]</span> {n.title}
+                      </div>
+                      <div style={{ fontSize:10, color:'var(--text4)', display:'flex', gap:8 }}>
+                        <span>{n.source}</span>
+                        {dataLeggibile(n) && <span>· {dataLeggibile(n)}</span>}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </>
           )
         })()}
-
-        {newsLoading ? (
-          <div style={{ fontSize:12, color:'var(--text4)' }}>Loading news...</div>
-        ) : walletNews.length === 0 ? (
-          <div style={{ fontSize:12, color:'var(--text4)' }}>No news in the last 24 hours for these tickers.</div>
-        ) : (
-          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-            {walletNews
-              .filter((n: any) => !newsTicker || n.ticker === newsTicker)
-              .map((n: any, i: number) => (
-              <a key={i} href={n.link} target="_blank" rel="noopener noreferrer" style={{
-                display:'block', padding:'8px 10px', border:'1px solid var(--border)',
-                borderRadius:4, textDecoration:'none', color:'inherit' }}>
-                <div style={{ fontSize:12, color:'var(--text)', marginBottom:2 }}>
-                  <span style={{ color:'var(--orange)', fontWeight:700 }}>[{n.ticker}]</span> {n.title}
-                </div>
-                <div style={{ fontSize:10, color:'var(--text4)' }}>{n.source}</div>
-              </a>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   )
