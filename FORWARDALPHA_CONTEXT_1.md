@@ -3318,3 +3318,70 @@ titoli fuori universo) la tabella e' arrivata a 14.003 righe e la lettura si
 troncava: essendo ordinata per codice alfabetico, sparivano i titoli in fondo
 all'alfabeto. **Global mostrava 7.010 titoli invece di 7.852.** Alzato a 24
 pagine con avviso nei log se il tetto venisse raggiunto.
+
+---
+
+## REGOLA — CONTROLLO QUOTIDIANO DEGLI AGGIORNAMENTI (26/8/2026)
+
+**Non deve essere Andrea ad accorgersi che un aggiornamento e' fermo.**
+Il controllo che tutto giri va fatto ogni giorno, in automatico, e ogni
+anomalia va segnalata nel rapporto del mattino.
+
+### Cosa deve essere aggiornato, e con quale cadenza
+
+| dato | cadenza | da cosa |
+|---|---|---|
+| Prezzi Europa | piu' volte al giorno (21:00, 02:30, 03:13, 07:00) | daily_eu_yahoo.py |
+| Prezzi USA e Canada | 02:30, 03:23, 07:00 | daily_us_yahoo.py |
+| Prezzi Asia-Pacifico | 18:00, 18:40, 23:00 | daily_apac_yahoo.py |
+| Beta (USA) | giornaliera | fetch_beta_us.py |
+| Tasso privo di rischio (Treasury 10Y) | giornaliera | macro_rates |
+| EPS NTM / LTM, crescita utili e ricavi | a ogni caricamento TIKR | fondamentali_auto.py |
+| **Reverse earnings model (implied growth)** | **giornaliera** | reverse_dcf_us.py |
+| Notizie | a intervalli regolari | trigger-news |
+| Vista prezzi correnti | ogni 10 minuti | pg_cron |
+
+### Casi in cui il guasto e' rimasto invisibile per mesi
+
+- **Reverse earnings model fermo dal 7 giugno al 26 agosto (80 giorni).**
+  Il file `.github/workflows/reverse_dcf_us.yml` era **YAML NON VALIDO**:
+  conteneva codice Python senza rientro dentro un blocco `run: |`. In YAML
+  una riga meno indentata della prima chiude il blocco, quindi il resto
+  veniva letto come configurazione. Effetto: ogni esecuzione moriva
+  PRIMA di creare un lavoro — nessun log, nessun errore leggibile, e
+  perfino l'avvio manuale veniva rifiutato con HTTP 422. Nel frattempo il
+  sito mostrava tassi impliciti vecchi di ottanta giorni (Nvidia 18,3%,
+  Apple 15,0%) senza alcun segnale.
+  **Come riconoscerlo**: un'esecuzione con conclusion=failure e ZERO job
+  e' sempre un file di configurazione invalido, non un errore dello script.
+
+- **Notizie con date sbagliate.** `news_cache.pub_date` e' salvato come
+  TESTO in formato RFC-822 ("Wed, 07 Oct 2025 07:00"), non come data.
+  Ordinarlo produce un ordine ALFABETICO: nella cache convivono notizie
+  dal 2018 al 2026 e le "piu' recenti" risultavano del 2021. Qualsiasi
+  filtro temporale su quel campo e' privo di significato. Risolto
+  convertendo il testo in data al momento della visualizzazione.
+
+- **Letture parziali silenziose.** Ricorrente, quattro casi distinti:
+  tetto di 1.000 righe nell'API, di 12.000 in `fetchAllByExchange`, di 250
+  candidati nel rapporto, e pagine fallite saltate senza avviso nelle
+  letture parallele. **Il sintomo e' sempre lo stesso: numeri che cambiano
+  fra un caricamento e l'altro.** Ogni lettura paginata deve confrontare
+  le righe lette con il conteggio autorevole del server e DICHIARARE la
+  differenza, mai restituire dati parziali come se fossero completi.
+
+### Cosa deve fare il rapporto del mattino
+
+Oltre alla copertura dei prezzi, deve verificare e segnalare per nome:
+
+1. ogni tabella il cui `updated_at` piu' recente sia piu' vecchio della
+   cadenza prevista (implied_growth, beta, macro_rates, fondamentali)
+2. ogni workflow con l'ultima esecuzione fallita o annullata
+3. ogni lettura del database che non abbia restituito tutte le righe attese
+
+### Principio generale
+
+**Un meccanismo che fallisce in silenzio e' peggio di uno che non esiste**,
+perche' da' l'impressione che qualcuno stia controllando. Se un
+aggiornamento non gira, il sistema deve dirlo — non aspettare che se ne
+accorga Andrea guardando il sito.
