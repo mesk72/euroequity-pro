@@ -3,27 +3,26 @@ from datetime import datetime, timezone, timedelta
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-print("Ora UTC:", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"))
+print("=== NEWS: fetched_at e' una data vera? ===")
+d=requests.get(U+"/rest/v1/news_cache",headers=H,
+    params={"select":"ticker,title,pub_date,fetched_at","order":"fetched_at.desc","limit":"6"}).json()
+for x in d: print("   %-8s fetch=%s  pub=%-22s %s" % (x.get("ticker"),str(x.get("fetched_at"))[:16],str(x.get("pub_date"))[:22],(x.get("title") or "")[:38]))
+ieri=(datetime.now(timezone.utc)-timedelta(hours=24)).isoformat()
+rc=requests.get(U+"/rest/v1/news_cache",headers={**H,"Prefer":"count=exact"},
+    params={"select":"ticker","fetched_at":"gte."+ieri,"limit":"1"})
+print("  scaricate nelle ultime 24h:", rc.headers.get("content-range","?").split("/")[-1])
 print()
-print("=== NEWS ===")
-d=requests.get(U+"/rest/v1/news_cache",headers=H,params={"select":"*","limit":"2"}).json()
-if isinstance(d,list) and d:
-    print("  colonne:", list(d[0].keys()))
-    campo=[c for c in d[0] if "date" in c or "time" in c or "pub" in c or "created" in c]
-    print("  campi temporali:",campo)
-    if campo:
-        c0=campo[0]
-        u=requests.get(U+"/rest/v1/news_cache",headers=H,
-            params={"select":"ticker,title,"+c0,"order":c0+".desc","limit":"5"}).json()
-        for x in u: print("   %-9s %s  %s" % (x.get("ticker"),str(x.get(c0))[:16],(x.get("title") or "")[:50]))
-        ieri=(datetime.now(timezone.utc)-timedelta(hours=24)).isoformat()
-        rc=requests.get(U+"/rest/v1/news_cache",headers={**H,"Prefer":"count=exact"},
-            params={"select":"ticker",c0:"gte."+ieri,"limit":"1"})
-        print("  nelle ultime 24 ore:", rc.headers.get("content-range","?").split("/")[-1])
+print("=== REVERSE EARNINGS MODEL ===")
+for campo in ["implied_growth","implied_growth_10y"]:
+    rc=requests.get(U+"/rest/v1/fundamentals",headers={**H,"Prefer":"count=exact"},
+        params={"select":"ticker",campo:"not.is.null","limit":"1"})
+    print("  %-20s valorizzato su %s righe" % (campo, rc.headers.get("content-range","?").split("/")[-1]))
+d2=requests.get(U+"/rest/v1/fundamentals",headers=H,
+    params={"select":"ticker,exchange,implied_growth,implied_growth_10y,updated_at","implied_growth":"not.is.null",
+            "order":"mkt_cap.desc","limit":"8"}).json()
 print()
-print("=== REVERSE EARNINGS: dove sta il dato? ===")
-f=requests.get(U+"/rest/v1/fundamentals",headers=H,params={"select":"*","limit":"1"}).json()
-if f:
-    imp=[c for c in f[0] if "impl" in c.lower() or "reverse" in c.lower() or "rev_dcf" in c.lower()]
-    print("  colonne in fundamentals:", imp if imp else "nessuna colonna 'implied'")
-    print("  tutte le colonne:", [c for c in f[0]][:30])
+print("  esempi (maggiori capitalizzazioni):")
+for x in d2: print("   %-8s %-4s implicita=%-8s a10a=%-8s aggiornato=%s" % (
+    x.get("ticker"),x.get("exchange"),x.get("implied_growth"),x.get("implied_growth_10y"),str(x.get("updated_at"))[:16]))
+print()
+print("=== chi calcola implied_growth? cerco nel repository ===")
