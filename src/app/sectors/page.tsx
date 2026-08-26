@@ -57,8 +57,34 @@ export default function SectorsPage() {
 
   const sectorStats = Object.entries(sectorMap).map(([sector, list]) => {
     const totalCap = list.reduce((a:number,s:any)=>a+(s.mktCap||0),0)
+    // SOGLIA SULLE CRESCITE ESTREME — introdotta il 24/8/2026.
+    //
+    // Le medie di settore per crescita di utili e ricavi erano distorte da
+    // poche societa' con ricavi attuali quasi nulli: biotech in fase
+    // clinica, minerarie esplorative, tecnologiche pre-fatturato. Quando la
+    // base di partenza tende a zero, il rapporto fra atteso e attuale
+    // esplode e non ha piu' significato economico.
+    //
+    // Casi misurati: Allogene Therapeutics +129.709%, Mau Capital +39.741%,
+    // European Lithium +34.300%. Il solo Allogene portava il settore
+    // Healthcare nordamericano da una mediana del 10% a una media del 57,2%,
+    // mentre Eli Lilly - la maggiore societa' del settore - contribuiva 3,2
+    // punti su 57,2.
+    //
+    // Settori corretti da questa soglia: Healthcare, Information Technology
+    // e Materials in Nord America, Information Technology e Materials in
+    // Asia-Pacifico. L'Europa non era distorta.
+    //
+    // I titoli esclusi restano visibili nelle proprie schede e negli
+    // elenchi: la soglia agisce SOLO sull'aggregato di settore.
+    const LIMITE_CRESCITA = 5.0   // 500%
+    const CAMPI_CRESCITA = ['epsGrowth', 'revGrowth']
+
     const mcw = (field:string) => {
-      const v = list.filter((s:any)=>s[field]!=null&&s.mktCap!=null&&s.mktCap>0)
+      const estremo = CAMPI_CRESCITA.includes(field)
+      const v = list.filter((s:any) =>
+        s[field]!=null && s.mktCap!=null && s.mktCap>0 &&
+        (!estremo || Math.abs(s[field]) <= LIMITE_CRESCITA))
       const tw = v.reduce((a:number,s:any)=>a+(s.mktCap||0),0)
       return tw>0 ? v.reduce((a:number,s:any)=>a+(s[field]||0)*(s.mktCap||0),0)/tw : null
     }
