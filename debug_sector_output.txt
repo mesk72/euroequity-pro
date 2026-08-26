@@ -1,12 +1,3 @@
-titoli con crescita implicita: 2081
-
-TITOLO   IMPLICITA  A 10 ANNI   AGGIORNATO
-AAPL         15.0%      14.7%   2026-06-07T08:58
-AMZN         15.9%      16.1%   2026-06-07T08:58
-AVGO         14.8%      12.9%   2026-06-07T08:58
-GOOGL        12.8%      11.9%   2026-06-07T08:58
-LLY           5.9%       6.6%   2026-06-07T08:58
-META          9.2%       6.6%   2026-06-07T08:58
-MSFT          8.6%      11.2%   2026-06-07T08:58
-NVDA         18.3%      17.8%   2026-06-07T08:58
-TSLA         46.8%      44.9%   2026-06-07T08:58
+righe totali fundamentals: 14003
+righe per NVDA.US: 1
+   {'ticker': 'NVDA', 'exchange': 'US', 'implied_growth_10y': 0.1778, 'updated_at': '2026-06-07T08:58:43.97312+00:00'}
