@@ -1,3 +1,12 @@
-  NVDA   fundamentals.price=213.05     | vista={'price': 213.05, 'price_date': '2026-08-25'}
-  AAPL   fundamentals.price=309.9      | vista={'price': 309.9, 'price_date': '2026-08-25'}
-  MSFT   fundamentals.price=491.71     | vista={'price': 491.71, 'price_date': '2026-08-25'}
+  implied_growth       su 2081 righe
+  implied_growth_10y   su 2165 righe
+  ke                   su 2516 righe
+  eps_ntm_dcf          su 2516 righe
+
+TITOLO    IMPLICITA   A 10 ANNI       Ke    EPS NTM
+AAPL          15.0%       14.7%    10.1%     9.3862
+AVGO          14.8%       12.9%    12.0%    16.0748
+LLY            5.9%        6.6%     7.2%    40.3852
+MSFT           8.6%       11.2%    10.1%    19.3391
+NVDA          18.3%       17.8%    15.7%    10.4964
+TSLA          46.8%       44.9%    13.8%     2.3346
