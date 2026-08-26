@@ -1,53 +1,6 @@
-============================================================================
-NORD AMERICA
-SETTORE                      N  PONDERATA    MEDIANA     SCARTO   peggiore anomalia
-(vuoto)                     22       3.0%       3.0%      -0.0   CHP.UN 14%
-Communication Services     121      18.2%       5.8%      12.4   ASTS 278%
-Consumer Discretionary     325      10.9%       5.4%       5.6   SERV 267%
-Consumer Staples           112       5.3%       3.4%       2.0   OFRM 33%
-Energy                     192       7.5%       6.3%       1.2   UEC 277%
-Financials                 550       8.6%       7.7%       0.9   OWLS 216%
-Healthcare                 401      57.2%      10.0%      47.2   ALLO 129709%  <-- DISTORTO
-Industrials                446      11.5%       7.2%       4.3   ACHR 964%
-Information Technology     369      35.6%      14.0%      21.6   AUR 1015%  <-- DISTORTO
-Materials                  201      94.0%      11.9%      82.1   MAU 39741%  <-- DISTORTO
-Real Estate                121      15.7%       4.2%      11.5   FRMI 2655%
-Utilities                   82       9.5%       5.6%       3.9   OKLO 471%
+=== il filtro e' arrivato in produzione? ===
+  filtro notizie presente nel codice pubblicato: False
 
-============================================================================
-EUROPA
-SETTORE                      N  PONDERATA    MEDIANA     SCARTO   peggiore anomalia
-Communication Services      91       2.8%       2.9%      -0.1   REMEDY 39%
-Consumer Discretionary     190       4.7%       3.5%       1.2   EBROM 62%
-Consumer Staples           106       1.9%       2.3%      -0.5   ANDF 366%
-Energy                      66       4.7%       4.7%       0.1   CAPT 96%
-Financials                 305       5.3%       4.2%       1.1   TRIG 418%
-Healthcare                 138       5.8%       5.8%       0.0   IVA 1102%
-Industrials                392       6.8%       4.1%       2.7   CLR 176%
-Information Technology     149      15.3%       7.9%       7.3   NAPA 115%
-Materials                  118       5.5%       2.9%       2.6   VISC 2446%
-Other                       40       8.4%       4.9%       3.6   AED 33%
-Real Estate                 20      10.4%       7.6%       2.8   COV 28%
-Technology                   1       3.0%       3.0%       0.0   D6H0 3%
-Utilities                   53       2.9%       3.4%      -0.4   COXG 59%
-
-============================================================================
-ASIA PACIFICO
-SETTORE                      N  PONDERATA    MEDIANA     SCARTO   peggiore anomalia
-(vuoto)                     46       3.8%       0.4%       3.4   9936 24%
-73                           1      14.1%      14.1%       0.0   UIBU 14%
-Communication Services      92       6.5%       5.3%       1.2   A036570 33%
-Consumer Discretionary     251       6.8%       5.2%       1.6   3350 131%
-Consumer Staples           144       7.3%       4.5%       2.7   A006040 88%
-Energy                      37       8.1%       7.8%       0.3   TBN 508%
-Financials                 240       6.0%       6.7%      -0.7   PNI 118%
-Healthcare                 154      14.0%       9.4%       4.6   IMR 294%
-Industrials                438       8.3%       6.2%       2.1   464A 135%
-Information Technology     252      58.2%      14.3%      43.9   EIQ 674%  <-- DISTORTO
-Materials                  212      27.8%       7.1%      20.7   EUR 34300%  <-- DISTORTO
-Real Estate                 43       2.9%       2.6%       0.3   NTDU 25%
-Utilities                   44       3.3%       2.7%       0.6   U96 26%
-
-============================================================================
-Quanti titoli in tutto hanno una crescita ricavi oltre il 500%%?
-  33 titoli su tutto l'universo
+=== il sito risponde correttamente? ===
+  https://www.forwardalpha.pro/                  HTTP 200 (12985 byte)
+  https://www.forwardalpha.pro/stock/AAPL-US     HTTP 200 (20849 byte)
