@@ -656,14 +656,31 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
             return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
           }
 
+          // FILTRO TEMPORALE — 27/8/2026.
+          // La cache news_cache accumula oltre 35.000 notizie dal 2018 in
+          // poi e non viene mai ripulita: il wallet le mostrava tutte,
+          // comprese quelle di maggio 2026. Qui si tengono solo le ultime
+          // 24 ore, che e' il comportamento atteso.
+          // Se in 24 ore non c'e' nulla si allarga a 7 giorni, cosi' il
+          // riquadro non resta vuoto nei fine settimana e nei giorni di
+          // borsa chiusa.
+          const ORA = Date.now()
+          const entro = (n: any, ore: number) => {
+            const t = quando(n)
+            return t > 0 && ORA - t <= ore * 3_600_000
+          }
+          const recenti24 = walletNews.filter((n: any) => entro(n, 24))
+          const finestraOre = recenti24.length > 0 ? 24 : 24 * 7
+          const recenti = walletNews.filter((n: any) => entro(n, finestraOre))
+
           const conteggi = new Map<string, number>()
-          walletNews.forEach((n: any) => {
+          recenti.forEach((n: any) => {
             if (n.ticker) conteggi.set(n.ticker, (conteggi.get(n.ticker) || 0) + 1)
           })
           const perTendina = Array.from(conteggi.entries()).sort((a, b) => a[0].localeCompare(b[0]))
 
           const cerca = newsSearch.trim().toLowerCase()
-          const filtrate = walletNews
+          const filtrate = recenti
             .filter((n: any) => !newsTicker || n.ticker === newsTicker)
             .filter((n: any) => !cerca
               || (n.title || '').toLowerCase().includes(cerca)
@@ -673,7 +690,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
 
           return (
             <>
-              {!newsLoading && walletNews.length > 0 && (
+              {!newsLoading && recenti.length > 0 && (
                 <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:10, alignItems:'center' }}>
                   <select
                     value={newsTicker || ''}
@@ -682,7 +699,7 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                       padding:'5px 8px', borderRadius:3, minWidth:190,
                       border:'1px solid var(--border)', background:'var(--bg2, transparent)',
                       color:'var(--text)', cursor:'pointer' }}>
-                    <option value="">All companies ({walletNews.length})</option>
+                    <option value="">All companies ({recenti.length})</option>
                     {perTendina.map(([tk, n]) => (
                       <option key={tk} value={tk}>{tk} ({n})</option>
                     ))}
@@ -709,15 +726,15 @@ export default function MyScreen({ userId, onSelectStock }: Props) {
                   )}
 
                   <span style={{ fontSize:10, color:'var(--text4)', fontFamily:'IBM Plex Sans Condensed' }}>
-                    {filtrate.length} of {walletNews.length}
+                    {filtrate.length} of {recenti.length} · last {finestraOre === 24 ? '24h' : '7 days'}
                   </span>
                 </div>
               )}
 
               {newsLoading ? (
                 <div style={{ fontSize:12, color:'var(--text4)' }}>Loading news...</div>
-              ) : walletNews.length === 0 ? (
-                <div style={{ fontSize:12, color:'var(--text4)' }}>No news available for these tickers.</div>
+              ) : recenti.length === 0 ? (
+                <div style={{ fontSize:12, color:'var(--text4)' }}>No news in the last 7 days for these tickers.</div>
               ) : filtrate.length === 0 ? (
                 <div style={{ fontSize:12, color:'var(--text4)' }}>No headline matches the current filter.</div>
               ) : (
