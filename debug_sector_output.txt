@@ -1,12 +1,11 @@
-  implied_growth       su 2081 righe
-  implied_growth_10y   su 2165 righe
-  ke                   su 2516 righe
-  eps_ntm_dcf          su 2516 righe
+MERCATO           TOT  ALLINEATI        %
+Europa           2131       2059    96.6%
+Stati Uniti      2976       2920    98.1%
+Canada            394        383    97.2%
+Giappone          997        994    99.7%
+Hong Kong         500        499    99.8%
+Australia         342        341    99.7%
+Corea             400        398    99.5%
+Singapore         101        101   100.0%
 
-TITOLO    IMPLICITA   A 10 ANNI       Ke    EPS NTM
-AAPL          15.0%       14.7%    10.1%     9.3862
-AVGO          14.8%       12.9%    12.0%    16.0748
-LLY            5.9%        6.6%     7.2%    40.3852
-MSFT           8.6%       11.2%    10.1%    19.3391
-NVDA          18.3%       17.8%    15.7%    10.4964
-TSLA          46.8%       44.9%    13.8%     2.3346
+TOTALE 7841 | allineati 7695 (98.1%)
