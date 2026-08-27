@@ -1,25 +1,22 @@
-titoli USA in universo con capitalizzazione: 2976
+titoli europei in universo con capitalizzazione: 2130
 
-=== PRIMI 500 TITOLI STATUNITENSI ===
-  MEDIANA:        51459 milioni  =   51.5 miliardi USD
-  MEDIA:         146663 milioni  =  146.7 miliardi
-  massimo:      4769748 milioni  =   4770 miliardi (NVDA)
-  minimo:         20055 milioni  =   20.1 miliardi (LNT)
-  somma:       73331437 milioni  =  73.33 trilioni
+=== PRIMI 500 TITOLI EUROPEI ===
+  MEDIANA:      17302 milioni =   17.3 miliardi USD
+  MEDIA:        38015 milioni =   38.0 miliardi
+  massimo:     719344 milioni =    719 mld (ASML.AS)
+  minimo:        6103 milioni =    6.1 mld (TKMS.XETRA)
+  somma:     19007616 milioni =  19.01 trilioni
 
-  quartili:
-    Q1:      29125 milioni = 29.1 mld
-    Q2:      51459 milioni = 51.5 mld
-    Q3:      98462 milioni = 98.5 mld
+  quartili: Q1 9.5 mld | Q2 17.3 mld | Q3 39.5 mld
 
-  primi 10:
-    NVDA        4770 mld
-    AAPL        4563 mld
-    GOOGL       4460 mld
-    MSFT        2888 mld
-    AMZN        2646 mld
-    SPCX        1969 mld
-    AVGO        1764 mld
-    META        1563 mld
-    TSLA        1513 mld
-    LLY         1102 mld
+  primi 10 europei:
+    ASML      AS        719 mld  ASML Holding N.V.
+    ROP       SWX       338 mld  Roche Holding AG
+    HSBA      LSE       332 mld  HSBC Holdings plc
+    AZN       LSE       299 mld  AstraZeneca PLC
+    NOVN      SWX       291 mld  Novartis AG
+    MC        PA        281 mld  LVMH Moët Hennessy - Louis Vui
+    NESN      SWX       271 mld  Nestlé S.A.
+    SIE       XETRA     250 mld  Siemens Aktiengesellschaft
+    OR        PA        233 mld  L'Oréal S.A.
+    NOVO B    CPSE      222 mld  Novo Nordisk A/S
