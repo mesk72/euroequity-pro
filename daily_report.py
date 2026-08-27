@@ -121,9 +121,20 @@ def leggi_tutto(tabella, select, exchange, filtri=None):
         if not blocco:
             break
         righe.extend(blocco)
-        if len(blocco) < 1000:
+        # FIX 27/8/2026 — NON FERMARSI SU UNA PAGINA CORTA.
+        # PostgREST limita la risposta anche per DIMENSIONE, non solo per
+        # numero di righe: se i record sono grandi ne restituisce meno di
+        # quanti se ne chiedono. Il codice precedente interpretava una
+        # pagina corta come "ultima pagina" e si fermava a meta'.
+        # Il 27/8 gli Stati Uniti risultavano letti per 2.282 titoli su
+        # 2.976 - un numero non multiplo di mille, che e' proprio la firma
+        # di questo difetto - e il rapporto dichiarava il 76,7% di
+        # copertura mentre i dati erano completi.
+        # Ora si avanza di quante righe si sono DAVVERO ricevute e ci si
+        # ferma solo quando una pagina torna vuota.
+        if not blocco:
             break
-        offset += 1000
+        offset += len(blocco)
         if offset > 50000:
             break
 
