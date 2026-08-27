@@ -1,20 +1,32 @@
 import os, requests
+from collections import Counter
 U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
-for c in ["implied_growth","implied_growth_10y","ke","eps_ntm_dcf"]:
-    r=requests.get(U+"/rest/v1/fundamentals",headers={**H,"Prefer":"count=exact"},
-        params={"select":"ticker",c:"not.is.null","limit":"1"})
-    print("  %-20s su %s righe" % (c, r.headers.get("content-range","?").split("/")[-1]))
+def leggi(ex):
+    out=[];off=0
+    while True:
+        b=requests.get(U+"/rest/v1/latest_prices_mv",headers=H,
+            params={"select":"price_date","exchange":"eq."+ex,"limit":"1000","offset":str(off)},timeout=120).json()
+        if not isinstance(b,list) or not b: break
+        out+=[x["price_date"] for x in b]
+        off+=len(b)
+    return out
+G=[("Europa",["MIL","XETRA","PA","AS","MC","BR","LS","VI","HE","IR","GR","LSE","SWX","OM","OB","CPSE"]),
+   ("Stati Uniti",["US"]),("Canada",["TSX"]),("Giappone",["TSE"]),("Hong Kong",["SEHK"]),
+   ("Australia",["ASX"]),("Corea",["KRX"]),("Singapore",["SGX"])]
+TOT=0;ALL=0
+print("%-14s %6s %10s %8s" % ("MERCATO","TOT","ALLINEATI","%"))
+for nome,lista in G:
+    t=0;d=[]
+    for ex in lista:
+        r=requests.get(U+"/rest/v1/stocks",headers={**H,"Prefer":"count=exact"},
+            params={"select":"ticker","exchange":"eq."+ex,"in_universe":"eq.true","limit":"1"})
+        t+=int(r.headers.get("content-range","0/0").split("/")[-1])
+        d+=leggi(ex)
+    c=Counter(d); sed=c.most_common(1)[0][0] if c else "-"
+    a=sum(1 for x in d if x>=sed)
+    TOT+=t; ALL+=a
+    print("%-14s %6d %10d %7.1f%%" % (nome,t,a,a/t*100 if t else 0))
 print()
-d=requests.get(U+"/rest/v1/fundamentals",headers=H,
-    params={"select":"ticker,implied_growth,implied_growth_10y,ke,eps_ntm_dcf",
-            "ticker":"in.(NVDA,AAPL,MSFT,AVGO,LLY,TSLA)","exchange":"eq.US"}).json()
-print("%-7s %11s %11s %8s %10s" % ("TITOLO","IMPLICITA","A 10 ANNI","Ke","EPS NTM"))
-for x in sorted(d,key=lambda z:z["ticker"]):
-    g=x.get("implied_growth"); g10=x.get("implied_growth_10y")
-    print("%-7s %10s%% %10s%% %7s%% %10s" % (x["ticker"],
-        ("%.1f"%(g*100)) if g is not None else "-",
-        ("%.1f"%(g10*100)) if g10 is not None else "-",
-        ("%.1f"%(x["ke"]*100)) if x.get("ke") is not None else "-",
-        x.get("eps_ntm_dcf")))
+print("TOTALE %d | allineati %d (%.1f%%)" % (TOT,ALL,ALL/TOT*100))
