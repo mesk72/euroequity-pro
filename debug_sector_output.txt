@@ -1,11 +1,25 @@
-MERCATO           TOT  ALLINEATI        %
-Europa           2131       2059    96.6%
-Stati Uniti      2976       2920    98.1%
-Canada            394        383    97.2%
-Giappone          997        994    99.7%
-Hong Kong         500        499    99.8%
-Australia         342        341    99.7%
-Corea             400        398    99.5%
-Singapore         101        101   100.0%
+titoli USA in universo con capitalizzazione: 2976
 
-TOTALE 7841 | allineati 7695 (98.1%)
+=== PRIMI 500 TITOLI STATUNITENSI ===
+  MEDIANA:        51459 milioni  =   51.5 miliardi USD
+  MEDIA:         146663 milioni  =  146.7 miliardi
+  massimo:      4769748 milioni  =   4770 miliardi (NVDA)
+  minimo:         20055 milioni  =   20.1 miliardi (LNT)
+  somma:       73331437 milioni  =  73.33 trilioni
+
+  quartili:
+    Q1:      29125 milioni = 29.1 mld
+    Q2:      51459 milioni = 51.5 mld
+    Q3:      98462 milioni = 98.5 mld
+
+  primi 10:
+    NVDA        4770 mld
+    AAPL        4563 mld
+    GOOGL       4460 mld
+    MSFT        2888 mld
+    AMZN        2646 mld
+    SPCX        1969 mld
+    AVGO        1764 mld
+    META        1563 mld
+    TSLA        1513 mld
+    LLY         1102 mld
