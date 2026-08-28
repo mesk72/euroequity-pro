@@ -1,2 +1,23 @@
-eseguito: 2026-08-28T13:05:48
+eseguito: 2026-08-28T14:13:05
 [Completamento seduta] Recupero i titoli rimasti indietro...
+  LSE: seduta 2026-08-27 — 5 indietro, 0 recuperati, 5 non disponibili su Yahoo
+  SGX: seduta 2026-08-27 — completo (101 titoli)
+  CPSE: seduta 2026-08-27 — 3 indietro, 0 recuperati, 3 non disponibili su Yahoo
+  GR: seduta 2026-08-27 — 1 indietro, 0 recuperati, 1 non disponibili su Yahoo
+  SWX: seduta 2026-08-27 — 6 indietro, 0 recuperati, 6 non disponibili su Yahoo
+  KRX: seduta 2026-08-27 — 2 indietro, 0 recuperati, 2 non disponibili su Yahoo
+  HE: seduta 2026-08-27 — completo (100 titoli)
+  OM: seduta 2026-08-27 — 1 indietro, 0 recuperati, 1 non disponibili su Yahoo
+  OB: seduta 2026-08-27 — 2 indietro, 0 recuperati, 2 non disponibili su Yahoo
+  PA: seduta 2026-08-27 — 1 indietro, 0 recuperati, 1 non disponibili su Yahoo
+  BR: seduta 2026-08-27 — 2 indietro, 0 recuperati, 2 non disponibili su Yahoo
+  AS: seduta 2026-08-27 — completo (98 titoli)
+  XETRA: seduta 2026-08-27 — 3 indietro, 0 recuperati, 3 non disponibili su Yahoo
+  VI: seduta 2026-08-27 — completo (53 titoli)
+  MC: seduta 2026-08-27 — completo (91 titoli)
+  IR: seduta 2026-08-27 — completo (15 titoli)
+  LS: seduta 2026-08-27 — completo (37 titoli)
+  MIL: seduta 2026-08-27 — completo (117 titoli)
+  RISULTATO: 2606/2632 titoli hanno l'ultima seduta (0 recuperati adesso)
+  26 non disponibili su Yahoo (delistati, sospesi o non ancora pubblicati)
+  26 titoli NON disponibili su Yahoo (verificati uno per uno):
