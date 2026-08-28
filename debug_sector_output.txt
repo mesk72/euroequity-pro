@@ -1,22 +1,9 @@
-titoli europei in universo con capitalizzazione: 2130
+=== lettura di stocks per US, pagina per pagina ===
+  offset     0 -> 1000 righe (0.7s)
+  offset  1000 -> 1000 righe (0.7s)
+  offset  2000 ->  976 righe (0.6s)
+  offset  2976 ->    0 righe (0.5s)
+  TOTALE: 2976
 
-=== PRIMI 500 TITOLI EUROPEI ===
-  MEDIANA:      17302 milioni =   17.3 miliardi USD
-  MEDIA:        38015 milioni =   38.0 miliardi
-  massimo:     719344 milioni =    719 mld (ASML.AS)
-  minimo:        6103 milioni =    6.1 mld (TKMS.XETRA)
-  somma:     19007616 milioni =  19.01 trilioni
-
-  quartili: Q1 9.5 mld | Q2 17.3 mld | Q3 39.5 mld
-
-  primi 10 europei:
-    ASML      AS        719 mld  ASML Holding N.V.
-    ROP       SWX       338 mld  Roche Holding AG
-    HSBA      LSE       332 mld  HSBC Holdings plc
-    AZN       LSE       299 mld  AstraZeneca PLC
-    NOVN      SWX       291 mld  Novartis AG
-    MC        PA        281 mld  LVMH Moët Hennessy - Louis Vui
-    NESN      SWX       271 mld  Nestlé S.A.
-    SIE       XETRA     250 mld  Siemens Aktiengesellschaft
-    OR        PA        233 mld  L'Oréal S.A.
-    NOVO B    CPSE      222 mld  Novo Nordisk A/S
+=== e con la selezione completa che usa il rapporto? ===
+  TOTALE: 2976
