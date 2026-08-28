@@ -77,6 +77,44 @@ LETTURE_INCOMPLETE = []
 
 
 def leggi_tutto(tabella, select, exchange, filtri=None):
+    """Legge tutte le righe, e se il conteggio non torna RILEGGE DA CAPO.
+
+    FIX 28/8/2026 — il difetto e' INTERMITTENTE. La paginazione corretta
+    (28/8) legge regolarmente i 2.976 titoli americani quando la si prova,
+    ma nel momento in cui gira il rapporto qualcosa fallisce e ne mancano
+    circa 650. Ritentare la singola pagina non basta, perche' il problema
+    non e' la pagina ma lo stato del momento.
+    Ora, se al termine le righe lette non coincidono con il conteggio
+    autorevole del server, l'intera lettura viene rifatta da zero fino a
+    tre volte. Solo se anche il terzo tentativo fallisce si dichiara la
+    lettura incompleta."""
+    atteso = None
+    try:
+        p = {"select": "ticker", "exchange": "eq." + exchange, "limit": "1"}
+        if filtri:
+            p.update(filtri)
+        rc = requests.get(SUPABASE_URL + "/rest/v1/" + tabella,
+                          headers={**HEADERS, "Prefer": "count=exact"},
+                          params=p, timeout=60)
+        atteso = int(rc.headers.get("content-range", "0/0").split("/")[-1])
+    except Exception:
+        pass
+
+    for tentativo in range(3):
+        righe = _leggi_una_volta(tabella, select, exchange, filtri)
+        if not atteso or len(righe) >= atteso:
+            return righe
+        print("  lettura %s/%s incompleta (%d su %d), rileggo da capo (tentativo %d)"
+              % (tabella, exchange, len(righe), atteso, tentativo + 1))
+        time.sleep(3 * (tentativo + 1))
+
+    print("  ATTENZIONE: %s/%s letti %d su %d dopo 3 riletture complete"
+          % (tabella, exchange, len(righe), atteso))
+    LETTURE_INCOMPLETE.append((tabella, exchange, len(righe), atteso))
+    return righe
+
+
+def _leggi_una_volta(tabella, select, exchange, filtri=None):
     """Legge TUTTE le righe di un exchange, paginando (PostgREST limita a 1000).
 
     FIX 23/8/2026 — LETTURA PARZIALE SILENZIOSA.
@@ -138,23 +176,6 @@ def leggi_tutto(tabella, select, exchange, filtri=None):
         if offset > 50000:
             break
 
-    # Verifica contro il conteggio autorevole del server.
-    try:
-        p = {"select": "ticker", "exchange": "eq." + exchange, "limit": "1"}
-        if filtri:
-            p.update(filtri)
-        rc = requests.get(SUPABASE_URL + "/rest/v1/" + tabella,
-                          headers={**HEADERS, "Prefer": "count=exact"},
-                          params=p, timeout=60)
-        atteso = int(rc.headers.get("content-range", "0/0").split("/")[-1])
-        if atteso and len(righe) != atteso:
-            print("  ATTENZIONE: %s/%s letti %d su %d attesi"
-                  % (tabella, exchange, len(righe), atteso))
-            LETTURE_INCOMPLETE.append((tabella, exchange, len(righe), atteso))
-    except Exception:
-        pass
-    if fallita:
-        LETTURE_INCOMPLETE.append((tabella, exchange, len(righe), None))
     return righe
 
 
