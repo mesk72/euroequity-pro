@@ -351,217 +351,126 @@ ok_prices = ok_yf; fail_prices = fail_yf
 
 
 # ── COMPLETAMENTO SEDUTA ─────────────────────────────────────
-# REGOLA (imposta da Andrea, 7/8/2026): non si accetta nessun titolo
-# indietro. Non esiste una soglia "abbastanza aggiornato": 998 su 1000 e'
-# un fallimento come 500 su 1000. Per ogni singolo titolo si arriva a una
-# di queste due conclusioni, e a nessun'altra:
-#   - il prezzo c'e' su Yahoo   -> viene scaricato, costi quel che costi
-#   - il prezzo NON c'e'        -> verificato UNO PER UNO con richiesta
-#                                  singola, e registrato con il motivo
+# RISCRITTO 28/8/2026 — TOLTA LA STIMA DELLA SEDUTA ATTESA.
 #
-# Perche' la versione precedente non bastava: si fermava quando una
-# passata non produceva progressi. Ma i titoli che restano indietro sono
-# proprio quelli che il download di gruppo perde sistematicamente (poco
-# scambiati, o penalizzati dai limiti di frequenza di Yahoo): rinunciare
-# quando il gruppo non li restituisce piu' significa non prenderli mai.
-# Ora, quando il gruppo smette di dare risultati, si passa alle richieste
-# SINGOLE, che sono lente ma affidabili.
-log("\n[Completamento seduta] Nessun titolo indietro: verifico uno per uno...")
+# La versione precedente stimava prima "qual e' l'ultima seduta del
+# mercato" campionando dodici titoli, poi cercava chi non l'avesse. Ma la
+# stima sbagliava: se i titoli campionati erano in anticipo o in ritardo
+# rispetto al resto, il codice cercava una data diversa da quella reale e
+# concludeva che non mancasse nessuno.
+#
+# Effetto misurato: per quattro volte di seguito la fase ha dichiarato
+# tutto completo mentre restavano indietro titoli che Yahoo aveva. Un
+# recupero manuale con la logica qui sotto ne ha ripresi 105 in dieci
+# minuti (33 danesi, 49 americani, 12 canadesi, 7 australiani).
+#
+# Metodo attuale, senza stime: si guarda quale data e' la PIU' DIFFUSA fra
+# i titoli di quel mercato — che per definizione e' l'ultima seduta reale,
+# perche' la maggioranza dei titoli ce l'ha — e chiunque sia indietro
+# rispetto a quella viene riscaricato uno per uno.
+log("\n[Completamento seduta] Recupero i titoli rimasti indietro...")
 
 _ymap = {}
 for _s in all_stocks:
     _ymap[(_s["ticker"], _s["exchange"])] = _s.get("yahoo_ticker") or yahoo_ticker(_s["ticker"], _s["exchange"])
 
 
-def _seduta_attesa(_ex, _tickers):
-    """Ultima seduta CHIUSA che Yahoo ha per questo mercato.
-    FIX 7/8/2026: si usa il valore PREVALENTE fra i titoli di riferimento,
-    non il massimo. Col massimo bastava un solo titolo in anticipo per far
-    risultare "mancanti" tutti gli altri: il 7/8 su Zurigo un unico titolo
-    aveva il 6 agosto mentre il resto del mercato si fermava al 5, e lo
-    script ha cercato inutilmente 137 titoli che Yahoo non aveva ancora
-    pubblicato. Si campionano piu' titoli (12 invece di 6) presi anche
-    dal centro dell'elenco, non solo dai primi in ordine alfabetico."""
-    _voti = []
-    _campione = _tickers[:6] + _tickers[len(_tickers) // 2: len(_tickers) // 2 + 6]
-    for _tk in _campione:
-        _yt = _ymap.get((_tk, _ex))
-        if not _yt:
-            continue
-        try:
-            _d = yf.download(_yt, period="12d", interval="1d", auto_adjust=True, progress=False)
-            if _d.empty:
-                continue
-            _c = _d["Close"]
-            if isinstance(_c, pd.DataFrame):
-                _c = _c.iloc[:, 0]
-            _c = _c.dropna()
-            for _i in range(len(_c) - 1, -1, -1):
-                _ds = _c.index[_i].strftime("%Y-%m-%d")
-                if seduta_conclusa(_ds):
-                    _voti.append(_ds)
-                    break
-        except Exception:
-            pass
-        time.sleep(0.3)
-    if not _voti:
-        return None
-    _conta = {}
-    for _v in _voti:
-        _conta[_v] = _conta.get(_v, 0) + 1
-    # il piu' votato; a parita' di voti si preferisce la data piu' recente
-    return sorted(_conta.items(), key=lambda x: (x[1], x[0]), reverse=True)[0][0]
-
-
-def _chi_manca(_ex, _tickers, _seduta):
-    _pres = set()
+def _date_di_mercato(_ex):
+    """Ultima data di ciascun titolo del mercato, letta da prices_eod.
+    Nessuna stima: si usa quello che c'e' davvero nel database."""
+    _ultima = {}
     _off = 0
     while True:
         try:
-            _r = requests.get(SUPABASE_URL + "/rest/v1/prices_eod", headers=headers_r,
-                              params={"select": "ticker", "exchange": "eq." + _ex,
-                                      "date": "eq." + _seduta,
-                                      "limit": "1000", "offset": str(_off)}, timeout=60)
+            _r = requests.get(SUPABASE_URL + "/rest/v1/latest_prices_mv", headers=headers_r,
+                              params={"select": "ticker,price_date", "exchange": "eq." + _ex,
+                                      "limit": "1000", "offset": str(_off)}, timeout=90)
             _b = _r.json()
         except Exception:
             break
         if not isinstance(_b, list) or not _b:
             break
-        _pres.update(_x["ticker"] for _x in _b)
-        _off += 1000
-        if len(_b) < 1000:
+        for _x in _b:
+            _ultima[_x["ticker"]] = _x.get("price_date")
+        _off += len(_b)
+        if _off > 20000:
             break
-    return [_t for _t in _tickers if _t not in _pres]
+    return _ultima
 
 
-def _scrivi(_righe):
-    _ok = 0
-    for _i in range(0, len(_righe), 500):
-        _w = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date",
-                           headers=headers_up, json=_righe[_i:_i + 500])
-        if _w.status_code in (200, 201, 204):
-            _ok += len(_righe[_i:_i + 500])
-    return _ok
+def _scarica_singolo(_tk, _ex, _seduta):
+    """Scarica quella singola seduta per un titolo. Restituisce la riga
+    da scrivere, oppure None se Yahoo non ha quel giorno."""
+    _yt = _ymap.get((_tk, _ex))
+    if not _yt:
+        return None
+    try:
+        _d = yf.download(_yt, period="10d", interval="1d", auto_adjust=True, progress=False)
+        if _d.empty:
+            return None
+        _c = _d["Close"]
+        if isinstance(_c, pd.DataFrame):
+            _c = _c.iloc[:, 0]
+        _c = _c.dropna()
+        for _i, _v in _c.items():
+            _ds = _i.strftime("%Y-%m-%d")
+            if _ds == _seduta and seduta_conclusa(_ds):
+                return {"ticker": _tk, "exchange": _ex, "date": _ds,
+                        "adj_close": round(float(_v), 6)}
+    except Exception:
+        pass
+    return None
 
 
-def _gruppo(_ex, _mancanti, _seduta):
-    """Tentativo a blocchi di 40: veloce, recupera la maggior parte."""
-    _dopo = (datetime.strptime(_seduta, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
-    _prima = (datetime.strptime(_seduta, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
-    _buf = []
-    for _i in range(0, len(_mancanti), 40):
-        _map = {}
-        for _t in _mancanti[_i:_i + 40]:
-            _yt = _ymap.get((_t, _ex))
-            if _yt:
-                _map[_yt] = _t
-        if not _map:
-            continue
-        try:
-            _df = yf.download(tickers=" ".join(_map.keys()), start=_prima, end=_dopo,
-                              interval="1d", auto_adjust=True, progress=False, threads=True)
-            if _df.empty:
-                continue
-            _cl = _df["Close"] if isinstance(_df.columns, pd.MultiIndex) \
-                else _df[["Close"]].rename(columns={"Close": list(_map.keys())[0]})
-            for _yt, _t in _map.items():
-                if _yt not in _cl.columns:
-                    continue
-                for _idx, _pr in _cl[_yt].dropna().items():
-                    if _idx.strftime("%Y-%m-%d") == _seduta and seduta_conclusa(_seduta):
-                        _buf.append({"ticker": _t, "exchange": _ex, "date": _seduta,
-                                     "adj_close": round(float(_pr), 6)})
-        except Exception:
-            pass
-        time.sleep(1.2)
-    _ded = {}
-    for _r in _buf:
-        _ded[(_r["ticker"], _r["exchange"], _r["date"])] = _r
-    return _scrivi(list(_ded.values()))
-
-
-def _singoli(_ex, _mancanti, _seduta):
-    """Ultima istanza: una richiesta per ciascun titolo. Lento ma e' il
-    metodo che da' la risposta definitiva. Restituisce (scritti, assenti),
-    dove 'assenti' sono i titoli per cui Yahoo NON ha quella seduta -
-    verificato singolarmente, non per esclusione."""
-    _buf = []
-    _assenti = []
-    for _t in _mancanti:
-        _yt = _ymap.get((_t, _ex))
-        if not _yt:
-            _assenti.append((_t, "nessun codice Yahoo"))
-            continue
-        try:
-            _d = yf.download(_yt, period="10d", interval="1d", auto_adjust=True, progress=False)
-            if _d.empty:
-                _assenti.append((_t, "Yahoo non ha dati"))
-            else:
-                _c = _d["Close"]
-                if isinstance(_c, pd.DataFrame):
-                    _c = _c.iloc[:, 0]
-                _c = _c.dropna()
-                _map = {_i.strftime("%Y-%m-%d"): float(_v) for _i, _v in _c.items()}
-                if _seduta in _map:
-                    _buf.append({"ticker": _t, "exchange": _ex, "date": _seduta,
-                                 "adj_close": round(_map[_seduta], 6)})
-                else:
-                    _ultimo = max(_map) if _map else "nessuna"
-                    _assenti.append((_t, "ultima seduta su Yahoo: " + _ultimo))
-        except Exception as _e:
-            _assenti.append((_t, "errore: " + str(_e)[:40]))
-        time.sleep(0.35)
-    return _scrivi(_buf), _assenti
-
-
-_sedute = {}
-for _ex, _tk in by_exchange.items():
-    _sedute[_ex] = _seduta_attesa(_ex, _tk)
-
-_non_disponibili = []
 recuperati_tot = 0
-
-for _ex, _tickers in by_exchange.items():
-    _seduta = _sedute.get(_ex)
-    if not _seduta:
-        log(f"  {_ex}: impossibile stabilire l'ultima seduta, salto")
-        continue
-
-    # fase A: tentativi a gruppi, finche' producono risultati
-    for _p in range(1, 4):
-        _manc = _chi_manca(_ex, _tickers, _seduta)
-        if not _manc:
-            break
-        _r = _gruppo(_ex, _manc, _seduta)
-        recuperati_tot += _r
-        if _r == 0:
-            break
-
-    # fase B: chi resta viene interrogato UNO PER UNO. Nessuna rinuncia
-    # prima di questo passaggio: e' l'unico modo per distinguere davvero
-    # "Yahoo non ce l'ha" da "il download di gruppo l'ha perso".
-    _manc = _chi_manca(_ex, _tickers, _seduta)
-    if _manc:
-        _r, _assenti = _singoli(_ex, _manc, _seduta)
-        recuperati_tot += _r
-        for _t, _mot in _assenti:
-            _non_disponibili.append((_ex, _t, _mot))
-        log(f"  {_ex}: seduta {_seduta} — {len(_manc)} da verificare singolarmente, "
-            f"{_r} recuperati, {len(_assenti)} non disponibili su Yahoo")
-    else:
-        log(f"  {_ex}: seduta {_seduta} — completo")
-
-# riepilogo: quanti titoli hanno DAVVERO l'ultima seduta
+_non_disponibili = []
 _completi = 0
 _totali = 0
+
 for _ex, _tickers in by_exchange.items():
     _totali += len(_tickers)
-    _seduta = _sedute.get(_ex)
-    if _seduta:
-        _completi += len(_tickers) - len(_chi_manca(_ex, _tickers, _seduta))
+    _ultima = _date_di_mercato(_ex)
+    _date = [_d for _d in _ultima.values() if _d]
+    if not _date:
+        log(f"  {_ex}: nessun prezzo, salto")
+        continue
+
+    # La seduta reale del mercato e' la data piu' diffusa: non serve
+    # stimarla interrogando Yahoo, ce l'abbiamo gia' nei nostri dati.
+    _seduta = Counter(_date).most_common(1)[0][0]
+    _indietro = [_t for _t in _tickers if _ultima.get(_t) is None or _ultima[_t] < _seduta]
+
+    if not _indietro:
+        _completi += len(_tickers)
+        log(f"  {_ex}: seduta {_seduta} — completo ({len(_tickers)} titoli)")
+        continue
+
+    _buf = []
+    for _t in _indietro:
+        _riga = _scarica_singolo(_t, _ex, _seduta)
+        if _riga:
+            _buf.append(_riga)
+        else:
+            _non_disponibili.append((_ex, _t))
+        time.sleep(0.25)
+
+    _ok = 0
+    for _i in range(0, len(_buf), 500):
+        _w = requests.post(SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date",
+                           headers=headers_up, json=_buf[_i:_i + 500])
+        if _w.status_code in (200, 201, 204):
+            _ok += len(_buf[_i:_i + 500])
+    recuperati_tot += _ok
+    _completi += len(_tickers) - len(_indietro) + _ok
+    log(f"  {_ex}: seduta {_seduta} — {len(_indietro)} indietro, "
+        f"{_ok} recuperati, {len(_indietro) - _ok} non disponibili su Yahoo")
 
 log(f"  RISULTATO: {_completi}/{_totali} titoli hanno l'ultima seduta "
     f"({recuperati_tot} recuperati adesso)")
+if _non_disponibili:
+    log(f"  {len(_non_disponibili)} non disponibili su Yahoo "
+        f"(delistati, sospesi o non ancora pubblicati)")
+
 if _non_disponibili:
     log(f"  {len(_non_disponibili)} titoli NON disponibili su Yahoo (verificati uno per uno):")
     for _ex, _t, _mot in _non_disponibili[:40]:
