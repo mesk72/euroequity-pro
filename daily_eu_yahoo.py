@@ -13,7 +13,7 @@ except ImportError:
     subprocess.run(["pip", "install", "python-dateutil", "--break-system-packages", "-q"])
     from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
-from collections import defaultdict
+from collections import defaultdict, Counter
 import yfinance as yf
 import pandas as pd
 
