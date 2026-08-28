@@ -19,7 +19,7 @@ except ImportError:
     subprocess.run(["pip", "install", "python-dateutil", "--break-system-packages", "-q"])
     from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 # SECONDO BLOCCO RIMOSSO 11/8/2026.
 # Usciva dichiarando SUCCESSO quando trovava un'altra esecuzione dello
