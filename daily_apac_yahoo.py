@@ -917,15 +917,18 @@ if _non_disponibili:
     log(f"  {len(_non_disponibili)} non disponibili su Yahoo "
         f"(delistati, sospesi o non ancora pubblicati)")
 
+# RIMOSSO 28/8/2026: era un frammento del vecchio riepilogo, rimasto
+# indietro nella riscrittura della fase di completamento. Si aspettava
+# TRE valori per titolo (mercato, ticker, motivo) mentre la versione
+# nuova ne fornisce due, e faceva morire lo script DOPO aver fatto tutto
+# il lavoro: i dati venivano scritti ma il workflow risultava fallito.
 if _non_disponibili:
-    log(f"  {len(_non_disponibili)} titoli NON disponibili su Yahoo (verificati uno per uno):")
-    for _ex, _t, _mot in _non_disponibili[:40]:
-        log(f"    {_t}.{_ex} — {_mot}")
-    if len(_non_disponibili) > 40:
-        log(f"    ...e altri {len(_non_disponibili) - 40}")
-if _completi + len(_non_disponibili) < _totali:
-    log(f"  ATTENZIONE: {_totali - _completi - len(_non_disponibili)} titoli non "
-        f"aggiornati e non giustificati. Da controllare.")
+    _per_mercato = Counter(_e for _e, _t in _non_disponibili)
+    log("    " + ", ".join(f"{_e}:{_n}" for _e, _n in sorted(_per_mercato.items())))
+    for _e, _t in _non_disponibili[:30]:
+        log(f"    {_t}.{_e}")
+    if len(_non_disponibili) > 30:
+        log(f"    ...e altri {len(_non_disponibili) - 30}")
 
 # ── VISTA DEI PREZZI CORRENTI ────────────────────────────────
 # FIX 6/8/2026: la chiamata HTTP a refresh_latest_prices() e' stata
