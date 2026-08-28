@@ -1,22 +1,2 @@
-MIL    indietro   2 -> recuperati   0
-XETRA  indietro   6 -> recuperati   0
-PA     indietro   9 -> recuperati   0
-AS     indietro   6 -> recuperati   0
-MC     indietro  13 -> recuperati   1
-BR     indietro  11 -> recuperati   0
-LS     indietro   6 -> recuperati   0
-VI     indietro   6 -> recuperati   0
-IR     indietro   2 -> recuperati   0
-GR     indietro   4 -> recuperati   0
-LSE    indietro  15 -> recuperati   0
-SWX    indietro  12 -> recuperati   0
-OM     indietro   1 -> recuperati   0
-OB     indietro   2 -> recuperati   0
-CPSE   indietro  40 -> recuperati  33
-US     indietro  94 -> recuperati  49
-TSX    indietro  21 -> recuperati  12
-TSE    indietro   6 -> recuperati   3
-ASX    indietro  10 -> recuperati   7
-KRX    indietro   2 -> recuperati   0
-
-TOTALE recuperati: 105 | non disponibili su Yahoo: 163
+eseguito: 2026-08-28T13:05:48
+[Completamento seduta] Recupero i titoli rimasti indietro...
