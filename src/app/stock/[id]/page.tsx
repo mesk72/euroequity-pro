@@ -111,8 +111,14 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
   }
 
   const pricePoints = closes.map((p, i) => `${toX(i).toFixed(1)},${toY(p).toFixed(1)}`).join(' ')
-  const isUp = closes[closes.length - 1] >= closes[0]
-  const c = isUp ? 'var(--green)' : 'var(--red)'
+  // FIX 1/9/2026 — COLORE E NUMERO VENIVANO DA FONTI DIVERSE.
+  // Il colore confrontava primo e ultimo prezzo DEL GRAFICO, mentre il
+  // numero mostrato e' il momentum precalcolato (1w, 1m, 6m, 12m, 3y, 5y).
+  // I due periodi non coincidono — il grafico copre un numero fisso di
+  // giorni di calendario, il momentum un periodo diverso — quindi si
+  // vedevano valori positivi colorati di rosso e viceversa.
+  // Ora il colore deriva SEMPRE dal numero mostrato: positivo verde,
+  // negativo rosso, zero neutro.
   const _fb = ((closes[closes.length-1]/closes[0]-1)*100).toFixed(2)
   const _pct = (v: number | null) => v != null ? Number(v).toFixed(2) : null
   const perf = momentum
@@ -123,6 +129,11 @@ function PriceChart({ history, days, momentum }: { history: any[]; days: number;
     : days <= 1000 ? (_pct(momentum.mom3y) ?? _fb)
     : (_pct(momentum.mom5y) ?? _fb))
     : _fb
+  const _perfNum = Number(perf)
+  const isUp = !isNaN(_perfNum) ? _perfNum >= 0 : closes[closes.length - 1] >= closes[0]
+  const c = !isNaN(_perfNum)
+    ? (_perfNum > 0 ? 'var(--green)' : _perfNum < 0 ? 'var(--red)' : 'var(--text3)')
+    : (isUp ? 'var(--green)' : 'var(--red)')
 
   const yLabels = [0, 0.25, 0.5, 0.75, 1].map(r => ({
     val: (maxP - r * range).toFixed(2),
