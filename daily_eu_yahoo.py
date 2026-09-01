@@ -941,6 +941,100 @@ for i in range(0, len(partial_rows), 500):
 log(f"  Quintili di settore: {q_ok} righe (exchange,settore) aggiornate")
 
 
+# ── CONTROLLO SPLIT E RAGGRUPPAMENTI ─────────────────────────
+# AGGIUNTO 31/8/2026 su richiesta di Andrea.
+#
+# Perche' serve: quando una societa' fa uno split o un raggruppamento,
+# Yahoo ricalcola TUTTA la serie storica con il nuovo fattore, mentre noi
+# aggiungiamo solo la riga del giorno. Nella nostra serie resta uno
+# scalino artificiale che non e' un movimento di mercato, e da quel
+# momento ogni rendimento calcolato su un periodo che attraversa quella
+# data e' sbagliato.
+#
+# Caso reale: Predictive Discovery (PDI.ASX) ha fatto un raggruppamento
+# uno-a-cinque il 26/8/2026. Nel nostro database il 14 agosto valeva
+# ancora 0,80 e il 17 agosto 4,25 — uno scalino del +431% — mentre Yahoo
+# aveva gia' rettificato tutto lo storico. I rendimenti a un mese, tre
+# mesi, sei mesi e un anno di quel titolo erano privi di senso.
+#
+# Regola: se un titolo si muove di oltre il 25% in un giorno rispetto al
+# nostro ultimo prezzo, non ci si fida della riga singola — si riscarica
+# l'intera serie di cinque anni, che Yahoo fornisce gia' rettificata.
+# Il 25% e' una soglia volutamente prudente: cattura anche split piccoli
+# (uno a due o tre a due) e nel peggiore dei casi riscarica lo storico di
+# un titolo che ha davvero fatto un balzo, il che non fa alcun danno.
+SOGLIA_SPLIT = 0.25
+ANNI_STORICO = 5
+
+log("\n[Controllo split] Cerco variazioni giornaliere anomale...")
+
+_sospetti = []
+for _ex, _tickers in by_exchange.items():
+    _prec = {}
+    _off = 0
+    while True:
+        try:
+            _r = requests.get(SUPABASE_URL + "/rest/v1/latest_prices_mv", headers=headers_r,
+                              params={"select": "ticker,price,prev_price", "exchange": "eq." + _ex,
+                                      "limit": "1000", "offset": str(_off)}, timeout=90)
+            _b = _r.json()
+        except Exception:
+            break
+        if not isinstance(_b, list) or not _b:
+            break
+        for _x in _b:
+            _p, _pp = _x.get("price"), _x.get("prev_price")
+            if _p and _pp and _pp > 0:
+                _prec[_x["ticker"]] = abs(_p / _pp - 1)
+        _off += len(_b)
+        if _off > 20000:
+            break
+    for _t, _var in _prec.items():
+        if _var > SOGLIA_SPLIT:
+            _sospetti.append((_t, _ex, _var))
+
+if not _sospetti:
+    log("  nessuna variazione sospetta")
+else:
+    log(f"  {len(_sospetti)} titoli con variazione oltre il {SOGLIA_SPLIT*100:.0f}%: riscarico lo storico")
+    _inizio = (datetime.now() - timedelta(days=365 * ANNI_STORICO + 10)).strftime("%Y-%m-%d")
+    _rifatti = 0
+    for _t, _ex, _var in _sospetti:
+        _yt = _ymap.get((_t, _ex))
+        if not _yt:
+            continue
+        try:
+            _df = yf.download(_yt, start=_inizio, end=END_FOR_DOWNLOAD,
+                              interval="1d", auto_adjust=True, progress=False)
+            if _df.empty:
+                log(f"    {_t}.{_ex}: Yahoo non ha lo storico, salto")
+                continue
+            _c = _df["Close"]
+            if isinstance(_c, pd.DataFrame):
+                _c = _c.iloc[:, 0]
+            _c = _c.dropna()
+            _righe = {}
+            for _i, _v in _c.items():
+                _ds = _i.strftime("%Y-%m-%d")
+                if not seduta_conclusa(_ds):
+                    continue
+                _righe[_ds] = {"ticker": _t, "exchange": _ex, "date": _ds,
+                               "adj_close": round(float(_v), 6)}
+            _righe = list(_righe.values())
+            _ok = 0
+            for _i in range(0, len(_righe), 500):
+                _w = requests.post(
+                    SUPABASE_URL + "/rest/v1/prices_eod?on_conflict=ticker,exchange,date",
+                    headers=headers_up, json=_righe[_i:_i + 500])
+                if _w.status_code in (200, 201, 204):
+                    _ok += len(_righe[_i:_i + 500])
+            _rifatti += 1
+            log(f"    {_t}.{_ex}: variazione {_var*100:.0f}% -> riscritte {_ok} sedute")
+        except Exception as _e:
+            log(f"    {_t}.{_ex}: errore {str(_e)[:70]}")
+        time.sleep(0.6)
+    log(f"  Storico ricostruito per {_rifatti} titoli")
+
 # ── VISTA DEI PREZZI CORRENTI ────────────────────────────────
 # FIX 6/8/2026: la chiamata HTTP a refresh_latest_prices() e' stata
 # rimossa perche' andava SEMPRE in timeout (errore 57014): Supabase
