@@ -1,7 +1,32 @@
-eseguito: 2026-08-28T17:20:13
-[Completamento seduta] Recupero i titoli rimasti indietro...
-  US: seduta 2026-08-27 — 27 indietro, 0 recuperati, 27 non disponibili su Yahoo
-  TSX: seduta 2026-08-27 — 10 indietro, 0 recuperati, 10 non disponibili su Yahoo
-  RISULTATO: 3333/3370 titoli hanno l'ultima seduta (0 recuperati adesso)
-  37 non disponibili su Yahoo (delistati, sospesi o non ancora pubblicati)
-  37 titoli NON disponibili su Yahoo (verificati uno per uno):
+anagrafica: [{'ticker': 'PDI', 'exchange': 'ASX', 'company': 'Predictive Discovery Limited', 'yahoo_ticker': 'PDI.AX'}]
+
+NOSTRI ultimi 12 prezzi (PDI.ASX):
+   2026-08-28  4.47
+   2026-08-27  4.4
+   2026-08-26  4.61
+   2026-08-25  4.475
+   2026-08-24  4.475
+   2026-08-21  4.45
+   2026-08-20  4.6
+   2026-08-19  4.25
+   2026-08-18  4.25
+   2026-08-17  4.25
+   2026-08-14  0.8
+   2026-08-13  0.805
+
+YAHOO (PDI.AX):
+   2026-08-14  4.0000
+   2026-08-17  4.2500
+   2026-08-18  4.2500
+   2026-08-19  4.2500
+   2026-08-20  4.6000
+   2026-08-21  4.4500
+   2026-08-24  4.4750
+   2026-08-25  4.4750
+   2026-08-26  4.6100
+   2026-08-27  4.4000
+   2026-08-28  4.4700
+   2026-08-31  4.1900
+
+SPLIT registrati da Yahoo:
+    {Timestamp('2017-05-19 10:00:00+1000', tz='Australia/Sydney'): 0.1, Timestamp('2026-08-26 10:00:00+1000', tz='Australia/Sydney'): 0.2}
