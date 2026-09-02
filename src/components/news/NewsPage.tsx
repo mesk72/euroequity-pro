@@ -236,7 +236,20 @@ async function fetchTickerNews(
       })
     )
 
+    // FIX 2/9/2026 — LE NOTIZIE REGIONALI NON AVEVANO LIMITE DI ETA'.
+    // Le notizie mondiali filtravano gia' a 48 ore, quelle di Europa, Asia
+    // e Americhe venivano solo ordinate: comparivano articoli di giugno e
+    // del 20 agosto accanto a quelli del giorno. Il difetto non era
+    // nell'aggiornamento — la cache viene riempita regolarmente, oltre
+    // 10.000 notizie nelle ultime sei ore — ma nel fatto che Yahoo
+    // restituisce per ogni titolo un misto di articoli recenti e vecchi,
+    // e la pagina li mostrava tutti.
+    const ETA_MASSIMA = 48 * 60 * 60 * 1000
     const batchNews: NewsItem[] = batchResults.flat()
+      .filter(n => {
+        const t = new Date(n.pubDate).getTime()
+        return !isNaN(t) && Date.now() - t <= ETA_MASSIMA
+      })
       .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
 
     if (batchNews.length > 0) onBatch(batchNews)
@@ -323,8 +336,24 @@ export default function NewsPage() {
             growthScore: i.growth_score, bestScore: i.best_score,
             mktCap: i.mkt_cap,
           }))
-          if (cachedItems.length > 0) {
-            setData(prev => ({ ...prev, [region]: cachedItems }))
+          // FIX 2/9/2026 — QUESTO E' IL PERCORSO PRINCIPALE E NON
+          // FILTRAVA NULLA. Le notizie regionali lette dalla cache
+          // venivano mostrate cosi' come arrivavano dal database: senza
+          // limite di eta' e senza ordinamento. Da qui gli articoli di
+          // giugno e del 20 agosto accanto a quelli del giorno.
+          // La cache viene riempita regolarmente (oltre 10.000 notizie
+          // nelle ultime sei ore): il problema non era l'aggiornamento ma
+          // il fatto che Yahoo restituisce per ogni titolo un misto di
+          // articoli recenti e vecchi, e qui si mostravano tutti.
+          const _eta = 48 * 60 * 60 * 1000
+          const _recenti = cachedItems
+            .filter(n => {
+              const t = new Date(n.pubDate).getTime()
+              return !isNaN(t) && Date.now() - t <= _eta
+            })
+            .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+          if (_recenti.length > 0) {
+            setData(prev => ({ ...prev, [region]: _recenti }))
             return  // usa cache, non chiama Yahoo
           }
         }
@@ -349,6 +378,10 @@ export default function NewsPage() {
         await fetchTickerNews(region, tickers, (batch) => {
           setData(prev => {
             const merged = [...(prev[region] || []), ...batch]
+              .filter(n => {
+                const t = new Date(n.pubDate).getTime()
+                return !isNaN(t) && Date.now() - t <= 48 * 60 * 60 * 1000
+              })
               .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
               
             return { ...prev, [region]: merged }
