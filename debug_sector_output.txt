@@ -1,18 +1,9 @@
-Ora UTC: 2026-09-02 04:12
+=== UIBU in anagrafica ===
+   {'ticker': 'UIBU', 'exchange': 'SGX', 'company': 'UI Boustead Real Estate Investment Trust', 'sector': '73', 'country': 'SGP', 'in_universe': True, 'yahoo_ticker': None}
 
-=== quando e' stata scaricata l'ultima notizia? ===
-   fetch=2026-09-02T03:40  pub=Mon, 31 Aug 2026 12:27:51  857      PetroChina Outperforms Peer Sinopec in D
-   fetch=2026-09-02T03:40  pub=Fri, 28 Aug 2026 03:18:17  857      PCCYF Stock Price and Chart — OTC:PCCYF 
-   fetch=2026-09-02T03:40  pub=Sun, 30 Aug 2026 11:41:00  857      PetroChina first-half earnings story wit
-   fetch=2026-09-02T03:40  pub=Sat, 22 Aug 2026 07:00:00  857      PetroChina (SEHK:857) Stock Trades Below
-   fetch=2026-09-02T03:40  pub=Tue, 01 Sep 2026 22:07:24  939      China Construction Bank (SEHK:939) Has I
-   fetch=2026-09-02T03:40  pub=Sat, 29 Aug 2026 09:40:53  939      China Construction Bank Unveils 2026 Int
-   fetch=2026-09-02T03:40  pub=Thu, 20 Aug 2026 07:00:00  939      Is China Construction Bank (CICHY) Stock
-   fetch=2026-09-02T03:40  pub=Tue, 01 Sep 2026 10:45:46  857      PetroChina (SEHK:857) Stock Profit Momen
+  fondamentali: [{'mkt_cap': 843.16, 'value_score': 67, 'growth_score': 32}]
+  righe di prezzo: 15
 
-  scaricate nelle ultime 6 ore      10874
-  scaricate nelle ultime 24 ore     35502
-  scaricate nelle ultime 3 giorni   35502
-
-=== il cron delle notizie sta girando? ===
-  log news: nessuno
+=== altri titoli con settore numerico (71-77) ===
+  quanti: 1
+   UIBU       SGX   settore=73   UI Boustead Real Estate Investment
