@@ -115,29 +115,34 @@ def leggi_tutto(tabella, select, exchange, filtri=None):
 
 
 def _leggi_una_volta(tabella, select, exchange, filtri=None):
-    """Legge TUTTE le righe di un exchange, paginando (PostgREST limita a 1000).
+    """Legge tutte le righe paginando PER CHIAVE, non per posizione.
 
-    FIX 23/8/2026 — LETTURA PARZIALE SILENZIOSA.
-    La versione precedente, se una pagina falliva (timeout, errore
-    momentaneo), usciva dal ciclo senza dire nulla e restituiva i dati
-    parziali come se fossero completi. Il 23/8 il rapporto ha lavorato su
-    2309 titoli americani invece di 2953 e ha dichiarato il 77,6% di
-    copertura per gli Stati Uniti, quando i dati nel database erano
-    completi al 99%.
+    FIX 2/9/2026 — CAUSA DEFINITIVA DELLE LETTURE INCOMPLETE.
+    La paginazione per posizione ("dammi le righe dalla 1000 alla 2000")
+    non e' affidabile su `latest_prices_mv`, che pg_cron ricalcola ogni
+    dieci minuti. Se il ricalcolo avviene mentre il rapporto legge, le
+    posizioni si spostano e un blocco di righe viene semplicemente
+    saltato. Il rapporto gira alle 08:02, quindi capita quasi ogni volta:
+    lo scarto era stabile intorno a 650 titoli, non casuale — la firma di
+    un problema sistematico e non di un errore di rete.
+    Ne sono derivati giorni di falsi allarmi: il rapporto dichiarava gli
+    Stati Uniti al 77% mentre erano davvero al 98%.
 
-    Ora: ogni pagina viene ritentata fino a 3 volte, e al termine il
-    numero di righe lette viene confrontato con il conteggio autorevole
-    del server. Se non coincidono, la funzione LO DICHIARA invece di
-    restituire in silenzio un dato incompleto.
+    La paginazione per chiave ("dammi le righe dopo l'ultimo simbolo
+    letto") e' immune: anche se le righe si spostano, la posizione di
+    ripartenza resta valida perche' e' un valore, non un indice.
     """
     righe = []
-    offset = 0
-    fallita = False
-    while True:
+    ultimo = ""
+    for _ in range(60):   # 60 x 1000 = 60.000 righe, ampiamente sufficiente
         params = {"select": select, "exchange": "eq." + exchange,
-                  "limit": "1000", "offset": str(offset)}
+                  "order": "ticker.asc", "limit": "1000"}
+        if ultimo:
+            params["ticker"] = "gt." + ultimo
         if filtri:
-            params.update(filtri)
+            for k, v in filtri.items():
+                if k != "ticker":
+                    params[k] = v
         blocco = None
         for tentativo in range(3):
             try:
@@ -152,30 +157,16 @@ def _leggi_una_volta(tabella, select, exchange, filtri=None):
                 pass
             time.sleep(2 * (tentativo + 1))
         if blocco is None:
-            print("  ATTENZIONE: %s/%s offset %d non leggibile dopo 3 tentativi"
-                  % (tabella, exchange, offset))
-            fallita = True
+            print("  %s/%s: pagina non leggibile dopo 3 tentativi (dopo %s)"
+                  % (tabella, exchange, ultimo or "inizio"))
             break
         if not blocco:
             break
         righe.extend(blocco)
-        # FIX 27/8/2026 — NON FERMARSI SU UNA PAGINA CORTA.
-        # PostgREST limita la risposta anche per DIMENSIONE, non solo per
-        # numero di righe: se i record sono grandi ne restituisce meno di
-        # quanti se ne chiedono. Il codice precedente interpretava una
-        # pagina corta come "ultima pagina" e si fermava a meta'.
-        # Il 27/8 gli Stati Uniti risultavano letti per 2.282 titoli su
-        # 2.976 - un numero non multiplo di mille, che e' proprio la firma
-        # di questo difetto - e il rapporto dichiarava il 76,7% di
-        # copertura mentre i dati erano completi.
-        # Ora si avanza di quante righe si sono DAVVERO ricevute e ci si
-        # ferma solo quando una pagina torna vuota.
-        if not blocco:
+        nuovo_ultimo = blocco[-1].get("ticker")
+        if not nuovo_ultimo or nuovo_ultimo == ultimo:
             break
-        offset += len(blocco)
-        if offset > 50000:
-            break
-
+        ultimo = nuovo_ultimo
     return righe
 
 
