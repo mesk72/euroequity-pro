@@ -83,37 +83,57 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     apac: ['TSE','SEHK','ASX','KRX','SGX'],
   }
 
-  let topByMktCap: any[] = []
-  for (const exchanges of Object.values(REGION_EXCHANGES)) {
-    const { data } = await supabase
-      .from('fundamentals')
-      .select('ticker,exchange,mkt_cap')
-      .in('exchange', exchanges)
-      .not('mkt_cap', 'is', null)
-      .order('mkt_cap', { ascending: false })
-      .limit(20)
-    if (data) topByMktCap = topByMktCap.concat(data)
+  // PRIORITA' PROGRESSIVA PER CAPITALIZZAZIONE — 2/9/2026.
+  //
+  // Prima solo 20 titoli per regione avevano priorita' alta e tutti gli
+  // altri 7.700 erano appiattiti a 0,6: per Google, Novartis contava
+  // quanto una micro cap sconosciuta. Non avendo indicazioni, Google
+  // sceglieva da se' cosa indicizzare, e con un sito nuovo tende a
+  // prendere le pagine che gli costa meno visitare — spesso proprio le
+  // meno rilevanti. Da qui la sensazione di vedere indicizzati "titoli
+  // insignificanti".
+  //
+  // Ora la priorita' scende per fasce di capitalizzazione. Non e' una
+  // garanzia — Google resta libero di decidere — ma e' il segnale
+  // esplicito che prima mancava del tutto.
+  const { data: capData } = await supabase
+    .from('fundamentals')
+    .select('ticker,exchange,mkt_cap')
+    .not('mkt_cap', 'is', null)
+    .order('mkt_cap', { ascending: false })
+    .limit(9000)
+
+  const capPerTicker = new Map<string, number>()
+  ;(capData || []).forEach((r: any) => {
+    capPerTicker.set(`${r.ticker}-${r.exchange}`, r.mkt_cap)
+  })
+
+  // Soglie in milioni di dollari. La mediana dei primi 500 titoli
+  // statunitensi e' circa 51.000, quella dei primi 500 europei 17.000:
+  // le fasce sono tarate per distinguere le grandi capitalizzazioni
+  // globali dalle societa' minori.
+  const prioritaPerCap = (mc?: number): number => {
+    if (mc == null) return 0.4
+    if (mc >= 200_000) return 1.0   // oltre 200 mld: le maggiori al mondo
+    if (mc >= 50_000)  return 0.9   // oltre 50 mld
+    if (mc >= 10_000)  return 0.8   // oltre 10 mld
+    if (mc >= 2_000)   return 0.7   // oltre 2 mld
+    if (mc >= 500)     return 0.6   // oltre 500 milioni
+    return 0.5
   }
 
-  const topTickerKeys = new Set(
-    topByMktCap.map((t: any) => `${t.ticker}-${t.exchange}`)
-  )
-
-  const TOP_TICKERS: MetadataRoute.Sitemap = topByMktCap.map((t: any) => ({
-    url: url(t.ticker, t.exchange),
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: 1.0,
-  }))
-
-  const stockPages: MetadataRoute.Sitemap = stocks
-    .filter((s: any) => !topTickerKeys.has(`${s.ticker}-${s.exchange}`))
-    .map((s: any) => ({
+  const stockPages: MetadataRoute.Sitemap = stocks.map((s: any) => {
+    const mc = capPerTicker.get(`${s.ticker}-${s.exchange}`)
+    return {
       url: url(s.ticker, s.exchange),
       lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.6,
-    }))
+      // Le societa' maggiori cambiano di piu' e meritano visite piu'
+      // frequenti; per le minori una cadenza settimanale evita di
+      // consumare il budget di scansione su pagine che cambiano poco.
+      changeFrequency: (mc != null && mc >= 10_000 ? 'daily' : 'weekly') as const,
+      priority: prioritaPerCap(mc),
+    }
+  })
 
   // Research slugs
   const { data: research } = await supabase
@@ -129,5 +149,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticPages, ...TOP_TICKERS, ...stockPages, ...researchPages]
+  return [...staticPages, ...stockPages, ...researchPages]
 }
