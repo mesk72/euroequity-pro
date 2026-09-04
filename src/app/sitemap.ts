@@ -77,12 +77,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Non piu' una lista scritta a mano che invecchia e puo' contenere ticker
   // sbagliati o non piu' esistenti — causa piu' probabile dei risultati
   // "senza senso" su Google.
-  const REGION_EXCHANGES: Record<string, string[]> = {
-    eu:   ['MIL','XETRA','PA','LSE','SWX','OM','AS','MC','BR','HE','CPSE','OB','GR','VI','IR','LS'],
-    na:   ['US','TSX'],
-    apac: ['TSE','SEHK','ASX','KRX','SGX'],
-  }
-
   // PRIORITA' PROGRESSIVA PER CAPITALIZZAZIONE — 2/9/2026.
   //
   // Prima solo 20 titoli per regione avevano priorita' alta e tutti gli
