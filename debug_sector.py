@@ -1,19 +1,19 @@
 import requests, re
-UA={"User-Agent":"Mozilla/5.0 (compatible; Googlebot/2.1)"}
-print("=== TITOLO E DESCRIZIONE della homepage (cio' che Google mostra) ===")
-r=requests.get("https://www.forwardalpha.pro/",timeout=60,headers=UA)
-t=re.search(r"<title>(.*?)</title>",r.text,re.S)
-d=re.search(r'<meta name="description" content="(.*?)"',r.text,re.S)
-print("  titolo:     ",(t.group(1) if t else "-"))
-print("  descrizione:",(d.group(1) if d else "-")[:200])
+from collections import Counter
+s=requests.get("https://www.forwardalpha.pro/sitemap.xml",timeout=180).text
+blocchi=re.findall(r"<url>(.*?)</url>", s, re.S)
+print("indirizzi:",len(blocchi))
+pri=Counter()
+esempi={}
+for b in blocchi:
+    loc=re.search(r"<loc>(.*?)</loc>",b)
+    p=re.search(r"<priority>(.*?)</priority>",b)
+    if not p: continue
+    v=p.group(1)
+    pri[v]+=1
+    if v not in esempi and loc and "/stock/" in loc.group(1):
+        esempi[v]=loc.group(1).split("/stock/")[-1]
 print()
-print("=== quanti indirizzi ha la sitemap e di che tipo ===")
-s=requests.get("https://www.forwardalpha.pro/sitemap.xml",timeout=120).text
-locs=re.findall(r"<loc>(.*?)</loc>", s)
-print("  totale:",len(locs))
-stock=[l for l in locs if "/stock/" in l]
-print("  schede titolo:",len(stock))
-print()
-print("=== esempi di schede titolo nella sitemap: sono titoli importanti? ===")
-import random
-for l in stock[:6]+stock[-6:]: print("   ",l.replace("https://www.forwardalpha.pro/stock/",""))
+print("=== distribuzione delle priorita' ===")
+for k,v in sorted(pri.items(),reverse=True):
+    print("   %-6s %5d indirizzi   esempio: %s" % (k,v,esempi.get(k,"(pagina fissa)")))
