@@ -1,9 +1,21 @@
-=== UIBU in anagrafica ===
-   {'ticker': 'UIBU', 'exchange': 'SGX', 'company': 'UI Boustead Real Estate Investment Trust', 'sector': '73', 'country': 'SGP', 'in_universe': True, 'yahoo_ticker': None}
+=== TITOLO E DESCRIZIONE della homepage (cio' che Google mostra) ===
+  titolo:      ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
+  descrizione: ForwardAlpha — Institutional-grade Value &amp; Growth scoring across 7,000+ global stocks: Europe, US, Canada, Japan, Hong Kong, Australia. Daily price refresh. Built by ex J.P. Morgan &amp; Zenit SGR
 
-  fondamentali: [{'mkt_cap': 843.16, 'value_score': 67, 'growth_score': 32}]
-  righe di prezzo: 15
+=== quanti indirizzi ha la sitemap e di che tipo ===
+  totale: 7846
+  schede titolo: 7841
 
-=== altri titoli con settore numerico (71-77) ===
-  quanti: 1
-   UIBU       SGX   settore=73   UI Boustead Real Estate Investment
+=== esempi di schede titolo nella sitemap: sono titoli importanti? ===
+    ASML-AS
+    ROP-SWX
+    HSBA-LSE
+    AZN-LSE
+    NOVN-SWX
+    MC-PA
+    ICFI-US
+    IMTX-US
+    INSP-US
+    JJSF-US
+    MRTN-US
+    PLTK-US
