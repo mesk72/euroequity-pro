@@ -1,21 +1,9 @@
-=== TITOLO E DESCRIZIONE della homepage (cio' che Google mostra) ===
-  titolo:      ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
-  descrizione: ForwardAlpha — Institutional-grade Value &amp; Growth scoring across 7,000+ global stocks: Europe, US, Canada, Japan, Hong Kong, Australia. Daily price refresh. Built by ex J.P. Morgan &amp; Zenit SGR
+indirizzi: 7846
 
-=== quanti indirizzi ha la sitemap e di che tipo ===
-  totale: 7846
-  schede titolo: 7841
-
-=== esempi di schede titolo nella sitemap: sono titoli importanti? ===
-    ASML-AS
-    ROP-SWX
-    HSBA-LSE
-    AZN-LSE
-    NOVN-SWX
-    MC-PA
-    ICFI-US
-    IMTX-US
-    INSP-US
-    JJSF-US
-    MRTN-US
-    PLTK-US
+=== distribuzione delle priorita' ===
+   1         87 indirizzi   esempio: ARM-US
+   0.9      360 indirizzi   esempio: ABX-TSX
+   0.8      503 indirizzi   esempio: 6954-TSE
+   0.7        1 indirizzi   esempio: (pagina fissa)
+   0.5        1 indirizzi   esempio: (pagina fissa)
+   0.4     6894 indirizzi   esempio: BYG-LSE
