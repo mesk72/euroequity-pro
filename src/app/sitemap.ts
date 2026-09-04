@@ -124,7 +124,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // Le societa' maggiori cambiano di piu' e meritano visite piu'
       // frequenti; per le minori una cadenza settimanale evita di
       // consumare il budget di scansione su pagine che cambiano poco.
-      changeFrequency: (mc != null && mc >= 10_000 ? 'daily' : 'weekly') as const,
+      changeFrequency: (mc != null && mc >= 10_000 ? 'daily' as const : 'weekly' as const),
       priority: prioritaPerCap(mc),
     }
   })
