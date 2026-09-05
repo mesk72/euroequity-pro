@@ -129,7 +129,10 @@ function PieLegend({ data, total }: { data: { label: string; value: number; colo
   )
 }
 
-const WALLET_NAMES = ['My Wallet 1', 'My Wallet 2', 'My Wallet 3']
+// Aggiunto il quarto wallet il 5/9/2026. L'elenco e' l'unica fonte:
+// selettore, menu di spostamento e messaggi lo leggono da qui, quindi per
+// aggiungerne altri in futuro basta allungarlo.
+const WALLET_NAMES = ['My Wallet 1', 'My Wallet 2', 'My Wallet 3', 'My Wallet 4']
 
 interface WatchStock {
   id: string
