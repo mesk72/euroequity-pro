@@ -1,3 +1,5 @@
-  wallet in uso: {0: 46, 2: 40, 1: 84}
-  scrittura wallet 3 -> HTTP 201 
-  (riga di prova rimossa)
+=== stesso titolo in piu' wallet: il vincolo lo permette ancora? ===
+   wallet 2 -> HTTP 201 
+   wallet 3 -> HTTP 201 
+   righe create: [2, 3]
+   (pulito)
