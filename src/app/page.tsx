@@ -60,7 +60,6 @@ function useGoToStock() {
   }, [ugsRouter])
 }
 
-import HomeSeoContent from '@/components/seo/HomeSeoContent'
 import MyScreen from '@/components/watchlist/MyScreen'
 import { DEMO_STOCKS } from '@/lib/demoData'
 import { computeScores } from '@/lib/ranking'
@@ -3112,10 +3111,8 @@ function AppContent() {
 export default function App() {
   return (
     <>
-      {/* FUORI dal Suspense di proposito: e' presente nell'HTML fin dal
-          primo byte, quindi Googlebot lo legge anche prima che i dati
-          siano caricati. Prima la homepage aveva 60 caratteri di testo. */}
-      <HomeSeoContent />
+      {/* Blocco SEO rimosso il 5/9/2026: con il ritorno all'uso personale
+          nessun contenuto deve essere leggibile da Google. */}
       <Suspense fallback={null}>
         <AppContent />
       </Suspense>
