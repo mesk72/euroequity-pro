@@ -1,6 +1,6 @@
 === il tag noindex e' presente? ===
   homepage       meta: noindex, nofollow, nocache   header: -
-  scheda AAPL    meta: ASSENTE                      header: -
+  scheda AAPL    meta: noindex, nofollow, nocache   header: -
   /value         meta: noindex, nofollow, nocache   header: -
   /sectors       meta: noindex, nofollow, nocache   header: -
 
