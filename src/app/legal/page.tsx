@@ -3,11 +3,12 @@ export default function LegalPage() {
     {
       title: '1. Terms of Use',
       items: [
-        ['Operator', 'ForwardAlpha is operated by Andrea Meschini, Verona, Italy. Contact: andrea@forwardalpha.pro . Contact: andrea@forwardalpha.pro · '],
+        ['Operator', 'ForwardAlpha is operated by Andrea Meschini, Verona, Italy. Contact: andrea@forwardalpha.pro'],
         ['Acceptance of Terms', 'By accessing or using ForwardAlpha, you confirm that you have read, understood, and agree to be bound by these Terms. If you do not agree, do not use this service.'],
         ['Description of Service', 'ForwardAlpha provides financial data, quantitative analytics, equity screening tools, and portfolio tracking for informational purposes only. Market and fundamental data are obtained from third-party providers under the applicable terms of use.'],
         ['Beta Access', 'ForwardAlpha is currently in a beta version and is free to use. Fundamental data are updated weekly.'],
         ['Prohibited Uses', 'You may not reverse-engineer, bulk-scrape, or resell data; share account credentials; or use the service to provide unauthorised investment advice to third parties.'],
+        ['Access, Suspension and Termination', 'Access to ForwardAlpha is granted at the sole discretion of the operator. As the service is provided free of charge and in a beta phase, the operator may suspend, restrict or terminate any account, and may modify, limit or discontinue the service in whole or in part, at any time and without prior notice or stated reason. No warranty of continued availability, uptime or uninterrupted access is given. Users may close their account at any time by written request. Upon termination, personal data are handled in accordance with the Privacy Policy set out in Section 5.'],
         ['Governing Law', 'These Terms are governed exclusively by Italian law. Any disputes shall be subject to the exclusive jurisdiction of the Court of Verona (Tribunale di Verona), without prejudice to mandatory EU consumer protection rights.'],
       ]
     },
