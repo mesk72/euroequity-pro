@@ -1,10 +1,19 @@
-indirizzi: 7846
+indirizzi: 7846 | con priorita': 7846
 
 === distribuzione delle priorita' ===
-   1         87 indirizzi   esempio: ARM-US
-   0.9      360 indirizzi   esempio: ABX-TSX
-   0.8     1122 indirizzi   esempio: LUG-TSX
-   0.7     2532 indirizzi   esempio: BYG-LSE
-   0.6     3006 indirizzi   esempio: ZQXVW9-US
-   0.5      738 indirizzi   esempio: NICU-TSX
-   0.4        1 indirizzi   esempio: 0E2-LSE
+   1        87 pagine
+   0.9     360 pagine
+   0.8    1122 pagine
+   0.7    2532 pagine
+   0.6    3006 pagine
+   0.5     738 pagine
+   0.4       1 pagine
+
+=== priorita' di alcuni titoli noti ===
+   ASML-AS    priorita' 1      daily
+   NOVN-SWX   priorita' 1      daily
+   AAPL-US    priorita' 1      daily
+   NVDA-US    priorita' 1      daily
+   MC-PA      priorita' 1      daily
+   ICFI-US    priorita' 0.6    weekly
+   MRTN-US    priorita' 0.6    weekly
