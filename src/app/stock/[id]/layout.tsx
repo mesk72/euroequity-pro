@@ -122,7 +122,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     pezzi.push('Analisi quantitativa ForwardAlpha.')
   }
 
-  const desc = pezzi.join(' ').slice(0, 300)
+  const desc = 'ForwardAlpha — private research platform.'
 
   const robots = d.in_universe === false ? { index: false, follow: false } : undefined
 
@@ -155,94 +155,15 @@ export default async function StockLayout({
   // Dati strutturati: dicono a Google in modo esplicito che la pagina
   // riguarda una societa' quotata, con il suo simbolo di borsa. Contengono
   // solo informazioni pubbliche - nessun punteggio proprietario.
-  const datiStrutturati = d
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'Corporation',
-        name: d.company || d.ticker,
-        tickerSymbol: d.ticker,
-        url: `https://www.forwardalpha.pro/stock/${params.id}`,
-        ...(d.sector ? { industry: d.sector } : {}),
-        ...(d.country ? { address: { '@type': 'PostalAddress', addressCountry: d.country } } : {}),
-      }
-    : null
 
-  // ── CONTENUTO LEGGIBILE DAI MOTORI DI RICERCA ──────────────
-  // Perche' esiste: la pagina carica i dati con una chiamata che richiede
-  // autenticazione. Googlebot non e' autenticato, riceve un errore e vede
-  // "Stock not found" con 101 caratteri di testo totali. Per Google queste
-  // 7.881 pagine erano contenuto inesistente: le avrebbe scartate quasi
-  // tutte, e nessuna si sarebbe mai posizionata.
-  //
-  // Questo blocco viene generato sul SERVER, quindi e' gia' nell'HTML
-  // quando Google arriva. Contiene SOLO dati pubblici (nome, settore,
-  // paese, prezzo, capitalizzazione, P/E) che stanno gia' su Yahoo,
-  // Borsa Italiana e ovunque: nasconderli non protegge nulla e toglie a
-  // Google le parole per capire di cosa parla la pagina.
-  //
-  // I PUNTEGGI PROPRIETARI NON COMPAIONO MAI. Vengono solo nominati, con
-  // invito a registrarsi: cosi' la pagina si posiziona anche per ricerche
-  // tipo "<societa> value score" e il visitatore diventa un'iscrizione.
-  //
-  // Regola generale (imposta 20/8/2026): il valore di ForwardAlpha non e'
-  // il punteggio del singolo titolo ma la CLASSIFICA. Nessuna pagina
-  // pubblica deve mai esporre elenchi ordinati per punteggio.
-  const nome = d?.company || ticker
-  const contenutoSEO = d ? (
-    <div
-      style={{
-        position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
-        overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0,
-      }}
-      aria-hidden="false"
-    >
-      <h1>{nome} ({d.ticker}) — analisi fondamentale e valutazione</h1>
-      <p>
-        {nome} e&apos; una societa&apos; quotata
-        {d.sector ? ` del settore ${d.sector}` : ''}
-        {d.country ? `, ${d.country}` : ''}, con codice di borsa {d.ticker} su {d.exchange}.
-      </p>
-      {d.description ? <p>{d.description}</p> : null}
-      <h2>Dati di mercato</h2>
-      <ul>
-        {d.price != null ? (
-          <li>Prezzo: {d.price}{d.price_date ? ` (${d.price_date})` : ''}</li>
-        ) : null}
-        {d.mkt_cap != null ? <li>Capitalizzazione: {capitalizzazione(d.mkt_cap)}</li> : null}
-        {d.pe_trailing != null && Math.abs(d.pe_trailing) < 500 ? (
-          <li>Rapporto prezzo/utili storico: {d.pe_trailing.toFixed(1)}x</li>
-        ) : null}
-        {d.sector ? <li>Settore: {d.sector}</li> : null}
-        {d.country ? <li>Paese: {d.country}</li> : null}
-      </ul>
-      <h2>Analisi quantitativa ForwardAlpha</h2>
-      <p>
-        ForwardAlpha calcola per {nome} un Value Score, un Growth Score e un Best Score
-        proprietari, ottenuti confrontando la societa&apos; con tutte le altre del suo mercato
-        su valutazione, crescita degli utili e dei ricavi e andamento del prezzo.
-        {d.exchange === 'US'
-          ? ' Per i titoli statunitensi e\u0027 disponibile anche un reverse earnings model, che ricava dal prezzo di mercato le aspettative di crescita degli utili implicite.'
-          : ''}
-        {' '}I punteggi sono riservati agli utenti registrati: l&apos;iscrizione e&apos; gratuita.
-      </p>
-      <h2>Cosa trovi nella scheda</h2>
-      <p>
-        Grafico dei prezzi a cinque anni, rendimenti a una settimana, un mese, sei mesi,
-        dodici mesi, tre e cinque anni, multipli di valutazione, confronto con la media
-        del settore e posizionamento nel proprio mercato di quotazione.
-      </p>
-    </div>
-  ) : null
+  // CONTENUTO PER I MOTORI DI RICERCA RIMOSSO — 5/9/2026.
+  // Esponeva prezzo, capitalizzazione, P/E, settore e paese in un blocco
+  // leggibile da Google. Con il ritorno all'uso personale nessun dato deve
+  // essere visibile a chi non e' autorizzato: il blocco e' stato tolto
+  // insieme ai dati strutturati.
 
   return (
     <>
-      {datiStrutturati && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(datiStrutturati) }}
-        />
-      )}
-      {contenutoSEO}
       {children}
     </>
   )
