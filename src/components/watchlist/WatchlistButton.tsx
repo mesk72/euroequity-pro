@@ -6,7 +6,11 @@ import { Stock } from '@/lib/ranking'
 import { Plus, Check, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const WALLET_NAMES = ['My Wallet 1', 'My Wallet 2', 'My Wallet 3']
+// Aggiunto il quarto wallet il 5/9/2026.
+// NB: questo elenco e' separato da quello di MyScreen.tsx — vanno tenuti
+// allineati, altrimenti il wallet compare nella schermata ma non nel menu
+// di aggiunta dallo screener e dalla scheda titolo.
+const WALLET_NAMES = ['My Wallet 1', 'My Wallet 2', 'My Wallet 3', 'My Wallet 4']
 
 interface Props {
   stock: Stock
