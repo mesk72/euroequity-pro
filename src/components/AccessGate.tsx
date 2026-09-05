@@ -41,13 +41,15 @@ export default function AccessGate() {
     return () => { attivo = false; sub?.subscription?.unsubscribe() }
   }, [])
 
-  // SOLO la homepage resta accessibile: e' la pagina di benvenuto, ed e'
-  // anche l'unica che resta indicizzata su Google.
+  // Restano accessibili la homepage (pagina di benvenuto, unica indicizzata
+  // su Google), la pagina About e quella legale: i termini d'uso e
+  // l'informativa privacy devono essere consultabili anche da chi non ha
+  // l'accesso, come richiesto dal GDPR.
   // Tutto il resto — screener, schede titolo, settori, notizie, research,
   // about e legal — e' coperto. Nessun dato deve essere visibile a chi non
   // ha l'accesso: nemmeno la capitalizzazione o i multipli, da cui ci si
   // potrebbe fare un'idea del contenuto.
-  const pagineAperte = ['/']
+  const pagineAperte = ['/', '/about', '/legal']
   if (pagineAperte.includes(pathname || '/')) return null
 
   // Durante la verifica non si mostra nulla, per evitare che il riquadro
