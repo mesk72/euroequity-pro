@@ -3,7 +3,8 @@ indirizzi: 7846
 === distribuzione delle priorita' ===
    1         87 indirizzi   esempio: ARM-US
    0.9      360 indirizzi   esempio: ABX-TSX
-   0.8      503 indirizzi   esempio: 6954-TSE
-   0.7        1 indirizzi   esempio: (pagina fissa)
-   0.5        1 indirizzi   esempio: (pagina fissa)
-   0.4     6894 indirizzi   esempio: BYG-LSE
+   0.8     1122 indirizzi   esempio: LUG-TSX
+   0.7     2532 indirizzi   esempio: BYG-LSE
+   0.6     3006 indirizzi   esempio: ZQXVW9-US
+   0.5      738 indirizzi   esempio: NICU-TSX
+   0.4        1 indirizzi   esempio: 0E2-LSE
