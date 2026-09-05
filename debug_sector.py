@@ -1,20 +1,14 @@
-import requests, re
-from collections import Counter
-s=requests.get("https://www.forwardalpha.pro/sitemap.xml",timeout=180).text
-locs=re.findall(r"<loc>(.*?)</loc>", s)
-prio=re.findall(r"<priority>(.*?)</priority>", s)
-print("indirizzi:",len(locs),"| con priorita':",len(prio))
-print()
-print("=== distribuzione delle priorita' ===")
-for p,n in sorted(Counter(prio).items(),reverse=True):
-    print("   %-5s %5d pagine" % (p,n))
-print()
-print("=== priorita' di alcuni titoli noti ===")
-blocchi=re.findall(r"<url>(.*?)</url>", s, re.S)
-for tk in ["ASML-AS","NOVN-SWX","AAPL-US","NVDA-US","MC-PA","ICFI-US","MRTN-US"]:
-    for b in blocchi:
-        if "/stock/"+tk in b:
-            pr=re.search(r"<priority>(.*?)</priority>",b)
-            cf=re.search(r"<changefreq>(.*?)</changefreq>",b)
-            print("   %-10s priorita' %-5s  %s" % (tk, pr.group(1) if pr else "-", cf.group(1) if cf else "-"))
-            break
+import os, requests
+U="https://mlqkisnizgyvvqajdvbh.supabase.co"
+K=os.environ.get("SUPABASE_SERVICE_KEY","")
+H={"apikey":K,"Authorization":"Bearer "+K}
+r=requests.get(U+"/auth/v1/admin/users",headers=H,params={"per_page":"50"})
+d=r.json(); users=d.get("users",d) if isinstance(d,dict) else d
+TIENI=["andreameschini19@gmail.com","infocasualinstyle03@gmail.com"]
+print("=== UTENTI REGISTRATI (%d) ===" % len(users))
+for u in users:
+    em=(u.get("email") or "").lower()
+    stato="  <-- DA TENERE" if em in [t.lower() for t in TIENI] else "      da rimuovere"
+    print("  %-40s registrato %s  ultimo accesso %s %s" % (
+        u.get("email"), (u.get("created_at") or "")[:10],
+        (u.get("last_sign_in_at") or "mai")[:10], stato))
