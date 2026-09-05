@@ -90,17 +90,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Ora la priorita' scende per fasce di capitalizzazione. Non e' una
   // garanzia — Google resta libero di decidere — ma e' il segnale
   // esplicito che prima mancava del tutto.
-  const { data: capData } = await supabase
-    .from('fundamentals')
-    .select('ticker,exchange,mkt_cap')
-    .not('mkt_cap', 'is', null)
-    .order('mkt_cap', { ascending: false })
-    .limit(9000)
-
+  // La tabella fundamentals ha oltre 14.000 righe (comprende anche
+  // titoli fuori universo), quindi un limite unico troncava la lettura e
+  // lasciava 6.894 titoli senza capitalizzazione, tutti appiattiti sulla
+  // priorita' minima. Si legge paginando finche' non si arriva in fondo.
   const capPerTicker = new Map<string, number>()
-  ;(capData || []).forEach((r: any) => {
-    capPerTicker.set(`${r.ticker}-${r.exchange}`, r.mkt_cap)
-  })
+  for (let pagina = 0; pagina < 20; pagina++) {
+    const { data: capData } = await supabase
+      .from('fundamentals')
+      .select('ticker,exchange,mkt_cap')
+      .not('mkt_cap', 'is', null)
+      .order('ticker', { ascending: true })
+      .range(pagina * 1000, pagina * 1000 + 999)
+    if (!capData || capData.length === 0) break
+    capData.forEach((r: any) => {
+      capPerTicker.set(`${r.ticker}-${r.exchange}`, r.mkt_cap)
+    })
+    if (capData.length < 1000) break
+  }
 
   // Soglie in milioni di dollari. La mediana dei primi 500 titoli
   // statunitensi e' circa 51.000, quella dei primi 500 europei 17.000:
