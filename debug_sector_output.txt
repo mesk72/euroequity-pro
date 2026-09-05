@@ -1,21 +1,13 @@
-=== il tag noindex e' presente? ===
-  homepage       meta: noindex, nofollow, nocache   header: -
-  scheda AAPL    meta: noindex, nofollow, nocache   header: -
-  /value         meta: noindex, nofollow, nocache   header: -
-  /sectors       meta: noindex, nofollow, nocache   header: -
+=== HOMEPAGE: deve essere indicizzabile ===
+  meta robots: assente (= indicizzabile)
+  header:      assente (= indicizzabile)
+  titolo:      ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
+  descrizione: ForwardAlpha — Institutional-grade Value &amp; Growth scoring across 7,000+ global stocks: Europe, US, Canada, Japan, Hong Kong, Australia. Daily pric
 
-=== la sitemap contiene ancora le schede titolo? ===
-  indirizzi: 1
-    https://www.forwardalpha.pro
-
-=== robots.txt consente la scansione (necessario per il noindex)? ===
-# ForwardAlpha — uso personale.
-# La scansione resta CONSENTITA di proposito: le pagine portano il tag
-# noindex e Google deve poterlo leggere per rimuoverle dall'indice.
-# Bloccare qui la scansione le lascerebbe indicizzate piu' a lungo.
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /admin/
-
-Sit
+=== PAGINE INTERNE: devono avere noindex ===
+  scheda AAPL   header: noindex, nofollow      meta: noindex, nofollow, nocache
+  /value        header: noindex, nofollow      meta: -
+  /sectors      header: noindex, nofollow      meta: -
+  /news         header: noindex, nofollow      meta: -
+  /about        header: noindex, nofollow      meta: -
+  /legal        header: noindex, nofollow      meta: -
