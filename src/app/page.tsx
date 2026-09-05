@@ -418,7 +418,7 @@ function StockTable({ stocks, onSelect, loading, maxRows = 100, userId = null, f
     if (NO_SORT.has(key)) return
     if (restrictScoreSort && SCORE_KEYS.has(key)) return
     if (!userId && LOCKED_GUEST.has(key)) {
-      alert('Register for free to sort by Value, Growth and Best Score.')
+      alert('ForwardAlpha is only for personal use. For information: andrea@forwardalpha.pro')
       return
     }
     if (sortKey === key) setSortAsc(a => !a)
@@ -1093,12 +1093,12 @@ function Screener({ initExchange = 'MIL', initSector = 'All', initEpsMom = '', o
                 </>
                 )
               ) : (
-                <div onClick={() => alert('Sign up for free to filter by Value, Growth and Best Score.')}
+                <div onClick={() => alert('ForwardAlpha is only for personal use. For information: andrea@forwardalpha.pro')}
                   style={{ cursor:'pointer', background:'var(--surface2)', border:'1px solid var(--border)',
                     borderRadius:4, padding:'8px 12px', fontSize:12, color:'var(--text3)',
                     display:'flex', alignItems:'center', gap:6 }}>
                   🔒 Value / Growth / Best filters
-                  <span style={{ color:'var(--orange)', fontWeight:700, marginLeft:'auto' }}>Sign up free →</span>
+                  <span style={{ color:'var(--text4)', fontWeight:700, marginLeft:'auto' }}>Private</span>
                 </div>
               )}
             </div>
@@ -2393,19 +2393,23 @@ function LoginGate({ onLogin, title }: { onLogin: () => void, title: string }) {
       <div className="section-hdr">⭐ {title}</div>
       <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
         borderRadius:6, padding:'32px', textAlign:'center', maxWidth:400, margin:'0 auto' }}>
+        {/* 5/9/2026 — TOLTA LA REGISTRAZIONE.
+            ForwardAlpha e' tornato a uso personale: non si invita piu'
+            nessuno a creare un account. Al posto dell'invito compare il
+            messaggio con il contatto diretto. */}
         <div style={{ fontSize:40, marginBottom:12 }}>🔒</div>
-        <div style={{ fontSize:15, fontWeight:700, color:'var(--text)', marginBottom:8 }}>
-          Members only
+        <div style={{ fontSize:15, fontWeight:700, color:'var(--text)', marginBottom:12 }}>
+          Private use
         </div>
-        <div style={{ fontSize:12, color:'var(--text3)', marginBottom:20, lineHeight:1.6 }}>
-          The <strong style={{ color:'var(--orange)' }}>{title}</strong> screen is reserved
-          for registered users. Create a free account to access our best investment ideas.
+        <div style={{ fontSize:13, color:'var(--text3)', marginBottom:8, lineHeight:1.6 }}>
+          ForwardAlpha is only for personal use.
         </div>
-        <button onClick={onLogin} className="btn-primary text-sm px-8 py-2.5">
-          Register for Free
-        </button>
-        <div style={{ fontSize:11, color:'var(--text4)', marginTop:12 }}>
-          Free access during Beta · No credit card required
+        <div style={{ fontSize:12, color:'var(--text4)', lineHeight:1.6 }}>
+          If you have any interest in the product, please contact{' '}
+          <a href="mailto:andrea@forwardalpha.pro"
+             style={{ color:'var(--orange)', textDecoration:'none', fontWeight:700 }}>
+            andrea@forwardalpha.pro
+          </a>
         </div>
       </div>
     </div>
