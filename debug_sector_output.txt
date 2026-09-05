@@ -1,10 +1,16 @@
-=== UTENTI REGISTRATI (9) ===
-  hamletgv@yahoo.com                       registrato 2026-08-19  ultimo accesso 2026-08-19       da rimuovere
-  galco@iol.it                             registrato 2026-08-12  ultimo accesso 2026-08-12       da rimuovere
-  nicola.ambrosini01@gmail.com             registrato 2026-08-02  ultimo accesso 2026-08-02       da rimuovere
-  infocasualestyle03@gmail.com             registrato 2026-07-20  ultimo accesso 2026-08-26       da rimuovere
-  hawkeyeboy05@icloud.com                  registrato 2026-06-29  ultimo accesso 2026-06-29       da rimuovere
-  ilovenokialumia635@gmail.com             registrato 2026-06-17  ultimo accesso 2026-06-17       da rimuovere
-  moritzalexanderschaefer@gmail.com        registrato 2026-06-04  ultimo accesso mai       da rimuovere
-  langskltdlondon@gmail.com                registrato 2026-05-28  ultimo accesso mai       da rimuovere
-  andreameschini19@gmail.com               registrato 2026-05-17  ultimo accesso 2026-09-05   <-- DA TENERE
+Da rimuovere: 7 | da tenere: 2
+
+  hamletgv@yahoo.com                     watchlist 0    account -> HTTP 200
+  galco@iol.it                           watchlist 0    account -> HTTP 200
+  nicola.ambrosini01@gmail.com           watchlist 0    account -> HTTP 200
+  hawkeyeboy05@icloud.com                watchlist 10   account -> HTTP 200
+  ilovenokialumia635@gmail.com           watchlist 1    account -> HTTP 200
+  moritzalexanderschaefer@gmail.com      watchlist 0    account -> HTTP 200
+  langskltdlondon@gmail.com              watchlist 0    account -> HTTP 200
+
+=== VERIFICA FINALE ===
+utenti rimasti: 2
+   infocasualestyle03@gmail.com           ultimo accesso 2026-08-26
+   andreameschini19@gmail.com             ultimo accesso 2026-09-05
+
+righe watchlist rimaste: 171
