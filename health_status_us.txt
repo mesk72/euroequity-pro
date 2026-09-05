@@ -1,24 +1,24 @@
 ======================================================================
-HEALTH CHECK — 2026-09-04 12:53 UTC
+HEALTH CHECK — 2026-09-05 12:38 UTC
 ======================================================================
 US       count= 2976/3000   campione_fresco=19/20  eta_max_campione=1gg  [OK]
-TSX      count=  394/400    campione_fresco=19/20  eta_max_campione=35gg  [OK]
+TSX      count=  394/400    campione_fresco=19/20  eta_max_campione=36gg  [OK]
 LSE      count=  421/-      campione_fresco=19/20  eta_max_campione=1gg  [OK]
 XETRA    count=  208/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 PA       count=  212/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 OM       count=  208/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 SWX      count=  156/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
 MIL      count=  117/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
-AS       count=   98/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
-MC       count=   91/100    campione_fresco=20/20  eta_max_campione=1gg  [PROBLEMA]
-BR       count=  100/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
+AS       count=   98/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
+MC       count=   91/100    campione_fresco=20/20  eta_max_campione=2gg  [PROBLEMA]
+BR       count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
 HE       count=  100/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
-CPSE     count=  100/100    campione_fresco=20/20  eta_max_campione=2gg  [OK]
+CPSE     count=  100/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
 OB       count=  114/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
-GR       count=  101/100    campione_fresco=19/20  eta_max_campione=1gg  [OK]
-VI       count=   53/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
-IR       count=   15/-      campione_fresco=15/15  eta_max_campione=1gg  [OK]
-LS       count=   37/-      campione_fresco=20/20  eta_max_campione=1gg  [OK]
+GR       count=  101/100    campione_fresco=19/20  eta_max_campione=2gg  [OK]
+VI       count=   53/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
+IR       count=   15/-      campione_fresco=15/15  eta_max_campione=2gg  [OK]
+LS       count=   37/-      campione_fresco=20/20  eta_max_campione=2gg  [OK]
 TSE      count=  997/1000   campione_fresco=20/20  eta_max_campione=1gg  [OK]
 SEHK     count=  500/500    campione_fresco=20/20  eta_max_campione=1gg  [OK]
 ASX      count=  342/350    campione_fresco=20/20  eta_max_campione=1gg  [OK]
@@ -26,5 +26,5 @@ KRX      count=  400/400    campione_fresco=20/20  eta_max_campione=1gg  [OK]
 SGX      count=  101/100    campione_fresco=20/20  eta_max_campione=1gg  [OK]
 ----------------------------------------------------------------------
 STATO GENERALE: PROBLEMA (1 mercati)
-  - MC: count=91/100 fresh=20/20 eta_max=1gg
+  - MC: count=91/100 fresh=20/20 eta_max=2gg
 ======================================================================
