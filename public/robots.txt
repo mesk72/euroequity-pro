@@ -1,3 +1,7 @@
+# ForwardAlpha — uso personale.
+# La scansione resta CONSENTITA di proposito: le pagine portano il tag
+# noindex e Google deve poterlo leggere per rimuoverle dall'indice.
+# Bloccare qui la scansione le lascerebbe indicizzate piu' a lungo.
 User-agent: *
 Allow: /
 Disallow: /api/
