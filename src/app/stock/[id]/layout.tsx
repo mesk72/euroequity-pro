@@ -124,7 +124,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
   const desc = 'ForwardAlpha — private research platform.'
 
-  const robots = d.in_universe === false ? { index: false, follow: false } : undefined
+  // NOINDEX SEMPRE — 5/9/2026.
+  // Questo layout definisce metadati propri e SOVRASCRIVE quelli globali:
+  // le 7.841 schede titolo restavano indicizzabili anche dopo aver messo
+  // il noindex nel layout radice. Qui va ripetuto esplicitamente.
+  const robots = { index: false, follow: false, nocache: true }
 
   return {
     title,
