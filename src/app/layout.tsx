@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import AccessGate from '@/components/AccessGate'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@vercel/analytics/react'
@@ -55,6 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             },
           }}
         />
+        {/* Blocco di accesso: copre tutte le pagine tranne la home */}
+        <AccessGate />
         {children}
         <Analytics />
       </body>
