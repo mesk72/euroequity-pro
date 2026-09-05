@@ -1,19 +1,10 @@
-indirizzi: 7846 | con priorita': 7846
-
-=== distribuzione delle priorita' ===
-   1        87 pagine
-   0.9     360 pagine
-   0.8    1122 pagine
-   0.7    2532 pagine
-   0.6    3006 pagine
-   0.5     738 pagine
-   0.4       1 pagine
-
-=== priorita' di alcuni titoli noti ===
-   ASML-AS    priorita' 1      daily
-   NOVN-SWX   priorita' 1      daily
-   AAPL-US    priorita' 1      daily
-   NVDA-US    priorita' 1      daily
-   MC-PA      priorita' 1      daily
-   ICFI-US    priorita' 0.6    weekly
-   MRTN-US    priorita' 0.6    weekly
+=== UTENTI REGISTRATI (9) ===
+  hamletgv@yahoo.com                       registrato 2026-08-19  ultimo accesso 2026-08-19       da rimuovere
+  galco@iol.it                             registrato 2026-08-12  ultimo accesso 2026-08-12       da rimuovere
+  nicola.ambrosini01@gmail.com             registrato 2026-08-02  ultimo accesso 2026-08-02       da rimuovere
+  infocasualestyle03@gmail.com             registrato 2026-07-20  ultimo accesso 2026-08-26       da rimuovere
+  hawkeyeboy05@icloud.com                  registrato 2026-06-29  ultimo accesso 2026-06-29       da rimuovere
+  ilovenokialumia635@gmail.com             registrato 2026-06-17  ultimo accesso 2026-06-17       da rimuovere
+  moritzalexanderschaefer@gmail.com        registrato 2026-06-04  ultimo accesso mai       da rimuovere
+  langskltdlondon@gmail.com                registrato 2026-05-28  ultimo accesso mai       da rimuovere
+  andreameschini19@gmail.com               registrato 2026-05-17  ultimo accesso 2026-09-05   <-- DA TENERE
