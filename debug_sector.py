@@ -3,16 +3,16 @@ U="https://mlqkisnizgyvvqajdvbh.supabase.co"
 K=os.environ.get("SUPABASE_SERVICE_KEY","")
 H={"apikey":K,"Authorization":"Bearer "+K}
 HP={**H,"Content-Type":"application/json"}
-r=requests.get(U+"/rest/v1/watchlist",headers=H,params={"select":"wallet","limit":"1000"}).json()
-from collections import Counter
-print("  wallet in uso:", dict(Counter(x.get("wallet") for x in r)))
-# prova a scrivere wallet 3
-w=requests.get(U+"/rest/v1/watchlist",headers=H,params={"select":"*","limit":"1"}).json()
-if w:
-    base=w[0]
-    p={"user_id":base["user_id"],"ticker":"__W4TEST__","exchange":"US","company":"prova","wallet":3}
-    rr=requests.post(U+"/rest/v1/watchlist?on_conflict=user_id,ticker,exchange,wallet",
-        headers={**HP,"Prefer":"resolution=merge-duplicates,return=minimal"},json=[p])
-    print("  scrittura wallet 3 -> HTTP", rr.status_code, rr.text[:120])
-    requests.delete(U+"/rest/v1/watchlist",headers=H,params={"ticker":"eq.__W4TEST__"})
-    print("  (riga di prova rimossa)")
+print("=== stesso titolo in piu' wallet: il vincolo lo permette ancora? ===")
+b=requests.get(U+"/rest/v1/watchlist",headers=H,params={"select":"*","limit":"1"}).json()[0]
+uid=b["user_id"]
+esiti=[]
+for w in [2,3]:
+    p={"user_id":uid,"ticker":"__MULTI__","exchange":"US","company":"prova","wallet":w}
+    r=requests.post(U+"/rest/v1/watchlist",headers={**HP,"Prefer":"return=minimal"},json=[p])
+    esiti.append((w,r.status_code,r.text[:90]))
+for w,c,t in esiti: print("   wallet %d -> HTTP %s %s" % (w,c,t))
+d=requests.get(U+"/rest/v1/watchlist",headers=H,params={"select":"wallet","ticker":"eq.__MULTI__"}).json()
+print("   righe create:", [x["wallet"] for x in d])
+requests.delete(U+"/rest/v1/watchlist",headers=H,params={"ticker":"eq.__MULTI__"})
+print("   (pulito)")
