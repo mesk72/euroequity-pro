@@ -1,13 +1,3 @@
-=== HOMEPAGE: deve essere indicizzabile ===
-  meta robots: assente (= indicizzabile)
-  header:      assente (= indicizzabile)
-  titolo:      ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked
-  descrizione: ForwardAlpha — Institutional-grade Value &amp; Growth scoring across 7,000+ global stocks: Europe, US, Canada, Japan, Hong Kong, Australia. Daily pric
-
-=== PAGINE INTERNE: devono avere noindex ===
-  scheda AAPL   header: noindex, nofollow      meta: noindex, nofollow, nocache
-  /value        header: noindex, nofollow      meta: -
-  /sectors      header: noindex, nofollow      meta: -
-  /news         header: noindex, nofollow      meta: -
-  /about        header: noindex, nofollow      meta: -
-  /legal        header: noindex, nofollow      meta: -
+  wallet in uso: {0: 46, 2: 40, 1: 84}
+  scrittura wallet 3 -> HTTP 201 
+  (riga di prova rimossa)
