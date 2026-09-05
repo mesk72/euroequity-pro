@@ -1,16 +1,21 @@
-Da rimuovere: 7 | da tenere: 2
+=== il tag noindex e' presente? ===
+  homepage       meta: noindex, nofollow, nocache   header: -
+  scheda AAPL    meta: ASSENTE                      header: -
+  /value         meta: noindex, nofollow, nocache   header: -
+  /sectors       meta: noindex, nofollow, nocache   header: -
 
-  hamletgv@yahoo.com                     watchlist 0    account -> HTTP 200
-  galco@iol.it                           watchlist 0    account -> HTTP 200
-  nicola.ambrosini01@gmail.com           watchlist 0    account -> HTTP 200
-  hawkeyeboy05@icloud.com                watchlist 10   account -> HTTP 200
-  ilovenokialumia635@gmail.com           watchlist 1    account -> HTTP 200
-  moritzalexanderschaefer@gmail.com      watchlist 0    account -> HTTP 200
-  langskltdlondon@gmail.com              watchlist 0    account -> HTTP 200
+=== la sitemap contiene ancora le schede titolo? ===
+  indirizzi: 1
+    https://www.forwardalpha.pro
 
-=== VERIFICA FINALE ===
-utenti rimasti: 2
-   infocasualestyle03@gmail.com           ultimo accesso 2026-08-26
-   andreameschini19@gmail.com             ultimo accesso 2026-09-05
+=== robots.txt consente la scansione (necessario per il noindex)? ===
+# ForwardAlpha — uso personale.
+# La scansione resta CONSENTITA di proposito: le pagine portano il tag
+# noindex e Google deve poterlo leggere per rimuoverle dall'indice.
+# Bloccare qui la scansione le lascerebbe indicizzate piu' a lungo.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
 
-righe watchlist rimaste: 171
+Sit
