@@ -5,21 +5,12 @@ import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
-  // ── SITO NON INDICIZZABILE — 5/9/2026, richiesta di Andrea ──
-  // ForwardAlpha torna a essere uso personale: nessun dato deve essere
-  // visibile a chi non e' autorizzato, ne' sul sito ne' su Google.
-  //
-  // ATTENZIONE: per RIMUOVERE le pagine gia' indicizzate serve proprio
-  // questo tag, e Google deve poterlo LEGGERE. Per questo robots.txt
-  // continua a consentire la scansione: bloccarla impedirebbe a Google di
-  // vedere il noindex e le pagine resterebbero nell'indice ancora piu' a
-  // lungo. La rimozione richiede qualche settimana.
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-    googleBot: { index: false, follow: false, noimageindex: true },
-  },
+  // LA HOMEPAGE RESTA INDICIZZABILE — 5/9/2026.
+  // Andrea vuole che il sito continui a comparire su Google con il proprio
+  // titolo e la propria descrizione, ma che nessuna pagina interna sia
+  // raggiungibile o indicizzata. Il noindex e' quindi applicato per
+  // percorso in vercel.json, non qui: qui resterebbe globale e
+  // toglierebbe anche la homepage.
 
   title: 'ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked',
   description: 'ForwardAlpha — Institutional-grade Value & Growth scoring across 7,000+ global stocks: Europe, US, Canada, Japan, Hong Kong, Australia. Daily price refresh. Built by ex J.P. Morgan & Zenit SGR Portfolio Manager, CFA.',
