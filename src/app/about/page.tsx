@@ -14,7 +14,7 @@ We combine two of the most proven investment philosophies — Value Investing an
 
 Andrea began his career at Gestiveneto SGR, one of Italy's established asset management firms, before moving to JPMorgan Asset Management in London, where he worked as a European equity analyst covering multiple sectors.
 
-He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as Investment Analyst on Hedge Fund and Value Fund strategies, and five years as Portfolio Manager, running long-only Euroequity mandates and supporting the management of Italian equity portfolios.
+He subsequently joined Zenit SGR, where he spent eight years across two distinct roles: three years as Investment Analyst on fund of hedge funds, and five years as Portfolio Manager, running long-only Euroequity mandates and supporting the management of Italian equity portfolios.
 
 Prior to founding ForwardAlpha, Andrea served as Senior Hedge Fund Analyst at Integrated Alternative Investments, focusing on manager selection and due diligence across global long/short equity strategies.
 
