@@ -21,6 +21,17 @@ import { supabase } from '@/lib/supabase'
 export default function AccessGate() {
   const pathname = usePathname()
   const [stato, setStato] = useState<'verifica' | 'dentro' | 'fuori'>('verifica')
+  // I parametri si leggono da window: useSearchParams richiederebbe un
+  // Suspense attorno al componente nel layout radice. L'app cambia vista
+  // senza ricaricare la pagina, quindi si ricontrolla periodicamente.
+  const [query, setQuery] = useState<URLSearchParams>(new URLSearchParams())
+  useEffect(() => {
+    const aggiorna = () => setQuery(new URLSearchParams(window.location.search))
+    aggiorna()
+    window.addEventListener('popstate', aggiorna)
+    const t = setInterval(aggiorna, 400)
+    return () => { window.removeEventListener('popstate', aggiorna); clearInterval(t) }
+  }, [pathname])
 
   useEffect(() => {
     let attivo = true
@@ -49,8 +60,23 @@ export default function AccessGate() {
   // about e legal — e' coperto. Nessun dato deve essere visibile a chi non
   // ha l'accesso: nemmeno la capitalizzazione o i multipli, da cui ci si
   // potrebbe fare un'idea del contenuto.
-  const pagineAperte = ['/', '/about', '/legal']
-  if (pagineAperte.includes(pathname || '/')) return null
+  // Restano accessibili SOLO: la pagina di benvenuto, About e Legal.
+  // I termini d'uso e l'informativa privacy devono essere consultabili
+  // anche da chi non ha l'accesso, come richiesto dal GDPR.
+  //
+  // ATTENZIONE — 5/9/2026: gli screen (Nord America, Europa, Asia
+  // Pacifico, i singoli paesi) NON sono pagine separate: stanno tutti
+  // sulla homepage con un parametro nell'indirizzo, del tipo
+  // `/?page=globalscreen`. Controllare il solo percorso non bastava: il
+  // blocco vedeva "/" e lasciava passare, quindi i dati dei titoli
+  // restavano visibili.
+  const percorso = pathname || '/'
+  const vista = query.get('page')
+  const aperta =
+    percorso === '/about' ||
+    percorso === '/legal' ||
+    (percorso === '/' && (!vista || vista === 'home'))
+  if (aperta) return null
 
   // Durante la verifica non si mostra nulla, per evitare che il riquadro
   // lampeggi a chi e' gia' autenticato.
