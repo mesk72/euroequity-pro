@@ -1,5 +1,4 @@
-=== stesso titolo in piu' wallet: il vincolo lo permette ancora? ===
-   wallet 2 -> HTTP 201 
-   wallet 3 -> HTTP 201 
-   righe create: [2, 3]
-   (pulito)
+/legal   HTTP 200 | testo 10490 car | menzione 'personal use': False
+   inizio: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked @import url(&#x27;https://fonts.googleapis.com/cs
+/about   HTTP 200 | testo  5940 car | menzione 'personal use': False
+   inizio: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked FORWARD ALPHA GLOBAL EQUITY RESEARCH · METHODOLOG
