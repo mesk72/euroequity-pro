@@ -2442,7 +2442,7 @@ function Legal() {
             ['1. Service Ownership',
              'ForwardAlpha is developed and operated by Andrea Meschini, based in Verona, Italy. Contact: andrea@forwardalpha.pro.'],
             ['2. Service Description & Beta Phase',
-             'ForwardAlpha is a web-based quantitative financial screening and research tool offering proprietary Value Score and Growth Score models (percentile rankings 1–100). The Platform is currently in Beta and free to use.'],
+             'ForwardAlpha is a web-based quantitative financial screening and research tool offering ForwardAlpha's own models (percentile rankings 1–100). The Platform is currently in Beta and free to use.'],
             ['3. Legal Disclaimer – No Financial Advice',
              'ForwardAlpha is for informational and educational purposes only. The Owner is not a registered financial advisor and does not provide investment advisory services. No content constitutes a personalised recommendation or offer to buy/sell financial instruments under MiFID II. Investing involves significant risk of capital loss. Past performance is not indicative of future results.'],
             ['4. Data Accuracy & Limitation of Liability',
