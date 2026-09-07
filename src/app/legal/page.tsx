@@ -36,7 +36,7 @@ export default function LegalPage() {
     {
       title: '4. Intellectual Property',
       items: [
-        ['Proprietary Content', 'All quantitative models (Value Score, Growth Score), ranking algorithms, software, design, and original text content on ForwardAlpha are the intellectual property of Andrea Meschini, protected by Italian copyright law (L. 633/1941) and applicable EU intellectual property law.'],
+        ['Ownership of Content', 'All quantitative models (Value Score, Growth Score, Best Score, reverse earnings model), ranking methodologies, software, design and original text content on ForwardAlpha are the work of Andrea Meschini. Copyright subsists automatically upon creation under Italian law (L. 633/1941, Art. 6) and applicable EU law; no registration is required or claimed. No trademark or patent registration is asserted.'],
         ['Market Data', 'Market and fundamental data are obtained from third-party providers. Users may not redistribute, resell, or commercially exploit this data without written permission.'],
         ['Permitted Use', 'Users may access and use data solely for personal, non-commercial investment research. Any other use requires prior written consent from Andrea Meschini.'],
       ]
