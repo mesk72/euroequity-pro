@@ -1,4 +1,6 @@
-/legal   HTTP 200 | testo 10490 car | menzione 'personal use': False
-   inizio: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked @import url(&#x27;https://fonts.googleapis.com/cs
-/about   HTTP 200 | testo  5940 car | menzione 'personal use': False
-   inizio: ForwardAlpha — Global Equity Research | 7,000+ Stocks Ranked FORWARD ALPHA GLOBAL EQUITY RESEARCH · METHODOLOG
+HTTP: 200
+  Cookie Policy presente: True
+  clausola beta presente: True
+  Ownership of Content:    True
+  sezione 6 IA:            False
+  rimandi a Section 7:     4
