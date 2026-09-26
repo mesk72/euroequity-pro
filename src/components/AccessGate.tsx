@@ -60,7 +60,7 @@ export default function AccessGate() {
   // about e legal — e' coperto. Nessun dato deve essere visibile a chi non
   // ha l'accesso: nemmeno la capitalizzazione o i multipli, da cui ci si
   // potrebbe fare un'idea del contenuto.
-  // Restano accessibili SOLO: la pagina di benvenuto e quella legale.
+  // Restano accessibili SOLO: la pagina di benvenuto, quella legale e Help.
   // About chiusa il 7/9/2026 su richiesta di Andrea.
   // I termini d'uso e l'informativa privacy devono essere consultabili
   // anche da chi non ha l'accesso, come richiesto dal GDPR.
@@ -75,6 +75,9 @@ export default function AccessGate() {
   const vista = query.get('page')
   const aperta =
     percorso === '/legal' ||
+    // La pagina Help resta aperta: chi non ha accesso deve poter capire
+    // a chi scrivere, senza trovarsi davanti solo un blocco.
+    percorso === '/help' ||
     (percorso === '/' && (!vista || vista === 'home'))
   if (aperta) return null
 
