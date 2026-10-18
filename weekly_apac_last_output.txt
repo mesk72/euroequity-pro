@@ -1,40 +1,35 @@
 ============================================================
-FORWARDALPHA WEEKLY APAC LOAD — 2026-10-11
+FORWARDALPHA WEEKLY APAC LOAD — 2026-10-18
 ============================================================
 
  Legge fiscal year end...
- FY end: 14355
+ FY end: 0
 
  Legge stocks APAC dal DB...
- TSE: 997 in_universe=true nel DB
- SEHK: 500 in_universe=true nel DB
- ASX: 342 in_universe=true nel DB
- KRX: 400 in_universe=true nel DB
- SGX: 101 in_universe=true nel DB
+ TSE: 0 in_universe=true nel DB
+ SEHK: 0 in_universe=true nel DB
+ ASX: 0 in_universe=true nel DB
+ KRX: 0 in_universe=true nel DB
+ SGX: 0 in_universe=true nel DB
 
  Legge file TIKR APAC...
- DEBUG: candidati SGX nel file TIKR (raw_rows): 508
- DEBUG: ticker SGX in stocks_tickers: 101
- DEBUG: primi 5 ticker SGX dal TIKR: ['7485', '2928', '6623', '9357', '1869']
- DEBUG: primi 5 ticker SGX in stocks: ['G13', '558', 'U06', '9A4U', 'E5H']
- TIKR TSE: 997 (in_universe ufficiale, target di riferimento=1000)
- TIKR SEHK: 500 (in_universe ufficiale, target di riferimento=500)
- TIKR ASX: 342 (in_universe ufficiale, target di riferimento=350)
- TIKR KRX: 400 (in_universe ufficiale, target di riferimento=400)
- TIKR SGX: 101 (in_universe ufficiale, target di riferimento=100)
- TIKR APAC totale: 2340
+ DEBUG: candidati SGX nel file TIKR (raw_rows): 0
+ DEBUG: ticker SGX in stocks_tickers: 0
+ DEBUG: primi 5 ticker SGX dal TIKR: []
+ DEBUG: primi 5 ticker SGX in stocks: []
+ TIKR TSE: 0 (in_universe ufficiale, target di riferimento=1000)
+ TIKR SEHK: 0 (in_universe ufficiale, target di riferimento=500)
+ TIKR ASX: 0 (in_universe ufficiale, target di riferimento=350)
+ TIKR KRX: 0 (in_universe ufficiale, target di riferimento=400)
+ TIKR SGX: 0 (in_universe ufficiale, target di riferimento=100)
+ TIKR APAC totale: 0
 
  Calcola fondamentali...
- Fondamentali: 2340/2340
- Momentum: 2340
- Fondamentali DB: 2340
- JPN: 997
- HKG: 500
- AUS: 342
- KOR: 400
- SGP: 101
- Rank APAC paese: 2340/2340
- Combined APAC (TSE+SEHK+ASX+KRX+SGX): 1969/1969
+ Fondamentali: 0/0
+ Momentum: 0
+ Fondamentali DB: 0
+ Rank APAC paese: 0/0
+ Combined APAC (TSE+SEHK+ASX+KRX+SGX): 0/0
 
-Weekly APAC completato in 21s
+Weekly APAC completato in 0s
 ============================================================
