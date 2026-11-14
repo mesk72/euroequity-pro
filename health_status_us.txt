@@ -1,5 +1,5 @@
 ======================================================================
-HEALTH CHECK — 2026-11-13 09:00 UTC
+HEALTH CHECK — 2026-11-14 08:29 UTC
 ======================================================================
 US       count=    0/3000   campione_fresco=0/0  eta_max_campione=-gg  [PROBLEMA]
 TSX      count=    0/400    campione_fresco=0/0  eta_max_campione=-gg  [PROBLEMA]
