@@ -1,5 +1,5 @@
 ============================================================
-FORWARDALPHA WEEKLY APAC LOAD — 2026-11-15
+FORWARDALPHA WEEKLY APAC LOAD — 2026-11-22
 ============================================================
 
  Legge fiscal year end...
@@ -31,5 +31,5 @@ FORWARDALPHA WEEKLY APAC LOAD — 2026-11-15
  Rank APAC paese: 0/0
  Combined APAC (TSE+SEHK+ASX+KRX+SGX): 0/0
 
-Weekly APAC completato in 1s
+Weekly APAC completato in 0s
 ============================================================
