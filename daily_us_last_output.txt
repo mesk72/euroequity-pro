@@ -1,5 +1,5 @@
 ============================================================
-FORWARDALPHA DAILY US+CA LOAD — 2026-11-25
+FORWARDALPHA DAILY US+CA LOAD — 2026-11-26
 ============================================================
 
 [1/5] Caricamento universo US+CA...
